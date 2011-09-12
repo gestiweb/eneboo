@@ -1,0 +1,11 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<texts>
+  <text>AbanQ</text>
+  <text>Software ERP de Código Libre</text>
+  <text>@@currency@@</text>
+  <text>@@dot@@</text>
+  <text>@@comma@@</text>
+  <text>@@datePattern@@</text>
+  <text>@@numberPattern@@</text>
+</texts>
+

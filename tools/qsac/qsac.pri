@@ -1,0 +1,5 @@
+QSAC_DIR = $$ROOT/tools/qsac
+
+INCLUDEPATH += $$QSAC_DIR
+
+HEADERS += $$QSAC_DIR/AQCompilerQSA.h

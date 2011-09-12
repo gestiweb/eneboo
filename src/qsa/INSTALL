@@ -1,0 +1,41 @@
+Installing Qt Script for Applications (QSA)
+-------------------------------------------
+
+Make sure that the $QTDIR environment variable points to the Qt
+installation directory and that $QTDIR/bin is in your PATH and
+$QTDIR/lib has to specified in your library path.
+
+
+Unix or Mac:
+------------
+./configure
+make
+
+
+Windows:
+--------
+Use the executable installer.
+
+
+For further information on Qt Script for Applications, 
+see the README file.
+
+--
+
+QSA requires Qt, and works with Qt 3.1.2 and newer versions of the Qt
+3.x series. It will not compile against Qt 4.
+
+If you have not already done so, install Qt. On Windows start
+the self extracting Qt package executable and follow the usual
+installation process. On Unix or Mac untar the Qt package, cd into the
+directory and follow with the usual installation process:
+(./configure; make).
+
+Note to users of Qt 3.2.3:
+Qt Assistant shipped with 3.2.3 needs a patch for the documentation in QSA
+to be properly installed for users of Mac and Unix. This is available
+in the download directory.
+
+Patch files are:
+qt-mac-assistant-3.2.3-qsa-patch.sitx
+qt-x11-assistant-3.2.3-qsa-patch.tar.gz

@@ -1,0 +1,15 @@
+This is Debian GNU/Linux's prepackaged version of lpr, the BSD line
+printing spool system.
+
+This package is maintained by Adam Klein <aklein@debian.org>.
+
+This version of lpr is taken from OpenBSD, and was obtained via CVS from
+anoncvs.usa.openbsd.org.
+
+It also includes, from OpenBSD, the getcap.c file, which is part of the
+OpenBSD C library.  It has been edited to remove its dependency on libdb.
+
+The printcap.5 manpage is also from them.
+
+The lpr package is distributed under the BSD licence. On Debian
+systems this licence is available in the file /usr/share/common-licenses/BSD.

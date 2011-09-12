@@ -1,0 +1,142 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>FLWidgetFieldDB</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>FLWidgetFieldDB</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>124</width>
+            <height>26</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>FLWidgetFieldDB</string>
+    </property>
+    <property name="focusPolicy">
+        <enum>StrongFocus</enum>
+    </property>
+    <property name="layoutMargin" stdset="0">
+    </property>
+    <property name="layoutSpacing" stdset="0">
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>1</number>
+        </property>
+        <property name="resizeMode">
+            <enum>Minimum</enum>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabelDB</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>MShape</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>MShadow</enum>
+            </property>
+            <property name="lineWidth">
+                <number>0</number>
+            </property>
+            <property name="textFormat">
+                <enum>PlainText</enum>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter|AlignLeft</set>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>lytButtons</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>2</number>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pushButtonDB</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>22</width>
+                            <height>22</height>
+                        </size>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>22</width>
+                            <height>22</height>
+                        </size>
+                    </property>
+                    <property name="focusPolicy">
+                        <enum>StrongFocus</enum>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image54645</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Busca el valor en la tabla relacionada (F2)</string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string>Busca el valor en la tabla relacionada (F2)</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </hbox>
+</widget>
+<images>
+    <image name="image54645">
+        <data format="PNG" length="464">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000019749444154789ca593b18b13411487bfb7d930d358d8052c048b5d0e943412c1269ac3cadd54572b5606025e6da59558aa8d9bceca4e10922b0477dc431bfd03520cd86bbd4d86dc30367bc77ae6c2a9bf66e60def7d7cc51bf8cf48bb188fc77742088f8061f374184278b1582ccab3009de34b9ee7cf81199068ada34ea7137bef7744e45e9224ca5abb1122005996ed8ac847adb59b4ea75f87c3e14f00634caf288ac16ab552c0ee7c3e37a701118088ec03b4870146a3d18fc964f20d2084b0bfc9206acedb4aa9757bb80d514aad45e4d636c03f276af48c73ae6b8ce99d6e28cbb2e79ceb8610aa330122f212a0288a411b628ce9cd66b301401cc7af36014ef620cbb26722f2184029b50670ce755bbd6febbabe5f55d5511b70b207d6da3249922f2272d17b7fc97b7f1442f81045d127e03a704d2975b5dfefbf5f2e97fe0f836dc9b2ec89883c6dca83baaef7aaaa5afd66b02dd6dac3344d2f003781442975234dd377d6daf5b90c8e6df33c7f0d3c041091cfc0dd7319b44c0ed234bd02f481cbc0f7f86f0040d05a3f68fe8668addffc0213b6957558a77edf0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>pushButtonDB</sender>
+        <signal>clicked()</signal>
+        <receiver>FLWidgetFieldDB</receiver>
+        <slot>searchValue()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>pushButtonDB</tabstop>
+</tabstops>
+<slots>
+    <slot access="protected">init()</slot>
+    <slot access="protected">destroy()</slot>
+    <slot access="protected">searchValue()</slot>
+</slots>
+<exportmacro>FL_EXPORT</exportmacro>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

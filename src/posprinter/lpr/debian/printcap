@@ -1,0 +1,23 @@
+# /etc/printcap: printer capability database. See printcap(5).
+# You can use the filter entries df, tf, cf, gf etc. for
+# your own filters. See /etc/filter.ps, /etc/filter.pcl and
+# the printcap(5) manual page for further details.
+
+lp|Generic dot-matrix printer entry:\
+        :lp=/dev/lp0:\
+        :sd=/var/spool/lpd/lp:\
+        :af=/var/log/lp-acct:\
+        :lf=/var/log/lp-errs:\
+        :pl#66:\
+        :pw#80:\
+        :pc#150:\
+        :mx#0:\
+        :sh:
+
+# rlp|Remote printer entry:\
+#         :lp=:\
+#         :rm=remotehost:\
+#         :rp=remoteprinter:\
+#         :sd=/var/spool/lpd/remote:\
+#         :mx#0:\
+#         :sh:

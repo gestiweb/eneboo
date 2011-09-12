@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Remove /etc/printcap file on purge ONLY if it has not changed.
+if [ "x$1" = "xpurge" ] ; then
+	cmp -s /etc/printcap /usr/share/doc/lpr/examples/printcap
+	if [ $? -eq 0 ] ; then
+		rm -f /etc/printcap
+	fi
+fi
+
+#DEBHELPER#

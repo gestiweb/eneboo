@@ -1,0 +1,93 @@
+<ACTIONS>
+
+	<action>
+		<name>flmodules</name>
+		<table>flmodules</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flmodulos</formrecord>
+		<scriptformrecord>flmodules</scriptformrecord>
+	</action>
+
+	<action>
+		<name>flareas</name>
+		<table>flareas</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flareas</formrecord>
+		<scriptform>flmasterareas</scriptform>
+	</action>
+
+	<action>
+		<name>flfiles</name>
+		<table>flfiles</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flfiles</formrecord>
+		<scriptformrecord>flfiles</scriptformrecord>
+	</action>
+
+	<action>
+		<name>flloadmod</name>
+		<scriptform>flloadmod</scriptform>
+	</action>
+
+	<action>
+		<name>flusers</name>
+		<table>flusers</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flusers</formrecord>
+	</action>
+	
+	<action>
+		<name>flgroups</name>
+		<table>flgroups</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flgroups</formrecord>
+	</action>
+
+	<action>
+		<name>flacls</name>
+		<table>flacls</table>
+		<form>flmasteracls</form>
+		<formrecord>flacls</formrecord>
+		<scriptform>flmasteracls</scriptform>
+	</action>
+	
+	<action>
+		<name>flacs</name>
+		<table>flacs</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flacs</formrecord>
+		<scriptformrecord>flacs</scriptformrecord>
+	</action>
+	
+	<action>
+		<name>flacos</name>
+		<table>flacos</table>
+		<form>FLWidgetMasterTable</form>
+		<formrecord>flacos</formrecord>
+	</action>
+	
+	<action>
+		<name>flreloadlast</name>
+		<scriptform>flreloadlast</scriptform>
+	</action>
+	
+	<action>
+		<name>flreloadbatch</name>
+		<scriptform>flreloadbatch</scriptform>
+	</action>
+	
+	<action>
+		<name>flreinit</name>
+		<scriptform>flreinit</scriptform>
+	</action>
+
+	<action>
+		<name>flmrproper</name>
+		<scriptform>flmrproper</scriptform>
+	</action>
+	
+	<action>
+		<name>flupdates</name>
+		<scriptform>flupdates</scriptform>
+	</action>
+</ACTIONS>

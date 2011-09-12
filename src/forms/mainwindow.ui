@@ -1,0 +1,115 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>mainwindow</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>mainwindow</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>480</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>AbanQ</string>
+    </property>
+    <property name="icon">
+        <pixmap>image42059</pixmap>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QTabWidget">
+            <property name="name">
+                <cstring>tabWidget</cstring>
+            </property>
+            <property name="tabPosition">
+                <enum>Top</enum>
+            </property>
+            <property name="tabShape">
+                <enum>Rounded</enum>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>new form</string>
+                </attribute>
+            </widget>
+        </widget>
+    </vbox>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBar</cstring>
+    </property>
+    <item text="&amp;AbanQ" name="abanqMenu">
+    </item>
+    <item text="&amp;Configuración" name="configMenu">
+        <action name="fontAction"/>
+    </item>
+    <item text="&amp;Ventana" name="windowMenu">
+    </item>
+    <item text="A&amp;yuda" name="helpMenu">
+        <action name="aboutQtAction"/>
+        <separator/>
+        <action name="aboutAbanQAction"/>
+    </item>
+</menubar>
+<toolbars>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>aboutQtAction</cstring>
+        </property>
+        <property name="text">
+            <string>Acerca de Qt</string>
+        </property>
+        <property name="menuText">
+            <string>Acerca de Qt</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aboutAbanQAction</cstring>
+        </property>
+        <property name="text">
+            <string>Acerca de AbanQ</string>
+        </property>
+        <property name="menuText">
+            <string>Acerca de AbanQ</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fontAction</cstring>
+        </property>
+        <property name="text">
+            <string>Fuente</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Fuente</string>
+        </property>
+    </action>
+</actions>
+<images>
+    <image name="image42059">
+        <data format="PNG" length="1644">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af40000063349444154789ced966f6c565719c07fe7dcfbdeb7a52db45d5b28d0454a80159c4a47d2f041a6c890cd9a4ca37c30e89c13a24e37b7998cc4992cdb3ef483d1c4c4c421ce0fcb9c14d746648a43978960a3c91a97b430c0b5b0528ad0f66ddf3fbdf7bdf79ef3f8e1beef5bd082c1cdeccb9ee424f73ef79ee7fc9e7fe71c4484f2d8b6ed7e8175d2d3b34faed6ff3f87e63d96f701de0778cf01dc77dba088485034e4f211c5c860a5ac07a592e79403b5351eb58b52ef1e40c18f657a26c058487b0e355529eaea3c5c47a3b52ac361ad10c696c0b78ce7e7de394031343295f1c9e643ea6aab68acf7f0520e8e4e3c5665b701508856a41c45b5e750679c7706309df165642c43e3925a9a1b6bf15c41a34bbb9c02055c15fa44040b589b44e37f06189fc8c9dbe3191a1a6a497b2ec6188c7670441049bc5d5812aaf2d79b06b056e4f4d949c627a6686cac41a12886318e934abce6dfc33e2fb2c0f34db5a108727e2cc3d9910b581b6345114571022660456105c4aa240a522e3e4aef94d2035604b13779185dbc94e3ef6f9c239f0f1014516c30d66204c40a22b692dbca22520610ac480930f9cf18fbdf53f0faebc392c9cce207069c7ab2b939c42aac11626389adc51a83b10ed60a53d35986864ee268cdead52b59ddde5629c60a844dbc37565d1fe0e0c123f2f8e33f6074f4ed8a6ed1a21ab6edd84ef7a7ba89e208131b4c6c898d303d3dc3fefd2ff2e31fedbfc6ced6ad9b79e6994778e2891ff2eaab033cf5f4a33cf6e80344b160ad5918a0b7f7088383c3ac5a752b3d3d8f51988be8eb3bcaf0d0290ef5f5131402f67c6d177118633c8331865d5ff826c343a700f8d27d9f6755fb4ab2b3397efe5c2ff7dcf3551a1aea2bf6630bd6426caed3058383c3ecd9b393679f7d8a3816fef8da9bdcd2dac18963c739f8e20bbcf2fbdfb1b1f323dcf9f13b2886212f3cdfcbf0d029eaeb17f38b5ffe84ce3b6ec775148ea3f8d6435fe1739fddcde0e03000c60a5194e43f32d729c2fafac5f4f47c0780e9990263172631b1a5ab6b336bd7750070e2c400be6f89c398fe970e03f0c0ee5d746c5897d486118c111a1a96f0ddef3d5cb16d8d21087cfc20c018b530c0ce9d3b6868580cc0d4944f2188b1c622081feeec04e0cd5327c96643ce9dbbc8c5f14b007ce2aead44b1218a4d05a2e017e9eada48dbadcb01088d1086117e10339bcd2d0cd0dede5609d7c4a5198c99df361a9b9a0198bc72996268f9c799b1cabca5ad4b09434b14c5182b1423432ee7939f8b696b5b91e43f34e4fd98821f902ff8376ec35caec885f14c6571e5fc276f64e677bd6cc6a7a64e10f108c33982b08858416985311680a018922ff8148b11c5a0b830c0c848e2d56c36a018442082520aad1da627af00d0d4dc82c5e1969696cabc93a74668ff401b8baaab99cc4c924a29d2551eaed68c8d8d0330572832313e4b3e1fe0cfc50ba7a0b7f708994c966cce27b671290089a76f0c0e02705bc77a009a9b5b686a4e20fef2e713601dce8f4d72e1a2cf858b01a3e7f3bcfcdb814a9d64674326fee9339b158ad175ba606626cbdebddfa750f01345e9701938fe27ce9c4e7a7de3a62e7469f69d5bb701d0dfd7c7d9336fe1fb825807635cb2b345fa0f1e984f997511f1b0d6c1847ae11474766e60dfbe5e0ebf7c8c4d5d9b31b1cbd9d34395c5b77ff26e6e5bbfa1f27ff7a7ef65f06f7f6574f42d1e7af841b67cec2eea16d713042103c7ff5049d9e495cb58ab08238d0d63c05d1860e7ce1decddbb9b6f3fd2c3a1befe8abebc156fdf712faa74a26b058e82279f7c9a43bff9352ffdea00c75e3b5a99b3b6e343747fe68b1cee7f9ec92b972b7ae5b88889af05387af4b96b0ef2ce4d9be4a73f3bc0542687e3d4b3bee376949ecf9ad60a47bba43d8f9ac5753cf8f56f70ff7d5fe6f02b0300342f6ba5a96569b260a986b416b4eb62b94104cad2505fc3dab56bb89c99c073dbe6e9b5423b1aad209dd254a73daaaad3b8aea6757913dd777f9433e767715c8df69c6b6c8ad668472192e86f781fa8abf5686a6e462b8d953c4a6bb40685a095e0392ee9540aaf34d25529dc9466fd0797b1bcb58e5892dbd1d537242b100b099cbace565c9654ca512b5734e1ba1eb1c96025406b3799a835aeab49a73cdc9443ca73a8aa4ee1553b6857b165cb0ad6ac5e426c04edcc032c6b59c49ad54b30b145b4e65fc1d9803fdc7e39510000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

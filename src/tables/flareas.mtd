@@ -1,0 +1,38 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flareas</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Áreas")</alias>
+
+	<field>
+		<name>bloqueo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Bloqueo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>unlock</type>
+		<default>true</default>
+	</field>
+
+	<field>
+		<name>idarea</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Área")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>15</length>
+
+		<relation>
+			<table>flmodules</table>
+			<field>idarea</field>
+			<card>1M</card>
+		</relation>
+	</field>
+	
+	<field>
+		<name>descripcion</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Descripción")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>100</length>
+	</field>
+</TMD>

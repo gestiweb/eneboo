@@ -1,0 +1,22 @@
+#
+# set QT_SOURCE_TREE if you build qt outside the source directory 
+#
+all:
+	-cd include && headers=`ls q*.h 2>/dev/null` &&\
+	[ "x$$headers" != "x" ] && rm -f $$headers;
+	[ -d include/private ] || mkdir -p include/private
+	if test -z $(QT_SOURCE_TREE); then \
+		cd include && ln -f -s ../src/*/q*.h . && ln -f -s ../src/*/aq*.h . && ln -f -s ../src/*/AQ*.h . && ln -f -s ../extensions/*/src/q*.h . && \
+		ln -f -s ../tools/designer/uilib/q*.h . &&\
+		ln -f -s ../tools/assistant/lib/q*.h . && rm -f q*_p.h && \
+		rm -f "AQ*.h"; rm -f "q*.h"; \
+		rm qtmultilineedit.h qttableview.h && \
+		cd private && rm -f q*.h && ln -f -s ../../src/*/q*_p.h .; \
+	else \
+		cd include && ln -f -s $(QT_SOURCE_TREE)/src/*/q*.h . && ln -f -s $(QT_SOURCE_TREE)/extensions/*/src/q*.h . && \
+		ln -f -s $(QT_SOURCE_TREE)/tools/designer/uilib/q*.h . &&\
+		ln -f -s $(QT_SOURCE_TREE)/tools/assistant/lib/q*.h . && rm -f q*_p.h && \
+		rm -f "AQ*.h"; rm -f "q*.h"; \
+		rm qtmultilineedit.h qttableview.h && \
+		cd private && rm -f q*.h && ln -f -s $(QT_SOURCE_TREE)/src/*/q*_p.h .; \
+	fi 

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+if [ ! -e /etc/printcap ]; then
+    cp /usr/share/doc/lpr/examples/printcap /etc/
+fi
+
+for i in /var/log/lp-acct /var/log/lp-errs
+do
+    if [ ! -f $i ]; then
+	touch $i
+	chmod 644 $i
+    fi
+done
+
+# Fix permissions - everything needs to be lp.lp now since lpd drop priv. all over the place
+# We also fix permissions if any file in spool is not owned by lp:lp OR the lead spool
+# diretory does not have 2775 permissions.
+if [ "$2" != ""  ] && dpkg --compare-versions "$2" lt 1:2003.09.23-7; then
+	echo -n "Updating /var/spool/lpd permissions "
+	chmod -f 2775 /var/spool/lpd
+	chmod -f 2775 /var/spool/lpd/lp
+	chmod -f 2775 /var/spool/lpd/remote
+	chown -f lp:lp --recursive /var/spool/lpd
+	chmod -f 640 `find /var/spool/lpd | grep /lock$` 2> /dev/null
+        chmod -f 661 `find /var/spool/lpd | grep /.seq$` 2> /dev/null
+	chown -f lp:lp `find /var/spool/lpd | grep /.seq$` 2> /dev/null
+	echo "[done]"
+fi
+
+if [ -x /usr/sbin/update-mime -a "$1" = configure ] && dpkg --compare-versions "$2" lt 1:0.35-3; then
+	update-mime
+fi
+
+#DEBHELPER#

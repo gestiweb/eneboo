@@ -1,0 +1,1 @@
+HEADERS	+= $$IDEDIR/qsworkbench.h
