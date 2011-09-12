@@ -4,15 +4,17 @@ VER="2.4"
 
 OPT_PREFIX=""
 OPT_QMAKESPEC=""
-OPT_DEBUG=no
+OPT_DEBUG=yes
+OPT_DEBUGGER=yes
 OPT_SQLLOG=no
 OPT_HOARD=yes
 OPT_QWT=yes
 OPT_DIGIDOC=yes
-OPT_MULTICORE=no
+OPT_MULTICORE=yes
+#OPT_MULTICORE=no
 OPT_AQ_DEBUG=yes
-#QT_DEBUG="-release -DQT_NO_CHECK"
-QT_DEBUG="-debug"
+QT_DEBUG="-release -DQT_NO_CHECK"
+#QT_DEBUG="-debug"
 QSADIR=qsa
 
 if [ "$BUILD_NUMBER" == "" ]; then
@@ -354,6 +356,11 @@ if [ "$OPT_DEBUG" = "yes" ]
 then
   echo "CONFIG *= debug" >> settings.pro
   echo "DEFINES *= FL_DEBUG" >> settings.pro
+fi
+
+if [ "$OPT_DEBUGGER" = "yes" ]
+then
+  echo "DEFINES *= QSDEBUGGER" >> settings.pro
 fi
 
 if [ "$OPT_AQ_DEBUG" = "yes" ]
