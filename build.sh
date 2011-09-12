@@ -9,9 +9,10 @@ OPT_SQLLOG=no
 OPT_HOARD=yes
 OPT_QWT=yes
 OPT_DIGIDOC=yes
-OPT_MULTICORE=yes
-OPT_AQ_DEBUG=no
-QT_DEBUG="-release -DQT_NO_CHECK"
+OPT_MULTICORE=no
+OPT_AQ_DEBUG=yes
+#QT_DEBUG="-release -DQT_NO_CHECK"
+QT_DEBUG="-debug"
 QSADIR=qsa
 
 if [ "$BUILD_NUMBER" == "" ]; then
@@ -189,27 +190,27 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cp -fv qconfig/qconfig.h src/qt/include
   cp -fv qconfig/qmodules.h src/qt/include
   cd $QTDIR
-  ./configure --win32 -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
+  ./configure --win32 -v -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
               -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
-              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
 else
   cp -vf Makefile.qt Makefile
   if [ "$BUILD_MACX" == "yes" ]; then
     mkdir -p $DIRINST/lib
     if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
-      ./configure -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
+      ./configure -v -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
                   -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
     else
-      ./configure -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
+      ./configure -v -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
                   -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
     fi
   else
     export ORIGIN=\\\$\$ORIGIN
-    ./configure -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl \
+    ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -thread -stl \
                 -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
-                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
   fi
 fi
 

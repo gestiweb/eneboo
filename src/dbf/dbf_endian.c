@@ -1,5 +1,5 @@
 /********************************************************************************
- * endian.c
+ * dbf_endian.c
  ********************************************************************************
  * Routines for Little Endian and Big Endian Systems
  * Library version
@@ -22,7 +22,7 @@
  * 2002-12-12	berg	first implementation
  *******************************************************************************/
 
-#include "endian.h"
+#include "dbf_endian.h"
 
 /*******************************************************************
  * Routine to test if System uses Big Endian or Little Endian

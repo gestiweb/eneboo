@@ -23,7 +23,7 @@
 #include "iodbf.h"
 #include "an_string.h"
 #include "statistic.h"
-#include "endian.h"
+#include "dbf_endian.h"
 #include "csv.h"
 #include "sql.h"
 
