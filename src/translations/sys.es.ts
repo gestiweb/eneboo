@@ -10700,16 +10700,6 @@ antes de empezar.
     </message>
 </context>
 <context>
-    <name>QSInterpreter</name>
-    <message>
-        <source>It is very probable that the version of  the modules or  application you  are&lt;br/&gt;using is too old or is not signed and certified by InfoSiAL. In this case you&lt;br/&gt;can not run normally  AbanQ. You  can get an updated and certified version of&lt;br/&gt;AbanQ from http://www.infosial.com</source>
-        <translation>Es muy probable  que la versión de  los módulos o  de la aplicación  que usted está
-usando es demasiado antigua o no está firmada  y  certificada por InfoSiAL.  En tal
-caso no podrá ejecutar AbanQ con normalidad.  Puede obtener una versión actualizada
-y certificada de AbanQ desde http://www.infosial.com</translation>
-    </message>
-</context>
-<context>
     <name>QSTimeEdit</name>
     <message>
         <source>Time:</source>

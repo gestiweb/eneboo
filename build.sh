@@ -549,7 +549,15 @@ echo -e "\nTerminando compilación...\n"
 cp -f ./src/forms/*.ui $PREFIX/share/abanq/forms 2> /dev/null
 cp -f ./src/tables/*.mtd $PREFIX/share/abanq/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/abanq/translations 2> /dev/null
-cp -f ./src/scripts/*.qs $PREFIX/share/abanq/scripts 2> /dev/null
+#cp -f ./src/scripts/*.qs $PREFIX/share/abanq/scripts 2> /dev/null
+rm $PREFIX/share/abanq/scripts/* 2> /dev/null
+cp -f ./src/scripts/*.qs.src $PREFIX/share/abanq/scripts 2> /dev/null
+for file in $PREFIX/share/abanq/scripts/*.qs.src
+do
+  DST="${file%.src}"
+  mv "$file" "$DST"
+done
+
 cp -f ./src/docs/*.html $PREFIX/share/abanq/doc 2> /dev/null
 cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null

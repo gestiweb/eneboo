@@ -376,7 +376,7 @@ QString FLManagerModules::content(const QString &n)
   return QString::null;
 }
 
-#ifndef QSDEBUGGER
+#if 0
 QString FLManagerModules::contentCode(const QString &n)
 {
   QByteArray byteCode;

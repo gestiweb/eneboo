@@ -10720,13 +10720,6 @@ antes de empezar.
     </message>
 </context>
 <context>
-    <name>QSInterpreter</name>
-    <message>
-        <source>It is very probable that the version of  the modules or  application you  are&lt;br/&gt;using is too old or is not signed and certified by InfoSiAL. In this case you&lt;br/&gt;can not run normally  AbanQ. You  can get an updated and certified version of&lt;br/&gt;AbanQ from http://www.infosial.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QSTimeEdit</name>
     <message>
         <source>Time:</source>

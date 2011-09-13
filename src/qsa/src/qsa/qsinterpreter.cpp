@@ -1060,16 +1060,11 @@ void QSInterpreter::runtimeError(const QString &message,
     }
   }
 #else
-  QString warnNoCert(tr("It is very probable that the version of  the modules or  application you  are<br/>"
-                        "using is too old or is not signed and certified by InfoSiAL. In this case you<br/>"
-                        "can not run normally  AbanQ. You  can get an updated and certified version of<br/>"
-                        "AbanQ from http://www.infosial.com"));
   QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),
                         QString::fromLatin1("The following error occurred in "
                                             "line <b>%1</b> of  <b>%2</b> while executing "
-                                            "the script:<pre><font color=red>%3</font></pre>"
-                                            "<pre><b>%4</b></pre>")
-                        .arg(lineNumber).arg(scriptName).arg(message).arg(warnNoCert));
+                                            "the script:<pre><font color=red>%3</font></pre>")
+                        .arg(lineNumber).arg(scriptName).arg(message));
 #endif
 }
 
