@@ -16,9 +16,10 @@
  versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
-extern "C" {
+// C Libraries ----
 #include <stdlib.h>
-}
+#include <stdio.h>
+// ----
 
 #include <qsplashscreen.h>
 
@@ -78,7 +79,8 @@ static inline bool silentConnect(const QString &conn)
   return true;
 }
 
-AQ_DECL_MAIN {
+void aq_main(int argc, char **argv) 
+{
   QPalette p(QColor(229, 229, 229), QColor(229, 229, 229));
   p.setColor(QPalette::Active, QColorGroup::Dark, QColor(246, 242, 246));
   p.setColor(QPalette::Inactive, QColorGroup::Dark, QColor(246, 242, 246));
@@ -221,7 +223,6 @@ AQ_DECL_MAIN {
     QTimer::singleShot(0, AbanQ, SLOT(quit()));
     return;
   }
-
   AbanQ->setNotExit(FLSettings::readBoolEntry("application/notExit", false));
   AbanQ->setPrintProgram(FLSettings::readEntry("printing/printProgram", QString::null));
   AbanQ->flushX();
@@ -242,14 +243,20 @@ AQ_DECL_MAIN {
       splash->finish(AbanQ->mainWidget());
       delete splash;
     }
-  } else if (splash)
-    QTimer::singleShot(0, splash, SLOT(deleteLater()));
+  } else {
+    if (splash) {
+      QTimer::singleShot(0, splash, SLOT(deleteLater()));
+    }
+  }
+    
 }
 
 int main(int argc, char **argv)
 {
+  int retval = 0;
   AQApplication app(argc, argv);
-  AQ_IMPL_MAIN(argc, argv);
-  return app.exec();
-  exit(0);
+  aq_main(argc, argv);
+  retval = app.exec();
+  exit(retval);
+  return retval;
 }

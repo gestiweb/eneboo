@@ -18,6 +18,8 @@
 
 #include <qdom.h>
 
+#include <stdio.h>
+
 #include "FLSqlDatabase.h"
 #include "FLManager.h"
 #include "FLManagerModules.h"
@@ -53,10 +55,10 @@ void AQApplication::init(const QString &n, const QString &callFunction,
     FLApplication::init(n, callFunction, arguments, quitAfterCall, noMax);
     return;
   }
-
+  printf("AQApplication::init  . . . . n:%s callFn:%s args:%s quit:%d nomax:%d\n",n.ascii(), callFunction.ascii(), arguments.ascii(), quitAfterCall, noMax);
+  
   QPixmap::setDefaultOptimization(QPixmap::BestOptim);
   qInitNetworkProtocols();
-
   FLDiskCache::init(this);
   AQ_DISKCACHE_CLR();
 
@@ -66,6 +68,7 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   project_ = new QSProject(0, db()->database());
 #endif
 
+  printf("AQApplication::init - 1 - LOAD\n");
   initializing_ = true;
   AQ_SET_MNGLOADER
 
@@ -76,6 +79,7 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   mngLoader_->loadAllIdModules();
   mngLoader_->loadIdAreas();
 
+  printf("AQApplication::init - 2 - ACL\n");
   acl_ = new FLAccessControlLists();
   acl_->init();
 
@@ -83,6 +87,7 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   mngLoader_->setShaLocalFromGlobal();
   loadTranslations();
 
+  printf("AQApplication::init - 3 - Interpreter\n");
   QSInterpreter *i = project_->interpreter();
   if (i) {
     i->addObjectFactory(flFactory_);
@@ -93,6 +98,7 @@ void AQApplication::init(const QString &n, const QString &callFunction,
     i->setErrorMode(QSInterpreter::Notify);
   }
 
+  printf("AQApplication::init - 4 - aqapplication.qs\n");
   d->aqAppScriptObject_ = new QObject(this, "aqAppScript");
   project_->addObject(d->aqAppScriptObject_);
   d->aqAppScript_ = project_->createScript(
@@ -100,16 +106,19 @@ void AQApplication::init(const QString &n, const QString &callFunction,
                       mngLoader_->contentCode("aqapplication.qs")
                     );
 
+  printf("AQApplication::init - 5 - Main\n");
   QStringList list(QStringList::split(':', arguments, false));
   QSArgumentList argList(callFunction);
   for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
     argList.append(QSArgument(*it));
   FLApplication::call("aqAppScriptMain", argList, d->aqAppScriptObject_);
   QTimer::singleShot(0, this, SLOT(callInitScript()));
+  printf("AQApplication::init - 6 - finish\n");
 
   AQ_UNSET_MNGLOADER
   initializing_ = false;
 
+  printf("AQApplication::init - 7 - end\n");
   connect(project_, SIGNAL(projectEvaluated()), this, SLOT(callReinitScript()));
 }
 
@@ -146,7 +155,10 @@ void AQApplication::reinit()
 
 void AQApplication::callInitScript()
 {
+  printf("AQApplication::callInitScript - init\n");
+
   FLApplication::call("initScript", QSArgumentList(), d->aqAppScriptObject_);
+  printf("AQApplication::callInitScript - end\n");
 }
 
 void AQApplication::callReinitScript()

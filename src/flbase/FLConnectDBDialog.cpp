@@ -15,6 +15,7 @@ email                : mail@infosial.com
    bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
+#include <stdio.h>
 
 #include <qtoolbutton.h>
 
@@ -352,5 +353,6 @@ void FLConnectDBDialog::setRememberPasswd(bool on)
 void FLConnectDBDialog::setOldApi(bool on)
 {
   oldApi_ = on;
+  printf("--> Setting old api: %s\n", on ? "True" : "False");
   FLSettings::writeEntry("application/oldApi", oldApi_);
 }
