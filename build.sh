@@ -24,7 +24,10 @@ BUILD_KEY="$VER-Build-$BUILD_NUMBER"
 
 for a in "$@"; do
   case "$a" in
-    -continue_build)
+    -single)
+      OPT_MULTICORE=no
+    ;;
+    -continue)
       REBUILD_QT=no
     ;;
     -debug)
@@ -453,6 +456,10 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   echo -e "\n ######## PART 2 ########\n"
   export QTDIR=$PREFIX
   cd $BASEDIR/src/qt
+  for license in LICENSE.*
+  do
+    mv "$license" "old_license${license#LICENSE}"
+  done
   rm -fr LICENSE.*
   touch LICENSE
   svn up 2> /dev/null
@@ -462,6 +469,10 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   $QTDIR/bin/qmake CONFIG+="shared"
   rm -fr $BASEDIR/src/qt/LICENSE
   echo -e "\n ######## PART 4 ########\n"
+  for license in old_license.*
+  do
+    mv "$license" "LICENSE${license#old_license}"
+  done
 else
   ./configure
 fi

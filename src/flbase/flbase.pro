@@ -24,6 +24,10 @@ INCLUDEPATH += $$ROOT \
     $$ROOT/src/flmail \
     $$ROOT/src/serialport \
     $$ROOT/src
+
+win32 { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+}
 enable_qwt:INCLUDEPATH += $$ROOT/src/qwt/src
 enable_digidoc:INCLUDEPATH += $$ROOT/src/libdigidoc \
     $$ROOT/src/libdigidoc/libxml2 \
