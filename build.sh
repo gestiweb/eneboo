@@ -2,6 +2,7 @@
 
 VER="2.4"
 
+REBUILD_QT=yes
 OPT_PREFIX=""
 OPT_QMAKESPEC=""
 OPT_DEBUG=no
@@ -23,6 +24,9 @@ BUILD_KEY="$VER-Build-$BUILD_NUMBER"
 
 for a in "$@"; do
   case "$a" in
+    -continue_build)
+      REBUILD_QT=no
+    ;;
     -debug)
       OPT_DEBUG=yes
     ;;
@@ -181,38 +185,39 @@ if [ "$OPT_HOARD" = "yes" ]
 then
   echo "CONFIG *= enable_hoard" >> tools/designer/app/hoard.pri
 fi
-
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-  cd $BASEDIR
-  TMP_QTDIR=$(echo $QTDIR | sed "s/\//\\\\\\\\\\\\\\//g")
-  cat qconfig/qconfig.h.in | sed "s/@BKEY@/$BUILD_KEY/" > qconfig/qconfig.h
-  cp -fv qconfig/qconfig.h src/qt/include
-  cp -fv qconfig/qmodules.h src/qt/include
-  cd $QTDIR
-  ./configure --win32 -v -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
-              -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
-              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
-else
-  cp -vf Makefile.qt Makefile
-  if [ "$BUILD_MACX" == "yes" ]; then
-    mkdir -p $DIRINST/lib
-    if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
-      ./configure -v -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
-                  -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
-    else
-      ./configure -v -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
-                  -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
-    fi
+if [ "$REBUILD_QT" = "yes" ]
+then
+  if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+    cd $BASEDIR
+    TMP_QTDIR=$(echo $QTDIR | sed "s/\//\\\\\\\\\\\\\\//g")
+    cat qconfig/qconfig.h.in | sed "s/@BKEY@/$BUILD_KEY/" > qconfig/qconfig.h
+    cp -fv qconfig/qconfig.h src/qt/include
+    cp -fv qconfig/qmodules.h src/qt/include
+    cd $QTDIR
+    ./configure --win32 -v -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
+                -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
+                -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
   else
-    export ORIGIN=\\\$\$ORIGIN
-    ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -thread -stl \
-                -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
-                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+    cp -vf Makefile.qt Makefile
+    if [ "$BUILD_MACX" == "yes" ]; then
+      mkdir -p $DIRINST/lib
+      if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
+        ./configure -v -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
+                    -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
+                    -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+      else
+        ./configure -v -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
+                    -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
+                    -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+      fi
+    else
+      export ORIGIN=\\\$\$ORIGIN
+      ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -thread -stl \
+                  -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
+                  -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+    fi
   fi
 fi
-
 make -s qmake-install || exit 1
 make -s moc-install || exit 1
 
@@ -405,30 +410,32 @@ then
   $CMD_MAKE || exit 1
   cd $BASEDIR
 fi
+if [ "$REBUILD_QT" = "yes" ]
+then
+  echo -e "\nCompilando Qt ($QTDIR) ...\n"
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
+  export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
 
-echo -e "\nCompilando Qt ($QTDIR) ...\n"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
-
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-  export QTDIR=$BASEDIR/src/qt
-  cd $QTDIR/src
-  $QTDIR/bin/qmake -spec $QTDIR/mkspecs/win32-g++-cross -o Makefile.main qtmain.pro
-  $CMD_MAKE -f Makefile.main || exit 1
+  if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+    export QTDIR=$BASEDIR/src/qt
+    cd $QTDIR/src
+    $QTDIR/bin/qmake -spec $QTDIR/mkspecs/win32-g++-cross -o Makefile.main qtmain.pro
+    $CMD_MAKE -f Makefile.main || exit 1
+  fi
+  if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+    cd $QTDIR/tools/designer/uic
+    $CMD_MAKE || exit 1
+  fi
+  if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
+    cd $QTDIR/tools/designer/uic
+    make clean
+    rm -f Makefile
+    $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
+    $CMD_MAKE || exit 1
+  fi
+  cd $QTDIR
+  $CMD_MAKE $MAKE_INSTALL || exit 1
 fi
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-  cd $QTDIR/tools/designer/uic
-  $CMD_MAKE || exit 1
-fi
-if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
-  cd $QTDIR/tools/designer/uic
-  make clean
-  rm -f Makefile
-  $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
-  $CMD_MAKE || exit 1
-fi
-cd $QTDIR
-$CMD_MAKE $MAKE_INSTALL || exit 1
 
 export QTDIR=$PREFIX
 
@@ -439,18 +446,22 @@ cp -fv ../qt/.qmake.cache src/$QSADIR/
 cp -fv ../qt/.qmake.cache src/plugin/
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   cd configure2
+  echo -e "\n ######## PART 1 ########\n"
   export QTDIR=/usr/share/qt3
-  /usr/bin/qmake -nocache -spec linux-g++ configure2.pro
+  /usr/bin/qmake-qt3 -nocache -spec linux-g++ configure2.pro
   make || exit 1
+  echo -e "\n ######## PART 2 ########\n"
   export QTDIR=$PREFIX
   cd $BASEDIR/src/qt
   rm -fr LICENSE.*
   touch LICENSE
   svn up 2> /dev/null
   cd $BASEDIR/src/$QSADIR
+  echo -e "\n ######## PART 3 ########\n"
   ./configure2/configure2
   $QTDIR/bin/qmake CONFIG+="shared"
   rm -fr $BASEDIR/src/qt/LICENSE
+  echo -e "\n ######## PART 4 ########\n"
 else
   ./configure
 fi
