@@ -43,3 +43,8 @@ contains(DEFINES, FL_QUICK_CLIENT) {
 }
 
 win32:QMAKE_LFLAGS += -mconsole -mwindows
+
+win32 { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
+}

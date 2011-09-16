@@ -27,6 +27,7 @@ INCLUDEPATH += $$ROOT \
 
 win32 { 
     INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }
 enable_qwt:INCLUDEPATH += $$ROOT/src/qwt/src
 enable_digidoc:INCLUDEPATH += $$ROOT/src/libdigidoc \
