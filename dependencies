@@ -1,0 +1,17 @@
+libc6-i686
+libgcc1
+libc6
+libuuid1
+libice6
+libsm6
+libstdc++6
+libx11-6
+libxau6
+libxcb1
+libxcursor1
+libxdmcp6
+libxext6
+libxfixes3
+libxinerama1
+libxrender1
+zlib1g
