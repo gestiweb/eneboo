@@ -169,7 +169,7 @@ echo -e "Estableciendo configuración...\n"
 rm -f $HOME/.qmake.cache
 
 export QTDIR=$BASEDIR/src/qt
-
+mkdir $QTDIR/bin 2>/dev/null
 if [ ! -f $QTDIR/include/qglobal.h ]
 then
   cd $QTDIR
