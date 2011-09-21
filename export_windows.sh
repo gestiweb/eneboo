@@ -13,7 +13,8 @@ tar cf "$PVERSION-win32.tar" "$PVERSION"
 bzip2 -9 "$PVERSION-win32.tar"
 
 mkdir "export/" 2>/dev/null
-mv "$PVERSION-win32.tar.bz2" "export/"
-
+cp "$PVERSION-win32.tar.bz2" "export/"
+unlink "$PVERSION-win32.tar.bz2"
+rm -Rf "$PVERSION"
 
 echo "Compilación exportada a: export/$PVERSION-win32.tar.bz2"

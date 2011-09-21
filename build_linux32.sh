@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build.sh -prefix 'abanq-build-linux32' -platform 'linux-g++'
+./build.sh -prefix "$(pwd)/abanq-build-linux32/" -platform "linux-g++" -debug
