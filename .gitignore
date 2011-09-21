@@ -49,3 +49,4 @@ src/qt/mkspecs/default
 src/qt/qmake/qmake
 src/qt/src/tools/qconfig.cpp
 src/qwt/designer/qmake_image_collection.cpp
+export/
