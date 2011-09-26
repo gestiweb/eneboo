@@ -53,7 +53,7 @@
     <property name="name">
         <cstring>MenuBar</cstring>
     </property>
-    <item text="Eneboo" name="Eneboo">
+    <item text="Eneboo" name="abanqMenu">
     </item>
     <item text="&amp;Configuración" name="configMenu">
         <action name="fontAction"/>
