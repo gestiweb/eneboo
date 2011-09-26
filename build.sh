@@ -591,5 +591,5 @@ cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null
 cp -f ./packages/*.abanq $PREFIX/share/abanq/packages 2> /dev/null
 
-echo -e "\Eneboo $VERSION - Compilación terminada.\n"
+echo -e "\n * Eneboo $VERSION - Compilación terminada. * \n"
 
