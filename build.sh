@@ -19,6 +19,10 @@ if [ "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(svnversion . -n)"
 fi
 
+if [ "$BUILD_NUMBER" == "" ]; then
+  BUILD_NUMBER="$(git describe --tags)"
+fi
+
 VERSION="$VER User Build $BUILD_NUMBER"
 BUILD_KEY="$VER-Build-$BUILD_NUMBER"
 

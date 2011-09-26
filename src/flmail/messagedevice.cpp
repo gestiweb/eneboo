@@ -486,8 +486,8 @@ QCString MessageDevice::rfc822Header()
         if(!_descriptor.priority.isEmpty()) header+="Priority: "+_descriptor.priority+"\n";
 
         // x tags
-        header+="X-Mailer: AbanQ "+QCString(AQ_VERSION)+"\n";
-        header+="X-AbanQ-Generated: header (rfc822), reference id "+_descriptor.indexID+"\n";
+        header+="X-Mailer: Eneboo "+QCString(AQ_VERSION)+"\n";
+        header+="X-Eneboo-Generated: header (rfc822), reference id "+_descriptor.indexID+"\n";
 
         // MIME version
         header+="MIME-Version: 1.0\n";
@@ -639,8 +639,8 @@ bool MessageDevice::saveMessage(int iPart, const QByteArray & data)
     if (!_descriptor.priority.isEmpty()) message+="Priority: "+_descriptor.priority+"\n";
 
     // x tags
-    message+="X-Mailer: AbanQ "+QCString(AQ_VERSION)+"\n";
-    message+="X-AbanQ-Generated: header (rfc822), reference id "+_descriptor.indexID+"\n";
+    message+="X-Mailer: Eneboo "+QCString(AQ_VERSION)+"\n";
+    message+="X-Eneboo-Generated: header (rfc822), reference id "+_descriptor.indexID+"\n";
 
     // MIME version
     message+="MIME-Version: 1.0\n";

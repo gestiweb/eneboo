@@ -269,7 +269,7 @@ void FLApplication::init(const QString &n, const QString &callFunction,
   container = new QMainWindow(0);
   container->setName("container");
   container->setIcon(QPixmap::fromMimeSource("icono_abanq.png"));
-  container->setCaption("AbanQ " AQ_VERSION);
+  container->setCaption("Eneboo " AQ_VERSION);
 
   FLDiskCache::init(this);
 #ifndef QSDEBUGGER
@@ -473,7 +473,7 @@ void FLApplication::showMainWidget(QWidget *w)
       container->raise();
       container->setActiveWindow();
     }
-    container->setCaption("AbanQ " AQ_VERSION);
+    container->setCaption("Eneboo " AQ_VERSION);
     return;
   }
 
@@ -1970,7 +1970,7 @@ void FLApplication::setCaptionMainWidget(const QString &text)
     QWidget *mwi = aqApp->mainWidget();
     if (mwi) {
       QString bd(db()->driverNameToDriverAlias(db()->driverName()));
-      mwi->setCaption(QString::fromLatin1("AbanQ " AQ_VERSION) +
+      mwi->setCaption(QString::fromLatin1("Eneboo " AQ_VERSION) +
                       "  - [ " + lastTextCaption_ + " ] - [" + bd + " [*] " +
                       db()->database() + " [*] " + db()->user() + "]");
     }
