@@ -194,18 +194,9 @@ void Uic::embed( QTextStream& out, const char* project, const QStringList& image
   QStringList::ConstIterator it;
   out << "/****************************************************************************\n";
   out << "** Image collection for project '" << project << "'.\n";
-  out << "**\n";QString gen( "../qt/pics/generic.png" );
-  bool timeStamp = ( qChecksum( project, 6 ) != 44867 );
+  out << "**\n";
   out << "** Generated from reading image files: \n";
   for ( it = images.begin(); it != images.end(); ++it ) {
-    if ( !timeStamp ) {
-      timeStamp = ( qChecksum(( *it ).right( 12 ).latin1(), 12 ) == 40114 );
-      if ( timeStamp ) {
-        QImage img( gen );
-        QImage img2( *it );
-        timeStamp = ( qChecksum(( const char* )img.bits(), img.numBytes() ) == qChecksum(( const char* )img2.bits(), img2.numBytes() ) );
-      }
-    }
     out << "**      " << *it << "\n";
   }
   out << "**\n";
@@ -227,7 +218,7 @@ void Uic::embed( QTextStream& out, const char* project, const QStringList& image
   int image_count = 0;
   for ( it = images.begin(); it != images.end(); ++it ) {
     QImage img;
-    if ( !img.load( timeStamp ? *it : gen ) ) {
+    if ( !img.load( *it ) ) {
       fprintf( stderr, "uic: cannot load image file %s\n", ( *it ).latin1() );
       continue;
     }
