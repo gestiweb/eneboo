@@ -145,7 +145,7 @@ if [ "$OPT_PREFIX" == "" ]
 then
   echo -e "AVISO : No se ha especificado directorio de instalación"
   echo -e "Uso :  $0 directorio_de_instalacion\n"
-  DIRINST=$PWD/abanq-build
+  DIRINST=$PWD/eneboo-build
   echo -e "Utilizando por defecto el directorio $DIRINST\n"
 else
   DIRINST=$OPT_PREFIX
@@ -336,7 +336,7 @@ void AQConfig::init(QApplication *aqApp)
 #else
   aqDirApp = QDir::cleanDirPath(aqApp->applicationDirPath() + QString::fromLatin1("/.."));
 #endif
-  aqKeyBase = QString::fromLatin1("AbanQ/");
+  aqKeyBase = QString::fromLatin1("Eneboo/");
   aqData = aqDirApp + QString::fromLatin1("/share/abanq");
   aqLib = aqDirApp + QString::fromLatin1("/lib");
   aqBin = aqDirApp + QString::fromLatin1("/bin");
