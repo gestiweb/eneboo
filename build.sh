@@ -116,8 +116,9 @@ if [ "$OPT_QMAKESPEC" == "" ]; then
   esac
 fi
 
-echo -e "\nUtilidad de compilación e instalación de AbanQ $VERSION"
+echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION"
 echo -e "(C) 2003-2011 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
+echo -e "(C) 2011 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   export CC=${CROSS}gcc
@@ -246,6 +247,7 @@ fi
 
 cd $BASEDIR
 
+mkdir -p $PREFIX/share/abanq/images
 mkdir -p $PREFIX/share/abanq/forms
 mkdir -p $PREFIX/share/abanq/tables
 mkdir -p $PREFIX/share/abanq/translations
@@ -571,6 +573,7 @@ then
 fi
 
 echo -e "\nTerminando compilación...\n"
+cp -f ./src/fflite/images/*.png $PREFIX/share/abanq/images 2> /dev/null
 cp -f ./src/forms/*.ui $PREFIX/share/abanq/forms 2> /dev/null
 cp -f ./src/tables/*.mtd $PREFIX/share/abanq/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/abanq/translations 2> /dev/null
@@ -588,6 +591,5 @@ cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null
 cp -f ./packages/*.abanq $PREFIX/share/abanq/packages 2> /dev/null
 
-echo -e "\nAbanQ $VERSION\n(C) 2003-2011 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
-echo -e "Compilación terminada.\n"
+echo -e "\Eneboo $VERSION - Compilación terminada.\n"
 

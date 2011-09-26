@@ -17,9 +17,9 @@ mac:RC_FILE = fl.icns
 DESTDIR = $$PREFIX/bin
 
 mac {
-  TARGET = AbanQ
+  TARGET = Eneboo
 } else {
-  TARGET = abanq 
+  TARGET = eneboo
 }
 
 INCLUDEPATH += $$ROOT/src/qt/src/kernel
