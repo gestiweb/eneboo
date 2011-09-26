@@ -30,14 +30,12 @@ function init() {
     txt += sys.translate("La versión instalada de los módulos en esta  base\n");
     txt += sys.translate("de datos está desactualizada, le recomendamos que\n");
     txt += sys.translate("la actualice lo antes posible.\n");
-    txt += sys.translate("Mientras tanto,  AbanQ  necesita realizar algunos\n");
+    txt += sys.translate("Mientras tanto, Eneboo necesita realizar algunos\n");
     txt += sys.translate("ajustes para  poder ser  ejecutado con las nuevas\n");
     txt += sys.translate("versiones.\n");
     txt += sys.translate("No  debería  continuar  si no tiene una  copia de\n");
     txt += sys.translate("seguridad que le  permita deshacer  los cambios y\n");
     txt += sys.translate("volver al estado anterior en cualquier momento.\n\n");
-    txt += sys.translate("Obtenga soporte en");
-    txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
 
@@ -215,8 +213,6 @@ function loadAbanQPackage(input, warnBackup)
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
     txt += sys.translate("datos mientras se realiza la carga.\n\n");
-    txt += sys.translate("Obtenga soporte en");
-    txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
@@ -260,7 +256,7 @@ function loadAbanQPackage(input, warnBackup)
       sys.Mr_Proper();
       MessageBox.information(sys.translate("La carga de módulos se ha realizado con éxito."),
                              MessageBox.Ok, MessageBox.NoButton,
-                             MessageBox.NoButton, "AbanQ");
+                             MessageBox.NoButton, "Eneboo");
       sys.AQTimer.singleShot(0, sys.reinit);
     }
   }
@@ -424,7 +420,7 @@ function errorMsgBox(msg)
 {
   msg += "\n";
   MessageBox.critical(msg, MessageBox.Ok, MessageBox.NoButton,
-                      MessageBox.NoButton, "AbanQ");
+                      MessageBox.NoButton, "Eneboo");
 }
 
 function trTagText(tagText)
@@ -452,7 +448,7 @@ class AbanQUpdater
   function AbanQUpdater()
   {
     this.w_ = new QDialog;
-    this.w_.caption = "AbanQ";
+    this.w_.caption = "Eneboo";
     this.w_.name = "abanqUpdaterDialog";
     this.w_.modal = true;
 
@@ -515,6 +511,9 @@ class AbanQUpdater
 
 function updateAbanQ()
 {
+  MessageBox.warning(sys.translate("Funcionalidad no soportada aún en Eneboo."), MessageBox.Ok, MessageBox.NoButton,MessageBox.NoButton, "Eneboo");
+  return;
+  /*
   var msg = "";
   msg += sys.translate("Se va a proceder a conectar a través de Internet\n");
   msg += sys.translate("con los sistemas de InfoSiAL S.L. para obtener la\n");
@@ -548,6 +547,7 @@ function updateAbanQ()
       QSProject.evaluateScripts(scriptInfos, "updaterMain24");
     }
   }
+  */
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -571,7 +571,7 @@ function exportModules()
   } else {
     MessageBox.warning(dirBasePath + 
                        sys.translate(" ya existe,\ndebe borrarlo antes de continuar"),
-                       MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
+                       MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "Eneboo");
     return;
   }
 
@@ -598,7 +598,7 @@ function exportModules()
   AQUtil.destroyProgressDialog();
   MessageBox.information(sys.translate("Módulos exportados en:\n") + dirBasePath,
                          MessageBox.Ok, MessageBox.NoButton,
-                         MessageBox.NoButton, "AbanQ");
+                         MessageBox.NoButton, "Eneboo");
 }
  
 function xmlModule(idMod)
@@ -618,7 +618,7 @@ function xmlModule(idMod)
   tag.appendChild(doc.createTextNode(idMod));
   tagMod.appendChild(tag);
 
-  var trNoop = "QT_TRANSLATE_NOOP(\"AbanQ\",\"%1\")";
+  var trNoop = "QT_TRANSLATE_NOOP(\"Eneboo\",\"%1\")";
   tag = doc.createElement("alias");
   tag.appendChild(doc.createTextNode(trNoop.argStr(qry.value(0))));
   tagMod.appendChild(tag);

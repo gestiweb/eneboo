@@ -225,7 +225,7 @@ class MainWindow
             MessageBox.information(
               sys.translate("¿Quiere salir de la aplicación?"),
               MessageBox.Yes, MessageBox.No,
-              MessageBox.NoButton, "AbanQ"
+              MessageBox.NoButton, "Eneboo"
             ));
   }
 
