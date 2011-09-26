@@ -3,7 +3,9 @@
                          -------------------
 begin                : Sat Jan 26 2002
 copyright            : (C) 2002-2005 by InfoSiAL S.L.
-email                : mail@infosial.com
+                           2011 by Gestiweb
+email                : mail@infosial.com 
+                       info@gestiweb.com
 ***************************************************************************/
 /***************************************************************************
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,14 +28,13 @@ FLAbout::FLAbout(const QString &v,
   FLWidgetAbout(parent, name)
 {
   labelVersion->setText(v);
-  lblCreditos->setText("<p align=\"center\"><b>AbanQ</b><br>"
+  lblCreditos->setText("<p align=\"center\"><b>Eneboo</b><br>"
                        "<b>Open Source ERP Software</b><br><br>"
                        "Publicado bajo los términos de la<br>"
-                       "<b>GNU GENERAL PUBLIC LICENSE</b>.<br>"
+                       "<b>GNU GENERAL PUBLIC LICENSE (version 2)</b>.<br>"
                        "Este software se distribuye \"como está\", <br>"
                        "<b>sin garantías de ninguna clase</b><br>"
-                       "<br>http://www.abanq.com<br>"
-                       "Copyright (C) 2003-2011 InfoSiAL, S.L. http://www.infosial.com</p>");
+                       );
 }
 
 FLAbout::~FLAbout() {}

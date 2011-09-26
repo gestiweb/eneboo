@@ -47,9 +47,8 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
 
   logo = QImage::fromMimeSource("logo_abanq.png");
 
-  QString verMsg("<p align=\"center\"><b>AbanQ %1</b><br>"
-                 "http://www.infosial.com<br>"
-                 "http://www.abanq.com</p>");
+  QString verMsg("<p align=\"center\"><b>Eneboo %1</b><br>"
+                 "</p>");
   lblCredito->setText(verMsg.arg(AQ_VERSION));
 
   rememberPasswd_ = FLSettings::readBoolEntry("DBA/rememberPasswd");
@@ -320,7 +319,7 @@ void FLConnectDBDialog::paintEvent(QPaintEvent *pe)
     QFont font8(qApp->font().family(), 8);
 #endif
     font8.setBold(true);
-    QString copyright("Copyright (C) 2003-2011 by InfoSiAL S.L.");
+    QString copyright("");
     int lineWidth = QFontMetrics(font8).width(copyright);
     int lineHeight = QFontMetrics(font8).height();
     p.setFont(font8);
