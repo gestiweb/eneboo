@@ -1,9 +1,9 @@
 #!/bin/bash
 
 VERSION=$(git describe --tags)
-PROJECT="abanq"
+PROJECT="eneboo"
 PVERSION="${PROJECT}-${VERSION}"
-SRC="abanq-build-linux64"
+SRC="eneboo-build-linux64"
 test -e "$SRC" || { echo "No existe compilacion para Linux 64 bits! (falta carpeta $SRC)"; exit 1; }
 
 echo "Exportando compilacion Linux 64 bits para $PVERSION . . . "

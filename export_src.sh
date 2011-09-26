@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION=$(git describe --tags)
-PROJECT="abanq"
+PROJECT="eneboo"
 PVERSION="${PROJECT}-${VERSION}"
 
 echo "Exportando código fuente para $PVERSION . . . "

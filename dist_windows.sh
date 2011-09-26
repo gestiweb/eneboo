@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=src/qt
-DST=abanq-build-win32
+DST=eneboo-build-win32
 
 mkdir "$DST" 2>/dev/null
 mkdir "$DST/bin" 2>/dev/null

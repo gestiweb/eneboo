@@ -1,9 +1,9 @@
 #!/bin/bash
 
 VERSION=$(git describe --tags)
-PROJECT="abanq"
+PROJECT="eneboo"
 PVERSION="${PROJECT}-${VERSION}"
-SRC="abanq-build-win32"
+SRC="eneboo-build-win32"
 test -e "$SRC" || { echo "No existe compilacion para Windows 32 bits! (falta carpeta $SRC)"; exit 1; }
 
 echo "Exportando compilacion Windows 32 bits para $PVERSION . . . "
@@ -17,4 +17,4 @@ cp "$PVERSION-win32.tar.bz2" "export/"
 unlink "$PVERSION-win32.tar.bz2"
 rm -Rf "$PVERSION"
 
-echo "Compilación exportada a: export/$PVERSION-win32.tar.bz2"
+echo "Compilacion exportada a: export/$PVERSION-win32.tar.bz2"
