@@ -23,8 +23,8 @@ if [ "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(git describe --tags)"
 fi
 
-VERSION="$VER User Build $BUILD_NUMBER"
-BUILD_KEY="$VER-Build-$BUILD_NUMBER"
+VERSION="$VER-$BUILD_NUMBER"
+BUILD_KEY="$VER-Build"
 
 for a in "$@"; do
   case "$a" in

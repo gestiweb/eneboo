@@ -319,8 +319,8 @@ void FLConnectDBDialog::paintEvent(QPaintEvent *pe)
     QFont font8(qApp->font().family(), 8);
 #endif
     font8.setBold(true);
-    lineWidth = QFontMetrics(font7).width("This software is provided under the terms");
-    lineHeight = QFontMetrics(font7).height();
+    int lineWidth = QFontMetrics(font7).width("This software is provided under the terms");
+    int lineHeight = QFontMetrics(font7).height();
     p.drawImage(lineWidth + 30 , height() - lineHeight * 4, QImage::fromMimeSource("defFactory"));
     p.setFont(font7);
     p.drawText(QRect(6, height() - lineHeight * 3 - 2, lineWidth + 10, lineHeight),
