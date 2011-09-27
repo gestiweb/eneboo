@@ -3212,8 +3212,20 @@ References
         <translation></translation>
     </message>
     <message>
-        <source>Acerca de AbanQ</source>
-        <translation>Quant a AbanQ</translation>
+        <source>Acerca de Eneboo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Autoría</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>En la realización de Eneboo han participado:
+
+InfoSiAL S.L. &lt;mail@infosial.com&gt; 
+Gestiweb Integración de Soluciones Web S.L. &lt;info@gestiweb.com&gt;
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3314,16 +3326,16 @@ References
         <source>Eliminar marcador de la lista</source>
         <translation>Elimina marcador de la llista</translation>
     </message>
-    <message>
-        <source>InfoSiAL, S.L. Creadores de AbanQ</source>
-        <translation>InfoSiAL, S.L. Creadors d&apos;AbanQ</translation>
-    </message>
     <message encoding="UTF-8">
         <source>Recordar contraseña</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Desactivar interfaz AbanQ v3</source>
+        <source>Utilizar interfaz SDI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Carga con múltiples ventanas separadas en lugar de un único contenedor con pestañas.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13104,16 +13116,8 @@ Remove this variable?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
-<context>
+<context encoding="UTF-8">
     <name>mainwindow</name>
-    <message>
-        <source>AbanQ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;AbanQ</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message encoding="UTF-8">
         <source>&amp;Configuración</source>
         <translation type="unfinished"></translation>
@@ -13125,10 +13129,6 @@ Remove this variable?</source>
     <message>
         <source>Acerca de Qt</source>
         <translation type="unfinished">Quant a Qt</translation>
-    </message>
-    <message>
-        <source>Acerca de AbanQ</source>
-        <translation type="unfinished">Quant a AbanQ</translation>
     </message>
     <message>
         <source>&amp;Fuente</source>
@@ -13144,6 +13144,14 @@ Remove this variable?</source>
     </message>
     <message>
         <source>new form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eneboo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acerca de Eneboo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

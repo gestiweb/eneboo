@@ -9,7 +9,7 @@ test -e "$SRC" || { echo "No existe compilacion para Linux 32 bits! (falta carpe
 echo "Exportando compilacion Linux 32 bits para $PVERSION . . . "
 
 mv "$SRC" "$PVERSION"
-tar cf "$PVERSION-linux32.tar" "$PVERSION"
+tar cf "$PVERSION-linux32.tar" "$PVERSION" --exclude="*.a" --exclude="*.o" --exclude="*.prl" --exclude="mkspecs" --exclude="include"  --exclude="templates" 
 bzip2 -9 "$PVERSION-linux32.tar"
 
 mkdir "export/" 2>/dev/null
