@@ -12,7 +12,9 @@ OPT_QWT=yes
 OPT_DIGIDOC=yes
 OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
-QT_DEBUG="-release -DQT_NO_CHECK"
+OPT_QUICK_CLIENT=no
+QT_DEBUG=""
+QT_DEBUG_OPT="-release -DQT_NO_CHECK"
 QSADIR=qsa
 
 if [ "$BUILD_NUMBER" == "" ]; then
@@ -23,11 +25,19 @@ if [ "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(git describe --tags)"
 fi
 
-VERSION="$VER (Build $BUILD_NUMBER)"
-BUILD_KEY="$VER-Build"
+if [ "$BUILD_NUMBER" == "" ]; then
+  BUILD_NUMBER="user-$(date --rfc-3339=date)"
+fi
+
 
 for a in "$@"; do
   case "$a" in
+    -static)
+      QT_DEBUG="$QT_DEBUG -static"
+    ;;
+    -quick)
+      OPT_QUICK_CLIENT=yes  
+    ;;
     -single)
       OPT_MULTICORE=no
     ;;
@@ -36,12 +46,14 @@ for a in "$@"; do
     ;;
     -debug)
       OPT_DEBUG=yes
+      BUILD_NUMBER="$BUILD_NUMBER-debug"
     ;;
     -aqdebug)
       OPT_AQ_DEBUG=yes
     ;;
     -qtdebug)
-      QT_DEBUG="-debug -DQT_NO_CHECK"
+      QT_DEBUG_OPT="-debug -DQT_NO_CHECK"
+      BUILD_NUMBER="$BUILD_NUMBER-qtdebug"
     ;;
     -sqllog)
       OPT_SQLLOG=yes
@@ -89,10 +101,15 @@ done
 
 CMD_MAKE="make -s "
 MAKE_INSTALL=""
+QT_DEBUG="$QT_DEBUG $QT_DEBUG_OPT"
 
 BUILD_MACX="no"
 if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
   BUILD_MACX="yes"
+fi
+if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
+  QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
+  BUILD_NUMBER="$BUILD_NUMBER-quick"
 fi
 
 if [ "$OPT_MULTICORE" == "yes" ]; then
@@ -119,6 +136,9 @@ if [ "$OPT_QMAKESPEC" == "" ]; then
   ;;
   esac
 fi
+
+VERSION="$VER (Build $BUILD_NUMBER)"
+BUILD_KEY="$VER-Build"
 
 echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION"
 echo -e "(C) 2003-2011 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"

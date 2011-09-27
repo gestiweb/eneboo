@@ -1191,10 +1191,12 @@ void FLApplication::writeState()
     FLSettings::writeEntry("windowsOpened/Main", windowsOpened);
 
     FLSettings::writeEntry("Geometry/MainwindowMaximized", container->isMaximized());
-    FLSettings::writeEntry("Geometry/MainwindowX", container->x());
-    FLSettings::writeEntry("Geometry/MainwindowY", container->y());
-    FLSettings::writeEntry("Geometry/MainwindowWidth", container->width());
-    FLSettings::writeEntry("Geometry/MainwindowHeight", container->height());
+    if (!container->isMaximized()) {
+      FLSettings::writeEntry("Geometry/MainwindowX", container->x());
+      FLSettings::writeEntry("Geometry/MainwindowY", container->y());
+      FLSettings::writeEntry("Geometry/MainwindowWidth", container->width());
+      FLSettings::writeEntry("Geometry/MainwindowHeight", container->height());
+    }
   }
 
   for (QMap<QString, QRect>::const_iterator it = mapGeometryForms_.begin(); it != mapGeometryForms_.end(); ++it) {
