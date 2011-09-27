@@ -31,7 +31,7 @@ FLAbout::FLAbout(const QString &v,
   lblCreditos->setText("<p align=\"center\"><b>Eneboo</b><br>"
                        "<b>Open Source ERP Software</b><br><br>"
                        "Publicado bajo los términos de la<br>"
-                       "<b>GNU GENERAL PUBLIC LICENSE (version 2)</b>.<br>"
+                       "<b>GNU GENERAL PUBLIC LICENSE<br>(version 2)</b><br>"
                        "Este software se distribuye \"como está\", <br>"
                        "<b>sin garantías de ninguna clase</b><br>"
                        );
