@@ -597,7 +597,7 @@ then
 fi
 
 echo -e "\nTerminando compilación...\n"
-cp -f ./src/fflite/images/*.png $PREFIX/share/abanq/images 2> /dev/null
+cp -f ./src/fllite/images/icon*.png $PREFIX/share/abanq/images 2> /dev/null
 cp -f ./src/forms/*.ui $PREFIX/share/abanq/forms 2> /dev/null
 cp -f ./src/tables/*.mtd $PREFIX/share/abanq/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/abanq/translations 2> /dev/null
