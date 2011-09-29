@@ -1,0 +1,559 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>FLWidgetTableDB</class>
+<comment>Acceso general a una tabla.</comment>
+<author>InfoSiAL, S.L.</author>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>FLWidgetTableDB</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>502</width>
+            <height>504</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>FLWidgetTableDB</string>
+    </property>
+    <property name="focusPolicy">
+        <enum>StrongFocus</enum>
+    </property>
+    <property name="layoutMargin" stdset="0">
+    </property>
+    <property name="layoutSpacing" stdset="0">
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QFrame">
+            <property name="name">
+                <cstring>FrameFind</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>Box</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="layoutMargin" stdset="0">
+            </property>
+            <property name="layoutSpacing" stdset="0">
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>2</number>
+                </property>
+                <property name="spacing">
+                    <number>4</number>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>TextLabelSearch</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <property name="frameShape">
+                        <enum>MShape</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>MShadow</enum>
+                    </property>
+                    <property name="text">
+                        <string>Buscar</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string></string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string></string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>lineEditSearch</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="focusPolicy">
+                        <enum>StrongFocus</enum>
+                    </property>
+                    <property name="acceptDrops">
+                        <bool>false</bool>
+                    </property>
+                    <property name="frameShape">
+                        <enum>LineEditPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                    <property name="maxLength">
+                        <number>100</number>
+                    </property>
+                    <property name="frame">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Busca en el campo seleccionado coincidencias que empiezen por el texto escrito</string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string>Busca en el campo seleccionado coincidencias que empiezen por el texto escrito</string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>TextLabelIn</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>en</string>
+                    </property>
+                </widget>
+                <widget class="QComboBox">
+                    <property name="name">
+                        <cstring>comboBoxFieldToSearch</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="focusPolicy">
+                        <enum>StrongFocus</enum>
+                    </property>
+                    <property name="autoMask">
+                        <bool>false</bool>
+                    </property>
+                    <property name="duplicatesEnabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Ordena los registros de la tabla por el campo seleccionado</string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string>Ordena los registros de la tabla por el campo seleccionado</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout6</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>1</number>
+                </property>
+                <property name="spacing">
+                    <number>1</number>
+                </property>
+                <widget class="QWidgetStack">
+                    <property name="name">
+                        <cstring>tabTable</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
+                    </property>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>tabData</cstring>
+                        </property>
+                        <attribute name="id">
+                            <number>0</number>
+                        </attribute>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <property name="margin">
+                                <number>0</number>
+                            </property>
+                            <property name="spacing">
+                                <number>0</number>
+                            </property>
+                        </vbox>
+                    </widget>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>tabFilter</cstring>
+                        </property>
+                        <attribute name="id">
+                            <number>1</number>
+                        </attribute>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <property name="margin">
+                                <number>2</number>
+                            </property>
+                            <property name="spacing">
+                                <number>4</number>
+                            </property>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout1</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <property name="margin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="spacing">
+                                        <number>0</number>
+                                    </property>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pbClear</cstring>
+                                        </property>
+                                        <property name="minimumSize">
+                                            <size>
+                                                <width>0</width>
+                                                <height>22</height>
+                                            </size>
+                                        </property>
+                                        <property name="maximumSize">
+                                            <size>
+                                                <width>32767</width>
+                                                <height>22</height>
+                                            </size>
+                                        </property>
+                                        <property name="focusPolicy">
+                                            <enum>NoFocus</enum>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="iconSet">
+                                            <iconset>image12858</iconset>
+                                        </property>
+                                        <property name="toolTip" stdset="0">
+                                            <string>Reiniciar filtro</string>
+                                        </property>
+                                        <property name="whatsThis" stdset="0">
+                                            <string>Reiniciar filtro</string>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QTable">
+                                <property name="name">
+                                    <cstring>tdbFilter</cstring>
+                                </property>
+                                <property name="focusPolicy">
+                                    <enum>NoFocus</enum>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>Box</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Plain</enum>
+                                </property>
+                                <property name="lineWidth">
+                                    <number>0</number>
+                                </property>
+                                <property name="numRows">
+                                    <number>0</number>
+                                </property>
+                                <property name="numCols">
+                                    <number>0</number>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Single</enum>
+                                </property>
+                                <property name="focusStyle">
+                                    <enum>SpreadSheet</enum>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                </widget>
+                <widget class="QButtonGroup">
+                    <property name="name">
+                        <cstring>bgrDataFilter</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>21</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>21</width>
+                            <height>32767</height>
+                        </size>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
+                    </property>
+                    <property name="title">
+                        <string></string>
+                    </property>
+                    <property name="flat">
+                        <bool>false</bool>
+                    </property>
+                    <property name="exclusive">
+                        <bool>true</bool>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>1</number>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbData</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="focusPolicy">
+                                <enum>NoFocus</enum>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>true</bool>
+                            </property>
+                            <property name="on">
+                                <bool>true</bool>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image11751</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Ver/Ocultar tabla de datos</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Ver/Ocultar tabla de datos</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbFilter</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="focusPolicy">
+                                <enum>NoFocus</enum>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>true</bool>
+                            </property>
+                            <property name="on">
+                                <bool>false</bool>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image54645</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Ver/Ocultar filtro</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Ver/Ocultar filtro</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<images>
+    <image name="image12858">
+        <data format="PNG" length="691">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000027a49444154789c95d24b4854511c06f0efde3bdeb9f3b88e4e3a6559463541912d32292bc382a0074120cda2a28d8b08a16c23b409090a22889eb49c20c14db529b094a1d1cc70e360c8980da3d6f848997166bcf338f7754e8b30d2e96167fd7d3ff87f1c0efff11e9cb35ee62cfc555d553da255badefc24d7c6afb47cff8cf592cd21dfd855dfb8fad4d9168e68ac150056043c3c8f55b0e0664dfd49477fb0135f2283209c1c0500cb4a00cac48b15ebaa04914ca16ee77abc19f89ccb1852cb3f814fef4afb28e39e073a8c66979897e2b110faa26256d5847b775e7c0dfcf5047f9b5f320dcb7eb9a4fad6219f754d59751e5185d71688101a1362d71673c29f80c6237b1f4d448ed6a8c42b782a6be12ccbc0ea9ae2ab36938ebc450d04836000c02d2f8ebf85a45b3c4f0d663b9e9e3f218d0e6fe447420adce509ec69f808431f82aea1f5589372bb0088f43acba9e008d865ef96b555a76d8c99d0f2318c8f26f0cc4f1109db51d730d05e5e3bd4e4f3415b0244bb4b5da64d7c2f97edf696b86b44a14886a9cd41991f012f64a09369f4766735ce99f3f82e24d38b3d1e0062fd9536c32e7639ddd59b64d776319b9e80a9c7a1e627915b88415767a0ab33703853055bf10090a3da2b87ecdde190b7daa6c75ec2515c018d4c21353b026a24a1a4a60150e82a80e46f004ad5c3a2e8b64f8cb6c3e9f2425767100df780646741cd2492090ac600c3e0789064be0000b8866f9341e81a204a12c2a14e3d154f821a0be00503f1390e9aca013cd2beb61fe32d01b61d4cf510d3b281d2a2c7e1c1d72cab90226a306a9a06f284474601127146798e752fdfa0e01f004097bfd86b9aec2e21ec80a6a2f86798e7f6f9ae281f7ecd7e07d64f1ccb5bcf07820000000049454e44ae426082</data>
+    </image>
+    <image name="image11751">
+        <data format="PNG" length="526">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001d549444154789c8d91bd6b535118c67f3714128a54a3f82d54690952043f40b42e9a2299e482368b085ec1212e3ab443d0d9bfc0c1d1415cba74b0536e422aa55a2ce8202d2e8a742a29a4cdd74d2ee6e4bc0e37f7b637b9830f1c78cfcb39bff779ce31cae5b268adf99fd5ebf5427bcbb28c1180743a3d74584422217ebf50280030e23797e6ae307e2c01c056d50dea416d555d6ebe2c22221e404410110e4f4e933c7d1480daf66e500faab6bd8b7f2704a8ff5a636fcf9b5aafba413da87ad58d06b4aee7b9383b8b88b0b9b8c8846946bec766b1180d883797f861af00106fd6f9b9bc12e920deac237267187079728ad4f91300244777827a50c9d11d52736bc01889ec820480f5ca04676fdd476b4df3c36dbead7a17c69fdba16f5caf940178f3f81a2fde7f0f47d82879b6634a71c1bcc49f8f1bfcfefc6a28026469bb7ff72300a1085fbfac228e8b568a1b5357b9fb2e1f00dececcc332b43b1e20e63b38333d4fe3e4236ac71fa295423b1db45254c61e00f0fae93dcf41ea0900ce4107a5522994f35457a15b1d7a5d856ddb00341c07a0bf3fb21fc1344d63f0a53f3d3b27ba1fc1b22c63267f487c402e973312d905f11dc4a2be4a2b85f423f86ab49cd09976a70bc0d074804c262351fd28fd03ecfc7e052331b87a0000000049454e44ae426082</data>
+    </image>
+    <image name="image54645">
+        <data format="PNG" length="464">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000019749444154789ca593b18b13411487bfb7d930d358d8052c048b5d0e943412c1269ac3cadd54572b5606025e6da59558aa8d9bceca4e10922b0477dc431bfd03520cd86bbd4d86dc30367bc77ae6c2a9bf66e60def7d7cc51bf8cf48bb188fc77742088f8061f374184278b1582ccab3009de34b9ee7cf81199068ada34ea7137bef7744e45e9224ca5abb1122005996ed8ac847adb59b4ea75f87c3e14f00634caf288ac16ab552c0ee7c3e37a701118088ec03b4870146a3d18fc964f20d2084b0bfc9206acedb4aa9757bb80d514aad45e4d636c03f276af48c73ae6b8ce99d6e28cbb2e79ceb8610aa330122f212a0288a411b628ce9cd66b301401cc7af36014ef620cbb26722f2184029b50670ce755bbd6febbabe5f55d5511b70b207d6da3249922f2272d17b7fc97b7f1442f81045d127e03a704d2975b5dfefbf5f2e97fe0f836dc9b2ec89883c6dca83baaef7aaaa5afd66b02dd6dac3344d2f003781442975234dd377d6daf5b90c8e6df33c7f0d3c041091cfc0dd7319b44c0ed234bd02f481cbc0f7f86f0040d05a3f68fe8668addffc0213b6957558a77edf0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>comboBoxFieldToSearch</sender>
+        <signal>activated(int)</signal>
+        <receiver>lineEditSearch</receiver>
+        <slot>setFocus()</slot>
+    </connection>
+    <connection>
+        <sender>comboBoxFieldToSearch</sender>
+        <signal>activated(int)</signal>
+        <receiver>lineEditSearch</receiver>
+        <slot>selectAll()</slot>
+    </connection>
+    <connection>
+        <sender>lineEditSearch</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>filterRecords(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>comboBoxFieldToSearch</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>putFirstCol(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>pbClear</sender>
+        <signal>clicked()</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>tdbFilterClear()</slot>
+    </connection>
+    <connection>
+        <sender>pbData</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>activeTabData(bool)</slot>
+    </connection>
+    <connection>
+        <sender>pbFilter</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>activeTabFilter(bool)</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>lineEditSearch</tabstop>
+    <tabstop>comboBoxFieldToSearch</tabstop>
+</tabstops>
+<slots>
+    <slot access="protected">init()</slot>
+    <slot access="protected">destroy()</slot>
+    <slot access="protected">filterRecords( const QString &amp; )</slot>
+    <slot>putFirstCol( const QString &amp; )</slot>
+    <slot access="protected">tdbFilterClear()</slot>
+    <slot access="protected">activeTabData( bool )</slot>
+    <slot access="protected">activeTabFilter( bool )</slot>
+</slots>
+<exportmacro>FL_EXPORT</exportmacro>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

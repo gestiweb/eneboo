@@ -1,0 +1,72 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flfiles</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Ficheros de Texto")</alias>
+
+	<field>
+		<name>nombre</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>255</length>
+		<regexp>\w+\.(mtd|ts|ui|qs|qry|kut|xml|jrxml)</regexp>
+	</field>
+
+	<field>
+		<name>bloqueo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Bloqueo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>unlock</type>
+		<default>true</default>
+	</field>
+
+	<field>
+		<name>idmodulo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Módulo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>15</length>
+
+		<relation>
+			<table>flmodules</table>
+			<field>idmodulo</field>
+			<card>M1</card>
+			<delC>true</delC>
+		</relation>
+	</field>
+
+	<field>
+		<name>sha</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","SHA1")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>255</length>
+		<calculated>true</calculated>
+		<editable>false</editable>
+	</field>
+
+	<field>
+		<name>contenido</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Contenido")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+		<visiblegrid>false</visiblegrid>
+	</field>
+	
+	<field>
+		<name>binario</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Binario")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>bytearray</type>
+		<visiblegrid>false</visiblegrid>
+		<visible>false</visible>
+		<editable>false</editable>
+	</field>
+</TMD>
+

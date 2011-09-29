@@ -1,0 +1,9 @@
+## Options used by the lpd daemom. Default is to disable
+## TCP/IP socket
+##
+## (see `man lpd` for more options)
+## -s         - does not listen on any TCP/IP addresses
+## -b <addr>  - listens to a specific IP address only
+#
+# OPTIONS=
+OPTIONS="-s"

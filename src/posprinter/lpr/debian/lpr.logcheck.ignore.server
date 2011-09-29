@@ -1,0 +1,3 @@
+^\w{3} [ :0-9]{11} [\._[:alnum:]]+ lpd\[[0-9]+\]: [\._[:alnum:]]+ requests displayq (short|long) [[:alnum:]]+$
+^\w{3} [ :0-9]{11} [\._[:alnum:]]+ lpd\[[0-9]+\]: [\._[:alnum:]]+ requests recvjob [[:alnum:]]+$
+^\w{3} [ :0-9]{11} [\._[:alnum:]]+ lpd\[[0-9]+\]: restarted$

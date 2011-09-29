@@ -1,0 +1,269 @@
+lpr (1:2008.05.17) unstable; urgency=low
+
+  * Change package priority from standard to optional since it was
+    already done in the override file
+  * Add upstream revision file
+  * Upgrade standards to 3.7.3
+  * Overwrite logcheck-database provided logcheck file with our own
+    version (closes: #418393)
+  * Added upstream patches
+    + lpd/printjob.c [rev. 1.41] - rfc 3834 support: "Auto-Submitted:
+    auto-generated" on lots of things; from Tamas TEVESZ
+    + Synched to upstream lpr as of 2008-05-17
+  * Merged logcheck-database rule with the ones provided by lpr.
+  * Remove old changelog entries for versions before OpenBSD's version
+    was used as an upstream.
+  * Added Vcs- info to control file.
+
+ -- Adam Majer <adamm@zombino.com>  Mon, 19 May 2008 21:11:19 -0500
+
+lpr (1:2006.11.04) unstable; urgency=low
+
+  * Added upstream patches
+     + lpr.c [rev. 1.39] - portability patch s/0/SEEK_SET/ in lseek
+  * /var/log/lp-{acct,errs} are now rotated weekly with lp:adm
+     ownership with 0640 permissions. The latter is to counteract any
+     security related information being leaked from filter's stderr to
+     the log to the user. (closes: #390720)
+
+ -- Adam Majer <adamm@zombino.com>  Sat,  4 Nov 2006 23:21:59 -0600
+
+lpr (1:2006.08.03) unstable; urgency=low
+
+  * Fixed the changelog errors (closes: #307753)
+  * (lpd/lpd.8) Manpage update clarifying that lpd will silently drop print
+    requests if reverse DNS lookup fails.
+  * Remove /etc/printcap conffile on purge only if it was not modified
+    (closes: #326046)
+  * Added a slightly modified patch to enable lpd to recognize
+    hosts.equiv and hosts.lpd lines without trailing newline (closes:
+    #323063)
+  * Applied a patch from Martin Michlmayr that moves the dot in the init
+    script next to the lpd name. This is to make the init script consistent
+    with the other deamon's init scrips. (closes: #337222)
+  * Plug a memory leak in displayq.c when nitems==0. Patch from
+    OpenBSD cvs - originally from NetBSD.
+  * Fixed lprm to function correctly when the - parameters is
+    used. (closes: #337743)
+  * Added LSB formatted dependencies to the init script (closes:
+    #376960)
+  * Updated Standards to 3.7.2. No changes.
+
+ -- Adam Majer <adamm@zombino.com>  Thu,  3 Aug 2006 18:12:19 -0500
+
+lpr (1:2005.05.01) unstable; urgency=low
+
+  * Changed to Debian native package. It is still based from OpenBSD cvs, but
+    syncing with upstream now occurs on an ongoing basis.
+  * (lpd/printjob.c) Applied a slightly modified patch from upstream to
+    pstatus which could cause possible stack corruption if vnsprintf failed.
+
+ -- Adam Majer <adamm@zombino.com>  Sun,  1 May 2005 17:56:18 -0500
+
+lpr (1:2005.01.28-5) unstable; urgency=low
+
+  * Fix a FTBFS - logcheck is not present as a group. Use dh_installlogcheck
+
+ -- Adam Majer <adamm@zombino.com>  Wed, 13 Apr 2005 02:14:04 -0500
+
+lpr (1:2005.01.28-4) unstable; urgency=low
+
+  * Added logcheck ignore files for server configuration.
+  * Added a patch from upstream that fixes handling of command line options
+    for lpr (lpr.c 1.37 revision upstream)
+  * Using dpatch for upstream patches which should keep things easier to sync
+    when upstream is synced.
+
+ -- Adam Majer <adamm@zombino.com>  Tue, 12 Apr 2005 18:31:45 -0500
+
+lpr (1:2005.01.28-3) unstable; urgency=low
+
+  * Added a timeout to question in postrm regarding removal the spool
+    directory during purge. Timeout is needed to handle non-interactive
+    removals. (closes: #293308)
+  * Added a hint (daemon not running) to error condition when connection to
+    daemon fails. (closes: #180287)
+
+ -- Adam Majer <adamm@zombino.com>  Thu, 17 Feb 2005 12:35:59 -0600
+
+lpr (1:2005.01.28-2) unstable; urgency=low
+
+  * Apply patch from Junio Hamano that makes the rotated log uid=lp instead of
+    root (closes: #283172)
+  * Apply a patch from NIIBE Yutaka to make cross-compile easier (closes:
+    #286618)
+
+ -- Adam Majer <adamm@zombino.com>  Mon, 31 Jan 2005 11:49:41 -0600
+
+lpr (1:2005.01.28-1) unstable; urgency=low
+
+  * Sync to new upstream version
+      - adds -j option to specify job name
+      - fixes banner printing
+  * Remove extraneous $i from postinst
+
+ -- Adam Majer <adamm@zombino.com>  Sun,  30 Jan 2005 08:01:11 -0500
+
+lpr (1:2003.09.23-7) unstable; urgency=high
+
+  * Remove bash specific syntax in postinst. To make sure permissions are fixed
+    for the new lpr, rerun permission fixups on /var/spool/lpd/*, again.
+    (closes: #261590)
+
+ -- Adam Majer <adamm@zombino.com>  Tue, 27 Jul 2004 16:45:19 -0500
+
+lpr (1:2003.09.23-6) unstable; urgency=low
+
+  * Fixed a possible null deference in checkremote() (closes: #258539)
+  * Added date listing in the printout of `lpq -l` (closes: #155053)
+  * If bind to a socket fails (busy), waits for up to 35 seconds
+    before giving up on it
+  * Fetches the numeric uid of UID(lp) instead of relying that
+    it is always 7 (closes: #258478)
+
+ -- Adam Majer <adamm@zombino.com>  Tue, 13 Jul 2004 14:14:39 -0500
+
+lpr (1:2003.09.23-5) unstable; urgency=low
+
+  * Added __ivaliduser_sa from OpenBSD so that hosts.lpd can
+    again include IP addresses (closes: #85133)
+    This should also re-enable netgroup support in both,
+    hosts.equiv and hosts.lpd (closes: #70521)
+    Also seems to fix printing over IPv6 sockets :)
+  * debian/postinst:
+      + Updat permissions of the .seq files in the
+        spool directories (closes: #258478)
+
+ -- Adam Majer <adamm@zombino.com>  Sat, 10 Jul 2004 15:36:14 -0500
+
+lpr (1:2003.09.23-4) unstable; urgency=low
+
+  * Quiet postinst a bit.
+
+ -- Adam Majer <adamm@zombino.com>  Sun,  4 Jul 2004 20:25:53 -0500
+
+lpr (1:2003.09.23-3) unstable; urgency=low
+
+  * debian/postinst: `chown` now uses : not . (closes: #256984)
+  * debian/printcap.5: "new" upstream version
+  * lpr/lpr.c:
+     + Fixed some nasty getopt parsing bugs
+     + pr(1) filter (lpr -p) now uses form-feed to get to new page.
+  * lpd/printjob.c:
+     + Fixed banner printing by adding \r
+  * Added /etc/default/lpd file that controls startup options of
+    lpr. By default, lpr will no longer listen on TCP port. You may
+    choose to re-enable this if you need to accept print requests
+    over the network.
+  * Fixed upgrade from pre-1:2003.09.23 version of lpr
+  * Added some configuration notes in README.Debian (closes: #180274)
+
+ -- Adam Majer <adamm@zombino.com>  Sun,  4 Jul 2004 14:51:06 -0500
+
+lpr (1:2003.09.23-2) unstable; urgency=low
+
+  * Applied patch to fix -s option thanks to Joachim H. Kaiser
+    (closes: #214445)
+  * Fixed a bug in lpd/lpd.c where lines with whitespace in
+    hosts.{lpd,equiv} were treated as EOF instead of being ignored
+  * Added filter's path to the logged error message when input
+    filter dies. (closes: #138367)
+  * Fixed a bug introduced in porting from OpenBSD in common_source/displaq.c
+    by adding vis.c fetched from latest OpenBSD source (closes: #255852)
+  * Fixed a locking problem where multiple printjobs (one for each printjob)
+    were launched simultaneously. lpr now uses flock() for locking
+    instead of OpenBSD's O_EXLOCK in open().
+  * Fixed cron.weekly to no longer start the daemon if it is not running
+    (closes: #142115)
+
+ -- Adam Majer <adamm@zombino.com>  Thu, 24 Jun 2004 19:34:10 -0500
+
+lpr (1:2003.09.23-1) unstable; urgency=low
+
+  * Upload of IPv6 capable lpr to Sid. Note that you'll need a relatively new
+    kernel, like debian 2.4.24 kernel, to listen on IPv6 socket.
+  * Change the ownership of all the files in the spool directory /var/spool/lpd
+    to lp.lp in the postinst.
+  * Added a lock file to /var/spool/lpd as required by the FHS (closes: #228542)
+  * New init script thanks to Ryan VanMiddlesworth should clean up 
+    all lpd processes, not just one. (closes: #56359)
+
+ -- Adam Majer <adamm@zombino.com>  Sun, 20 Jun 2004 18:43:22 -0500
+
+lpr (1:2003.09.23-0test1) experimental; urgency=low
+
+  * New upstream release (sync with CVS on 2003-09-23)
+     - you may need to change permissions of files in the spool directory
+       to 'lp' from 'root'.
+  * Removed build-depends on pmake - lpr will now use GNU make
+
+ -- Adam Majer <adamm@zombino.com>  Tue,  4 Nov 2003 08:06:38 -0600
+
+lpr (1:2000.05.07-5) unstable; urgency=low
+
+  * New maintainer (closes: #182928)
+  * Acknowledge some NMUs (closes: #116728, #103562, #112523, #186478)
+  * Updated standards to 3.6.1
+
+ -- Adam Majer <adamm@zombino.com>  Wed, 24 Sep 2003 02:32:42 -0500
+
+lpr (1:2000.05.07-4.20) unstable; urgency=high
+
+  * Non-maintainer upload by the Security Team
+  * Rebuilt for sid so the update for woody can enter the archive
+
+ -- Martin Schulze <joey@infodrom.org>  Thu, 20 Mar 2003 20:03:29 +0100
+
+lpr (1:2000.05.07-4.3) stable-security; urgency=high
+
+  * Non-maintainer upload by the Security Team
+  * Applied patch from SuSE to fix buffer overvlow and arbitrary file access
+
+ -- Martin Schulze <joey@infodrom.org>  Sat, 15 Mar 2003 14:54:38 +0100
+
+lpr (1:2000.05.07-4.2) unstable; urgency=low
+
+  * NMU
+  * Fix lpr -# handling (closes: #103562, #112523)
+
+ -- Julian Gilbey <jdg@debian.org>  Thu, 21 Mar 2002 15:14:38 +0000
+
+lpr (1:2000.05.07-4.1) unstable; urgency=low
+
+  * NMU
+  * handle non-tty remove's, patch in bts.  Closes: #116728.
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 11 Mar 2002 11:37:43 -0700
+
+lpr (1:2000.05.07-4) unstable; urgency=low
+
+  * Reverted to mktemp() for now, because for some inexplicable reason I
+    didn't notice that mkstemp() isn't a drop-in replacement
+
+ -- Adam Klein <aklein@debian.org>  Thu, 18 Jan 2001 20:40:53 -0800
+
+lpr (1:2000.05.07-3) unstable; urgency=low
+
+  * Applied patch from Matt Zimmerman <mdz@debian.org> to have lpd
+    itself parse hosts.{equiv,lpd} instead of using an internal glibc
+    function (closes: #67044)
+  * Modified lpr to use getopt() (closes: #51157)
+  * Removed suidmanager use
+  * Removed potato build stuff from rules
+  * Use mkstemp() in place of mktemp() in printjob.c
+  * Moved the master lockfile back to /var/run/lpd.pid for the Nth time
+    (closes: #80486)
+
+ -- Adam Klein <aklein@debian.org>  Mon, 15 Jan 2001 15:17:34 -0800
+
+lpr (1:2000.05.07-2) unstable; urgency=low
+
+  * Got rid of duplicate fclose()s in getcap.c (closes: #64199, #63929)
+
+ -- Adam Klein <aklein@debian.org>  Tue, 16 May 2000 23:15:24 -0700
+
+lpr (1:2000.05.07-1) unstable; urgency=low
+
+  * Now using OpenBSD as upstream source (may close many bugs)
+
+ -- Adam Klein <aklein@debian.org>  Sun,  7 May 2000 21:40:41 -0700

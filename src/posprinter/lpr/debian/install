@@ -1,0 +1,8 @@
+lpr/lpr		usr/bin
+lpq/lpq		usr/bin
+lprm/lprm	usr/bin
+lpc/lpc		usr/sbin
+lpd/lpd		usr/sbin
+filters/lpf	usr/sbin
+pac/pac		usr/sbin
+lptest/lptest	usr/bin

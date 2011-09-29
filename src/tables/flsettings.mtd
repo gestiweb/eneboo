@@ -1,0 +1,23 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flsettings</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Configuración global")</alias>
+
+	<field>
+		<name>flkey</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Clave")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>30</length>
+	</field>
+
+	<field>
+		<name>valor</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Valor")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+		<visiblegrid>false</visiblegrid>
+	</field>
+</TMD>

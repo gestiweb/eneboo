@@ -1,0 +1,9 @@
+MODDIR="../.."
+LANGS="es_ES en_GB en_US de_DE fr_FR"
+TEXTS="messages.raw"
+METADATAS="*.mtd"
+QUERIES="*.qry"
+REPORTS="*.kut"
+FORMS="*.ui"
+SCRIPTS="*.qs"
+

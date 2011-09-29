@@ -1,0 +1,73 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flmodules</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Módulos")</alias>
+
+	<field>
+		<name>bloqueo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Bloqueo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>unlock</type>
+		<default>true</default>
+	</field>
+
+	<field>
+		<name>idmodulo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Id. del Módulo")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>15</length>
+
+		<relation>
+			<table>flfiles</table>
+			<field>idmodulo</field>
+			<card>1M</card>
+		</relation>
+	</field>
+
+	<field>
+		<name>idarea</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Id. del Área")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>15</length>
+		<visiblegrid>false</visiblegrid>
+
+		<relation>
+			<table>flareas</table>
+			<field>idarea</field>
+			<card>M1</card>
+		</relation>
+	</field>
+
+	<field>
+		<name>descripcion</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Descripción")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>100</length>
+	</field>
+
+	<field>
+		<name>version</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Versión")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>3</length>
+		<default>0.0</default>
+		<regexp>[0-9]\.[0-9]</regexp>
+	</field>
+
+	<field>
+		<name>icono</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Icono")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>pixmap</type>
+	</field>
+</TMD>

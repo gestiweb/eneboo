@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          lpd
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Should-Start:      
+# Should-Stop:       
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: BSD lpr/lpd line printer spooling system
+# Description:       This is the BSD printer spooler and associated
+#		     utilities. You can use this for local and remote
+#		     printers.
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+DAEMON=/usr/sbin/lpd
+
+OPTIONS=""
+
+. /etc/default/lpd
+test -x $DAEMON -a -f /usr/sbin/pac || exit 0
+
+case "$1" in
+  start)
+	echo -n "Starting printer spooler: lpd"
+        if start-stop-daemon --quiet --stop --signal 0 --exec $DAEMON
+	then
+		echo " [already running]"
+	else
+		/sbin/start-stop-daemon --start --quiet --exec $DAEMON -- $OPTIONS
+		echo "."
+	fi
+	;;
+  stop)
+	echo -n "Stopping printer spooler: lpd"
+	if start-stop-daemon --quiet --stop --signal 0 --exec $DAEMON
+	then
+		start-stop-daemon --quiet --stop --exec $DAEMON 
+		echo "."
+	else
+		echo " [not running]";
+	fi
+	;;
+  force-reload|restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+  *)
+	echo "Usage: /etc/init.d/lpd {start|stop|restart|force-reload}"
+	exit 1
+esac
+
+exit 0

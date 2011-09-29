@@ -1,0 +1,10 @@
+etc
+etc/logcheck/ignore.d.server
+usr/sbin
+usr/bin
+usr/share/man/man1
+usr/share/man/man5
+usr/share/man/man8
+var/log
+var/spool/lpd/lp
+var/spool/lpd/remote

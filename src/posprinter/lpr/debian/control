@@ -1,0 +1,22 @@
+Source: lpr
+Section: net
+Priority: optional
+Build-Depends: debhelper (>= 4.2.29)
+Maintainer: Adam Majer <adamm@zombino.com>
+Standards-Version: 3.7.3
+Vcs-Browser: http://git.debian.org/?p=collab-maint/lpr.git;a=summary
+Vcs-Git: git://git.debian.org/git/collab-maint/lpr.git
+
+Package: lpr
+Architecture: any
+Depends: ${shlibs:Depends}, netbase
+Suggests: magicfilter | apsfilter, gs
+Conflicts: suidmanager (<< 0.50)
+Replaces: logcheck-database
+Description: BSD lpr/lpd line printer spooling system
+ This is the BSD printer spooler and associated utilities.
+ You can use this for local and remote printers.
+ .
+ If you install magicfilter or apsfilter (along with ghostscript),
+ lpr will be able to automatically handle special file types
+ (such as Postscript and PDF files).

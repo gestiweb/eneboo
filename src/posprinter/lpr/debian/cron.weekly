@@ -1,0 +1,14 @@
+#! /bin/sh
+
+DAEMON=/usr/sbin/lpd
+
+# Make sure the lpr package is installed (use pac because lprng doesn't have it
+test -f /usr/sbin/pac || exit 0
+
+savelog -u lp -g adm -m 0640 -n -q -t /var/log/lp-acct
+savelog -u lp -g adm -m 0640 -n -q -t /var/log/lp-errs
+
+if /sbin/start-stop-daemon --quiet --stop --signal 0 --exec $DAEMON; then
+	/etc/init.d/lpd restart >/dev/null
+fi
+

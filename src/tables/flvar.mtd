@@ -1,0 +1,44 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flvar</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Variables")</alias>
+
+	<field>
+		<name>id</name>
+		<!--Identificador interno de la tabla-->
+		<alias>QT_TRANSLATE_NOOP("MetaData","Identificador")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>serial</type>
+		<visiblegrid>false</visiblegrid>
+	</field>
+
+	<field>
+		<name>idvar</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Identificador de la variable")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<ck>true</ck>
+		<type>string</type>
+		<length>30</length>
+	</field>
+	
+	<field>
+		<name>idsesion</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Identificador de la sesión")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<ck>true</ck>
+		<type>string</type>
+		<length>30</length>
+	</field>
+	
+	<field>
+		<name>valor</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Valor")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+		<visiblegrid>false</visiblegrid>
+	</field>
+</TMD>

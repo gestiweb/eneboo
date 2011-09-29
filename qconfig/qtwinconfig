@@ -1,0 +1,1 @@
+CONFIG += warn_off shared thread release stl 

@@ -1,0 +1,29 @@
+lpr for Debian
+----------------------
+
+Please note that as of version 2000.05.07-1, Debian is now using OpenBSD lpr
+as the upstream source.  This means that, as in the old days, filters are not
+run for remote printers.
+
+An up to date source code is available on
+  http://git.debian.org/?p=collab-maint/lpr.git;a=summary
+
+
+Configuration
+--------------------
+
+For quick and painless configuration, install package magicfilter, and configure
+the printer using its `/usr/sbin/magicfilterconfig` utility to have your
+printer working in less than a minute. People that want to know how lpr works, 
+read on.
+
+Printer configuration is done in the /etc/printcap file. For detailed 
+information, please see man 5 printcap. For an overview of the BSD lpr
+print spooler, see the UNIX System Manager's Manual which is available
+
+http://people.debian.org/~adamm/doc/#smm
+
+Section 7 deals with the printer spooler. Please note that this manual
+is not specific to Debian or Linux and it is a little bit out of date.
+Manual pages for all of the utilities supersede any information in these
+guides.

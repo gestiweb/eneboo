@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper. GNU copyright 1997 by Joey Hess.
+# Modified for lpr by Adam Klein <aklein@debian.org>
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+CFLAGS = -Wall -O2 -D_GNU_SOURCE -D__KAME__ -I../common_source
+CPPFLAGS = -Wall -O2 -D_GNU_SOURCE -D__KAME__ -I../common_source
+# -D_BSD_SOURCE
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	make -W CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)"
+	touch build-stamp
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp install-stamp
+	-make clean
+	dh_clean
+
+install: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	touch install-stamp
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_install
+	dh_installman
+	dh_installdocs
+	dh_installexamples
+	dh_installlogcheck
+	dh_installinit --name=lpd
+	dh_installcron
+	dh_installchangelogs
+	dh_strip
+	dh_compress
+	dh_fixperms
+	chown root.lp debian/lpr/usr/bin/lpr \
+		      debian/lpr/usr/bin/lpq \
+		      debian/lpr/usr/bin/lprm \
+		      debian/lpr/usr/sbin/lpc
+	chmod 6755 debian/lpr/usr/bin/lpr \
+		   debian/lpr/usr/bin/lpq \
+		   debian/lpr/usr/bin/lprm
+	chmod 2755 debian/lpr/usr/sbin/lpc
+	chown lp.lp debian/lpr/var/spool/lpd \
+		    debian/lpr/var/spool/lpd/lp \
+		    debian/lpr/var/spool/lpd/remote
+	chmod 2775 debian/lpr/var/spool/lpd \
+		   debian/lpr/var/spool/lpd/lp \
+		   debian/lpr/var/spool/lpd/remote
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

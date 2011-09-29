@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+if [ $1 = "purge" ]
+then
+  rm -f /var/log/lp-acct* /var/log/lp-errs*
+  echo -n "Do you want to remove /var/spool/lpd? [y/N] "
+  if ! read -t 30 X; then	# added to handle EOF on stdin gracefully as well as non-interactive removals
+    X="n"
+  fi
+  if [ "$X" = Y -o "$X" = y ]; then
+    rm -rf /var/spool/lpd
+  fi
+fi
+ 
+#DEBHELPER#

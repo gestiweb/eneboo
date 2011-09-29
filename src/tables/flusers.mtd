@@ -1,0 +1,45 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flusers</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Usuarios")</alias>
+
+	<field>
+		<name>iduser</name>
+		<!--Nombre del usuario utilizado para conectar a la base de datos--> 
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>30</length>
+
+		<relation>
+			<table>flacs</table>
+			<field>iduser</field>
+			<card>1M</card>
+		</relation>
+	</field>
+
+	<field>
+		<name>idgroup</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Grupo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>30</length>
+
+		<relation>
+			<table>flgroups</table>
+			<field>idgroup</field>
+			<card>M1</card>
+		</relation>
+	</field>
+	
+	<field>
+		<name>descripcion</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Descripción")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>100</length>
+	</field>
+</TMD>

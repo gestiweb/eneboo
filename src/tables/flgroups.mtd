@@ -1,0 +1,35 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flgroups</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Grupos de Usuarios")</alias>
+
+	<field>
+		<name>idgroup</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>30</length>
+
+		<relation>
+			<table>flusers</table>
+			<field>idgroup</field>
+			<card>1M</card>
+		</relation>
+
+		<relation>
+			<table>flacs</table>
+			<field>idgroup</field>
+			<card>1M</card>
+		</relation>
+	</field>
+	
+	<field>
+		<name>descripcion</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Descripción")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>100</length>
+	</field>
+</TMD>

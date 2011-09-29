@@ -1,0 +1,36 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>sys</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>sys</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>492</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Administración</string>
+    </property>
+    <property name="whatsThis" stdset="0">
+        <string>Administración del sistema</string>
+    </property>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBarEditor</cstring>
+    </property>
+</menubar>
+<toolbars>
+</toolbars>
+<slots>
+    <slot>openDefaultForm()</slot>
+    <slot>execDefaultScript()</slot>
+    <slot>staticLoaderSetup()</slot>
+    <slot>openQSWorkbench()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

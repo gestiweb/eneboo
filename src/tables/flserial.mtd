@@ -1,0 +1,24 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flserial</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Serie")</alias>
+
+	<field>
+		<name>serie</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Serie")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>serial</type>
+	</field>
+
+	<field>
+		<name>sha</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","SHA1")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>255</length>
+		<calculated>true</calculated>
+		<editable>false</editable>
+	</field>
+</TMD>

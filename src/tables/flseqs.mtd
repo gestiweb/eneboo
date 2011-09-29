@@ -1,0 +1,32 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>flseqs</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Secuencias")</alias>
+
+	<field>
+		<name>tabla</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre de la tabla")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>255</length>
+	</field>
+
+	<field>
+		<name>campo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre del campo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<ck>true</ck>
+		<type>string</type>
+		<length>255</length>
+	</field>
+	
+	<field>
+		<name>seq</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Secuencia")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>uint</type>
+	</field>
+</TMD>
