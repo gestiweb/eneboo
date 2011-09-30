@@ -30,6 +30,12 @@ win32 {
 	include(../psprinter/psprinter.pri)
 }
 
+win32 { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
+}
+
+
 mac {
 	INCLUDEPATH += $$ROOT/src/psprinter
 	include(../psprinter/psprinter.pri)

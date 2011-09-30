@@ -193,7 +193,8 @@ extern "C" int pthread_create (pthread_t *thread,
 			       const pthread_attr_t *attr,
 			       void * (*start_routine) (void *),
 			       void * arg)
-#if !defined(__SUNPRO_CC) && !defined(__APPLE__)
+#if 0
+// # if !defined(__SUNPRO_CC) && !defined(__APPLE__)
   throw ()
 #endif
 {
