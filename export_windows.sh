@@ -1,23 +1,20 @@
 #!/bin/bash
-SRC=src/qt
-DST=abanq-build-win32
 
-mkdir "$DST" 2>/dev/null
-mkdir "$DST/bin" 2>/dev/null
-mkdir "$DST/lib" 2>/dev/null
-mkdir "$DST/plugins" 2>/dev/null
-mkdir "$DST/plugins/designer" 2>/dev/null
-mkdir "$DST/plugins/styles" 2>/dev/null
-mkdir "$DST/plugins/sqldrivers" 2>/dev/null
+VERSION=$(git describe --tags)
+PROJECT="abanq"
+PVERSION="${PROJECT}-${VERSION}"
+SRC="abanq-build-win32"
+test -e "$SRC" || { echo "No existe compilacion para Windows 32 bits! (falta carpeta $SRC)"; exit 1; }
 
-cp "$SRC/bin/"*.exe "$DST/bin"
-cp "$SRC/bin/"*.dll "$DST/bin"
-cp "$SRC/lib/"*.dll "$DST/lib"
-cp "$SRC/plugins/designer/"*.dll "$DST/plugins/designer" 
-cp "$SRC/plugins/styles/"*.dll "$DST/plugins/styles" 
-cp "$SRC/plugins/sqldrivers/"*.dll "$DST/plugins/sqldrivers" 
-cp -R "$SRC/share" "$DST/" 
+echo "Exportando compilacion Windows 32 bits para $PVERSION . . . "
 
+mv "$SRC" "$PVERSION"
+tar cf "$PVERSION-win32.tar" "$PVERSION"
+bzip2 -9 "$PVERSION-win32.tar"
 
+mkdir "export/" 2>/dev/null
+cp "$PVERSION-win32.tar.bz2" "export/"
+unlink "$PVERSION-win32.tar.bz2"
+rm -Rf "$PVERSION"
 
-
+echo "Compilación exportada a: export/$PVERSION-win32.tar.bz2"
