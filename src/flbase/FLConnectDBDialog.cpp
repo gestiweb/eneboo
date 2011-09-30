@@ -324,15 +324,9 @@ void FLConnectDBDialog::paintEvent(QPaintEvent *pe)
     QFont font8(qApp->font().family(), 8);
 #endif
     font8.setBold(true);
-    QString copyright("");
-    int lineWidth = QFontMetrics(font8).width(copyright);
-    int lineHeight = QFontMetrics(font8).height();
-    p.setFont(font8);
-    p.drawText(QRect(6, height() - lineHeight * 4 - 2, lineWidth + 10, lineHeight),
-               Qt::AlignVCenter | Qt::AlignJustify | Qt::SingleLine, copyright);
-    p.drawImage(lineWidth + 20 , height() - lineHeight * 4, QImage::fromMimeSource("defFactory"));
-    lineWidth = QFontMetrics(font7).width("This software is provided under the terms");
-    lineHeight = QFontMetrics(font7).height();
+    int lineWidth = QFontMetrics(font7).width("This software is provided under the terms");
+    int lineHeight = QFontMetrics(font7).height();
+    p.drawImage(lineWidth + 30 , height() - lineHeight * 4, QImage::fromMimeSource("defFactory"));
     p.setFont(font7);
     p.drawText(QRect(6, height() - lineHeight * 3 - 2, lineWidth + 10, lineHeight),
                Qt::AlignVCenter | Qt::AlignJustify | Qt::SingleLine, "This software is provided under the terms");
