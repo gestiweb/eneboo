@@ -162,7 +162,7 @@ echo -e "Estableciendo configuración...\n"
 rm -f $HOME/.qmake.cache
 
 export QTDIR=$BASEDIR/src/qt
-
+mkdir $QTDIR/bin 2>/dev/null
 if [ ! -f $QTDIR/include/qglobal.h ]
 then
   cd $QTDIR
@@ -189,27 +189,30 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cp -fv qconfig/qconfig.h src/qt/include
   cp -fv qconfig/qmodules.h src/qt/include
   cd $QTDIR
-  ./configure --win32 -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
+  ./configure --win32 -v -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
               -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
-              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
 else
   cp -vf Makefile.qt Makefile
   if [ "$BUILD_MACX" == "yes" ]; then
     mkdir -p $DIRINST/lib
     if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
-      ./configure -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
+      ./configure -v -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
                   -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
     else
-      ./configure -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
+      ./configure -v -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
                   -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
-                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                  -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
     fi
   else
     export ORIGIN=\\\$\$ORIGIN
-    ./configure -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl \
+      # Configure informa de que no se encuentra MySQL o PostgreSQL, pero si se agrega:
+      # -I/usr/include/mysql/ -I/usr/include/postgresql/
+      # , se incluyen, pero luego aparece un error para libpg: LOCALEDIR undefined.
+    ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -thread -stl \
                 -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
-                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
   fi
 fi
 
@@ -353,6 +356,11 @@ if [ "$OPT_DEBUG" = "yes" ]
 then
   echo "CONFIG *= debug" >> settings.pro
   echo "DEFINES *= FL_DEBUG" >> settings.pro
+fi
+
+if [ "$OPT_DEBUGGER" = "yes" ]
+then
+  echo "DEFINES *= QSDEBUGGER" >> settings.pro
 fi
 
 if [ "$OPT_AQ_DEBUG" = "yes" ]
@@ -544,7 +552,15 @@ echo -e "\nTerminando compilación...\n"
 cp -f ./src/forms/*.ui $PREFIX/share/abanq/forms 2> /dev/null
 cp -f ./src/tables/*.mtd $PREFIX/share/abanq/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/abanq/translations 2> /dev/null
-cp -f ./src/scripts/*.qs $PREFIX/share/abanq/scripts 2> /dev/null
+#cp -f ./src/scripts/*.qs $PREFIX/share/abanq/scripts 2> /dev/null
+rm $PREFIX/share/abanq/scripts/* 2> /dev/null
+cp -f ./src/scripts/*.qs.src $PREFIX/share/abanq/scripts 2> /dev/null
+for file in $PREFIX/share/abanq/scripts/*.qs.src
+do
+  DST="${file%.src}"
+  mv "$file" "$DST"
+done
+
 cp -f ./src/docs/*.html $PREFIX/share/abanq/doc 2> /dev/null
 cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null

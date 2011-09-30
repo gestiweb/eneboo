@@ -191,5 +191,5 @@ rm -f src/plugins/styles/kde/styles/plastik/src/moc/moc_plastik.cpp
 rm -f src/libmysql
 rm -f clean
 
-svn up
+# svn up
 

@@ -731,7 +731,8 @@ void MReportEngine::drawDetail(MPageCollection *pages, int level, uint &currReco
           newPage(pages, level);
         }
 
-        QDomNode *ptrRecord = &records.item(currRecord);
+        QDomNode record = records.item(currRecord);
+        QDomNode *ptrRecord = &record;
 
         setFieldValues(&fields, level, detail, ptrRecord);
 

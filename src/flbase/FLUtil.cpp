@@ -262,7 +262,7 @@ QChar FLUtil::calcularDC(const QString &n)
   else if (DC == 10)
     DC = 1;
 
-  return QChar::QChar(DC + 48);
+  return QChar(DC + 48);
 }
 
 QString FLUtil::dateDMAtoAMD(const QString &f)
