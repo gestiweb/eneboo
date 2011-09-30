@@ -1,4 +1,4 @@
-AQMODULE=AbanQ User
+AQMODULE=Eneboo
 
 QMAKE_MKDIR           = @echo $$AQMODULE ::   [MKDIR] $< && $$QMAKE_MKDIR
 QMAKE_COPY            = @echo $$AQMODULE ::   [CP___] $< && $$QMAKE_COPY
