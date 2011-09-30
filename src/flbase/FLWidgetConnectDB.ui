@@ -577,9 +577,6 @@ una conexion a un DSN.</comment>
                             <property name="frameShadow">
                                 <enum>Raised</enum>
                             </property>
-                            <property name="toolTip" stdset="0">
-                                <string>InfoSiAL, S.L. Creadores de AbanQ</string>
-                            </property>
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
