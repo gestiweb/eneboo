@@ -618,7 +618,6 @@ private slots:
   */
   void loadModules();
   void exportModules();
-  void importModules();
   void updateAbanQ();
 
 private:

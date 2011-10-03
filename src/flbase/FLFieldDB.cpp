@@ -235,12 +235,8 @@ bool FLFieldDB::eventFilter(QObject *obj, QEvent *ev)
     }
 
     return false;
-  } else if (ev->type() == QEvent::MouseButtonRelease && obj == textLabelDB
-             && ((QMouseEvent *) ev)->button() == Qt::LeftButton) {
-    emit labelClicked();
-  } else {
+  } else
     return false;
-  }
 }
 
 void FLFieldDB::updateValue(const QDate &d)
@@ -329,8 +325,8 @@ void FLFieldDB::updateValue(const QString &t)
   else
     cursor_->setValueBuffer(fieldName_, s);
 
-  if (isVisible() && hasFocus() && field->type() == QVariant::String && field->length()
-      == s.length())
+  if (isVisible() && hasFocus() && field->type() == QVariant::String &&
+      field->length() == s.length())
     focusNextPrevChild(true);
 }
 
@@ -864,19 +860,9 @@ void FLFieldDB::initEditor()
         connect(editor_, SIGNAL(textChanged(const QString &)), this,
                 SLOT(emitTextChanged(const QString &)));
         if (hasPushButtonDB) {
-          if (showed) {
+          if (showed)
             disconnect(this, SIGNAL(keyF2Pressed()), pushButtonDB, SLOT(animateClick()));
-            disconnect(this, SIGNAL(labelClicked()), this, SLOT(openFormRecordRelation()));
-          }
           connect(this, SIGNAL(keyF2Pressed()), pushButtonDB, SLOT(animateClick()));
-          connect(this, SIGNAL(labelClicked()), this, SLOT(openFormRecordRelation()));
-          textLabelDB->installEventFilter(this);
-          QFont tlF = textLabelDB->font();
-          tlF.setUnderline(true);
-          textLabelDB->setFont(tlF);
-          QColor cB("blue");
-          textLabelDB->setPaletteForegroundColor(cB);
-          textLabelDB->setCursor(QCursor::PointingHandCursor);
         }
       }
 
@@ -1120,58 +1106,6 @@ void FLFieldDB::initEditor()
   else
     setShowEditor(showEditor_);
 
-}
-
-void FLFieldDB::openFormRecordRelation()
-{
-  if (!cursor_)
-    return;
-
-  if (fieldName_.isEmpty())
-    return;
-  FLTableMetaData *tMD = cursor_->metadata();
-  if (!tMD)
-    return;
-
-  FLFieldMetaData *field = tMD->field(fieldName_);
-  if (!field)
-    return;
-
-  if (!field->relationM1()) {
-#ifdef FL_DEBUG
-    qWarning("FLFieldDB : " + tr("El campo de búsqueda debe tener una relación M1"));
-#endif
-    return;
-  }
-
-  FLSqlCursor *c = 0;
-  FLFieldMetaData *fMD = field->associatedField();
-  FLAction *a = 0;
-
-  QVariant v = cursor_->valueBuffer(field->name());
-  if (v.toString().isEmpty()) {
-    QMessageBox::warning(qApp->focusWidget(), tr("Aviso"),
-                         tr("Debe indicar un valor para %1").arg(field->alias()), QMessageBox::Ok,
-                         0, 0);
-    return;
-  }
-  c = new FLSqlCursor(field->relationM1()->foreignTable(), true, cursor_->db()->connectionName());
-  c->select(cursor_->db()->manager()->formatAssignValue(field->relationM1()->foreignField(), field,
-                                                        v, true));
-  if (c->size() <= 0) {
-    return;
-  }
-  c->next();
-
-  if (actionName_.isEmpty())
-    a = cursor_->db()->manager()->action(field->relationM1()->foreignTable());
-  else {
-    a = cursor_->db()->manager()->action(actionName_);
-  }
-  c->setAction(a);
-
-  int modeAccess = cursor_->modeAccess();
-  c->openFormInMode(FLSqlCursor::EDIT, false);
 }
 
 void FLFieldDB::searchValue()
@@ -1648,8 +1582,8 @@ void FLFieldDB::refresh(const QString &fN)
   int partDecimal = field->partDecimal();
   bool ol = field->hasOptionsList();
 
-  setDisabled(keepDisabled_ || cursor_->fieldDisabled(fieldName_) || (modeAccess
-                                                                      == FLSqlCursor::EDIT && (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
+  setDisabled(keepDisabled_ || cursor_->fieldDisabled(fieldName_) ||
+              (modeAccess == FLSqlCursor::EDIT && (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
               || !field->editable() || modeAccess == FLSqlCursor::BROWSE);
 
   switch (type) {
@@ -2072,11 +2006,6 @@ void FLFieldDB::emitKeyF2Pressed()
   emit keyF2Pressed();
 }
 
-void FLFieldDB::emitLabelClicked()
-{
-  emit labelClicked();
-}
-
 void FLFieldDB::emitTextChanged(const QString &t)
 {
   emit textChanged(t);
@@ -2161,27 +2090,11 @@ void FLFieldDB::toggleAutoCompletion()
         FLSqlCursor *cur;
 
         if (!field->relationM1()) {
-          if (!fieldRelation_.isEmpty() && !foreignField_.isEmpty()) {
-            autoComFieldName_ = foreignField_;
-
-            FLFieldMetaData *fRel = tMD ? tMD->field(fieldRelation_) : 0;
-            if (!fRel) {
-              return;
-            }
-            autoComFieldRelation_ = fRel->relationM1()->foreignField();
-            cur = new FLSqlCursor(fRel->relationM1()->foreignTable(), false,
-                                  cursor_->db()->connectionName(), 0, 0, autoComFrame_);
-            tMD = cur->metadata();
-            field = tMD ? tMD->field(autoComFieldName_) : field;
-          } else {
-            autoComFieldName_ = fieldName_;
-            autoComFieldRelation_ = QString::null;
-            cur = new FLSqlCursor(tMD->name(), false, cursor_->db()->connectionName(), 0, 0,
-                                  autoComFrame_);
-          }
+          autoComFieldName_ = fieldName_;
+          cur = new FLSqlCursor(tMD->name(), false, cursor_->db()->connectionName(), 0, 0,
+                                autoComFrame_);
         } else {
           autoComFieldName_ = field->relationM1()->foreignField();
-          autoComFieldRelation_ = QString::null;
           cur = new FLSqlCursor(field->relationM1()->foreignTable(), false,
                                 cursor_->db()->connectionName(), 0, 0, autoComFrame_);
           tMD = cur->metadata();
@@ -2273,9 +2186,6 @@ void FLFieldDB::autoCompletionUpdateValue()
       ed->setCursorPosition(cval.length());
       ed->cursorBackward(true, cval.length() - val.length());
     }
-  }
-  if (!autoComFieldRelation_.isEmpty()) {
-    cursor_->setValueBuffer(fieldRelation_, cur->valueBuffer(autoComFieldRelation_));
   }
 }
 

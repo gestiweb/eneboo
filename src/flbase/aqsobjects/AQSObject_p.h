@@ -53,7 +53,7 @@
     } \
   }\
   public: \
-  virtual const char *RTTI() const { return #Class; } \
+  virtual const char *rtti() const { return #Class; } \
   operator Prefix##Class *() { return o_; } \
   operator const Prefix##Class *() const { return o_; } \
   operator Prefix##Class &() { if (o_) return *o_; } \
@@ -185,14 +185,6 @@ public slots :
     AQ_CALL_VOID(killTimer(id));
   }
 
-  virtual QCString className() {
-    AQ_CALL_RET(className());
-  }
-
-  virtual QCString rtti() {
-    return RTTI();
-  }
-
   virtual void insertChild(QObject *obj) {
     AQ_CALL_VOID(insertChild(obj));
   }
@@ -205,7 +197,7 @@ public slots :
     xml_.clear();
     QDomElement e(xml_.createElement("object"));
 
-    e.setAttribute("class", RTTI());
+    e.setAttribute("class", rtti());
     xml_.appendChild(e);
 
     if (!o_)

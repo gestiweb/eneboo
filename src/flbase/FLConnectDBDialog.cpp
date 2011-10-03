@@ -52,15 +52,10 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
   lblCredito->setText(verMsg.arg(AQ_VERSION));
 
   rememberPasswd_ = FLSettings::readBoolEntry("DBA/rememberPasswd");
-  if (FLSettings::readBoolEntry("application/forceOldApi", false)) {
-    setOldApi(true);
-    chkOldApi->hide();
-  } else {
-    bool ok = false;
-    oldApi_ = FLSettings::readBoolEntry("application/oldApi", ok, &ok);
-    if (!ok)
-      setOldApi(oldApi_);
-  }
+  bool ok = false;
+  oldApi_ = FLSettings::readBoolEntry("application/oldApi", ok, &ok);
+  if (!ok)
+    setOldApi(oldApi_);
 
   comboBoxInsert(comboBoxMarks, FLSettings::readListEntry("DBA/marks"));
   lineEditUser->setText(FLSettings::readEntry("DBA/username"));

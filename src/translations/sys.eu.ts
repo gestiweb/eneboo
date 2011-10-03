@@ -1383,10 +1383,6 @@ Remove these functions?</source>
         <source>Exportar M&#xf3;dulos a Disco</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Importar M&#xf3;dulos desde Disco</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>FLApplicationInterface</name>

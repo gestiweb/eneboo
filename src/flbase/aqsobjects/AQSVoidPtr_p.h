@@ -50,7 +50,7 @@
     } \
   }\
   public: \
-  virtual const char *RTTI() const { return #Class; } \
+  virtual const char *rtti() const { return #Class; } \
   operator Prefix##Class *() { return o_; } \
   operator const Prefix##Class *() const { return o_; } \
   operator Prefix##Class &() { if (o_) return *o_; } \
@@ -79,10 +79,6 @@ public:
 public slots :
   bool isEqual(void *other) const {
     return (o_ ? o_ == other : false);
-  }
-
-  virtual QCString rtti() {
-    return RTTI();
   }
 
 protected:

@@ -396,11 +396,6 @@ protected slots:
 public slots:
 
   /**
-  Abre un formulario de edición para el valor seleccionado en su acción correspondiente
-  */
-  void openFormRecordRelation();
-
-  /**
   Abre un dialogo para buscar en la tabla relacionada
   */
   void searchValue();
@@ -447,11 +442,6 @@ public slots:
   está conectada a este slot.
   */
   void emitKeyF2Pressed();
-
-  /**
-  Emite la señal de labelClicked. Se usa en los campos M1 para editar el formulario de edición del valor seleccionado.
-  */
-  void emitLabelClicked();
 
   /**
   Emite la señal de textChanged.
@@ -638,7 +628,6 @@ private:
   FLDataTable *autoComPopup_;
   QVBox *autoComFrame_;
   QString autoComFieldName_;
-  QString autoComFieldRelation_;
 
   /**
   Auxiliares para poder repetir llamada a setMapValue y refrescar filtros
@@ -657,11 +646,6 @@ signals:
   Señal emitida si se pulsa la tecla F2 en el editor
   */
   void keyF2Pressed();
-
-  /**
-  Señal emitida si se hace click en el label de un campo M1
-  */
-  void labelClicked();
 
   /**
   Señal emitida si se cambia el texto en el editor, sólo si es del tipo FLLineEdit
