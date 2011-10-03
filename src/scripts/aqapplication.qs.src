@@ -557,6 +557,13 @@ class MainWindow
     exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
     connect(exportMod, "activated()", this.actSigMap_, "map()");
     this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
+
+    var importMod = new QAction(agm);
+    importMod.name = "importModulesAction";
+    importMod.menuText = sys.translate("&Importar Módulos desde Disco");
+    importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
+    connect(importMod, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
     
     var update = new QAction(agm);
     update.name = "updateAbanQAction";
@@ -827,6 +834,11 @@ function triggerAction(signature)
     case "exportModules()":
       if (ok)
         sys.exportModules();
+      break;
+
+    case "importModules()":
+      if (ok)
+        sys.importModules();
       break;
       
     case "updateAbanQ()":

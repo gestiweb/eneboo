@@ -105,4 +105,4 @@ const struct QSHashEntry mainTableEntries[] = {
    { "volatile", RESERVED, 0, 0 }
 };
 
-const struct QSHashTable mainTable = { 2, 74, mainTableEntries, 41 };
+const struct QSHashTable mainTable = { 2, 74, mainTableEntries, 40 };

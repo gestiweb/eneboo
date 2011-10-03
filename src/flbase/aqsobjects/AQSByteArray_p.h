@@ -28,6 +28,7 @@ class AQSByteArray : public AQSAbstractMemArray
 {
   Q_OBJECT
 
+  Q_PROPERTY(QString string READ string WRITE setString);
   Q_PROPERTY(QByteArray toVariant READ toVariant);
 
   AQ_DECLARE_AQS_VOID(ByteArray, AbstractMemArray);
@@ -91,6 +92,45 @@ public slots:
     if (!o_)
       return QByteArray();
     return qUncompress(*o_);
+  }
+
+  int rand() {
+    if (!o_)
+      return 0;
+    return rand_bytes(o_);
+  }
+
+  int rand_pseudo() {
+    if (!o_)
+      return 0;
+    return rand_pseudo_bytes(o_);
+  }
+
+  QByteArray aes256Encrypt(const QByteArray &key,
+                           const QByteArray &iv) {
+    if (!o_)
+      return QByteArray();
+    return aes_256_encrypt(o_, key, iv);
+  }
+
+  QByteArray aes256Decrypt(const QByteArray &key,
+                           const QByteArray &iv) {
+    if (!o_)
+      return QByteArray();
+    return aes_256_decrypt(o_, key, iv);
+  }
+
+  void setString(const QString &str) {
+    if (!o_)
+      return;
+    QTextStream ts(*o_, IO_WriteOnly);
+    ts << str;
+  }
+
+  QString string() const {
+    if (!o_)
+      return QString::null;
+    return QString(*o_);
   }
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@

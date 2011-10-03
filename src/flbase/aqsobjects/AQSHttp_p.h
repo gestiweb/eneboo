@@ -32,7 +32,7 @@ class AQSHttp : public AQSNetworkProtocol
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
-  int setHost(const QString &, Q_UINT16 = 80);
+  int setHost(const QString &, uint = 80);
   int get(const QString &, QIODevice *);
   int get(const QString &, AQSIODevice *);
   int post(const QString &, QIODevice *, QIODevice *);
@@ -62,7 +62,7 @@ public slots:
   int request(AQSHttpRequestHeader *, AQSByteArray *, AQSIODevice *);
   int closeConnection();
   ulong bytesAvailable() const;
-  long readBlock(char *, Q_ULONG);
+  long readBlock(char *, ulong);
   QByteArray *readAll();
   int currentId() const;
   QIODevice *currentSourceDevice() const;
@@ -81,9 +81,9 @@ protected:
     candidates[1].append(QString::fromLatin1("QObject*"));
     candidates[2].append(QString::fromLatin1("QObject*,QString"));
     candidates[1].append(QString::fromLatin1("QString"));
-    candidates[2].append(QString::fromLatin1("QString,Q_UINT16"));
-    candidates[3].append(QString::fromLatin1("QString,Q_UINT16,QObject*"));
-    candidates[4].append(QString::fromLatin1("QString,Q_UINT16,QObject*,QString"));
+    candidates[2].append(QString::fromLatin1("QString,uint"));
+    candidates[3].append(QString::fromLatin1("QString,uint,QObject*"));
+    candidates[4].append(QString::fromLatin1("QString,uint,QObject*,QString"));
     QString sgt(castArgsSignature(args, candidates));
     if (sgt.isEmpty())
       return new QHttp;
@@ -94,16 +94,16 @@ protected:
                        *(argValue<QString *>(args[1])));
     if (sgt == QString::fromLatin1("QString"))
       return new QHttp(*(argValue<QString *>(args[0])));
-    if (sgt == QString::fromLatin1("QString,Q_UINT16"))
+    if (sgt == QString::fromLatin1("QString,uint"))
       return new QHttp(*(argValue<QString *>(args[0])),
-                       *(argValue<Q_UINT16 *>(args[1])));
-    if (sgt == QString::fromLatin1("QString,Q_UINT16,QObject*"))
+                       args[1].variant().toUInt());
+    if (sgt == QString::fromLatin1("QString,uint,QObject*"))
       return new QHttp(*(argValue<QString *>(args[0])),
-                       *(argValue<Q_UINT16 *>(args[1])),
+                       args[1].variant().toUInt(),
                        argValue<QObject *>(args[2]));
-    if (sgt == QString::fromLatin1("QString,Q_UINT16,QObject*,QString"))
+    if (sgt == QString::fromLatin1("QString,uint,QObject*,QString"))
       return new QHttp(*(argValue<QString *>(args[0])),
-                       *(argValue<Q_UINT16 *>(args[1])),
+                       args[1].variant().toUInt(),
                        argValue<QObject *>(args[2]),
                        *(argValue<QString *>(args[3])));
     return 0;
@@ -116,16 +116,16 @@ public:
     candidates[1].append(QString::fromLatin1("QObject*"));
     candidates[2].append(QString::fromLatin1("QObject*,QString"));
     candidates[1].append(QString::fromLatin1("QString"));
-    candidates[2].append(QString::fromLatin1("QString,Q_UINT16"));
-    candidates[3].append(QString::fromLatin1("QString,Q_UINT16,QObject*"));
-    candidates[4].append(QString::fromLatin1("QString,Q_UINT16,QObject*,QString"));
+    candidates[2].append(QString::fromLatin1("QString,uint"));
+    candidates[3].append(QString::fromLatin1("QString,uint,QObject*"));
+    candidates[4].append(QString::fromLatin1("QString,uint,QObject*,QString"));
     return candidates;
   }
   //@AQ_END_DEF_PUB_SLOTS@
 };
 
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline int AQSHttp::setHost(const QString &arg0,  Q_UINT16 arg1)
+inline int AQSHttp::setHost(const QString &arg0,  uint arg1)
 {
   AQ_CALL_RET_V(setHost(arg0, arg1), int);
 }
@@ -245,7 +245,7 @@ inline ulong AQSHttp::bytesAvailable() const
 {
   AQ_CALL_RET_V(bytesAvailable(), ulong);
 }
-inline long AQSHttp::readBlock(char *arg0,  Q_ULONG arg1)
+inline long AQSHttp::readBlock(char *arg0,  ulong arg1)
 {
   AQ_CALL_RET_V(readBlock(arg0, arg1), long);
 }

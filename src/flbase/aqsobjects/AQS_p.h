@@ -19,6 +19,12 @@
 #ifndef AQS_P_H_
 #define AQS_P_H_
 
+#ifndef Q_OS_MACX
+#include <openssl/rand.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#endif
+
 #include <qdom.h>
 #include <qsinterpreter.h>
 #include <qmetaobject.h>
@@ -587,6 +593,7 @@ class AQS : public QObject
   Q_ENUMS(IconSetSize IconSetMode IconSetState)
   Q_ENUMS(ToolButtonTextPosition)
   Q_ENUMS(Corner)
+  Q_ENUMS(HttpState HttpError)
 
 public:
 
@@ -2660,7 +2667,7 @@ private:
     } \
   } \
   public: \
-  virtual const char *rtti() const { return #Class; } \
+  virtual const char *RTTI() const { return #Class; } \
   AQS##Class() : AQSBaseObject (), o_(0) {} \
   virtual ~AQS##Class() { \
     finish(); \
@@ -2876,6 +2883,116 @@ static inline QByteArray byteArrayFromBase64(QByteArray *ba)
   return tmp;
 }
 
+// Ver openssl/RAND_bytes
+static inline int rand_bytes(QByteArray *ba)
+{
+#if defined(Q_OS_MACX)
+  return 0;
+#else
+  return RAND_bytes((uchar *)ba->data(), ba->size());
+#endif
+}
+
+// Ver openssl/RAND_pseudo_bytes
+static inline int rand_pseudo_bytes(QByteArray *ba)
+{
+#if defined(Q_OS_MACX)
+  return 0;
+#else
+  return RAND_pseudo_bytes((uchar *)ba->data(), ba->size());
+#endif
+}
+
+static inline QByteArray aes_256_encrypt(QByteArray *ba,
+                                         const QByteArray &key, // Espera 256 bits (32 bytes)
+                                         const QByteArray &iv // Espera 256 bits (32 bytes)
+                                        )
+{
+#if defined(Q_OS_MACX)
+  return *ba;
+#else
+  EVP_CIPHER_CTX ctx;
+  EVP_CIPHER_CTX_init(&ctx);
+
+  if (!EVP_EncryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL,
+                          (uchar *)key.data(), (uchar *)iv.data())) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_EncryptInit_ex \n"));
+    return QByteArray();
+  }
+
+  int len = ba->size();
+  int c_len = len + ctx.cipher->block_size - 1;
+  int f_len = 0;
+  QByteArray res(c_len);
+  uchar *ciphertext = (uchar *)res.data();
+  uchar *plaintext = (uchar *)ba->data();
+
+  if (!EVP_EncryptUpdate(&ctx, ciphertext, &c_len, plaintext, len)) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_EncryptUpdate \n"));
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    return QByteArray();
+  }
+
+  if (!EVP_EncryptFinal_ex(&ctx, ciphertext + c_len, &f_len)) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_EncryptFinal_ex \n"));
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    return QByteArray();
+  }
+
+  EVP_CIPHER_CTX_cleanup(&ctx);
+  res.truncate(c_len + f_len);
+  return res;
+#endif
+}
+
+static inline QByteArray aes_256_decrypt(QByteArray *ba,
+                                         const QByteArray &key, // Espera 256 bits (32 bytes)
+                                         const QByteArray &iv // Espera 256 bits (32 bytes)
+                                        )
+{
+#if defined(Q_OS_MACX)
+  return *ba;
+#else
+  EVP_CIPHER_CTX ctx;
+  EVP_CIPHER_CTX_init(&ctx);
+
+  if (!EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL,
+                          (uchar *)key.data(), (uchar *)iv.data())) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_DecryptInit_ex \n"));
+    return QByteArray();
+  }
+
+  int len = ba->size();
+  int p_len = len;
+  int f_len = 0;
+  QByteArray res(p_len);
+  uchar *plaintext = (uchar *)res.data();
+  uchar *ciphertext = (uchar *)ba->data();
+
+  if (!EVP_DecryptUpdate(&ctx,  plaintext, &p_len, ciphertext, len)) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_DecryptUpdate \n"));
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    return QByteArray();
+  }
+
+  if (!EVP_DecryptFinal_ex(&ctx, plaintext + p_len, &f_len)) {
+    ERR_print_errors_fp(stderr);
+    AQS_IF_DEBUG(printf("AQS_p.h aes_256_encrypt: ERROR in EVP_DecryptFinal_ex \n"));
+    EVP_CIPHER_CTX_cleanup(&ctx);
+    return QByteArray();
+  }
+
+  EVP_CIPHER_CTX_cleanup(&ctx);
+  res.truncate(p_len + f_len);
+  return res;
+#endif
+}
+
 class AQSBaseObject : public QObject
 {
   Q_OBJECT
@@ -2902,7 +3019,7 @@ public:
     wrap_ = true;
   }
 
-  virtual const char *rtti() const = 0;
+  virtual const char *RTTI() const = 0;
 
   static QMap<int, QStringList> candidateConstructors() {
     return QMap<int, QStringList>();

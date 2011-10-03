@@ -210,12 +210,16 @@ IMAGES += images/infosial.png \
     images/minus.png \
     images/plus.png \
     images/down.png \
+    images/up.png \
+    images/bottom.png \
+    images/top.png \
     images/document-new.png \
     images/load.png \
     images/printer.png \
     images/folder.png \
     images/check_x_on.png \
-    images/export.png
+    images/export.png \
+    images/import.png
 include(aqsobjects/aqsobjects.pri)
 include(../../tools/qsac/qsac.pri)
 include(../../tools/packager/packager.pri)

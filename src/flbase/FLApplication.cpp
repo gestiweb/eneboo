@@ -650,6 +650,18 @@ void FLApplication::initToolBox()
 
         ++c;
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Importar Módulos desde Disco");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("import.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
+
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Actualización y Soporte");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
@@ -2232,6 +2244,11 @@ void FLApplication::loadModules()
 void FLApplication::exportModules()
 {
   call("sys.exportModules", QSArgumentList(), 0);
+}
+
+void FLApplication::importModules()
+{
+  call("sys.importModules", QSArgumentList(), 0);
 }
 
 void FLApplication::updateAbanQ()
