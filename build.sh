@@ -13,6 +13,7 @@ OPT_DIGIDOC=yes
 OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
+OPT_MAKE_SILENT=yes
 QT_DEBUG=""
 QT_DEBUG_OPT="-release -DQT_NO_CHECK"
 QSADIR=qsa
@@ -32,6 +33,12 @@ fi
 
 for a in "$@"; do
   case "$a" in
+    -verbose)
+      OPT_MAKE_SILENT=no
+    ;;
+    -silent)
+      OPT_MAKE_SILENT=yes
+    ;;
     -static)
       QT_DEBUG="$QT_DEBUG -static"
     ;;
@@ -99,7 +106,12 @@ for a in "$@"; do
   esac
 done
 
-CMD_MAKE="make -s "
+CMD_MAKE="make"
+if [ "$OPT_MAKE_SILENT" == "yes" ]; then
+  CMD_MAKE="$CMD_MAKE -s "
+fi
+
+
 MAKE_INSTALL=""
 QT_DEBUG="$QT_DEBUG $QT_DEBUG_OPT"
 
@@ -114,7 +126,8 @@ fi
 
 if [ "$OPT_MULTICORE" == "yes" ]; then
   PROCESSORS=$(expr  $(cat /proc/cpuinfo | grep processor | tail -n 1 | sed "s/.*:\(.*\)/\1/") + 1)
-  CMD_MAKE="make -k -j $PROCESSORS -s "
+  # CMD_MAKE="make -k -j $PROCESSORS -s "
+  CMD_MAKE="$CMD_MAKE -k -j $PROCESSORS "
 fi
   
 if [ "$BUILD_MACX" == "no" ]; then
@@ -160,7 +173,6 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
 
   OPT_PREFIX="$PWD/src/qt"
   BUILD_KEY="$VER-Build-mingw32-4.2"
-  CMD_MAKE="make -k -j $PROCESSORS "
 else
   MAKE_INSTALL="install"
 fi
@@ -189,6 +201,8 @@ PREFIX=$DIRINST
 
 echo -e "Directorio de instalación : $PREFIX\n"
 
+echo -e "El comando MAKE es: $CMD_MAKE\n"
+
 echo -e "Estableciendo configuración...\n"
 
 rm -f $HOME/.qmake.cache
@@ -198,7 +212,7 @@ mkdir $QTDIR/bin 2>/dev/null
 if [ ! -f $QTDIR/include/qglobal.h ]
 then
   cd $QTDIR
-  make -s -f Makefile.cvs
+  $CMD_MAKE -f Makefile.cvs
   cd $BASEDIR
 fi
 
@@ -249,8 +263,8 @@ then
     fi
   fi
 fi
-make -s qmake-install || exit 1
-make -s moc-install || exit 1
+$CMD_MAKE qmake-install || exit 1
+$CMD_MAKE moc-install || exit 1
 
 cd $BASEDIR
 
@@ -460,7 +474,7 @@ then
   fi
   if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
     cd $QTDIR/tools/designer/uic
-    make clean
+    $CMD_MAKE clean
     rm -f Makefile
     $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
     $CMD_MAKE || exit 1
@@ -481,7 +495,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   echo -e "\n ######## PART 1 ########\n"
   export QTDIR=/usr/share/qt3
   /usr/bin/qmake-qt3 -nocache -spec linux-g++ configure2.pro
-  make || exit 1
+  $CMD_MAKE || exit 1
   echo -e "\n ######## PART 2 ########\n"
   export QTDIR=$PREFIX
   cd $BASEDIR/src/qt
@@ -506,11 +520,14 @@ else
   ./configure
 fi
 $CMD_MAKE
-make -s $MAKE_INSTALL
-$CMD_MAKE
-make -s $MAKE_INSTALL
-$CMD_MAKE
-make -s $MAKE_INSTALL
+$CMD_MAKE $MAKE_INSTALL
+
+# ----> para que sirve tanto make?
+#$CMD_MAKE
+#$CMD_MAKE $MAKE_INSTALL
+#$CMD_MAKE
+#$CMD_MAKE $MAKE_INSTALL
+# <----------------------
 
 cd $BASEDIR
 
@@ -540,17 +557,17 @@ echo -e "Compilando...\n"
 cd src/flbase
 $QTDIR/bin/qmake flbase.pro
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-  make mocables || exit 1
+  $CMD_MAKE mocables || exit 1
 else
-  make uicables || exit 1
+  $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
 $CMD_MAKE
-make -s $MAKE_INSTALL
-$CMD_MAKE
-make -s $MAKE_INSTALL
-$CMD_MAKE || exit 1
-make -s $MAKE_INSTALL
+$CMD_MAKE $MAKE_INSTALL
+#$CMD_MAKE
+#$CMD_MAKE $MAKE_INSTALL
+#$CMD_MAKE || exit 1
+#$CMD_MAKE $MAKE_INSTALL
 
 if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
