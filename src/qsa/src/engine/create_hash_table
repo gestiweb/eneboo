@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/perl
 
 $file = $ARGV[0];
 open(IN, $file) or die "No such file $file";
@@ -10,7 +10,7 @@ open(IN, $file) or die "No such file $file";
 my $inside = 0;
 my $name;
 my $size;
-my $hashsize;
+my $hashsize; 
 my $banner = 0;
 
 while (<IN>) {
