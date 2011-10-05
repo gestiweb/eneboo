@@ -257,6 +257,9 @@ then
       # Configure informa de que no se encuentra MySQL o PostgreSQL, pero si se agrega:
       # -I/usr/include/mysql/ -I/usr/include/postgresql/
       # , se incluyen, pero luego aparece un error para libpg: LOCALEDIR undefined.
+      # rpath: -R $ORIGIN/../lib , sirve para que en Linux busque las librerías (también) de forma relativa al ejecutable del programa.
+      # ... pero el símbolo dólar ($) da problemas tanto en bash como en make. En bash hay que escaparlo, y en make hay que duplicar el símbolo dolar.
+      # ... hacer uso del flag "-continue" puede desembocar en que no se aplique el -rpath.
       ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu -thread -stl \
                   -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
                   -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
@@ -562,12 +565,12 @@ else
   $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
+$CMD_MAKE 
+$CMD_MAKE $MAKE_INSTALL 
+$CMD_MAKE
+$CMD_MAKE $MAKE_INSTALL
 $CMD_MAKE || exit 1
-$CMD_MAKE $MAKE_INSTALL || exit 1
-#$CMD_MAKE
-#$CMD_MAKE $MAKE_INSTALL
-#$CMD_MAKE || exit 1
-#$CMD_MAKE $MAKE_INSTALL
+$CMD_MAKE $MAKE_INSTALL
 
 if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
