@@ -21,7 +21,7 @@ OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
 QT_DEBUG=""
-QT_DEBUG_OPT="-release -DQT_NO_CHECK"
+QT_DEBUG_OPT="-release"
 QSADIR=qsa
 
 if [ "$BUILD_NUMBER" == "" ]; then
@@ -64,8 +64,11 @@ for a in "$@"; do
     -aqdebug)
       OPT_AQ_DEBUG=yes
     ;;
+    -no-check)
+     QT_DEBUG="$QT_DEBUG -DQT_NO_CHECK"
+    ;;
     -qtdebug)
-      QT_DEBUG_OPT="-debug -DQT_NO_CHECK"
+      QT_DEBUG_OPT="-debug"
       BUILD_NUMBER="$BUILD_NUMBER-qtdebug"
     ;;
     -sqllog)
@@ -512,7 +515,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   done
   rm -fr LICENSE.*
   touch LICENSE
-  svn up 2> /dev/null
+  # svn up 2> /dev/null
   cd $BASEDIR/src/$QSADIR
   ./configure2/configure2
   $QTDIR/bin/qmake CONFIG+="shared"
