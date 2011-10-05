@@ -519,8 +519,8 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
 else
   ./configure
 fi
-$CMD_MAKE
-$CMD_MAKE $MAKE_INSTALL
+$CMD_MAKE || exit 1
+$CMD_MAKE $MAKE_INSTALL || exit 1
 
 # ----> para que sirve tanto make?
 #$CMD_MAKE
@@ -562,8 +562,8 @@ else
   $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
-$CMD_MAKE
-$CMD_MAKE $MAKE_INSTALL
+$CMD_MAKE || exit 1
+$CMD_MAKE $MAKE_INSTALL || exit 1
 #$CMD_MAKE
 #$CMD_MAKE $MAKE_INSTALL
 #$CMD_MAKE || exit 1
