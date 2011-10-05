@@ -7,7 +7,13 @@ OPT_PREFIX=""
 OPT_QMAKESPEC=""
 OPT_DEBUG=no
 OPT_SQLLOG=no
-OPT_HOARD=yes
+
+OPT_HOARD=no
+# Hoard se desactiva por defecto. Eneboo funciona principalmente con un 
+# único hilo y hoard es un "memory allocator" orientado a mejorar la 
+# velocidad de malloc/free para multihilo, en sistemas con más de un 
+# núcleo.
+
 OPT_QWT=yes
 OPT_DIGIDOC=yes
 OPT_MULTICORE=yes
@@ -282,7 +288,7 @@ then
   echo -e "OK : qmake encontrado\n"
 else
   echo -e "ERROR : No se encuentra qmake, esta utilidad se proporciona con las Qt."
-  exho -e "        Comprueba que se encuentra en la ruta de búsqueda (variable $PATH).\n"
+  echo -e "        Comprueba que se encuentra en la ruta de búsqueda (variable $PATH).\n"
     exit 1
 fi
 
@@ -495,11 +501,9 @@ cp -fv ../qt/.qmake.cache src/$QSADIR/
 cp -fv ../qt/.qmake.cache src/plugin/
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   cd configure2
-  echo -e "\n ######## PART 1 ########\n"
   export QTDIR=/usr/share/qt3
   /usr/bin/qmake-qt3 -nocache -spec linux-g++ configure2.pro
   $CMD_MAKE || exit 1
-  echo -e "\n ######## PART 2 ########\n"
   export QTDIR=$PREFIX
   cd $BASEDIR/src/qt
   for license in LICENSE.*
@@ -510,11 +514,9 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   touch LICENSE
   svn up 2> /dev/null
   cd $BASEDIR/src/$QSADIR
-  echo -e "\n ######## PART 3 ########\n"
   ./configure2/configure2
   $QTDIR/bin/qmake CONFIG+="shared"
   rm -fr $BASEDIR/src/qt/LICENSE
-  echo -e "\n ######## PART 4 ########\n"
   for license in old_license.*
   do
     mv "$license" "LICENSE${license#old_license}"
