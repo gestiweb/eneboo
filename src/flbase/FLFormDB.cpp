@@ -216,11 +216,11 @@ void FLFormDB::hideEvent(QHideEvent *h)
     QRect geo(pW->x(), pW->y(), pW->width(), pW->height());
 
     if (this->isMinimized()) {
-      geo.setWidth(1);
-      aqApp->saveGeometryForm(QObject::name(), geo);
+      //geo.setWidth(1);
+      //aqApp->saveGeometryForm(QObject::name(), geo);
     } else if (this->isMaximized()) {
-      geo.setWidth(9999);
-      aqApp->saveGeometryForm(QObject::name(), geo);
+      //geo.setWidth(9999);
+      //aqApp->saveGeometryForm(QObject::name(), geo);
     } else
       aqApp->saveGeometryForm(QObject::name(), geo);
   } else {
@@ -278,40 +278,37 @@ void FLFormDB::initMainWidget(QWidget *w)
       acl->process(this);
 
     QWidget *pW = this->parentWidget();
+    if (!(pW && pW->isA("QWorkspaceChild"))) {
+      pW = this;
+    }
 
-    if (pW && pW->isA("QWorkspaceChild")) {
-      QRect geo(aqApp->geometryForm(QObject::name()));
+    QRect geo(aqApp->geometryForm(QObject::name()));
 
-      if (geo.width() == 9999) {
-        pW->resize(size().expandedTo(mWidget->size()));
-        pW->showMaximized();
-      } else if (geo.width() == 1) {
-        pW->resize(size().expandedTo(mWidget->size()));
-        pW->showMinimized();
-      } else if (geo.isValid()) {
-        QRect desk = QApplication::desktop()->availableGeometry(this);
-        QRect inter = desk.intersect(geo);
-        pW->resize(geo.size());
-        if (inter.width() * inter.height() > (geo.width() * geo.height() / 20))
-          pW->move(geo.topLeft());
-      } else
-        pW->resize(size().expandedTo(mWidget->size()));
+    if (geo.width() == 9999) {
+    } else if (geo.width() == 1) {
+    } else if (geo.isValid()) {
+      QRect desk = QApplication::desktop()->availableGeometry(this);
+      QRect inter = desk.intersect(geo);
+      // Exceeds available horizontal area:
+      if (geo.width() > desk.width() - 5) {
+        geo.setWidth(desk.width() - 5);
+      }
+      // Exceeds available vertical area:
+      if (geo.height() > desk.height() - 5) {
+        geo.setHeight(desk.height() - 5);
+      }
+      // Outside of screen, re-center:
+      if (  geo.right() > desk.right() - 1 
+         || geo.left() < desk.left() + 1
+         || geo.bottom() > desk.bottom() - 1 
+         || geo.top() < desk.top() + 1) {
+        geo.moveCenter(desk.center());
+      }
+        
+      pW->resize(geo.size());
+      pW->move(geo.topLeft());
     } else {
-      QRect geo(aqApp->geometryForm(QObject::name()));
-      if (geo.width() == 9999) {
-        this->resize(size().expandedTo(mWidget->size()));
-        this->showMaximized();
-      } else if (geo.width() == 1) {
-        this->resize(size().expandedTo(mWidget->size()));
-        this->showMinimized();
-      } else if (geo.isValid()) {
-        QRect desk = QApplication::desktop()->availableGeometry(this);
-        QRect inter = desk.intersect(geo);
-        this->resize(geo.size());
-        if (inter.width() * inter.height() > (geo.width() * geo.height() / 20))
-          this->move(geo.topLeft());
-      } else
-        this->resize(size().expandedTo(mWidget->size()));
+      pW->resize(size().expandedTo(mWidget->size()));
     }
 
     if (!initFocusWidget_) {
