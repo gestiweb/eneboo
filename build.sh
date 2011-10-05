@@ -288,16 +288,16 @@ fi
 
 cd $BASEDIR
 
-mkdir -p $PREFIX/share/abanq/images
-mkdir -p $PREFIX/share/abanq/forms
-mkdir -p $PREFIX/share/abanq/tables
-mkdir -p $PREFIX/share/abanq/translations
-mkdir -p $PREFIX/share/abanq/scripts
-mkdir -p $PREFIX/share/abanq/queries
-mkdir -p $PREFIX/share/abanq/reports
-mkdir -p $PREFIX/share/abanq/tmp
-mkdir -p $PREFIX/share/abanq/doc
-mkdir -p $PREFIX/share/abanq/packages
+mkdir -p $PREFIX/share/eneboo/images
+mkdir -p $PREFIX/share/eneboo/forms
+mkdir -p $PREFIX/share/eneboo/tables
+mkdir -p $PREFIX/share/eneboo/translations
+mkdir -p $PREFIX/share/eneboo/scripts
+mkdir -p $PREFIX/share/eneboo/queries
+mkdir -p $PREFIX/share/eneboo/reports
+mkdir -p $PREFIX/share/eneboo/tmp
+mkdir -p $PREFIX/share/eneboo/doc
+mkdir -p $PREFIX/share/eneboo/packages
 mkdir -p $PREFIX/lib
 mkdir -p $PREFIX/bin
 
@@ -378,7 +378,7 @@ void AQConfig::init(QApplication *aqApp)
   aqDirApp = QDir::cleanDirPath(aqApp->applicationDirPath() + QString::fromLatin1("/.."));
 #endif
   aqKeyBase = QString::fromLatin1("Eneboo/");
-  aqData = aqDirApp + QString::fromLatin1("/share/abanq");
+  aqData = aqDirApp + QString::fromLatin1("/share/eneboo");
   aqLib = aqDirApp + QString::fromLatin1("/lib");
   aqBin = aqDirApp + QString::fromLatin1("/bin");
   aqUsrHome = QDir::cleanDirPath(QDir::home().absPath());
@@ -617,23 +617,23 @@ then
 fi
 
 echo -e "\nTerminando compilación...\n"
-cp -f ./src/fllite/images/icon*.png $PREFIX/share/abanq/images 2> /dev/null
-cp -f ./src/forms/*.ui $PREFIX/share/abanq/forms 2> /dev/null
-cp -f ./src/tables/*.mtd $PREFIX/share/abanq/tables 2> /dev/null
-cp -f ./src/translations/*.ts $PREFIX/share/abanq/translations 2> /dev/null
-#cp -f ./src/scripts/*.qs $PREFIX/share/abanq/scripts 2> /dev/null
-rm $PREFIX/share/abanq/scripts/* 2> /dev/null
-cp -f ./src/scripts/*.qs.src $PREFIX/share/abanq/scripts 2> /dev/null
-for file in $PREFIX/share/abanq/scripts/*.qs.src
+cp -f ./src/fllite/images/icon*.png $PREFIX/share/eneboo/images 2> /dev/null
+cp -f ./src/forms/*.ui $PREFIX/share/eneboo/forms 2> /dev/null
+cp -f ./src/tables/*.mtd $PREFIX/share/eneboo/tables 2> /dev/null
+cp -f ./src/translations/*.ts $PREFIX/share/eneboo/translations 2> /dev/null
+#cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
+rm $PREFIX/share/eneboo/scripts/* 2> /dev/null
+cp -f ./src/scripts/*.qs.src $PREFIX/share/eneboo/scripts 2> /dev/null
+for file in $PREFIX/share/eneboo/scripts/*.qs.src
 do
   DST="${file%.src}"
   mv "$file" "$DST"
 done
 
-cp -f ./src/docs/*.html $PREFIX/share/abanq/doc 2> /dev/null
-cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
-cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null
-cp -f ./packages/*.abanq $PREFIX/share/abanq/packages 2> /dev/null
+cp -f ./src/docs/*.html $PREFIX/share/eneboo/doc 2> /dev/null
+cp -f ./src/*.xml $PREFIX/share/eneboo 2> /dev/null
+cp -f ./src/*.xpm $PREFIX/share/eneboo 2> /dev/null
+# cp -f ./packages/*.eneboo $PREFIX/share/eneboo/packages 2> /dev/null
 
 echo -e "\n * Eneboo $VERSION - Compilación terminada. * \n"
 
