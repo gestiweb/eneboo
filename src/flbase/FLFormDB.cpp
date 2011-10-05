@@ -297,11 +297,28 @@ void FLFormDB::initMainWidget(QWidget *w)
       if (geo.height() > desk.height() - 5) {
         geo.setHeight(desk.height() - 5);
       }
+      
+      if ( geo.top() < desk.top() )  {
+        geo.setTop(desk.top());
+      }
+      
+      if ( geo.left() < desk.left() ) {
+        geo.setLeft(desk.left());
+      }
+      
+      if ( geo.bottom() > desk.bottom() ) {
+        geo.setBottom(desk.bottom());
+      }
+      
+      if ( geo.right() > desk.right() ) {
+        geo.setRight(desk.right());
+      }
+      
       // Outside of screen, re-center:
-      if (  geo.right() > desk.right() - 1 
-         || geo.left() < desk.left() + 1
-         || geo.bottom() > desk.bottom() - 1 
-         || geo.top() < desk.top() + 1) {
+      if (  geo.right() > desk.right()  
+         || geo.left() < desk.left() 
+         || geo.bottom() > desk.bottom() 
+         || geo.top() < desk.top() ) {
         geo.moveCenter(desk.center());
       }
         
