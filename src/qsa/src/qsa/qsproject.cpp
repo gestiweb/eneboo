@@ -32,7 +32,9 @@
 
 #include "../engine/qsfuncref.h"
 #ifdef QSDEBUGGER
+#ifdef QSDEBUGGER_VISUAL
 #include "../ide/idewindow.h"
+#endif
 #include "../kernel/quickdebugger.h"
 #endif
 #include "../kernel/quickinterpreter.h"

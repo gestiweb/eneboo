@@ -20,15 +20,16 @@ OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
+OPT_DEBUGGER=no
 QT_DEBUG=""
 QT_DEBUG_OPT="-release"
 QSADIR=qsa
 
-if [ "$BUILD_NUMBER" == "" ]; then
+if [ -e ".svn" -a "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(svnversion . -n)"
 fi
 
-if [ "$BUILD_NUMBER" == "" ]; then
+if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(git describe --tags)"
 fi
 
@@ -59,6 +60,7 @@ for a in "$@"; do
     ;;
     -debug)
       OPT_DEBUG=yes
+      OPT_DEBUGGER=yes
       BUILD_NUMBER="$BUILD_NUMBER-debug"
     ;;
     -aqdebug)
@@ -139,6 +141,7 @@ if [ "$OPT_MULTICORE" == "yes" ]; then
   CMD_MAKE="$CMD_MAKE -k -j $PROCESSORS "
 fi
   
+unlink src/libmysql 2>/dev/null
 if [ "$BUILD_MACX" == "no" ]; then
   QT_DEBUG="$QT_DEBUG -DQT_NO_COMPAT"
   ln -s libmysql_std src/libmysql
