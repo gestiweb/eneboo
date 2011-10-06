@@ -6,6 +6,5 @@ no-png {
 	      designer
     #SUBDIRS += linguist
 }
-
 CONFIG+=ordered
 REQUIRES=full-config

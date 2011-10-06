@@ -1,5 +1,4 @@
 TEMPLATE = subdirs
-
 contains(sql-plugins, psql)	: SUBDIRS += psql
 contains(sql-plugins, mysql)	: SUBDIRS += mysql
 contains(sql-plugins, odbc)	: SUBDIRS += odbc

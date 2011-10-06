@@ -6,9 +6,8 @@
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the Qwt License, Version 1.0
 ##############################################
-
+PRJ_MODULE = QWT
 include( qwtconfig.pri )
-
 TEMPLATE = subdirs
 
 SUBDIRS = \

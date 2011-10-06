@@ -3,7 +3,6 @@
 ######################################################################
 TEMPLATE = app
 INCLUDEPATH += .
-
 # Input
 HEADERS += disasm.h \
            fterrcompat.h \

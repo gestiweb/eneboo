@@ -1,10 +1,10 @@
+PRJ_MODULE      = SqlDrivers-SqlLite
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }
 else {
         error("settings.pro missing, unable to build")
 }
-
 TEMPLATE = lib
 CONFIG += warn_off plugin
 DESTDIR = $$PREFIX/plugins/sqldrivers

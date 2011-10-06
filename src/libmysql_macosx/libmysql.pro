@@ -1,3 +1,4 @@
+PRJ_MODULE      = LibMySQL-MacOSX
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }
@@ -6,7 +7,6 @@ else {
 }
 
 TEMPLATE = lib
-
 CONFIG += warn_off create_prl
 !mac:CONFIG += plugin
 CONFIG -= qt x11

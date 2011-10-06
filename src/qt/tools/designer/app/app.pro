@@ -4,7 +4,6 @@ exists(./hoard.pri) {
 
 TEMPLATE 	= app
 TARGET		= designer
-
 CONFIG 		-= moc dll
 DESTDIR		= $$QT_BUILD_TREE/bin
 

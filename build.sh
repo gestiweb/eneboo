@@ -2,7 +2,7 @@
 
 VER="2.4"
 
-REBUILD_QT=yes
+REBUILD_QT=auto
 OPT_PREFIX=""
 OPT_QMAKESPEC=""
 OPT_DEBUG=no
@@ -54,8 +54,8 @@ for a in "$@"; do
     -single)
       OPT_MULTICORE=no
     ;;
-    -continue)
-      REBUILD_QT=no
+    -rebuild-qt)
+      REBUILD_QT=yes
     ;;
     -debug)
       OPT_DEBUG=yes
@@ -236,8 +236,19 @@ if [ "$OPT_HOARD" = "yes" ]
 then
   echo "CONFIG *= enable_hoard" >> tools/designer/app/hoard.pri
 fi
+if [ "$REBUILD_QT" = "auto" ]
+then
+  if $CMD_MAKE qmake-install
+  then
+    REBUILD_QT=no
+  else
+    REBUILD_QT=yes
+  fi
+fi
+
 if [ "$REBUILD_QT" = "yes" ]
 then
+  $CMD_MAKE confclean
   if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
     cd $BASEDIR
     TMP_QTDIR=$(echo $QTDIR | sed "s/\//\\\\\\\\\\\\\\//g")
@@ -468,32 +479,31 @@ then
   $CMD_MAKE || exit 1
   cd $BASEDIR
 fi
-if [ "$REBUILD_QT" = "yes" ]
-then
-  echo -e "\nCompilando Qt ($QTDIR) ...\n"
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
-  export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
 
-  if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-    export QTDIR=$BASEDIR/src/qt
-    cd $QTDIR/src
-    $QTDIR/bin/qmake -spec $QTDIR/mkspecs/win32-g++-cross -o Makefile.main qtmain.pro
-    $CMD_MAKE -f Makefile.main || exit 1
-  fi
-  if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
-    cd $QTDIR/tools/designer/uic
-    $CMD_MAKE || exit 1
-  fi
-  if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
-    cd $QTDIR/tools/designer/uic
-    $CMD_MAKE clean
-    rm -f Makefile
-    $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
-    $CMD_MAKE || exit 1
-  fi
-  cd $QTDIR
-  $CMD_MAKE $MAKE_INSTALL || exit 1
+
+echo -e "\nCompilando Qt ($QTDIR) ...\n"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:$PREFIX/lib
+
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+  export QTDIR=$BASEDIR/src/qt
+  cd $QTDIR/src
+  $QTDIR/bin/qmake -spec $QTDIR/mkspecs/win32-g++-cross -o Makefile.main qtmain.pro
+  $CMD_MAKE -f Makefile.main || exit 1
 fi
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+  cd $QTDIR/tools/designer/uic
+  $CMD_MAKE || exit 1
+fi
+if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
+  cd $QTDIR/tools/designer/uic
+  $CMD_MAKE clean
+  rm -f Makefile
+  $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
+  $CMD_MAKE || exit 1
+fi
+cd $QTDIR
+$CMD_MAKE $MAKE_INSTALL || exit 1
 
 export QTDIR=$PREFIX
 
@@ -561,7 +571,7 @@ cp -f src/qt/.qmake.cache src/plugins/styles/bluecurve/
 
 $QTDIR/bin/qmake user.pro
 
-echo -e "Compilando...\n"
+echo -e " * * * Compilando Eneboo ...\n"
 cd src/flbase
 $QTDIR/bin/qmake flbase.pro
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
@@ -570,10 +580,6 @@ else
   $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
-$CMD_MAKE 
-$CMD_MAKE $MAKE_INSTALL 
-$CMD_MAKE
-$CMD_MAKE $MAKE_INSTALL
 $CMD_MAKE || exit 1
 $CMD_MAKE $MAKE_INSTALL
 

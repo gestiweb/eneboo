@@ -1,3 +1,4 @@
+PRJ_MODULE      = FieldDB
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }

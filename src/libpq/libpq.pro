@@ -1,3 +1,4 @@
+PRJ_MODULE      = LibPQ
 exists(../../settings.pro) {
         include(../../settings.pro)
 }

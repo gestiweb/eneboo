@@ -1,10 +1,10 @@
+PRJ_MODULE      = QSA-Src
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }
 else {
         error("settings.pro missing, unable to build")
 }
-
 TEMPLATE	= lib
 CONFIG		+= warn_on link_prl
 !mac:CONFIG += plugin

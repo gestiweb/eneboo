@@ -1,3 +1,4 @@
+PRJ_MODULE      = OpenSSL-crypto
 exists(../../../../settings.pro) {
 	include(../../../../settings.pro)
 }

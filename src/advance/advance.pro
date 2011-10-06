@@ -4,7 +4,7 @@ exists(../../settings.pro) {
 else {
 	error("settings.pro missing, unable to build")
 }
-
+PRJ_MODULE      = Advance
 TEMPLATE = lib
 
 CONFIG += warn_off createprl linkprl qt 

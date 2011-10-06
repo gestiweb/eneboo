@@ -1,3 +1,4 @@
+PRJ_MODULE      = FLTableDB
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }

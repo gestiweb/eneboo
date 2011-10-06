@@ -1,3 +1,4 @@
+PRJ_MODULE      = Eneboo-src
 exists(../settings.pro) {
   include(../settings.pro)
 }

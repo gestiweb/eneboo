@@ -1,6 +1,5 @@
 TEMPLATE = lib
 TARGET	 = qsqlpsql
-
 CONFIG	+= qt plugin
 DESTDIR	 = ../../../sqldrivers
 

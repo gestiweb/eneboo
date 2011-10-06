@@ -1,10 +1,10 @@
+PRJ_MODULE      = LibHoard
 exists(../../settings.pro) {
         include(../../settings.pro)
 }
 else {
         error("settings.pro missing, unable to build")
 }
-
 TEMPLATE = lib
 CONFIG += warn_off exceptions plugin
 CONFIG -= x11 qt

@@ -3,7 +3,6 @@ TEMPLATE = lib
 TARGET	 = qtmain
 VERSION	 = 3.8.0
 DESTDIR	 = $$QMAKE_LIBDIR_QT
-
 CONFIG	+= qt staticlib warn_off release
 CONFIG	-= dll
 

@@ -1,3 +1,4 @@
+PRJ_MODULE      = Styles-QtCurve
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }

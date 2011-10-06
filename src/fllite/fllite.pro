@@ -1,10 +1,10 @@
+PRJ_MODULE      = FLLite
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }
 else {
 	error("settings.pro missing, unable to build")
 }
-
 TEMPLATE = app 
 
 CONFIG += warn_off link_prl qt 

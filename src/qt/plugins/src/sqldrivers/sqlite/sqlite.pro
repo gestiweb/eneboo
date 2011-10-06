@@ -1,6 +1,5 @@
 TEMPLATE = lib
 TARGET	 = qsqlite
-
 CONFIG	+= qt plugin
 DESTDIR	 = ../../../sqldrivers
 

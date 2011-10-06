@@ -1,3 +1,4 @@
+PRJ_MODULE      = Styles-BlueCurve
 exists(../../../../settings.pro) {
         include(../../../../settings.pro)
 }

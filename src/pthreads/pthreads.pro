@@ -1,3 +1,4 @@
+PRJ_MODULE      = pthreads
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }
@@ -6,7 +7,6 @@ else {
 }
 
 TEMPLATE = lib
-
 DEFINES += _REENTRANT HAVE_CONFIG_H
 CONFIG += warn_off exceptions
 CONFIG -= qt debug

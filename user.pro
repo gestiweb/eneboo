@@ -1,3 +1,4 @@
+PRJ_MODULE      = Eneboo-project
 exists(settings.pro) {
 	include(settings.pro)
 } else {

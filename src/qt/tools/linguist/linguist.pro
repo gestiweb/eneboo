@@ -6,5 +6,4 @@ SUBDIRS		= linguist
 		         qm2ts
 }
 CONFIG += ordered
-
 REQUIRES=full-config #nocrosscompiler
