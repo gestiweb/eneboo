@@ -8,7 +8,7 @@
 ##############################################
 
 # qmake project file for building the qwt libraries
-
+PRJ_MODULE = QWT
 include( ../qwtconfig.pri )
 
 TARGET            = qwt
