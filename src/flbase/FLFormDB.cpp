@@ -288,7 +288,14 @@ void FLFormDB::initMainWidget(QWidget *w)
     } else if (geo.width() == 1) {
     } else if (geo.isValid()) {
       QRect desk = QApplication::desktop()->availableGeometry(this);
+#if defined(Q_OS_WIN32)
+      // In windows, desktop seems to be the entire screen, instead of the 
+      // .. available area for apps. 
+      desk.setHeight(desk.height()-32);
+#endif
+      
       QRect inter = desk.intersect(geo);
+      
       // Exceeds available horizontal area:
       if (geo.width() > desk.width() - 5) {
         geo.setWidth(desk.width() - 5);
