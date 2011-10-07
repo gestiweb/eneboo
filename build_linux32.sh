@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build.sh -prefix "$(pwd)/eneboo-build-linux32/" -platform "linux-g++" -debug
+./build.sh -prefix "$(pwd)/eneboo-build-linux32/" -platform "linux-g++"
