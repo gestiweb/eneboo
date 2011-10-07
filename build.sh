@@ -586,7 +586,9 @@ else
   $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
-$CMD_MAKE || exit 1
+# A veces (en win32) no compila correctamente qwt, porque compila antes el designer plugin de qwt que la propia librería.
+# , por eso, esperamos que el make falle y lo re-ejecutamos, para que complete.
+$CMD_MAKE || { $CMD_MAKE || exit 1; }
 $CMD_MAKE $MAKE_INSTALL
 
 if  [ "$BUILD_MACX" == "yes" ];then
