@@ -291,7 +291,8 @@ void FLFormDB::initMainWidget(QWidget *w)
 #if defined(Q_OS_WIN32)
       // In windows, desktop seems to be the entire screen, instead of the 
       // .. available area for apps. 
-      desk.setHeight(desk.height()-32);
+      desk.setHeight(desk.height()-34);
+      desk.setWidth(desk.width()-6);
 #endif
       
       QRect inter = desk.intersect(geo);
