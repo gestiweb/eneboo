@@ -20,7 +20,7 @@ OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
-OPT_DEBUGGER=no
+OPT_DEBUGGER=yes
 QT_DEBUG=""
 QT_DEBUG_OPT="-release"
 QSADIR=qsa
@@ -57,6 +57,9 @@ for a in "$@"; do
     ;;
     -rebuild-qt)
       REBUILD_QT=yes
+    ;;
+    -no-debugger)
+      OPT_DEBUGGER=no
     ;;
     -debug)
       OPT_DEBUG=yes

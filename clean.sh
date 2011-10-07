@@ -107,7 +107,7 @@ rm -f	     src/qt/mkspecs/default
 
 rm -f	     src/qt/tools/designer/app/hoard.pri
 
-find . -name "abanq-build" -exec rm -vfR \{\} \;
+find . -name "eneboo-build*" -exec rm -vfR \{\} \;
 find . -name "*~" -exec rm -vf \{\} \;
 find . -name "*.bak" -exec rm -vf \{\} \;
 find . -name "*.old" -exec rm -vf \{\} \;
