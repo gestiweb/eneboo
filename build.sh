@@ -31,7 +31,10 @@ if [ -e ".svn" -a "$BUILD_NUMBER" == "" ]; then
 fi
 
 if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
-  BUILD_NUMBER="$(git describe --tags)"
+  APPEND="$(git diff --quiet || echo '-dev')"
+  BUILD_NUMBER="$(git describe --tags)$APPEND"
+  
+  
 fi
 
 if [ "$BUILD_NUMBER" == "" ]; then
