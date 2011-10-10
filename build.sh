@@ -1,5 +1,6 @@
 #!/bin/bash
-
+DIR="$( cd -P "$( dirname "$0" )" && pwd )"
+cd "$DIR"
 VER="2.4"
 
 REBUILD_QT=auto
@@ -34,7 +35,14 @@ if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
 fi
 
 if [ "$BUILD_NUMBER" == "" ]; then
-  BUILD_NUMBER="user-$(date --rfc-3339=date)"
+  SRC_VERSION="${DIR##*/eneboo-}"
+  if [ "$SRC_VERSION" != "$DIR" -a "$SRC_VERSION" != "" ]; then
+    BUILD_NUMBER=$SRC_VERSION
+  fi
+fi
+
+if [ "$BUILD_NUMBER" == "" ]; then
+  BUILD_NUMBER="unknown-$(date --rfc-3339=date)"
 fi
 
 
