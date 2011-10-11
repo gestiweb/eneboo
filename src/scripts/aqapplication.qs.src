@@ -415,7 +415,7 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
                     }
    if (!visible) 
          {
-         tw.addTab(fm,new QSet(iconSet16x16(new QPixmap(Pixmap))), texto);
+         tw.addTab(fm,new QIconSet(iconSet16x16(new QPixmap(Pixmap))), texto);
          idx = tw.indexOf(fm);
          fm.setIdMDI(actionName);
          fm.show();
