@@ -173,6 +173,7 @@ class MainWindow
   var actSigMap_;
   var initializedMods_;
   var mainWidgets_;
+  var ListaTabs_ = [];
 
   function MainWindow(app)
   {
@@ -275,7 +276,7 @@ class MainWindow
   function readState()
   {
     var w = this.w_;
-
+    var mng = aqApp.db().managerModules();
     this.dckMod_.readState();
     this.dckRec_.readState();
     this.dckMar_.readState();
@@ -300,7 +301,7 @@ class MainWindow
       for (var i = 0; i < tw.count; ++i)
         tw.page(i).close();
       for (var i = 0; i < openActions.length; ++i)
-        this.addForm(openActions[i]);
+        this.addForm(openActions[i],this.iconSet16x16(mng.iconModule(openActions[i])));
       var idx = settings.readNumEntry(key + "currentPageIndex");
       if (idx >= 0 && idx < tw.count)
         tw.setCurrentPage(idx);
@@ -389,12 +390,39 @@ class MainWindow
     if (fm.mainWidget() == undefined)
       return;
 
-    tw.addTab(fm,new QIconSet(iconSet16x16(new QPixmap(Pixmap))), fm.caption);
-    fm.setIdMDI(actionName);
-    fm.show();
-    var idx = tw.indexOf(fm);
-    tw.setCurrentPage(idx);
-  }
+var idx = undefined;
+var texto = undefined;
+var visible = false; 
+if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName]; 
+    if(texto == undefined)
+                   {
+                    for (var i = 0; i < tw.count; ++i) if (tw.tabLabel(tw.page(i)) == fm.caption) texto = fm.caption + " (bís)"; 
+                   if (texto == undefined) texto = fm.caption; 
+                   }
+                   else 
+                     { 
+                      texto = this.ListaTabs_[actionName];
+                        for (var i = 0; i < tw.count; ++i)
+                                           {
+                       if (tw.tabLabel(tw.page(i)) == texto) 
+                                                    {
+                                                    this.ListaTabs_[actionName] = texto;
+                                                    visible = true;
+                                                    idx = i;
+                                                    }
+                                           }
+                        
+                    }
+   if (!visible) 
+         {
+         tw.addTab(fm,new QSet(iconSet16x16(new QPixmap(Pixmap))), texto);
+         idx = tw.indexOf(fm);
+         fm.setIdMDI(actionName);
+         fm.show();
+         this.ListaTabs_[actionName]=texto;
+         } 
+   tw.setCurrentPage(idx);  // llamamos a nuestra pestaña
+}
 
   function addRecent(action)
   {
