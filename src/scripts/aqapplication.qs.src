@@ -380,7 +380,7 @@ class MainWindow
     mng.setActiveIdModule(module);
   }
 
-  function addForm(actionName)
+  function addForm(actionName,Pixmap)
   {
     var tw = this.tw_;
     var fm = new AQFormDB(actionName, tw, 0);
@@ -389,7 +389,7 @@ class MainWindow
     if (fm.mainWidget() == undefined)
       return;
 
-    tw.addTab(fm, fm.caption);
+    tw.addTab(fm,new QIconSet(iconSet16x16(new QPixmap(Pixmap))), fm.caption);
     fm.setIdMDI(actionName);
     fm.show();
     var idx = tw.indexOf(fm);
@@ -814,7 +814,7 @@ function triggerAction(signature)
 
     case "openDefaultForm()":
       if (ok) {
-        mw.addForm(ac.name);
+        mw.addForm(ac.name,ac.iconSet().pixmap());
         mw.addRecent(ac);
       }
       break;
