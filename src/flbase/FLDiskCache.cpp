@@ -67,7 +67,7 @@ void FLDiskCache::clear()
 #ifndef QSDEBUGGER
   QTextCodec *codec = QTextCodec::codecForLocale();
   QString localEncode(codec ? codec->mimeName() : "");
-  QString path(AQ_USRHOME + "/.aqcache/" + localEncode);
+  QString path(AQ_USRHOME + "/.eneboocache/" + localEncode);
   QDir d2(path);
   if (d2.exists()) {
     QStringList lst = d2.entryList("sys*");
@@ -98,12 +98,12 @@ void FLDiskCache::init(FLApplication *app)
   QTextCodec *codec = QTextCodec::codecForLocale();
   QString localEncode(codec ? codec->mimeName() : "");
   if (!app) {
-    aqSetAndCreateDirPath(AQ_USRHOME + "/.aqcache");
+    aqSetAndCreateDirPath(AQ_USRHOME + "/.eneboocache");
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
   } else {
     aqSetAndCreateDirPath(
-      AQ_USRHOME + "/.aqcache/" +
+      AQ_USRHOME + "/.eneboocache/" +
       app->db()->database()
     );
     if (!localEncode.isEmpty())
