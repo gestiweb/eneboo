@@ -193,7 +193,7 @@ class AQTimer {
 function loadModules(input, warnBackup)
 {
   if (input == undefined) {
-    var dir = new Dir(sys.installPrefix() + "/share/abanq/packages");
+    var dir = new Dir(sys.installPrefix() + "/share/eneboo/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
               "AbanQ Packages (*.abanq)",
