@@ -20,6 +20,8 @@ win32 {
   RC_FILE = version.rc
   LIBS += -lws2_32
   QMAKE_CC = $(CXX)
+  QMAKE_CFLAGS = 
+  QMAKE_LFLAGS =
 }
 
 VERSION = 2
