@@ -263,6 +263,8 @@ then
   fi
 fi
 
+export ORIGIN=\\\$\$ORIGIN
+
 if [ "$REBUILD_QT" = "yes" ]
 then
   $CMD_MAKE confclean
@@ -290,7 +292,6 @@ then
                     -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
       fi
     else
-      export ORIGIN=\\\$\$ORIGIN
       # Configure informa de que no se encuentra MySQL o PostgreSQL, pero si se agrega:
       # -I/usr/include/mysql/ -I/usr/include/postgresql/
       # , se incluyen, pero luego aparece un error para libpg: LOCALEDIR undefined.
