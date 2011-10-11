@@ -60,7 +60,7 @@
 #include <qmutex.h>
 #include <qgroupbox.h>
 #include <qnetwork.h>
-#include <aqapplication.h>
+#include "../qt/include/aqapplication.h"
 
 #define AQ_SET_MNGLOADER                 \
   bool noMngLoader = (mngLoader_ == 0);  \

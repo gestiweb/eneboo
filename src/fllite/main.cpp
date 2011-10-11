@@ -23,14 +23,14 @@
 
 #include <qsplashscreen.h>
 
-#include "FLConnectDBDialog.h"
-#include "FLDiskCache.h"
-#include "FLSqlDatabase.h"
-#include "FLSqlConnections.h"
-#include "FLSettings.h"
+#include "../flbase/FLConnectDBDialog.h"
+#include "../flbase/FLDiskCache.h"
+#include "../flbase/FLSqlDatabase.h"
+#include "../flbase/FLSqlConnections.h"
+#include "../flbase/FLSettings.h"
 
-#include "AQApplication.h"
-#include "AQConfig.h"
+#include "../flbase/AQApplication.h"
+#include "../../AQConfig.h"
 
 static inline bool silentConnect(const QString &conn)
 {

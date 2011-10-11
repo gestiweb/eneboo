@@ -143,6 +143,8 @@ QT_DEBUG="$QT_DEBUG $QT_DEBUG_OPT"
 BUILD_MACX="no"
 if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
   BUILD_MACX="yes"
+  OPT_MULTICORE="no"
+  OPT_DIGIDOC="no"
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
@@ -607,12 +609,12 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
 	CMD_INST_NAME_TOOL=${CROSS}install_name_tool
   
-	${CROSS}install_name_tool -change libqsa.1.dylib @executable_path/../../../../lib/libqsa.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libqwt.5.dylib @executable_path/../../../../lib/libqwt.5.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
+	${CROSS}install_name_tool -change libqsa.1.dylib @executable_path/../../../../lib/libqsa.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libqwt.5.dylib @executable_path/../../../../lib/libqwt.5.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	
 	for i in $(find $PREFIX -type f -name "*.dylib" -print)
 	do
