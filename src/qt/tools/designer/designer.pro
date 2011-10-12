@@ -4,8 +4,8 @@ CONFIG  += ordered
 
 SUBDIRS	=  uic \
 	   uilib \
-	   designer
-#SUBDIR	+= app
+	   designer \
+            app
 
 dll:SUBDIRS *=  editor plugins
 shared:SUBDIRS *=  editor plugins
