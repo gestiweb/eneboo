@@ -3125,6 +3125,13 @@ void QApplication::postEvent( QObject *receiver, QEvent *event )
 	delete event;
 	return;
     }
+    if ( receiver->aqWasDeleted() ) {
+#if defined(QT_CHECK_NULL)
+	qWarning( "QApplication::postEvent: Unexpected posted event for an already deleted QObject" );
+#endif
+	delete event;
+	return;
+    }
 
 #ifdef QT_THREAD_SUPPORT
     QMutexLocker locker( postevent_mutex );
@@ -3268,17 +3275,22 @@ void QApplication::sendPostedEvents( QObject *receiver, int event_type )
 
 		// look for the local list, and take whatever we're
 		// delivering out of it. r->postedEvents maybe *l
+                // "r" ya es invalido.
 		if ( r->postedEvents ) {
-		    r->postedEvents->removeRef( pe );
+                    // *** En algun momento, postedEvents es !=NULL, pero no es
+                    // .. un puntero valido.
+                    if (r->postedEvents->count()) {
+                        r->postedEvents->removeRef( pe );
+                    }
 		    // if possible, get rid of that list. this is not
 		    // ideal - we will create and delete a list for
 		    // each update() call. it would be better if we'd
 		    // leave the list empty here, and delete it
 		    // somewhere else if it isn't being used.
-		    if ( r->postedEvents->isEmpty() ) {
+		    /*if ( r->postedEvents->isEmpty() ) {
 			delete r->postedEvents;
 			r->postedEvents = 0;
-		    }
+		    }*/
 		}
 
 #ifdef QT_THREAD_SUPPORT

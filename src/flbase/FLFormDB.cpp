@@ -233,8 +233,9 @@ void FLFormDB::showEvent(QShowEvent *e)
 {
   QWidget::showEvent(e);
   this->showForm();
-  if (!aqApp->project()->interpreter()->hadError())
+  if (!isClosing_ and !this->aqWasDeleted() and !aqApp->project()->interpreter()->hadError()) {
     QTimer::singleShot(0, this, SLOT(emitFormReady()));
+  }
 }
 
 void FLFormDB::showForm()

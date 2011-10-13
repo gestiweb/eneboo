@@ -23,6 +23,7 @@
 #include "AQSEvent_p.h"
 #include <qscrollview.h>
 #include <qbitarray.h>
+#include <qguardedptr.h>
 
 #define AQ_DECLARE_AQS_PREFIX_OBJECT(Prefix,Class,BaseClass) \
   protected: \
@@ -31,7 +32,8 @@
     AQS##BaseClass::internalInit(o); \
   } \
   private: \
-  Prefix##Class *o_; \
+  /*Prefix##Class *o_;*/ \
+  QGuardedPtr<Prefix##Class> o_;\
   void init(QObject *qo) { \
     o_ = ::qt_cast<Prefix##Class *>(qo); \
     if (!o_) { \
