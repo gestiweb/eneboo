@@ -1319,6 +1319,10 @@ if [ -z "$MAKE" ]; then
     exit 1
 fi
 
+if [ "$OPT_VERBOSE" = "no" ]; then
+  MAKE="$MAKE -s "
+fi
+
 fi ### help
 
 
@@ -3687,6 +3691,6 @@ if [ `basename $0` != "config.status" ]; then
 fi
 
 echo
-echo Qt is now configured for building. Just run $MAKE.
-echo To reconfigure, run $MAKE confclean and configure.
+echo "Qt is now configured for building. Just run $MAKE."
+echo "To reconfigure, run $MAKE confclean and configure."
 echo

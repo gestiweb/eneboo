@@ -22,10 +22,13 @@ OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
 OPT_DEBUGGER=yes
+OPT_NEBULA_BUILD=no
+
+QT_CHECK=" -DQT_CHECK_NULL"
 QT_DEBUG=""
 QT_DEBUG_OPT="-release"
 QSADIR=qsa
-
+QT_CONFIG_VERBOSE=""
 if [ -e ".svn" -a "$BUILD_NUMBER" == "" ]; then
   BUILD_NUMBER="$(svnversion . -n)"
 fi
@@ -51,6 +54,9 @@ fi
 
 for a in "$@"; do
   case "$a" in
+    -nebula)
+      OPT_NEBULA_BUILD=yes
+    ;;
     -verbose)
       OPT_MAKE_SILENT=no
     ;;
@@ -81,7 +87,13 @@ for a in "$@"; do
       OPT_AQ_DEBUG=yes
     ;;
     -no-check)
-     QT_DEBUG="$QT_DEBUG -DQT_NO_CHECK"
+     QT_CHECK="-DQT_NO_CHECK "
+    ;;
+    -check)     
+     QT_CHECK="-DQT_CHECK_STATE -DQT_CHECK_RANGE -DQT_CHECK_NULL -DQT_CHECK_MATH "
+    ;;
+    -thread)     
+     QT_DEBUG="$QT_DEBUG -DQT_THREAD_SUPPORT "
     ;;
     -qtdebug)
       QT_DEBUG_OPT="-debug"
@@ -130,10 +142,12 @@ for a in "$@"; do
     ;;
   esac
 done
-
+QT_DEBUG="$QT_DEBUG $QT_CHECK"
 CMD_MAKE="make"
 if [ "$OPT_MAKE_SILENT" == "yes" ]; then
   CMD_MAKE="$CMD_MAKE -s "
+else
+  QT_CONFIG_VERBOSE="-v"
 fi
 
 
@@ -149,6 +163,10 @@ fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
   BUILD_NUMBER="$BUILD_NUMBER-quick"
+fi
+if [ "$OPT_NEBULA_BUILD" == "yes" ]; then
+  QT_DEBUG="$QT_DEBUG -DAQ_NEBULA_BUILD"
+  BUILD_NUMBER="$BUILD_NUMBER-nebula"
 fi
 
 if [ "$OPT_MULTICORE" == "yes" ]; then
@@ -257,7 +275,7 @@ then
 fi
 if [ "$REBUILD_QT" = "auto" ]
 then
-  if $CMD_MAKE qmake-install
+  if $CMD_MAKE qmake-install 2>/dev/null
   then
     REBUILD_QT=no
   else
@@ -269,7 +287,7 @@ export ORIGIN=\\\$\$ORIGIN
 
 if [ "$REBUILD_QT" = "yes" ]
 then
-  $CMD_MAKE confclean
+  $CMD_MAKE confclean 2>/dev/null
   if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
     cd $BASEDIR
     TMP_QTDIR=$(echo $QTDIR | sed "s/\//\\\\\\\\\\\\\\//g")
@@ -277,7 +295,7 @@ then
     cp -fv qconfig/qconfig.h src/qt/include
     cp -fv qconfig/qmodules.h src/qt/include
     cd $QTDIR
-    ./configure --win32 -v -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
+    ./configure --win32 $QT_CONFIG_VERBOSE -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
                 -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
                 -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
   else
@@ -285,11 +303,11 @@ then
     if [ "$BUILD_MACX" == "yes" ]; then
       mkdir -p $DIRINST/lib
       if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
-        ./configure -v -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
+        ./configure $QT_CONFIG_VERBOSE -platform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch -no-exceptions \
                     -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
                     -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
       else
-        ./configure -v -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
+        ./configure $QT_CONFIG_VERBOSE -platform linux-g++ -xplatform $OPT_QMAKESPEC $QT_DEBUG -prefix $PREFIX -thread -stl -no-pch \
                     -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -no-ipv6 -no-nas-sound -no-nis -qt-libjpeg \
                     -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
       fi
@@ -300,7 +318,7 @@ then
       # rpath: -R $ORIGIN/../lib , sirve para que en Linux busque las librerías (también) de forma relativa al ejecutable del programa.
       # ... pero el símbolo dólar ($) da problemas tanto en bash como en make. En bash hay que escaparlo, y en make hay que duplicar el símbolo dolar.
       # ... hacer uso del flag "-continue" puede desembocar en que no se aplique el -rpath.
-      ./configure -v -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu -thread -stl \
+      ./configure $QT_CONFIG_VERBOSE -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu -thread -stl \
                   -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
                   -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
     fi
