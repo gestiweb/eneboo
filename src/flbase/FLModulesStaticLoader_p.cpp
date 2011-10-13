@@ -30,19 +30,16 @@
 #define AQ_SETTINGS_KEY_BD(B) \
   QString key("StaticLoader/" + B + "/")
 
-struct AQStaticDirInfo {
-  inline AQStaticDirInfo(const QString &entry) {
-    active_ = entry.left(1).toUInt();
-    path_ = entry.mid(1);
-  }
-  inline AQStaticDirInfo(uint active,
-                         const QString &path) {
-    active_ = active;
-    path_ = path;
-  }
-  uint active_: 1;
-  QString path_;
-};
+inline AQStaticDirInfo::AQStaticDirInfo(const QString &entry) {
+  active_ = entry.left(1).toUInt();
+  path_ = entry.mid(1);
+}
+
+inline AQStaticDirInfo::AQStaticDirInfo(uint active,
+                       const QString &path) {
+  active_ = active;
+  path_ = path;
+}
 
 AQStaticDirInfo *AQStaticBdInfo::findPath(const QString &path)
 {
