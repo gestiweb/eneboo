@@ -34,7 +34,7 @@ if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
 fi
 
 if [ "$BUILD_NUMBER" == "" ]; then
-  BUILD_NUMBER="user-$(date --rfc-3339=date)"
+  BUILD_NUMBER="user-$(date +%Y-%m-%d)"
 fi
 
 
@@ -601,6 +601,12 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/linguist.app/Contents/MacOS/linguist
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../lib/libqt-mt.3.dylib $PREFIX/bin/lupdate
+	
+        mkdir -p $PREFIX/bin/designer.app/Contents/plugins/designer
+        cp -f $PREFIX/plugins/designer/*.dylib $PREFIX/bin/designer.app/Contents/plugins/designer 2> /dev/null
 	
 	for i in $(find $PREFIX -type f -name "*.dylib" -print)
 	do
