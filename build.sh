@@ -1,5 +1,6 @@
 #!/bin/bash
-
+DIR="$( cd -P "$( dirname "$0" )" && pwd )"
+cd "$DIR"
 VER="2.4"
 
 REBUILD_QT=auto
@@ -30,11 +31,21 @@ if [ -e ".svn" -a "$BUILD_NUMBER" == "" ]; then
 fi
 
 if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
-  BUILD_NUMBER="$(git describe --tags)"
+  APPEND="$(git diff --quiet || echo '-dev')"
+  BUILD_NUMBER="$(git describe --tags)$APPEND"
+  
+  
 fi
 
 if [ "$BUILD_NUMBER" == "" ]; then
-  BUILD_NUMBER="user-$(date --rfc-3339=date)"
+  SRC_VERSION="${DIR##*/eneboo-}"
+  if [ "$SRC_VERSION" != "$DIR" -a "$SRC_VERSION" != "" ]; then
+    BUILD_NUMBER=$SRC_VERSION
+  fi
+fi
+
+if [ "$BUILD_NUMBER" == "" ]; then
+  BUILD_NUMBER="unknown-$(date --rfc-3339=date)"
 fi
 
 
@@ -132,6 +143,8 @@ QT_DEBUG="$QT_DEBUG $QT_DEBUG_OPT"
 BUILD_MACX="no"
 if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
   BUILD_MACX="yes"
+  OPT_MULTICORE="no"
+  OPT_DIGIDOC="no"
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
@@ -252,6 +265,8 @@ then
   fi
 fi
 
+export ORIGIN=\\\$\$ORIGIN
+
 if [ "$REBUILD_QT" = "yes" ]
 then
   $CMD_MAKE confclean
@@ -279,7 +294,6 @@ then
                     -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
       fi
     else
-      export ORIGIN=\\\$\$ORIGIN
       # Configure informa de que no se encuentra MySQL o PostgreSQL, pero si se agrega:
       # -I/usr/include/mysql/ -I/usr/include/postgresql/
       # , se incluyen, pero luego aparece un error para libpg: LOCALEDIR undefined.
@@ -586,19 +600,21 @@ else
   $CMD_MAKE uicables || exit 1
 fi
 cd $BASEDIR
-$CMD_MAKE || exit 1
+# A veces (en win32) no compila correctamente qwt, porque compila antes el designer plugin de qwt que la propia librería.
+# , por eso, esperamos que el make falle y lo re-ejecutamos, para que complete.
+$CMD_MAKE || { $CMD_MAKE || exit 1; }
 $CMD_MAKE $MAKE_INSTALL
 
 if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
 	CMD_INST_NAME_TOOL=${CROSS}install_name_tool
   
-	${CROSS}install_name_tool -change libqsa.1.dylib @executable_path/../../../../lib/libqsa.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libqwt.5.dylib @executable_path/../../../../lib/libqwt.5.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
+	${CROSS}install_name_tool -change libqsa.1.dylib @executable_path/../../../../lib/libqsa.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libqwt.5.dylib @executable_path/../../../../lib/libqwt.5.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	
 	for i in $(find $PREFIX -type f -name "*.dylib" -print)
 	do
