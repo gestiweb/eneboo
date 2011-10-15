@@ -21,6 +21,7 @@ email                : mail@infosial.com
 #include <qlabel.h>
 
 #include "FLAbout.h"
+#include "AQConfig.h"
 
 FLAbout::FLAbout(const QString &v,
                  QWidget *parent,
@@ -35,6 +36,7 @@ FLAbout::FLAbout(const QString &v,
                        "Este software se distribuye \"como está\", <br>"
                        "<b>sin garantías de ninguna clase</b><br>"
                        );
+ lblCompilacion->setText(ENB_DATOS_COMP);
 }
 
 FLAbout::~FLAbout() {}
