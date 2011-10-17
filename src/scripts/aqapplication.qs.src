@@ -276,6 +276,7 @@ class MainWindow
   function readState()
   {
     var w = this.w_;
+    var action;
     var mng = aqApp.db().managerModules();
     this.dckMod_.readState();
     this.dckRec_.readState();
@@ -301,7 +302,10 @@ class MainWindow
       for (var i = 0; i < tw.count; ++i)
         tw.page(i).close();
       for (var i = 0; i < openActions.length; ++i)
-        this.addForm(openActions[i],this.iconSet16x16(mng.iconModule(openActions[i])));
+                {
+                 action = this.agMenu_.child(openActions[i], "QAction");
+               this.addForm(openActions[i],action.iconSet().pixmap());
+                 }
       var idx = settings.readNumEntry(key + "currentPageIndex");
       if (idx >= 0 && idx < tw.count)
         tw.setCurrentPage(idx);
