@@ -10,10 +10,11 @@
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; version 2 of the License.               *
  ***************************************************************************/
-/***************************************************************************************************
- * Este programa es software libre. Puede redistribuirlo y/o modificarlo bajo los términos de la
- * Licencia Pública General de GNU en su versión 2, publicada por la Free Software Foundation.
- **************************************************************************************************/
+/***************************************************************************
+   Este  programa es software libre. Puede redistribuirlo y/o modificarlo
+   bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
+   versión 2, publicada  por  la  Free  Software Foundation.
+ ***************************************************************************/
 
 function init() {
   var qry = new AQSqlQuery;
@@ -50,13 +51,83 @@ function init() {
     sys.AQTimer.singleShot(0, sys.reinit);
     return;
   }
-  
+
   if (isLoadedModule("flfactppal")) {
-    var codEjercicio = flfactppal.iface.pub_ejercicioActual();
-    var nombreEjercicio = AQUtil.sqlSelect("ejercicios", "nombre", 
-                                           "codejercicio='" + codEjercicio + "'");
+    var util: FLUtil = new FLUtil();
+    var codEjercicio: String = flfactppal.iface.pub_ejercicioActual();
+    var nombreEjercicio: String = util.sqlSelect("ejercicios", "nombre", "codejercicio='" + codEjercicio + "'");
     setCaptionMainWidget(nombreEjercicio);
   }
+  //return;
+  if (sys.mainWidget() != undefined) {
+    var util = new FLUtil();
+    var curFiles = new FLSqlCursor("flfiles");
+    curFiles.select();
+    if (!curFiles.size()) {
+      var continuar = MessageBox.warning(util.translate("scripts", "No hay módulos cargados en esta base de datos,\nAbanQ puede cargar automáticamente la base de módulos\nde Facturación y Financiera incluidos en la instalación.\n\n¿Desea cargar ahora estos módulos base?\n"), MessageBox.Yes, MessageBox.No);
+      if (continuar == MessageBox.Yes) {
+        var dirModsFact = sys.installPrefix() + "/share/facturalux/modulos/facturacion/";
+        var dirModsCont = sys.installPrefix() + "/share/facturalux/modulos/contabilidad/";
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "principal/flfactppal.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "almacen/flfactalma.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "facturacion/flfacturac.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "tesoreria/flfactteso.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "informes/flfactinfo.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsCont + "principal/flcontppal.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsCont + "informes/flcontinfo.mod"));
+        while (formRecordflmodules.child("log"))
+        sys.processEvents();
+        sys.reinit();
+      }
+    }
+  }
+}
+
+function afterCommit_flfiles(curFiles) {
+  if (curFiles.modeAccess() != curFiles.Browse) {
+    var qry = new FLSqlQuery();
+    qry.setTablesList("flserial");
+    qry.setSelect("sha");
+    qry.setFrom("flfiles");
+    qry.setForwardOnly(true);
+    if (qry.exec()) {
+      if (qry.first()) {
+        var util = new FLUtil();
+        var v = util.sha1(qry.value(0));
+        while (qry.next())
+        v = util.sha1(v + qry.value(0));
+        var curSerial = new FLSqlCursor("flserial");
+        curSerial.select();
+        if (!curSerial.first()) curSerial.setModeAccess(curSerial.Insert);
+        else curSerial.setModeAccess(curSerial.Edit);
+        curSerial.refreshBuffer();
+        curSerial.setValueBuffer("sha", v);
+        curSerial.commitBuffer();
+      }
+    } else {
+      var curSerial = new FLSqlCursor("flserial");
+      curSerial.select();
+      if (!curSerial.first()) curSerial.setModeAccess(curSerial.Insert);
+      else curSerial.setModeAccess(curSerial.Edit);
+      curSerial.refreshBuffer();
+      curSerial.setValueBuffer("sha", curFiles.valueBuffer("sha"));
+      curSerial.commitBuffer();
+    }
+  }
+
+  return true;
 }
 
 function statusDbLocksDialog( locks ) {
