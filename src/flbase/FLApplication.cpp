@@ -15,9 +15,6 @@ email                : mail@infosial.com
    bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
-// for debuggiong with printf:
-#include <stdio.h>
-// ----
 
 #include <qsworkbench.h>
 
@@ -264,7 +261,6 @@ void FLApplication::init(const QString &n, const QString &callFunction,
                          const QString &arguments, bool quitAfterCall, bool noMax)
 {
   initializing_ = true;
-  printf("FLApplication::init . . . . n:%s callFn:%s args:%s quit:%d nomax:%d\n",n.ascii(), callFunction.ascii(), arguments.ascii(), quitAfterCall, noMax);
 
   container = new QMainWindow(0);
   container->setName("container");
@@ -334,28 +330,21 @@ void FLApplication::init(const QString &n, const QString &callFunction,
   loadScripts();
   mngLoader_->setShaLocalFromGlobal();
   loadTranslations();
-  printf("Loading QSA interpreter . . .\n");
+
   QSInterpreter *i = project_->interpreter();
   if (i) {
-    printf("-> FLFactory . . .\n");
     i->addObjectFactory(flFactory_);
-    printf("-> AQSObjectFactory . . .\n");
     i->addObjectFactory(new AQSObjectFactory);
-    printf("-> AQSWrapperFactory . . .\n");
     i->addWrapperFactory(new AQSWrapperFactory);
-    printf("-> QSInputDialogFactory . . .\n");
     i->addObjectFactory(new QSInputDialogFactory);
-    printf("-> QSUtilFactory . . .\n");
     i->addObjectFactory(new QSUtilFactory);
-    printf("-> QSInterpreter::Notify . . .\n");
     i->setErrorMode(QSInterpreter::Notify);
-    printf("done!\n\n");
   } else {
-    printf("failed!\n\n");
+    // Failed loading QSA.
   }
 
   if (!callFunction.isEmpty()) {
-    printf("callfunction - init\n");
+
     QStringList argumentList = QStringList::split(':', arguments, false);
     QSArgumentList arglist;
     for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
@@ -369,34 +358,21 @@ void FLApplication::init(const QString &n, const QString &callFunction,
       db()->manager()->finish();
       QTimer::singleShot(3000, this, SLOT(quit()));
     }
-    printf("callfunction - done\n");
   }
   
 
   if (!quitAfterCall) {
-    printf("load - begin\n");
     if (n.isEmpty()) {
-      printf("load - A - 1\n");
       call("init", QSArgumentList(), "sys");
-      printf("load - A - 2\n");
       initToolBox();
-      printf("load - A - 3\n");
       readState();
-      printf("load - A - 4\n");
       container->installEventFilter(this);
-      printf("load - A - 5\n");
     } else {
-      printf("load - B - 1\n");
       FLFormDB *f = new FLFormDB(n, 0, (noMax ? 0 : Qt::WStyle_Customize));
-      printf("load - B - 2\n");
       formAlone_ = true;
-      printf("load - B - 3\n");
       f->installEventFilter(this);
-      printf("load - B - 4\n");
       f->setMainWidget();
-      printf("load - B - 5\n");
       QApplication::setMainWidget(f);
-      printf("load - B - 6\n");
       if (f->mainWidget()) {
         if (noMax) {
           f->show();
@@ -405,15 +381,12 @@ void FLApplication::init(const QString &n, const QString &callFunction,
         }
       }
       else {
-        printf("load - noMainWidget??? -- closing!\n");
         f->close();
       }
     }
   }
 
-  printf("Exiting load manager ...\n");
   AQ_UNSET_MNGLOADER
-  printf("done.\n\n");
 
   initializing_ = false;
 }
