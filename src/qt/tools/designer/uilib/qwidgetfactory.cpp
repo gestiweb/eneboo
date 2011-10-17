@@ -1880,7 +1880,13 @@ void QWidgetFactory::setProperty( QObject* widget, const QString &prop, const QD
     QVariant value( DomTool::elementToVariant( e, QVariant(), comment ) );
 
     if ( e.tagName() == "string" ) {
-        value = translate( value.asString(), comment );
+        bool translatable = true;
+        if (prop.startsWith("table")) translatable = false;
+        if (prop.startsWith("field")) translatable = false;
+        if (prop.startsWith("foreign")) translatable = false;
+        if (translatable) {
+          value = translate( value.asString(), comment );
+        }
     } else if ( e.tagName() == "pixmap" ) {
         QPixmap pix = loadPixmap( value.toString() );
         if ( !pix.isNull() )
