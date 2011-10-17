@@ -12,9 +12,13 @@ settings.pro
 /*.patch
 bin
 /abanq-build
+/*-build-*
 /src/qt/include
 /src/qt/tools/designer/designer
 /src/qt/tools/designer
+/src/qt/tools/linguist/linguist/about.*
+/src/qt/tools/linguist/linguist/qmake_image_collection.*
+/src/qt/tools/linguist/linguist/statistics.*
 src/advance/qmake_image_collection.cpp
 src/flbase/FLStaticLoaderUI.cpp
 src/flbase/FLStaticLoaderUI.h
