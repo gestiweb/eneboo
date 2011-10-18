@@ -56,7 +56,8 @@ isEmpty(QT_INSTALL_PREFIX):QT_INSTALL_PREFIX=$(QTDIR)
 INCLUDEPATH	+= ../engine \
 		   ../../tools/designer/editor \
 		   ../kernel \
-		    . 
+		   ../ide \		    
+			. 
 
 DEFINES += HAVE_CONFIG_H
 DEFINES += QT_INTERNAL_XML

@@ -35,22 +35,27 @@
 
 #ifndef QSA_NO_IDE
 
+class QSWorkbenchPrivate;
+
 class QSA_EXPORT QSWorkbench : public QObject
 {
     Q_OBJECT
 
 public:
-    QSWorkbench( QSProject *, QWidget * = 0, const char * = 0 ) {}
-    ~QSWorkbench() {}
+    QSWorkbench( QSProject *project, QWidget *parent = 0, const char *name = 0 );
+    ~QSWorkbench();
 
-    QWidget *widget() { return 0; }
-    QSProject *project() { return 0;}
+    QWidget *widget();
+    QSProject *project();
 
 public slots:
-    void open() {}
-    void close() {}
-    void showScript( QSScript * ) {}
-    void showFunction( QSScript *, const QString & ) {}
+    void open();
+    void close();
+    void showScript( QSScript *script );
+    void showFunction( QSScript *script, const QString &function );
+
+private:
+    QSWorkbenchPrivate *d;
 };
 
 #endif
