@@ -522,6 +522,7 @@ struct QPostEvent {
    ~QPostEvent()			{ delete event; }
     QObject  *receiver;
     QEvent   *event;
+    int loopLevel;
 };
 
 class Q_EXPORT QPostEventList : public QPtrList<QPostEvent>
@@ -3198,9 +3199,14 @@ void QApplication::postEvent( QObject *receiver, QEvent *event )
     QPostEvent * pe = new QPostEvent( receiver, event );
     l->append( pe );
     globalPostedEvents->append( pe );
-
-    if (eventloop)
+    int loopLevel = -1;
+    
+    if (eventloop) {
 	eventloop->wakeUp();
+        loopLevel = eventloop->loopLevel();
+    }
+    pe->loopLevel = loopLevel;
+    
 }
 
 
@@ -3265,6 +3271,16 @@ void QApplication::sendPostedEvents( QObject *receiver, int event_type )
 		      || event_type == pe->event->type() ) ) { // we send THAT type
 		// first, we diddle the event so that we can deliver
 		// it, and that noone will try to touch it later.
+                int loopLevel = -1;
+    
+                if (eventloop) {
+                    loopLevel = eventloop->loopLevel();
+                }
+                if (loopLevel > 0 and pe->loopLevel > 0 and pe->loopLevel < loopLevel) {
+                    // Discard events in inner loops.
+                    continue;
+                }
+                
 		pe->event->posted = FALSE;
 		QEvent * e = pe->event;
 		QObject * r = pe->receiver;
