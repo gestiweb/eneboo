@@ -3276,7 +3276,7 @@ void QApplication::sendPostedEvents( QObject *receiver, int event_type )
                 if (eventloop) {
                     loopLevel = eventloop->loopLevel();
                 }
-                if (loopLevel > 0 and pe->loopLevel > 0 and pe->loopLevel < loopLevel) {
+                if (loopLevel > 0 and pe->loopLevel > 0 and pe->loopLevel < loopLevel and pe->event->type() == QEvent::DeferredDelete) {
                     // Discard events in inner loops.
                     continue;
                 }
