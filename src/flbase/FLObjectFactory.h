@@ -64,6 +64,8 @@
 #include <qtabwidget.h>
 #include <qptrdict.h>
 
+#include <stdio.h>
+
 class FLDomNodeInterface;
 class FLDomNodesCache;
 class FLSqlQueryInterface;
@@ -4005,7 +4007,18 @@ public slots:
       cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
     return (cursor_ ? cursor_ : new FLSqlCursorInterface());
   }
-
+  
+  bool connect ( const QObject * sender, const char * signal, const QObject * receiver, const char * member ) const {
+#if defined(FL_DEBUG)
+    printf("%s == Signal Connected :: %s.%s  --->>>>   %s.%s\n", this->name(), sender->name(), signal, receiver->name(), member);
+#endif
+    return QObject::connect(sender, signal, receiver, member);
+  }
+  
+  bool connect ( const QObject * sender, const char * signal, const char * member ) const {
+    return this->connect(sender, signal, this, member);
+  }
+  
   /**
    Obtiene el widget principal del formulario.
 
@@ -4241,6 +4254,18 @@ public:
     } else
       cursor_ = 0;
   }
+  
+  bool connect ( const QObject * sender, const char * signal, const QObject * receiver, const char * member ) const {
+#if defined(FL_DEBUG)
+    printf("%s =* Signal Connected :: %s.%s  --->>>>   %s.%s\n", this->name(), sender->name(), signal, receiver->name(), member);
+#endif
+    return QObject::connect(sender, signal, receiver, member);
+  }
+  
+  bool connect ( const QObject * sender, const char * signal, const char * member ) const {
+    return this->connect(sender, signal, this, member);
+  }
+  
 
   /**
    Establece el cursor del objeto relacionado con el formulario
