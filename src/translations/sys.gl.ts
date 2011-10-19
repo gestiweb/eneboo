@@ -2562,10 +2562,6 @@ Se van a cancelar las transacciones pendientes.
         <source>0.0</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Acuerdo de &amp;licencia</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message encoding="UTF-8">
         <source>[INCLUIDA VERSION EN CASTELLANO A CONTINUACIÓN DE LA VERSIÓN EN INGLÉS]
 
@@ -3216,8 +3212,12 @@ References
         <source>Acerca de Eneboo</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Licencia</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message encoding="UTF-8">
-        <source>Autoría</source>
+        <source>A&amp;utoría</source>
         <translation type="unfinished"></translation>
     </message>
     <message encoding="UTF-8">
@@ -3225,7 +3225,12 @@ References
 
 InfoSiAL S.L. &lt;mail@infosial.com&gt; 
 Gestiweb Integración de Soluciones Web S.L. &lt;info@gestiweb.com&gt;
+Grupo Easy Soft. &lt;info@easysoftcommunity.com&gt;
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>&amp;Compilación</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6886,6 +6891,18 @@ load these files?</source>
     </message>
     <message>
         <source>Binario</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ficheros de gran tama&#xf1;o</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clave de Referencia</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hash Sha1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13023,6 +13040,48 @@ Remove this variable?</source>
     </message>
 </context>
 <context>
+    <name>formAreas</name>
+    <message>
+        <source>Areas</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>formFiles</name>
+    <message>
+        <source>Ficheros</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nombre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contenido</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editor XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editar XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editar fichero</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>formGroups</name>
     <message>
         <source>Grupos</source>
@@ -13074,6 +13133,105 @@ Remove this variable?</source>
     </message>
     <message>
         <source>flusers</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>formModules</name>
+    <message encoding="UTF-8">
+        <source>Módulos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>idmodulo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>icono</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>descripcion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>idarea</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>flareas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Ficheros</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insertar registro (A)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Para crear un nuevo registro en la tabla</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modificar registro (M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Para modificar el registro activo de la tabla</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eliminar registro (E)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Elimina el registro actual de la tabla</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ver registro (V)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Para ver registro, sin permitir editar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cargar ficheros de un directorio del disco</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Carga todo los ficheros dentro de un directorio y subdirectorios</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exportar ficheros a un directorio del disco</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporta todo los ficheros a un directorio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>flfiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13313,6 +13471,239 @@ Remove this variable?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>scripts</name>
+    <message>
+        <source>Antes de cargar un m&#xf3;dulo aseg&#xfa;rese de tener una copia de seguridad de todos los datos,
+y de que no hay ningun otro usuario conectado a la base de datos mientras se realiza la carga.
+
+&#xbf;Desea continuar?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Elegir Fichero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imposible cargar el m&#xf3;dulo.
+Licencia del m&#xf3;dulo no aceptada.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error en la carga del fichero xml .mod</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Este m&#xf3;dulo necesita la versi&#xf3;n </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> o superior de la aplicaci&#xf3;n base,
+actualmente la versi&#xf3;n instalada es la </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>.
+FacturaLUX puede fallar por esta causa.
+&#xbf;Desea continuar la carga?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>El &#xe1;rea con el identificador </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> no existe. &#xbf;Desea crearla?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crear &#xe1;rea </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aceptar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Descripci&#xf3;n: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>El m&#xf3;dulo </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> ya existe. &#xbf;Desea recargarlo?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Este m&#xf3;dulo depende del m&#xf3;dulo </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, que no est&#xe1; instalado.
+FacturaLUX puede fallar por esta causa.
+&#xbf;Desea continuar la carga?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Cargando :: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Actualizando :: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Backup :: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Convirtiendo %0 a kut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volcando a disco </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error de conversi&#xf3;n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Elegir Directorio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acuerdo de Licencia.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&#xed;, acepto este acuerdo de licencia.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, no acepto este acuerdo de licencia.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>* Carga finalizada.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>* Exportaci&#xf3;n finalizada.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directorio de M&#xf3;dulos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error al buscar los m&#xf3;dulos en el directorio:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error al cargar el m&#xf3;dulo:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error al crear el &#xe1;rea:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seleccione m&#xf3;dulos a cargar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M&#xf3;dulo a cargar (*.mod)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M&#xf3;dulo a cargar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>La aplicaci&#xf3;n no se compil&#xf3; en modo test, por lo que esta opoci&#xf3;n no est&#xe1; disponible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lanzar sesi&#xf3;n de pruebas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lanzar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error al obtener la lista de sesiones para la base de datos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seleccione sesi&#xf3;n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Se va a proceder a conectar a trav&#xe9;s de Internet
+con los sistemas de InfoSiAL S.L. para obtener la
+herramienta de actualizaci&#xf3;n de AbanQ.
+
+&#xbf; Desea continuar ?
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conectando</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actualizaci&#xf3;n cancelada.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actualizaci&#xf3;n cancelada.
+Se ha producido un error al intentar obtener la herramienta de actualizaci&#xf3;n.
+Pruebe a repetir la actualizaci&#xf3;n m&#xe1;s tarde y si el problema persiste
+puede obtener ayuda y soporte en http://www.infosial.com InfoSiAL S.L.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Descargando %1 de %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No hay m&#xf3;dulos cargados en esta base de datos,
+AbanQ puede cargar autom&#xe1;ticamente la base de m&#xf3;dulos
+de Facturaci&#xf3;n y Financiera incluidos en la instalaci&#xf3;n.
+
+&#xbf;Desea cargar ahora estos m&#xf3;dulos base?
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bloqueos de la base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Registro bloqueado</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seleccionar Fichero</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context encoding="UTF-8">
     <name>sys</name>
     <message encoding="UTF-8">
@@ -13321,6 +13712,146 @@ Remove this variable?</source>
     </message>
     <message encoding="UTF-8">
         <source>Administración del sistema</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Principal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Usuarios</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>&amp;Módulos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Módulos (Ctrl+M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Administración de los módulos de aplicación (Ctrl+M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Á&amp;reas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Áreas (Ctrl+R)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Áreas de negocio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>&amp;Cargar Módulo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Cargar Módulo (Ctrl+C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Carga un módulo desde disco</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Recargar último módulo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reiniciar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+H</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Usuarios</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>U&amp;suarios</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Usuarios del sistema</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grupos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Grupos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grupos de usuarios</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Cargar Directorio de Módulos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regenerar base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actualizar AbanQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Act&amp;ualizar AbanQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conecta con el servicio de actualizaciones de AbanQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1325,6 +1325,7 @@ bool FLManager::isSystemTable(const QString &n)
                       "flmodules,"
                       "flareas,"
                       "flserial,"
+                      "fllarge,"
                       "flvar,"
                       "flsettings,"
                       "flseqs,");
@@ -1342,8 +1343,8 @@ QString FLManager::storeLargeValue(FLTableMetaData *mtd, const QString &largeVal
   if (isSystemTable(tableName))
     return QString::null;
 
-  QString tableLarge(QString::fromLatin1("fllarge_") + tableName);
-  if (!existsTable(tableLarge)) {
+  QString tableLarge(QString::fromLatin1("fllarge"));
+  /*if (!existsTable(tableLarge)) {
     FLTableMetaData *mtdLarge = new FLTableMetaData(tableLarge, tableLarge);
     FLFieldMetaData *fieldLarge = new FLFieldMetaData("refkey", "refkey", false, true, QVariant::String, 100);
     mtdLarge->addFieldMD(fieldLarge);
@@ -1356,7 +1357,7 @@ QString FLManager::storeLargeValue(FLTableMetaData *mtd, const QString &largeVal
     if (!mtdAux)
       return QString::null;
   }
-
+*/
   QString sha(FLUtil::sha1(largeValue));
   QString refKey(QString::fromLatin1("RK@") + tableName.left(50) + QString::fromLatin1("@") + sha);
   QSqlCursor curLarge(tableLarge, true, db_->dbAux());
@@ -1392,8 +1393,7 @@ QVariant FLManager::fetchLargeValue(const QString &refKey) const
   if (cachedV)
     return QVariant(*cachedV);
 
-  QString tableLarge(QString::fromLatin1("fllarge_") +
-                     refKey.section('@', 1, 1));
+  QString tableLarge(QString::fromLatin1("fllarge"));
   if (!existsTable(tableLarge))
     return QVariant();
 

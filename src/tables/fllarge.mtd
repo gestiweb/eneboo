@@ -1,0 +1,34 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>fllarge</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Ficheros de gran tamaño")</alias>
+
+	<field>
+		<name>refkey</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Clave de Referencia")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>100</length>
+	</field>
+
+	<field>
+		<name>sha1</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Hash Sha1")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>50</length>
+	</field>
+
+	<field>
+		<name>contenido</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Contenido")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+		<visiblegrid>false</visiblegrid>
+	</field>
+	
+</TMD>
+

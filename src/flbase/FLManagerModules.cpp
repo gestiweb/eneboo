@@ -161,6 +161,7 @@ void FLManagerModules::init()
   tmpTMD = db_->manager()->createSystemTable("flsettings");
   tmpTMD = db_->manager()->createSystemTable("flserial");
   tmpTMD = db_->manager()->createSystemTable("flvar");
+  tmpTMD = db_->manager()->createSystemTable("fllarge");
 
   FLSqlCursor curSet("flsettings", true, db_->dbAux());
   QString modVer;

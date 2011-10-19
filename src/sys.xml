@@ -90,4 +90,9 @@
 		<name>flupdates</name>
 		<scriptform>flupdates</scriptform>
 	</action>
+        
+	<action>
+		<name>fllarge</name>
+		<table>fllarge</table>
+	</action>
 </ACTIONS>
