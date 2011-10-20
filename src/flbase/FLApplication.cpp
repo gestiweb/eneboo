@@ -2297,7 +2297,7 @@ void FLWorkspace::paintEvent(QPaintEvent *pe)
 
   p.setPen(pColor);
   p.setBrush(pColor);
-  p.drawRect(dx + 23, 0, 2, dy);
+  //p.drawRect(dx + 23, 0, 2, dy);
 
   p.end();
 
@@ -2322,7 +2322,7 @@ void FLWidget::paintEvent(QPaintEvent *pe)
 
   p.setPen(pColor);
   p.setBrush(pColor);
-  p.drawRect(dx + 23, 0, 2, dy);
+  //p.drawRect(dx + 23, 0, 2, dy);
 
   p.end();
 
