@@ -644,8 +644,23 @@ void FLApplication::initToolBox()
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
+
+#ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
+         ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("QSA WorkBench");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("bug.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
+#endif
+
 #ifndef QSDEBUGGER
-        continue;
+
 #else
         ++c;
 #endif

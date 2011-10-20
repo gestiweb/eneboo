@@ -21,7 +21,7 @@ OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
-OPT_DEBUGGER=yes
+OPT_DEBUGGER=no
 OPT_NEBULA_BUILD=no
 
 QT_CHECK=" -DQT_CHECK_NULL"
@@ -80,8 +80,11 @@ for a in "$@"; do
     ;;
     -debug)
       OPT_DEBUG=yes
-      OPT_DEBUGGER=yes
       BUILD_NUMBER="$BUILD_NUMBER-debug"
+    ;;
+    -debugger)
+      OPT_DEBUGGER=yes
+      BUILD_NUMBER="$BUILD_NUMBER-debugger"
     ;;
     -aqdebug)
       OPT_AQ_DEBUG=yes
@@ -473,7 +476,11 @@ fi
 
 if [ "$OPT_DEBUGGER" = "yes" ]
 then
-  echo "DEFINES *= QSDEBUGGER" >> settings.pro
+  if [ "$OPT_DEBUG" = "no" ]
+  then
+    echo "DEFINES *= FL_DEBUG" >> settings.pro
+  fi
+  echo "DEFINES *= QSDEBUGGER QSDEBUGGER_VISUAL AQ_DEBUGGER FL_DEBUGGER" >> settings.pro  
 fi
 
 if [ "$OPT_AQ_DEBUG" = "yes" ]

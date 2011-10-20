@@ -1,0 +1,875 @@
+<!DOCTYPE UI><UI version="3.1.2" stdsetdef="1">
+<class>IdeWindow</class>
+<comment>***************************************************************************
+** $Id: idewindow.ui  1.1.5   edited 2005-07-04T13:29:55$
+**
+** Copyright (C) 2001-2003 Trolltech AS.  All rights reserved.
+**
+** This file is part of the Qt Script for Applications framework (QSA).
+**
+** This file may be distributed and/or modified under the terms of the
+** GNU General Public License version 2 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.
+**
+** Licensees holding a valid Qt Script for Applications license may use
+** this file in accordance with the Qt Script for Applications License
+** Agreement provided with the Software.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+** See http://www.trolltech.com/pricing.html or email sales@trolltech.com for
+**   information about QSA Commercial License Agreements.
+** See http://www.trolltech.com/gpl/ for GPL licensing information.
+**
+** Contact info@trolltech.com if any conditions of this licensing are
+** not clear to you.
+**
+****************************************************************************</comment>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>IdeWindow</cstring>
+    </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>800</width>
+            <height>677</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>QSA Workbench</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QTabWidget" row="0" column="0">
+            <property name="name">
+                <cstring>tabWidget</cstring>
+            </property>
+            <property name="tabPosition">
+                <enum>Top</enum>
+            </property>
+            <property name="tabShape">
+                <enum>Rounded</enum>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>new script</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                </grid>
+            </widget>
+        </widget>
+    </grid>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>menubar</cstring>
+    </property>
+    <item text="&amp;File" name="fileMenu">
+        <action name="fileNewAction"/>
+        <action name="fileImportAction"/>
+        <action name="fileExportAction"/>
+        <separator/>
+        <action name="fileRenameAction"/>
+        <action name="fileRemoveAction"/>
+        <action name="fileCloseAction"/>
+        <separator/>
+	<action name="filePrintAction"/>
+	<separator/>
+        <action name="fileExitAction"/>
+    </item>
+    <item text="&amp;Edit" name="editMenu">
+        <action name="editUndoAction"/>
+        <action name="editRedoAction"/>
+        <separator/>
+        <action name="editCutAction"/>
+        <action name="editCopyAction"/>
+        <action name="editPasteAction"/>
+        <action name="editSelectAllAction"/>
+        <separator/>
+        <action name="editPreferencesAction"/>
+    </item>
+    <item text="&amp;Search" name="searchMenu">
+        <action name="editFindAction"/>
+	<action name="editFindAgainAction"/>
+	<action name="editFindAgainBWAction"/>
+        <action name="editReplaceAction"/>
+        <separator/>
+        <action name="editGotoLineAction"/>
+    </item>
+    <item text="&amp;Project" name="projectMenu">
+        <action name="projectCallAction"/>
+        <action name="projectRunAction"/>
+        <action name="projectStopAction"/>
+        <separator/>
+        <action name="projectEvaluateAction"/>
+    </item>
+    <item text="&amp;Window" name="windowMenu">
+    </item>
+    <item text="&amp;Help" name="helpMenu">
+        <action name="helpAboutAction"/>
+    </item>
+</menubar>
+<toolbars>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>fileToolBar</cstring>
+        </property>
+        <property name="label">
+            <string>File</string>
+        </property>
+        <action name="fileNewAction"/>
+        <action name="fileImportAction"/>
+        <action name="fileExportAction"/>
+        <action name="fileRemoveAction"/>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>editToolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Edit</string>
+        </property>
+        <action name="editUndoAction"/>
+        <action name="editRedoAction"/>
+        <separator/>
+        <action name="editCutAction"/>
+        <action name="editCopyAction"/>
+        <action name="editPasteAction"/>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>projectToolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Project</string>
+        </property>
+        <action name="projectCallAction"/>
+        <action name="projectRunAction"/>
+	<action name="projectStopAction"/>
+    </toolbar>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>fileNewAction</cstring>
+        </property>
+        <property name="text">
+            <string>New Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;New Script</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+N</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileImportAction</cstring>
+        </property>
+        <property name="text">
+            <string>Import Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Import Script...</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+I</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileExportAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Export Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Export Script...</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+E</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileExitAction</cstring>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+        <property name="menuText">
+            <string>E&amp;xit</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>filePrintAction</cstring>
+        </property>
+        <property name="text">
+            <string>Print Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Print Script</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+P</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileRenameAction</cstring>
+        </property>
+        <property name="text">
+            <string>Rename Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Rename Script</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+R</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editUndoAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Undo</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Undo</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Z</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editRedoAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Redo</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Redo</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Y</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editCutAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Cut</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Cut</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+X</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editCopyAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Copy</string>
+        </property>
+        <property name="menuText">
+            <string>C&amp;opy</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+C</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editPasteAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Paste</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Paste</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+V</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editFindAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Find</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Find...</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+F</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editFindAgainAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Find Again</string>
+        </property>
+        <property name="menuText">
+            <string>Find &amp;Next</string>
+        </property>
+        <property name="accel">
+            <string>F3</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editFindAgainBWAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Find Backwards</string>
+        </property>
+        <property name="menuText">
+            <string>Find &amp;Previous</string>
+        </property>
+        <property name="accel">
+            <string>Shift+F3</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editPreferencesAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Preferences</string>
+        </property>
+        <property name="menuText">
+            <string>Preferences...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>helpContentsAction</cstring>
+        </property>
+        <property name="text">
+            <string>Contents</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Contents...</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>helpIndexAction</cstring>
+        </property>
+        <property name="text">
+            <string>Index</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Index...</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>helpAboutAction</cstring>
+        </property>
+        <property name="text">
+            <string>About</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;About</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileCloseAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Close Tab</string>
+        </property>
+        <property name="menuText">
+            <string>Close &amp;Tab</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+F4</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileRemoveAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Remove Script</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Remove Script</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+D</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>projectRunAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Call Previous</string>
+        </property>
+        <property name="menuText">
+            <string>Call &amp;Previous</string>
+        </property>
+        <property name="accel">
+            <string>F6</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editSelectAllAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Select &amp;All</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+A</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editGotoLineAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Goto Line</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Goto Line</string>
+        </property>
+        <property name="accel">
+            <string>Alt+G</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editReplaceAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Replace</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Replace...</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+H</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>projectCallAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Call Function</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Call Function...</string>
+        </property>
+        <property name="accel">
+            <string>F5</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>projectEvaluateAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Evaluate Project</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Evaluate Project</string>
+        </property>
+        <property name="accel">
+            <string>F7</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>projectStopAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Kill interpreter</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Kill interpreter</string>
+        </property>
+        <property name="accel">
+            <string>F8</string>
+        </property>
+    </action>
+</actions>
+<connections>
+    <connection>
+        <sender>fileNewAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptNew()</slot>
+    </connection>
+    <connection>
+        <sender>filePrintAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptPrint()</slot>
+    </connection>
+    <connection>
+        <sender>fileRenameAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptRename()</slot>
+    </connection>
+    <connection>
+        <sender>projectEvaluateAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>evaluateProject()</slot>
+    </connection>
+    <connection>
+        <sender>fileExitAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptExit()</slot>
+    </connection>
+    <connection>
+        <sender>editUndoAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editUndo()</slot>
+    </connection>
+    <connection>
+        <sender>editRedoAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editRedo()</slot>
+    </connection>
+    <connection>
+        <sender>editCutAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editCut()</slot>
+    </connection>
+    <connection>
+        <sender>editCopyAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editCopy()</slot>
+    </connection>
+    <connection>
+        <sender>editPasteAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editPaste()</slot>
+    </connection>
+    <connection>
+        <sender>helpIndexAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>helpIndex()</slot>
+    </connection>
+    <connection>
+        <sender>helpContentsAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>helpContents()</slot>
+    </connection>
+    <connection>
+        <sender>helpAboutAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>helpAbout()</slot>
+    </connection>
+    <connection>
+        <sender>fileCloseAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>removePage()</slot>
+    </connection>
+    <connection>
+        <sender>fileRemoveAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>removeScript()</slot>
+    </connection>
+    <connection>
+        <sender>fileImportAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptImport()</slot>
+    </connection>
+    <connection>
+        <sender>fileExportAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>scriptExport()</slot>
+    </connection>
+    <connection>
+        <sender>fileExitAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>close()</slot>
+    </connection>
+    <connection>
+        <sender>projectRunAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>projectRun()</slot>
+    </connection>
+    <connection>
+        <sender>editSelectAllAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editSelectAll()</slot>
+    </connection>
+    <connection>
+        <sender>projectCallAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>projectCall()</slot>
+    </connection>
+    <connection>
+        <sender>editPreferencesAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editPreferences()</slot>
+    </connection>
+    <connection>
+        <sender>projectStopAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>projectStop()</slot>
+    </connection>
+    <connection>
+        <sender>editFindAgainAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editFindNext()</slot>
+    </connection>
+    <connection>
+        <sender>editFindAgainBWAction</sender>
+        <signal>activated()</signal>
+        <receiver>IdeWindow</receiver>
+        <slot>editFindPrev()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in implementation">findtext.h</include>
+    <include location="local" impldecl="in implementation">replacetext.h</include>
+    <include location="local" impldecl="in implementation">gotoline.h</include>
+    <include location="local" impldecl="in implementation">outputcontainer.h</include>
+    <include location="local" impldecl="in implementation">preferences.h</include>
+    <include location="local" impldecl="in implementation">preferencescontainer.h</include>
+    <include location="local" impldecl="in implementation">projectcontainer.h</include>
+    <include location="local" impldecl="in implementation">qapplication.h</include>
+    <include location="local" impldecl="in implementation">qcombobox.h</include>
+    <include location="local" impldecl="in implementation">qdockwindow.h</include>
+    <include location="local" impldecl="in implementation">qfile.h</include>
+    <include location="local" impldecl="in implementation">qfiledialog.h</include>
+    <include location="local" impldecl="in implementation">qinputdialog.h</include>
+    <include location="local" impldecl="in implementation">qheader.h</include>
+    <include location="local" impldecl="in implementation">qlistview.h</include>
+    <include location="local" impldecl="in implementation">qmessagebox.h</include>
+    <include location="local" impldecl="in implementation">qtextedit.h</include>
+    <include location="local" impldecl="in implementation">qspinbox.h</include>
+    <include location="local" impldecl="in implementation">qcheckbox.h</include>
+    <include location="local" impldecl="in implementation">qradiobutton.h</include>
+    <include location="local" impldecl="in implementation">qtoolbutton.h</include>
+    <include location="local" impldecl="in implementation">qseditor.h</include>
+    <include location="local" impldecl="in implementation">qsproject.h</include>
+    <include location="local" impldecl="in implementation">qsinterpreter.h</include>
+    <include location="local" impldecl="in implementation">qsscript.h</include>
+    <include location="local" impldecl="in implementation">idewindow.ui.h</include>
+</includes>
+<forwards>
+    <forward>class QDockWindow</forward>
+    <forward>class QSProject</forward>
+    <forward>class QSScript</forward>
+    <forward>class QSOutputContainer</forward>
+    <forward>class QSProjectContainer</forward>
+    <forward>class QSVariablesContainer</forward>
+    <forward>class QSPreferencesContainer</forward>
+    <forward>class QListViewItem</forward>
+    <forward>class QSFindText</forward>
+    <forward>class QSGotoLine</forward>
+    <forward>class QSReplaceText</forward>
+    <forward>class PreferencesBase</forward>
+</forwards>
+<variables>
+    <variable access="public">QSProject *project;</variable>
+    <variable access="private">int errorMode;</variable>
+    <variable access="private">bool hadError;</variable>
+    <variable access="private">PreferencesBase *qsaEditorSyntax;</variable>
+    <variable access="private">QSPreferencesContainer *preferencesContainer;</variable>
+    <variable access="private">QSProjectContainer *projectContainer;</variable>
+    <variable access="private">QDockWindow *projectContainerDock;</variable>
+    <variable access="private">QSVariablesContainer *variablesContainer;</variable>
+    <variable access="private">QDockWindow *variablesContainerDock;</variable>
+    <variable access="private">QString runFunction;</variable>
+    <variable access="private">QDockWindow *outputContainerDock;</variable>
+    <variable access="private">QSOutputContainer *outputContainer;</variable>
+    <variable access="private">QSFindText *findText;</variable>
+    <variable access="private">QSGotoLine *gotoLine;</variable>
+    <variable access="private">QSReplaceText *replaceText;</variable>
+    <variable>int newVariable;</variable>
+</variables>
+<slots>
+    <slot>scriptNew()</slot>
+    <slot>scriptImport()</slot>
+    <slot>scriptExport()</slot>
+    <slot>scriptExit()</slot>
+    <slot>scriptPrint()</slot>
+    <slot>scriptRename()</slot>
+    <slot>editUndo()</slot>
+    <slot>editRedo()</slot>
+    <slot>editCut()</slot>
+    <slot>editCopy()</slot>
+    <slot>editPaste()</slot>
+    <slot>editFind()</slot>
+    <slot>editFindNext()</slot>
+    <slot>editFindPrev()</slot>
+    <slot>editReplace()</slot>
+    <slot>editReplaceAll()</slot>
+    <slot>editSelectAll()</slot>
+    <slot>editPreferences()</slot>
+    <slot>editGotoLine()</slot>
+    <slot>helpIndex()</slot>
+    <slot>helpContents()</slot>
+    <slot>helpAbout()</slot>
+    <slot>addPage( QSScript * s )</slot>
+    <slot>removePage( QSScript * s )</slot>
+    <slot>removePage()</slot>
+    <slot>showPage( QSScript * s )</slot>
+    <slot>showFunction( QSScript * s, const QString &amp; f )</slot>
+    <slot>removeScript( QSScript * s )</slot>
+    <slot>removeScript()</slot>
+    <slot>projectRun()</slot>
+    <slot>projectCall()</slot>
+    <slot>projectStop()</slot>
+    <slot>currentTabChanged( QWidget * w )</slot>
+    <slot>projectError( const QString &amp; msg, const QString &amp;, int line )</slot>
+    <slot>scriptItemDoubleClicked( QListViewItem * i )</slot>
+    <slot>enableEditActions( bool enable )</slot>
+    <slot>enableProjectActions( bool enable )</slot>
+    <slot>textChanged()</slot>
+    <slot>savePreferences()</slot>
+    <slot>projectChanged()</slot>
+    <slot>evaluateProject()</slot>
+    <slot>interpreterTimeout(int)</slot>
+</slots>
+<functions>
+    <function>editReplace( bool all )</function>
+    <function specifier="non virtual">init()</function>
+    <function specifier="non virtual">setupActionIcons()</function>
+    <function>setProject( QSProject * p )</function>
+    <function>showEvent(QShowEvent *e)</function>
+    <function>hideEvent(QHideEvent *e)</function>
+    <function>setRunningState(bool)</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
