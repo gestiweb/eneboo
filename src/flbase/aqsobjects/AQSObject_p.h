@@ -25,11 +25,15 @@
 #include <qbitarray.h>
 #include <qguardedptr.h>
 
-#define AQ_DECLARE_AQS_PREFIX_OBJECT(Prefix,Class,BaseClass) \
+void __aq_baseclass_init_error( 
+    const char * prefix, const char * clname, const char * bclname, 
+    QObject *qo );
+
+#define AQ_DECLARE_XYZ_PREFIX_OBJECT(XYZ, PXYZ, Prefix,Class,BaseClass) \
   protected: \
   void internalInit(Prefix##Class *o) { \
     o_ = o; \
-    AQS##BaseClass::internalInit(o); \
+    PXYZ##BaseClass::internalInit(o); \
   } \
   private: \
   /*Prefix##Class *o_;*/ \
@@ -37,19 +41,17 @@
   void init(QObject *qo) { \
     o_ = ::qt_cast<Prefix##Class *>(qo); \
     if (!o_) { \
-      AQS_IF_DEBUG(printf("%s\n", \
-                      AQ_QUOTEME(BaseClass: AQS##Class must be initialized with a valid Prefix##Class) \
-                         )); \
+      __aq_baseclass_init_error(AQ_QUOTEME(Prefix), AQ_QUOTEME(Class), AQ_QUOTEME(BaseClass), qo ); \
     } else { \
       QObject::setName(AQ_QUOTEME(Prefix##Class)); \
-      AQS##BaseClass::internalInit(o_); \
-      AQS_IF_DEBUG(printf("%s init %s %p\n", AQ_QUOTEME(AQS##Class), o_->QObject::name(), o_)); \
+      PXYZ##BaseClass::internalInit(o_); \
+      AQS_IF_DEBUG(printf("%s init %s %p\n", AQ_QUOTEME(XYZ##Class), o_->QObject::name(), (Prefix##Class *)o_)); \
       specializedInternalInit(); \
     } \
   }\
   void finish() { \
     if (!finished_) { \
-      AQS_IF_DEBUG(printf("%s finish %p\n", AQ_QUOTEME(AQS##Class), o_)); \
+      AQS_IF_DEBUG(printf("%s finish %p\n", AQ_QUOTEME(XYZ##Class), (Prefix##Class *)o_)); \
       finished_ = true; \
       specializedInternalFinish(); \
     } \
@@ -60,15 +62,19 @@
   operator const Prefix##Class *() const { return o_; } \
   operator Prefix##Class &() { if (o_) return *o_; } \
   operator const Prefix##Class &() const { if (o_) return *o_; } \
-  AQS##Class() : AQS##BaseClass (), o_(0) {} \
-  AQS##Class(QObject *qo) : AQS##BaseClass () {init(qo);} \
-  virtual ~AQS##Class() { \
+  XYZ##Class() : PXYZ##BaseClass (), o_(0) {} \
+  XYZ##Class(QObject *qo) : PXYZ##BaseClass () {init(qo);} \
+  virtual ~XYZ##Class() { \
     finish(); \
   } \
   AQ_STATIC_CONSTRUCTOR(Prefix,Class)
 
+#define AQ_DECLARE_AQS_PREFIX_OBJECT(Prefix,Class,BaseClass)  AQ_DECLARE_XYZ_PREFIX_OBJECT(AQS, AQS, Prefix,Class,BaseClass)
+
 #define AQ_DECLARE_AQS_OBJECT(Class,BaseClass) AQ_DECLARE_AQS_PREFIX_OBJECT(Q,Class,BaseClass)
 #define AQ_DECLARE_AQS_AQOBJECT(Class,BaseClass) AQ_DECLARE_AQS_PREFIX_OBJECT(AQ,Class,BaseClass)
+#define AQ_DECLARE_AQS_FLOBJECT(Class,BaseClass) AQ_DECLARE_XYZ_PREFIX_OBJECT(FLS, AQS, FL,Class,BaseClass)
+#define AQ_DECLARE_AQS_AQFLOBJECT(Class,BaseClass) AQ_DECLARE_XYZ_PREFIX_OBJECT(AQS, FLS, AQ,Class,BaseClass)
 
 class AQSObject : public AQSBaseObject
 {

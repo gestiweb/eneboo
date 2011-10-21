@@ -20,6 +20,15 @@
 #include "AQS_g.h"
 #include "AQSWrapperFactory_p.h"
 
+void __aq_baseclass_init_error( 
+    const char * prefix, const char * clname, const char * bclname, 
+    QObject *qo ) 
+{
+  printf("%s base class %s init error: AQS%s  must be initialized with "
+          "a valid %s%s (object was: (%s *) %p)\n", 
+          prefix, bclname, clname, prefix, clname, qo->className(), qo); 
+}
+
 AQSWrapperFactory::AQSWrapperFactory()
 {
   d = new AQSWrapperFactoryPrivate;
@@ -27,6 +36,8 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_GEN_REG_WRAP
 
   //### Remove in AbanQ v3
+#define AQ_REG_COMPAT_FLS(Class) \
+  registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(FLS##Class))
 #define AQ_REG_COMPAT_FL(Class) \
   registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(AQS##Class))
 #define AQ_REG_COMPAT_FL2(FClass,Class) \
@@ -39,7 +50,7 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL(SqlCursor);
   AQ_REG_COMPAT_FL(SqlQuery);
   AQ_REG_COMPAT_FL(FieldDB);
-  AQ_REG_COMPAT_FL(TableDB);
+  AQ_REG_COMPAT_FLS(TableDB);
   AQ_REG_COMPAT_FL(FormDB);
   AQ_REG_COMPAT_FL(FormRecordDB);
   AQ_REG_COMPAT_FL(FormSearchDB);
@@ -76,6 +87,9 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   AQ_GEN_CRE_WRAP
 
   //### Remove in AbanQ v3
+#define AQ_CRE_COMPAT_FLS(Class) \
+  if (className == AQ_QUOTEME(FL##Class)) \
+    return new FLS##Class(static_cast<QObject *>(ptr))
 #define AQ_CRE_COMPAT_FL(Class) \
   if (className == AQ_QUOTEME(FL##Class)) \
     return new AQS##Class(static_cast<QObject *>(ptr))
@@ -90,7 +104,7 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   AQ_CRE_COMPAT_FL(SqlCursor);
   AQ_CRE_COMPAT_FL(SqlQuery);
   AQ_CRE_COMPAT_FL(FieldDB);
-  AQ_CRE_COMPAT_FL(TableDB);
+  AQ_CRE_COMPAT_FLS(TableDB);
   AQ_CRE_COMPAT_FL(FormDB);
   AQ_CRE_COMPAT_FL(FormRecordDB);
   AQ_CRE_COMPAT_FL(FormSearchDB);
