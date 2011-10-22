@@ -597,12 +597,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
    // connect(exportMod, "activated()", this.actSigMap_, "map()");
    // this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
 
-    var importMod = new QAction(ac);
-    importMod.name = "importModulesAction";
-    importMod.menuText = sys.translate("&Importar Módulos desde Disco");
-    importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
-    connect(importMod, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
+   // var importMod = new QAction(ac);
+   // importMod.name = "importModulesAction";
+   // importMod.menuText = sys.translate("&Importar Módulos desde Disco");
+   // importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
+   // connect(importMod, "activated()", this.actSigMap_, "map()");
+   // this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
     
     var update = new QAction(ac);
     update.name = "updateAbanQAction";

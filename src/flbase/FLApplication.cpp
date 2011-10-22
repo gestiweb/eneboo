@@ -624,7 +624,7 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(exportModules()));
 
         ++c; */
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Importar Módulos desde Disco");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
@@ -635,7 +635,7 @@ void FLApplication::initToolBox()
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
 
-        ++c;
+        ++c; */
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Actualización y Soporte");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
