@@ -481,6 +481,11 @@ public slots:
 
   /** Uso interno */
   void callScriptEntryFunction();
+   
+  /**
+  Muestra la venta de ayuda con el índice
+  */
+  void helpIndex();
 
 protected:
 
@@ -549,11 +554,6 @@ private slots:
   Conmuta la barra de estado entre visible y oculta
   */
   void toggleStatusBar(bool toggle);
-
-  /**
-  Muestra la venta de ayuda con el índice
-  */
-  void helpIndex();
 
   /**
   Llamado cuando el menu Ventana es activado; regenera el menu ventana con todas

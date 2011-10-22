@@ -519,6 +519,7 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
     connect(w.child("aboutQtAction"), "activated()", aqApp, "aboutQt()");
     connect(w.child("aboutAbanQAction"), "activated()", aqApp, "aboutAbanQ()");
     connect(w.child("fontAction"), "activated()", aqApp, "chooseFont()");
+    connect(w.child("helpIndexAction"), "activated()", aqApp, "helpIndex()");
   }
 
   function updateActionGroup()
@@ -651,6 +652,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
       this.iconSet16x16(AQS.Pixmap_fromMimeSource("icono_abanq.png"))
     );
     connect(aboutAbanQ, "activated()", aqApp, "aboutAbanQ()");
+
+   var helpIndex = w.child("helpIndexAction");
+    helpIndex.setIconSet(
+      this.iconSet16x16(AQS.Pixmap_fromMimeSource("help_index.png"))
+    );
+    connect(helpIndex, "activated()", aqApp, "helpIndex()");
   }
 
   function initConfigMenu()

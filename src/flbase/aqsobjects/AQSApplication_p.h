@@ -100,6 +100,7 @@ public slots:
   void quit();
   void closeAllWindows();
   void aboutQt();
+  void helpIndex();
   void reinit();
   FLSqlDatabase *db();
   void setMainWidget(QWidget *);
@@ -393,6 +394,11 @@ inline void AQSApplication::aboutQt()
 {
   AQ_CALL_VOID(aboutQt());
 }
+inline void AQSApplication::helpIndex()
+{
+  AQ_CALL_VOID(helpIndex());
+}
+
 inline void AQSApplication::reinit()
 {
   AQ_CALL_VOID(reinit());
