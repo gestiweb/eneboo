@@ -573,6 +573,15 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
         pg.setProgress(pg.progress() + 1);
         if (ac.name == "sys" && ag.name == "sys")
           {
+            if (sys.isDebuggerEnabled())
+              {
+                var wb = new QAction(agm);
+                wb.name = "runWorkBench";
+                wb.menuText = sys.translate("QSA Work Bench");
+                wb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("bug.png")));
+                connect(wb, "activated()", this.actSigMap_, "map()");
+				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
+                }
 
     var load = new QAction(ac);
     load.name = "loadAbanQPackageAction";
@@ -878,6 +887,11 @@ function triggerAction(signature)
     case "updateAbanQ()":
       if (ok)
         sys.updateAbanQ();
+      break;
+
+	    case "runWorkBench()":
+      if (ok)
+        sys.openQSWorkbench();
       break;
 
     case "exit()":
