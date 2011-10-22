@@ -583,12 +583,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
 				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
                 }
 
-    var load = new QAction(ac);
-    load.name = "loadAbanQPackageAction";
-    load.menuText = sys.translate("Cargar Paquete de &Módulos");
-    load.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("load.png")));
-    connect(load, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
+   // var load = new QAction(ac);
+   // load.name = "loadAbanQPackageAction";
+   // load.menuText = sys.translate("Cargar Paquete de &Módulos");
+   // load.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("load.png")));
+   // connect(load, "activated()", this.actSigMap_, "map()");
+   // this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
 
     var exportMod = new QAction(ac);
     exportMod.name = "exportModulesAction";

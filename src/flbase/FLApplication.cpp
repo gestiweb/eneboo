@@ -598,6 +598,7 @@ void FLApplication::initToolBox()
       if (QChar(c) == 'Q')
         ++c;
       if (*itM == "sys") {
+        /*
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
@@ -610,6 +611,7 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(loadModules()));
 
         ++c;
+        */
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Exportar Módulos a Disco");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
