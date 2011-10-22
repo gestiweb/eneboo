@@ -575,7 +575,7 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
           {
             if (sys.isDebuggerEnabled())
               {
-                var wb = new QAction(agm);
+                var wb = new QAction(ag);
                 wb.name = "runWorkBench";
                 wb.menuText = sys.translate("QSA Work Bench");
                 wb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("bug.png")));
