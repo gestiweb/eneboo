@@ -590,12 +590,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
    // connect(load, "activated()", this.actSigMap_, "map()");
    // this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
 
-    var exportMod = new QAction(ac);
-    exportMod.name = "exportModulesAction";
-    exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
-    exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
-    connect(exportMod, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
+   // var exportMod = new QAction(ac);
+   // exportMod.name = "exportModulesAction";
+   // exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
+   // exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
+   // connect(exportMod, "activated()", this.actSigMap_, "map()");
+   // this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
 
     var importMod = new QAction(ac);
     importMod.name = "importModulesAction";
