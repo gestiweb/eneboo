@@ -232,6 +232,17 @@ public slots:
   }
 
   /**
+   Indica si la aplicación se compiló en modo DEBUGGER
+
+   @return TRUE en caso de que la aplicación se compilara en modo DEBUGGER, FALSE en caso contrario
+   */
+  bool isDebuggerEnabled() {
+#ifdef QSDEBUGGER
+    return true;
+#endif
+    return false;
+  }
+  /**
    Indica si la aplicación se compiló en modo TEST
 
    @return TRUE en caso de que la aplicación se compilara en modo TEST, FALSE en caso contrario
