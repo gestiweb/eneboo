@@ -604,12 +604,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
    // connect(importMod, "activated()", this.actSigMap_, "map()");
    // this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
     
-    var update = new QAction(ac);
-    update.name = "updateAbanQAction";
-    update.menuText = sys.translate("Act&ualización y Soporte");
-    update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
-    connect(update, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
+   // var update = new QAction(ac);
+   // update.name = "updateAbanQAction";
+   // update.menuText = sys.translate("Act&ualización y Soporte");
+   // update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
+   // connect(update, "activated()", this.actSigMap_, "map()");
+   // this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
 
            }
       }

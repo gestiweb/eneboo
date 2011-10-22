@@ -636,7 +636,7 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
 
         ++c; */
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Actualización y Soporte");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
@@ -646,9 +646,10 @@ void FLApplication::initToolBox()
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
-
+        ++c;
+        */
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
-         ++c;
+         
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("QSA WorkBench");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
