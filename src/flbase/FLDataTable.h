@@ -299,6 +299,8 @@ signals:
   void primaryKeyToggled(const QVariant &primaryKeyValue, bool on);
 };
 
+typedef FLDataTable FLDataTableDB;
+
 // Uso interno
 class FLCheckBox: public QCheckBox
 {

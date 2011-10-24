@@ -38,6 +38,8 @@ AQSWrapperFactory::AQSWrapperFactory()
   //### Remove in AbanQ v3
 #define AQ_REG_COMPAT_FLS(Class) \
   registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(FLS##Class))
+#define AQ_REG_COMPAT_FLS2(FClass,Class) \
+  registerWrapper(AQ_QUOTEME(FL##FClass), AQ_QUOTEME(FLS##Class))
 #define AQ_REG_COMPAT_FL(Class) \
   registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(AQS##Class))
 #define AQ_REG_COMPAT_FL2(FClass,Class) \
@@ -54,7 +56,7 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL(FormDB);
   AQ_REG_COMPAT_FL(FormRecordDB);
   AQ_REG_COMPAT_FL(FormSearchDB);
-  AQ_REG_COMPAT_FL2(DataTable, DataTableDB);
+  AQ_REG_COMPAT_FLS2(DataTable, DataTableDB);
   AQ_REG_COMPAT_FL2(RelationMetaData, RelationMD);
   AQ_REG_COMPAT_FL2(FieldMetaData, FieldMD);
   AQ_REG_COMPAT_FL2(TableMetaData, TableMD);
@@ -90,6 +92,9 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
 #define AQ_CRE_COMPAT_FLS(Class) \
   if (className == AQ_QUOTEME(FL##Class)) \
     return new FLS##Class(static_cast<QObject *>(ptr))
+#define AQ_CRE_COMPAT_FLS2(FClass,Class) \
+  if (className == AQ_QUOTEME(FL##FClass)) \
+    return new FLS##Class(static_cast<QObject *>(ptr))
 #define AQ_CRE_COMPAT_FL(Class) \
   if (className == AQ_QUOTEME(FL##Class)) \
     return new AQS##Class(static_cast<QObject *>(ptr))
@@ -108,7 +113,7 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   AQ_CRE_COMPAT_FL(FormDB);
   AQ_CRE_COMPAT_FL(FormRecordDB);
   AQ_CRE_COMPAT_FL(FormSearchDB);
-  AQ_CRE_COMPAT_FL2(DataTable, DataTableDB);
+  AQ_CRE_COMPAT_FLS2(DataTable, DataTableDB);
   AQ_CRE_COMPAT_FL2(RelationMetaData, RelationMD);
   AQ_CRE_COMPAT_FL2(FieldMetaData, FieldMD);
   AQ_CRE_COMPAT_FL2(TableMetaData, TableMD);

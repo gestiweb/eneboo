@@ -22,11 +22,12 @@
 #include "AQSDataTable_p.h"
 #include "AQObjects.h"
 
-class AQSDataTableDB : public AQSDataTable
+class FLSDataTableDB : public AQSDataTable
 {
   Q_OBJECT
 
-  AQ_DECLARE_AQS_AQOBJECT(DataTableDB, DataTable);
+  //_AQ_DECLARE_AQS_FLOBJECT_PTYPE(DataTableDB, DataTable, FLDataTable);
+  AQ_DECLARE_AQS_FLOBJECT(DataTableDB, DataTable);
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
@@ -75,44 +76,54 @@ public:
   //@AQ_END_DEF_PUB_SLOTS@
 };
 
+
+class AQSDataTableDB : public FLSDataTableDB
+{
+  Q_OBJECT
+
+  AQ_DECLARE_AQS_AQFLOBJECT(DataTableDB,DataTableDB);
+  
+};
+
+
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline void AQSDataTableDB::setPersistentFilter(const QString &arg0)
+inline void FLSDataTableDB::setPersistentFilter(const QString &arg0)
 {
   AQ_CALL_VOID(setPersistentFilter(arg0));
 }
-inline FLSqlCursor *AQSDataTableDB::cursor() const
+inline FLSqlCursor *FLSDataTableDB::cursor() const
 {
   AQ_CALL_RET(cursor());
 }
-inline void AQSDataTableDB::setFLReadOnly(const bool arg0)
+inline void FLSDataTableDB::setFLReadOnly(const bool arg0)
 {
   AQ_CALL_VOID(setFLReadOnly(arg0));
 }
-inline void AQSDataTableDB::setEditOnly(const bool arg0)
+inline void FLSDataTableDB::setEditOnly(const bool arg0)
 {
   AQ_CALL_VOID(setEditOnly(arg0));
 }
-inline void AQSDataTableDB::setInsertOnly(const bool arg0)
+inline void FLSDataTableDB::setInsertOnly(const bool arg0)
 {
   AQ_CALL_VOID(setInsertOnly(arg0));
 }
-inline QVariantList AQSDataTableDB::primarysKeysChecked() const
+inline QVariantList FLSDataTableDB::primarysKeysChecked() const
 {
   AQ_CALL_RET_V(primarysKeysChecked(), QVariantList);
 }
-inline void AQSDataTableDB::clearChecked()
+inline void FLSDataTableDB::clearChecked()
 {
   AQ_CALL_VOID(clearChecked());
 }
-inline void AQSDataTableDB::setPrimaryKeyChecked(const QVariant &arg0,  bool arg1)
+inline void FLSDataTableDB::setPrimaryKeyChecked(const QVariant &arg0,  bool arg1)
 {
   AQ_CALL_VOID(setPrimaryKeyChecked(arg0, arg1));
 }
-inline void AQSDataTableDB::setShowAllPixmaps(bool arg0)
+inline void FLSDataTableDB::setShowAllPixmaps(bool arg0)
 {
   AQ_CALL_VOID(setShowAllPixmaps(arg0));
 }
-inline void AQSDataTableDB::setFunctionGetColor(const QString &arg0)
+inline void FLSDataTableDB::setFunctionGetColor(const QString &arg0)
 {
   AQ_CALL_VOID(setFunctionGetColor(arg0));
 }

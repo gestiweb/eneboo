@@ -76,7 +76,7 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   connect(timer, SIGNAL(timeout()), SLOT(refreshDelayed()));
 }
 
-FLDataTable *FLTableDB::tableRecords()
+FLDataTable *FLTableDB::tableRecords() 
 {
   if (!tableRecords_) {
     tableRecords_ = new FLDataTable(tabData, "tableRecords");

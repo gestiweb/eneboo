@@ -2621,15 +2621,17 @@ private:
 #define AQ_CALL_RET_V(F,V) return (o_ ? o_->F : V())
 #define AQ_CALL_RET_PTR(F,V) return (o_ ? new V ( o_->F ) : 0)
 
-#define AQ_STATIC_CONSTRUCTOR(Prefix,Class) \
-  static Prefix##Class *Prefix##Class##_(const QSArgumentList &args) { \
-    Prefix##Class *co = reinterpret_cast<Prefix##Class *>(specializedConstruct(construct(args))); \
+#define AQ_STATIC_CONSTRUCTOR_PTYPE(Prefix,Class, PtrType) \
+  static PtrType *PtrType##_(const QSArgumentList &args) { \
+    PtrType *co = reinterpret_cast<PtrType *>(specializedConstruct(construct(args))); \
     if (!co) { \
       AQS_IF_DEBUG(printf("Failed to construct %s(%s)\n", \
-                          AQ_QUOTEME(Prefix##Class), argsSignature(args).latin1())); \
+                          AQ_QUOTEME(PtrType), argsSignature(args).latin1())); \
     } \
     return co; \
   }
+
+#define AQ_STATIC_CONSTRUCTOR(Prefix,Class) AQ_STATIC_CONSTRUCTOR_PTYPE(Prefix, Class, Prefix##Class)
 
 #define AQ_SKIP_DECLARE(Class,BaseClass)
 
