@@ -91,7 +91,11 @@ void AQApplication::init(const QString &n, const QString &callFunction,
     i->addWrapperFactory(new AQSWrapperFactory);
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
-    i->setErrorMode(QSInterpreter::Notify);
+#ifdef FL_DEBUGGER
+    i->setErrorMode( QSInterpreter::AskForDebug );
+#else
+    i->setErrorMode( QSInterpreter::Notify );
+#endif
   }
 
   d->aqAppScriptObject_ = new QObject(this, "aqAppScript");

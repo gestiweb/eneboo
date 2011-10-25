@@ -94,7 +94,7 @@ class QSA_EXPORT QSInterpreter : public QObject
   Q_PROPERTY(int timeoutInterval READ timeoutInterval WRITE setTimeoutInterval)
 
 public:
-  enum ErrorMode { Notify, Nothing };
+  enum ErrorMode { Notify, Nothing, AskForDebug };
   enum ClassFlags { AllClasses, GlobalClasses };
   enum FunctionFlags { FunctionNames = 0,
                        FunctionSignatures = 1,

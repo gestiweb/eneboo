@@ -1058,6 +1058,10 @@ void QSInterpreter::runtimeError(const QString &message,
                                                 "the script:<pre><font color=red>%3</font></pre>")
                             .arg(lineNumber).arg(scriptName).arg(message));
     }
+  } else if (errorMode() == AskForDebug) {
+    // TODO: Add here code to debug the runtimeError...
+    qDebug("Error in script: '%s', line: %d\n  %s\n",
+           scriptName.latin1(), lineNumber, message.latin1());
   }
 #else
   QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),
