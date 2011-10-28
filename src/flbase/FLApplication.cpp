@@ -196,13 +196,13 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
 
   switch (ev->type()) {
     case QEvent::KeyPress:
-      if (obj == container) {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
-        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
-          openQSWorkbench();
-          return true;
-        }
-      }
+       // if (obj == container) {
+       // QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
+       //  if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
+       //   openQSWorkbench();
+       //   return true;
+       // }
+       // }
       if (obj == mainWidget_) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
         if (ke->key() == Key_Shift && (ke->state() & ControlButton)) {
@@ -213,10 +213,10 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
           generalExit();
           return true;
         }
-        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
-          openQSWorkbench();
-          return true;
-        }
+      //  if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
+      //    openQSWorkbench();
+      //    return true;
+      //  }
         if (ke->key() == Key_Escape) {
           static_cast<QWidget *>(obj)->hide();
           return true;
@@ -654,7 +654,7 @@ void FLApplication::initToolBox()
         */
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
          
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("QSA WorkBench");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
@@ -663,7 +663,7 @@ void FLApplication::initToolBox()
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench())); */
 #endif
 
 #ifndef QSDEBUGGER
