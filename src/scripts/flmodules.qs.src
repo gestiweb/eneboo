@@ -84,7 +84,7 @@ function cargarFicheroEnBD(nombre, contenido, log, directorio) {
 
 function cargarAr(nombre, contenido, log, directorio)
 {
-	if (!sys.isLoadedModule("flar2kut"))
+	if (!sys.isLoadedModule("eneboodev"))
 		return false;
 		
 	if (util.readSettingEntry("scripts/sys/conversionAr") != "true")
@@ -92,7 +92,7 @@ function cargarAr(nombre, contenido, log, directorio)
 
 	  log.append(util.translate("scripts", "Convirtiendo %0 a kut").arg(nombre));
 	  contenido = sys.toUnicode(contenido, "UTF-8");
-	  contenido = flar2kut.iface.pub_ar2kut(contenido);
+	  contenido = eneboodev.iface.pub_ar2kut(contenido);
 
 	  nombre = nombre.toString().left(nombre.length - 3) + ".kut";
 	  if (contenido) {
