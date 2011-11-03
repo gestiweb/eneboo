@@ -19,7 +19,8 @@ email                : mail@infosial.com
  ***************************************************************************/
 
 #include <qlabel.h>
-
+#include <qclipboard.h>
+#include <qapplication.h> /// qapp
 #include "FLAbout.h"
 #include "AQConfig.h"
 
@@ -40,3 +41,10 @@ FLAbout::FLAbout(const QString &v,
 }
 
 FLAbout::~FLAbout() {}
+
+void FLAbout::copy2Clipboard()
+{
+QClipboard *clipboard = QApplication::clipboard();
+clipboard->setText(ENB_DATOS_COMP);
+}
+

@@ -43,6 +43,13 @@ public:
   destructor.
   */
   ~FLAbout();
-};
 
+
+public slots:
+
+  /**
+  Copia la información de compilación en el portapapeles
+  */
+  void copy2Clipboard();
+};
 #endif
