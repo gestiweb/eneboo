@@ -57,16 +57,5 @@
 		<type>stringlist</type>
 		<visiblegrid>false</visiblegrid>
 	</field>
-	
-	<field>
-		<name>binario</name>
-		<alias>QT_TRANSLATE_NOOP("MetaData","Binario")</alias>
-		<null>true</null>
-		<pk>false</pk>
-		<type>bytearray</type>
-		<visiblegrid>false</visiblegrid>
-		<visible>false</visible>
-		<editable>false</editable>
-	</field>
 </TMD>
 
