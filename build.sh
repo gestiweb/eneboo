@@ -372,7 +372,7 @@ fi
 
 echo -e "\n\nRecopilando datos de la compilación \n"
 
-DATOS_COMPILACION="\n Versión eneboo: $VERSION \n Mkspecs: $OPT_QMAKESPEC \n Comando Make: $CMD_MAKE \n Versión GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ')" 
+DATOS_COMPILACION="\n Versión eneboo: $VERSION \n Mkspecs: $OPT_QMAKESPEC \n Make: $CMD_MAKE \n Versión GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilación : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT" 
 
 cat > AQConfig.h <<EOF
 // ** $(date +%d%m%Y):$PREFIX -> AQConfig.h
