@@ -289,45 +289,41 @@ void FLFormDB::initMainWidget(QWidget *w)
     } else if (geo.width() == 1) {
     } else if (geo.isValid()) {
       QRect desk = QApplication::desktop()->availableGeometry(this);
-#if defined(Q_OS_WIN32)
-      // In windows, desktop seems to be the entire screen, instead of the 
-      // .. available area for apps. 
-      desk.setHeight(desk.height()-34);
-      desk.setWidth(desk.width()-6);
-#endif
+      int border = 5, border_b = 32;
       
-      QRect inter = desk.intersect(geo);
       
       // Exceeds available horizontal area:
-      if (geo.width() > desk.width() - 5) {
-        geo.setWidth(desk.width() - 5);
+      if (geo.width() > desk.width() - border * 2) {
+        geo.setWidth(desk.width() - border * 2);
       }
       // Exceeds available vertical area:
-      if (geo.height() > desk.height() - 5) {
-        geo.setHeight(desk.height() - 5);
+      if (geo.height() > desk.height() - border - border_b) {
+        geo.setHeight(desk.height() - border - border_b);
       }
       
-      if ( geo.top() < desk.top() )  {
-        geo.setTop(desk.top());
+      if ( geo.top() < desk.top() + border)  {
+        geo.setTop(desk.top() + border);
       }
       
-      if ( geo.left() < desk.left() ) {
-        geo.setLeft(desk.left());
+      if ( geo.left() < desk.left() + border) {
+        geo.setLeft(desk.left() + border);
       }
       
-      if ( geo.bottom() > desk.bottom() ) {
-        geo.setBottom(desk.bottom());
+      if ( geo.bottom() > desk.bottom() - border_b ) {
+        int diff = geo.bottom() - desk.bottom() - border_b;
+        geo.setTop(geo.top() - diff);
       }
       
-      if ( geo.right() > desk.right() ) {
-        geo.setRight(desk.right());
+      if ( geo.right() > desk.right() - border) {
+        int diff = geo.right() - desk.right() - border;
+        geo.setLeft(geo.left() - diff);
       }
       
       // Outside of screen, re-center:
-      if (  geo.right() > desk.right()  
-         || geo.left() < desk.left() 
-         || geo.bottom() > desk.bottom() 
-         || geo.top() < desk.top() ) {
+      if (  geo.right() > desk.right() - border  
+         || geo.left() < desk.left() + border
+         || geo.bottom() > desk.bottom() - border_b
+         || geo.top() < desk.top() + border ) {
         geo.moveCenter(desk.center());
       }
         
