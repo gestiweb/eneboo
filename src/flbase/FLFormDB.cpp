@@ -289,34 +289,34 @@ void FLFormDB::initMainWidget(QWidget *w)
     } else if (geo.width() == 1) {
     } else if (geo.isValid()) {
       QRect desk = QApplication::desktop()->availableGeometry(this);
-      int border = 5, border_b = 32;
+      int border = 5, border_b = 48;
       
       
       // Exceeds available horizontal area:
       if (geo.width() > desk.width() - border * 2) {
-        geo.setWidth(desk.width() - border * 2);
+        geo.setWidth(desk.width() - border * 2 - 5);
       }
       // Exceeds available vertical area:
       if (geo.height() > desk.height() - border - border_b) {
-        geo.setHeight(desk.height() - border - border_b);
+        geo.setHeight(desk.height() - border - border_b - 5);
       }
       
       if ( geo.top() < desk.top() + border)  {
-        geo.setTop(desk.top() + border);
+        geo.moveTop(desk.top() + border - geo.top()+1);
       }
       
       if ( geo.left() < desk.left() + border) {
-        geo.setLeft(desk.left() + border);
+        geo.moveLeft(desk.left() + border - geo.left()+1);
       }
       
       if ( geo.bottom() > desk.bottom() - border_b ) {
         int diff = geo.bottom() - desk.bottom() - border_b;
-        geo.setTop(geo.top() - diff);
+        geo.moveTop(-diff-1);
       }
       
       if ( geo.right() > desk.right() - border) {
         int diff = geo.right() - desk.right() - border;
-        geo.setLeft(geo.left() - diff);
+        geo.moveLeft(-diff-1);
       }
       
       // Outside of screen, re-center:
