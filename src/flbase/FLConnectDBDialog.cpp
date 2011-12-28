@@ -251,6 +251,20 @@ void FLConnectDBDialog::removeMark()
     names << comboBoxMarks->text(i);
 
   FLSettings::writeEntry("DBA/marks", names);
+
+  QString usuario = lineEditUser->text();
+  QString host = lineEditHost->text();
+  QString puerto = lineEditPort->text();
+
+  connectionPath_ = usuario;
+  connectionPath_ = connectionPath_ + puerto;
+  connectionPath_ = connectionPath_ + host;
+  connectionPath_ = connectionPath_ + comboBoxDB->currentText();
+  connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
+  FLSettings::writeEntry("DBA/rememberPasswd" + connectionPath_,false);
+  FLSettings::writeEntry("DBA/password" + connectionPath_, QString::null);
+   chkRemember->setChecked(false);
+
 }
 
 void FLConnectDBDialog::selectMark(const QString &mark)
