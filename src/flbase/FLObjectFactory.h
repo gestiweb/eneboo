@@ -52,7 +52,7 @@
 #include "mimecodec.h"
 #include "qextserialport.h"
 #include "FLDigiDoc.h"
-
+#include "FLSettings.h"
 #include "AQConfig.h"
 
 #include <qsobjectfactory.h>
@@ -242,6 +242,19 @@ public slots:
 #endif
     return false;
   }
+
+  /**
+   Indica si la aplicación se ejecuta en modo DEBUGGER
+
+   @return TRUE en caso de que la aplicación se ejecuta en modo DEBUGGER, FALSE en caso contrario
+   */
+  bool isDebuggerMode() {
+#ifdef QSDEBUGGER
+    return FLSettings::readBoolEntry("application/isDebuggerMode");
+#endif
+    return false;
+  }
+
   /**
    Indica si la aplicación se compiló en modo TEST
 
