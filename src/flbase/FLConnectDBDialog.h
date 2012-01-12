@@ -148,6 +148,12 @@ private:
   bool rememberPasswd_;
 
   /**
+  Indicador flag relacionada con conexion actual
+  */
+  QString connectionPath_;
+
+
+  /**
   Desactivar avances de AbanQ v3
   */
   bool oldApi_;

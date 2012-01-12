@@ -128,7 +128,6 @@ FLApplication::FLApplication(int &argc, char **argv) :
   FLMemCache::init();
   FLDiskCache::init();
   flFactory_ = new FLObjectFactory;
-
   timeUser_ = QDateTime::currentDateTime();
   multiLangEnabled_ = false;
   multiLangId_ = QString(QTextCodec::locale()).left(2).upper();
@@ -193,12 +192,12 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
     obj->installEventFilter(this);
   }
 #endif
-
+  FLApplicationInterface *ap2 = new FLApplicationInterface(this);
   switch (ev->type()) {
     case QEvent::KeyPress:
       if (obj == container) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
-        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
+        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton)) && ap2->isDebuggerMode()) {
           openQSWorkbench();
           return true;
         }
@@ -559,11 +558,12 @@ void FLApplication::showToggleBars()
 
 void FLApplication::initToolBox()
 {
+  
   if (!toolBox || !modulesMenu)
     return;
 
   modulesMenu->clear();
-
+  FLApplicationInterface *ap2 = new FLApplicationInterface(this);
   while (toolBox->count()) {
     QWidget *item = toolBox->item(0);
     if (item) {
@@ -653,7 +653,9 @@ void FLApplication::initToolBox()
         ++c;
         */
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
-         
+
+  if (ap2->isDebuggerMode())
+                                  {        
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("QSA WorkBench");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
@@ -664,6 +666,7 @@ void FLApplication::initToolBox()
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
+                                  }
 #endif
 
 #ifndef QSDEBUGGER

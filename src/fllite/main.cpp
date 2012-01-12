@@ -215,8 +215,12 @@ void aq_main(int argc, char **argv)
       QTimer::singleShot(0, AbanQ, SLOT(quit()));
       return;
     }
-
-    splash = new QSplashScreen(QPixmap::fromMimeSource("splashabanq.png"));
+    //Buscamos splashScreen Externo
+    QImage img(AQ_PREFIX + "/share/eneboo/splashscreen.png");
+      if(!img.isNull()) // Load succeded ?
+             splash = new QSplashScreen(QPixmap(img)); 
+               else
+             splash = new QSplashScreen(QPixmap::fromMimeSource("splashabanq.png"));
     splash->show();
     splash->message(QT_TR_NOOP("Inicializando..."), Qt::AlignRight, QColor(0, 0, 0));
   } else if (!silentConnect(silentConn)) {

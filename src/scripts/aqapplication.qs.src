@@ -574,12 +574,12 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
         pg.setProgress(pg.progress() + 1);
         if (ac.name == "sys" && ag.name == "sys")
           {
-            if (sys.isDebuggerEnabled())
+            if (sys.isDebuggerMode())
               {
                 var wb = new QAction(ag);
                 wb.name = "runWorkBench";
                 wb.menuText = sys.translate("QSA Work Bench");
-                wb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("bug.png")));
+                wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
                 connect(wb, "activated()", this.actSigMap_, "map()");
 				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
                 }
