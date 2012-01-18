@@ -38,11 +38,14 @@ public:
   QByteArray getBinary() const;
 
   QStringList errorMessages() const;
+  QString getVersion() const;
+  void jump();
 
 private:
   QFile *file_;
   QDataStream *stream_;
   QStringList errMsgs_;
+  char *packageVersion_;
 };
 
 #endif /* AQUNPACKER_H_ */

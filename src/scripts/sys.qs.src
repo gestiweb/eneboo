@@ -232,7 +232,7 @@ function loadModules(input, warnBackup)
     var dir = new Dir(sys.installPrefix() + "/share/eneboo/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
-              "AbanQ Packages (*.abanq)",
+              "Eneboo Packages (*.eneboopkg)\nAbanQ Packages (*.abanq)",
               AQUtil.translate("scripts", "Seleccionar Fichero")
             );
   }
@@ -276,7 +276,13 @@ function loadAbanQPackage(input, warnBackup)
         errorMsgBox(msg);
         ok = false;
       }
+      //debug("Versión " + unpacker.getVersion()); //devuelve el fabricante del paquete
+          //Por ahora los paquetes a cargar usan la misma estructura
+                   unpacker.jump(); //Espacio1
+                   unpacker.jump(); //Espacio2
+                   unpacker.jump(); //Espacio3
 
+ 
       if (ok)
         ok = loadModulesDef(unpacker);
 
@@ -350,6 +356,7 @@ function loadFilesDef(un)
 
 function registerFile(fil, un)
 {
+var Dump;
   if (fil.id.endsWith(".xpm")) {
     var cur = new AQSqlCursor("flmodules");
     if (!cur.select("idmodulo='" + fil.module + "'"))
@@ -374,8 +381,8 @@ function registerFile(fil, un)
   cur.setValueBuffer("sha", fil.shatext);
   if (fil.text.length > 0)
     cur.setValueBuffer("contenido", un.getText());
-  if (fil.binary.length > 0)
-    cur.setValueBuffer("binario", un.getBinary());
+ if (fil.binary.length > 0)
+    Dump = un.getBinary(); // Hay que solicitarlo para que cuente el espacio.
   return cur.commitBuffer();
 }
 

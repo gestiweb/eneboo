@@ -734,7 +734,7 @@ void FLUtil::createProgressDialog(const QString &l, int tS, const QString &id)
   if (!pd) {
     pd = new QProgressDialog(l, 0, tS, 0, 0, true);
     dictProgressD_.insert(id, pd);
-    pd->setCaption("AbanQ");
+    pd->setCaption("Eneboo");
   }
 }
 
