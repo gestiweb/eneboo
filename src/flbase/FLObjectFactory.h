@@ -505,6 +505,32 @@ public slots:
     }
   }
 
+    /**
+   Crea un fichero con la codificación especificada
+
+   @param file Nombre del fichero a escribir
+   @param encode Codificación. Puede ser ISO-8859-1 o UTF8
+   @param contenido Datos a grabar en el fichero
+   */
+  void write(const QString &encode, const QString &file, const QString &text) {
+      QFile f(file);
+       if (f.open(IO_WriteOnly))
+     {
+     QTextStream dt(&f);
+     
+     if (encode == "ISO-8859-1")
+         {
+         dt.setCodec( QTextCodec::codecForName("ISO-8859-1") ); 
+         dt << text.latin1();
+         } 
+    else
+         {
+         dt.setCodec( QTextCodec::codecForName("UTF-8") );
+         dt << text.latin1();
+         }
+     f.close();
+     }
+  }
   /**
    Convierte una cadena en Unicode a la codificacion indicada
 
