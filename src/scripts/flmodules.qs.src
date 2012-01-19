@@ -225,31 +225,31 @@ function exportarADisco(directorio) {
         if (!contenido.isEmpty()) {
           switch (tipo) {
           case ".xml":
-            File.write(directorio + "/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".ui":
-            File.write(directorio + "/forms/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/forms/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".qs":
-            File.write(directorio + "/scripts/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/scripts/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".qry":
-            File.write(directorio + "/queries/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/queries/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".mtd":
-            File.write(directorio + "/tables/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/tables/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".kut":
-            File.write(directorio + "/reports/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/reports/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".ts":
-            File.write(directorio + "/translations/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/translations/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           default:
@@ -267,7 +267,7 @@ function exportarADisco(directorio) {
                      areaName = cursorAreas.valueBuffer("descripcion");
 
 
-                   File.write(directorio + "/" + cursorModules.valueBuffer("idmodulo")+".xpm", cursorModules.valueBuffer("icono"));
+                   sys.write("ISO-8859-1", directorio + "/" + cursorModules.valueBuffer("idmodulo")+".xpm", cursorModules.valueBuffer("icono"));
                    log.append(util.translate("scripts", "* Exportando " + cursorModules.valueBuffer("idmodulo") + ".xpm ."));
 
                    contenido = '<!DOCTYPE MODULE>\n<MODULE>\n<name>'+cursorModules.valueBuffer("idmodulo")+'</name>\n<alias>QT_TRANSLATE_NOOP("FLWidgetApplication","'+
@@ -275,7 +275,7 @@ function exportarADisco(directorio) {
                        areaName+'")</areaname>\n<version>'+cursorModules.valueBuffer("version")+'</version>\n<icon>'+cursorModules.valueBuffer("idmodulo")+
                        '.xpm</icon>\n<flversion>'+cursorModules.valueBuffer("version")+'</flversion>\n<description>'+cursorModules.valueBuffer("idmodulo")+'</description>\n</MODULE>';
                     
-                    File.write(directorio + "/" + cursorModules.valueBuffer("idmodulo")+".mod",contenido);
+                    sys.write("ISO-8859-1", directorio + "/" + cursorModules.valueBuffer("idmodulo")+".mod",contenido);
                    log.append(util.translate("scripts", "* Generando " + cursorModules.valueBuffer("idmodulo") + ".mod ."));      
 
                      
