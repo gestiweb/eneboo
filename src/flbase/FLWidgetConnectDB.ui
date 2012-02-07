@@ -146,6 +146,12 @@ una conexion a un DSN.</comment>
                                                     <height>0</height>
                                                 </size>
                                             </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>200</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
                                             <property name="editable">
                                                 <bool>true</bool>
                                             </property>
@@ -200,6 +206,12 @@ una conexion a un DSN.</comment>
                                                     <height>0</height>
                                                 </size>
                                             </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>200</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
                                             <property name="toolTip" stdset="0">
                                                 <string>Usuario de la base de datos</string>
                                             </property>
@@ -246,6 +258,12 @@ una conexion a un DSN.</comment>
                                                 <size>
                                                     <width>200</width>
                                                     <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>200</width>
+                                                    <height>32767</height>
                                                 </size>
                                             </property>
                                             <property name="echoMode">

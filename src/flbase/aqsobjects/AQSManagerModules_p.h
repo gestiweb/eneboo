@@ -19,7 +19,7 @@
 #ifndef AQSMANAGERMODULES_P_H_
 #define AQSMANAGERMODULES_P_H_
 
-#include "AQSVoidPtr_p.h"
+#include "AQSByteArray_p.h"
 #include "AQObjects.h"
 
 class AQSManagerModules : public AQSVoidPtr
@@ -31,6 +31,8 @@ class AQSManagerModules : public AQSVoidPtr
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   QString content(const QString &);
+  QString byteCodeToStr(QByteArray *) const;
+  QString byteCodeToStr(AQSByteArray *) const;
   QString contentCode(const QString &);
   QString contentCached(const QString &, QString* = 0);
   void setContent(const QString &, const QString &, const QString &);
@@ -68,6 +70,14 @@ protected:
 inline QString AQSManagerModules::content(const QString &arg0)
 {
   AQ_CALL_RET_V(content(arg0), QString);
+}
+inline QString AQSManagerModules::byteCodeToStr(QByteArray *arg0) const
+{
+  AQ_CALL_RET_V(byteCodeToStr(*arg0), QString);
+}
+inline QString AQSManagerModules::byteCodeToStr(AQSByteArray *arg0) const
+{
+  AQ_CALL_RET_V(byteCodeToStr(*arg0), QString);
 }
 inline QString AQSManagerModules::contentCode(const QString &arg0)
 {

@@ -41,27 +41,27 @@ class QSWrapperFactoryPrivate;
 
 class QSA_EXPORT QSWrapperFactory
 {
-    friend class QSInterpreter;
+  friend class QSInterpreter;
 public:
-    QSWrapperFactory();
-    virtual ~QSWrapperFactory();
+  QSWrapperFactory();
+  virtual ~QSWrapperFactory();
 
-    virtual QObject *create( const QString &className, void *ptr ) = 0;
+  virtual QObject *create(const QString &className, void *ptr) = 0;
 
-    void registerWrapper( const QString &className,
-			const QString &cppClassName = QString::null );
+  void registerWrapper(const QString &className,
+                       const QString &cppClassName = QString::null);
 
-    void throwError( const QString &message );
+  void throwError(const QString &message);
 
-    QMap<QString,QString> wrapperDescriptors() const;
+  QMap<QString, QString> wrapperDescriptors() const;
 
 protected:
-    QSInterpreter * interpreter() const;
+  QSInterpreter *interpreter() const;
 
 private:
-    void setInterpreter( QSInterpreter *interp );
+  void setInterpreter(QSInterpreter *interp);
 
-    QSWrapperFactoryPrivate *d;
+  QSWrapperFactoryPrivate *d;
 };
 
 #endif

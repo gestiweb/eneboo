@@ -40,7 +40,7 @@ public slots:
   uint operation() const;
   uint state() const;
   QString arg(int) const;
-  QByteArray *rawArg(int) const;
+  QByteArray rawArg(int) const;
   QString protocolDetail() const;
   int errorCode() const;
   void free();
@@ -111,9 +111,9 @@ inline QString AQSNetworkOperation::arg(int arg0) const
 {
   AQ_CALL_RET_V(arg(arg0), QString);
 }
-inline QByteArray *AQSNetworkOperation::rawArg(int arg0) const
+inline QByteArray AQSNetworkOperation::rawArg(int arg0) const
 {
-  AQ_CALL_RET_PTR(rawArg(arg0), QByteArray);
+  AQ_CALL_RET_V(rawArg(arg0), QByteArray);
 }
 inline QString AQSNetworkOperation::protocolDetail() const
 {

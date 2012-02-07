@@ -105,7 +105,7 @@ void FLFormDB::initForm()
     }
 
     setCaption(cursor_->metadata()->alias() + caption);
-    setName("form" + action_->name());
+    setName("form" + idMDI_);
     QSProject *p = aqApp->project();
     iface = static_cast<FLFormDBInterface *>(p->object(name()));
     if (iface) {
@@ -211,10 +211,8 @@ void FLFormDB::closeEvent(QCloseEvent *e)
 void FLFormDB::hideEvent(QHideEvent *h)
 {
   QWidget *pW = this->parentWidget();
-
   if (pW && pW->isA("QWorkspaceChild")) {
     QRect geo(pW->x(), pW->y(), pW->width(), pW->height());
-
     if (this->isMinimized()) {
       geo.setWidth(1);
       aqApp->saveGeometryForm(QObject::name(), geo);
@@ -231,19 +229,18 @@ void FLFormDB::hideEvent(QHideEvent *h)
 
 void FLFormDB::showEvent(QShowEvent *e)
 {
-  QWidget::showEvent(e);
-  this->showForm();
-  if (!aqApp->project()->interpreter()->hadError())
-    QTimer::singleShot(0, this, SLOT(emitFormReady()));
-}
-
-void FLFormDB::showForm()
-{
   if (!showed && mainWidget_) {
     showed = true;
     initMainWidget();
-    this->initScript();
+    callInitScript();
   }
+}
+
+void FLFormDB::callInitScript()
+{
+  this->initScript();
+  if (!isClosing_ && !aqApp->project()->interpreter()->hadError())
+    QTimer::singleShot(0, this, SLOT(emitFormReady()));
 }
 
 void FLFormDB::initMainWidget(QWidget *w)
@@ -281,7 +278,6 @@ void FLFormDB::initMainWidget(QWidget *w)
 
     if (pW && pW->isA("QWorkspaceChild")) {
       QRect geo(aqApp->geometryForm(QObject::name()));
-
       if (geo.width() == 9999) {
         pW->resize(size().expandedTo(mWidget->size()));
         pW->showMaximized();
@@ -309,7 +305,11 @@ void FLFormDB::initMainWidget(QWidget *w)
         QRect inter = desk.intersect(geo);
         this->resize(geo.size());
         if (inter.width() * inter.height() > (geo.width() * geo.height() / 20))
+#if defined(Q_OS_WIN32)
+          this->setGeometry(geo);
+#else
           this->move(geo.topLeft());
+#endif
       } else
         this->resize(size().expandedTo(mWidget->size()));
     }

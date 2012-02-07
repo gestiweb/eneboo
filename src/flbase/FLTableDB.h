@@ -27,6 +27,7 @@
 #include <qstringlist.h>
 #include <qwidgetstack.h>
 #include <qbuttongroup.h>
+#include <qprogressdialog.h>
 #include "FLWidgetTableDB.h"
 
 class FLSqlCursor;
@@ -613,6 +614,11 @@ public slots:
   @return Alto de la fila
   */
   int rowHeight( int row );
+
+  /**
+  Exporta a una hoja de cálculo ODS y la visualiza
+  */
+  void exportToOds();
 
 protected slots:
 

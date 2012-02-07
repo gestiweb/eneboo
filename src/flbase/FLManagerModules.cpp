@@ -131,10 +131,20 @@ void FLManagerModules::loadKeyFiles()
 
   QSqlQuery q(QString::null, db_->dbAux());
   q.setForwardOnly(true);
+#ifndef QSDEBUGGER
+  q.exec("SELECT nombre,sha,idmodulo,binario FROM flfiles");
+#else
   q.exec("SELECT nombre,sha,idmodulo FROM flfiles");
+#endif
+  QString name;
   while (q.next()) {
-    dictKeyFiles->replace(q.value(0).toString(), new QString(q.value(1).toString()));
-    dictModFiles->replace(q.value(0).toString().upper(), new QString(q.value(2).toString()));
+    name = q.value(0).toString();
+    dictKeyFiles->replace(name, new QString(q.value(1).toString()));
+    dictModFiles->replace(name.upper(), new QString(q.value(2).toString()));
+#ifndef QSDEBUGGER
+    if (name.endsWith(".qs") && !q.isNull(3))
+      FLMemCache::insert(name, byteCodeToStr(q.value(3).toByteArray()));
+#endif
   }
 }
 
@@ -161,6 +171,7 @@ void FLManagerModules::init()
   tmpTMD = db_->manager()->createSystemTable("flsettings");
   tmpTMD = db_->manager()->createSystemTable("flserial");
   tmpTMD = db_->manager()->createSystemTable("flvar");
+  tmpTMD = db_->manager()->createSystemTable("flupdates");
 
   FLSqlCursor curSet("flsettings", true, db_->dbAux());
   QString modVer;
@@ -173,8 +184,14 @@ void FLManagerModules::init()
       modVer = '@';
     } else if (modVer[0] == '#') {
       tmpTMD = db_->manager()->metadata("flfiles");
-      if (db_->regenTable("flfiles", tmpTMD))
+      if (db_->regenTable("flfiles", tmpTMD)) {
         modVer = QString::null;
+      } else if (db_->driverName() != "FLQPSQL7") {
+        QString xmlNew(contentCached("flfiles.mtd"));
+        QString xmlOld(xmlNew);
+        db_->manager()->alterTable(xmlOld.replace("255", "300"), xmlNew);
+        modVer = QString::null;
+      }
     } else if (modVer != AQ_VERSION && modVer[0] != '@') {
       int numVer = modVer[0].digitValue() * 10 + modVer[2].digitValue();
       modVer = (numVer < 24) ? modVer.prepend('@') : QString::null;
@@ -365,8 +382,7 @@ QString FLManagerModules::content(const QString &n)
 
         cursor.setModeAccess(FLSqlCursor::EDIT);
         cursor.first();
-        QString s = FLUtil::sha1(ret);
-        cursor.setValueBuffer("sha", s);
+        cursor.setValueBuffer("sha", FLUtil::sha1(ret));
         cursor.commitBuffer();
       }
       return ret;
@@ -376,9 +392,48 @@ QString FLManagerModules::content(const QString &n)
   return QString::null;
 }
 
-#ifndef QSDEBUGGER
-QString FLManagerModules::contentCode(const QString &n)
+static QTextCodec *codecByte = 0;
+
+QString FLManagerModules::byteCodeToStr(const QByteArray &byteCode) const
 {
+  QDataStream in(byteCode, IO_ReadOnly);
+  uint size = byteCode.size();
+  QString strOut;
+  QTextStream out(&strOut, IO_WriteOnly);
+  Q_UINT8 c1;
+  Q_UINT8 c2;
+  while (size > 0) {
+    in >> c1;
+    AQ_CIN(c1);
+    --size;
+    if (size <= 0) {
+      if (c1)
+        out << QChar((Q_UINT16)c1);
+      break;
+    }
+    in >> c2;
+    AQ_CIN(c2);
+    --size;
+    if (c2 & 0x80) {
+      out << QChar(c2, c1);
+    } else {
+      if (c1)
+        out << QChar((Q_UINT16)c1);
+      if (c2)
+        out << QChar((Q_UINT16)c2);
+    }
+  }
+  if (codecByte == 0)
+    codecByte = QTextCodec::codecForName("ISO8859-15");
+  return codecByte->toUnicode(strOut);
+}
+
+#ifndef QSDEBUGGER
+QString FLManagerModules::contentCode(const QString &n) const
+{
+  QString *sc = FLMemCache::find(n);
+  if (sc) 
+    return *sc;
   QByteArray byteCode;
   if (n == "sys.qs" ||
       n == "aqapplication.qs" ||
@@ -403,40 +458,9 @@ QString FLManagerModules::contentCode(const QString &n)
       return contentCode("sys.qs");
     byteCode = q.value(0).toByteArray();
   }
-  QDataStream in(byteCode, IO_ReadOnly);
-  uint size = byteCode.size();
-  QString strOut;
-  QTextStream out(&strOut, IO_WriteOnly);
-  Q_UINT8 c1;
-  Q_UINT8 c2;
-  while (size > 0) {
-    in >> c1;
-    AQ_CIN(c1);
-    --size;
-    if (size <= 0) {
-      if (c1)
-        out << QChar((Q_UINT16)c1);
-      break;
-    }
-    in >> c2;
-    AQ_CIN(c2);
-    --size;
-    if (c2 & 0x80) {
-      if (c1) {
-        Q_UINT16 ch = c1;
-        ch <<= 8;
-        ch |= c2;
-        out << QChar(ch);
-      } else
-        out << QChar((Q_UINT16)c2);
-    } else {
-      if (c1)
-        out << QChar((Q_UINT16)c1);
-      if (c2)
-        out << QChar((Q_UINT16)c2);
-    }
-  }
-  return strOut;
+  QString sr(byteCodeToStr(byteCode));
+  FLMemCache::insert(n, sr);
+  return sr;
 }
 #else
 QString FLManagerModules::contentCode(const QString &n)
@@ -444,20 +468,6 @@ QString FLManagerModules::contentCode(const QString &n)
   if (n == "sys.qs" || n == "plus_sys.qs")
     return contentCached(n);
   QString s(contentCached(n));
-#if 1
-  QRegExp rx;
-  rx.setPattern("\\)\\s*:\\s*(FL\\w+|Object\\w*|String\\w*|Date\\w*|Number\\w*|Boolean\\w*|Array\\w*)");
-  s.replace(rx, ")");
-  rx.setPattern(":\\s*(FL\\w+|Object\\w*|String\\w*|Date\\w*|Number\\w*|Boolean\\w*|Array\\w*)\\s*\\=");
-  s.replace(rx, "=");
-  rx.setPattern("[\n\r]{3,}");
-  s.replace(rx, "\n");
-  rx.setMinimal(true);
-  rx.setPattern("class\\s+(\\w+)\\s+extends\\s+\\1([\\s\n]*\\{.*\\}[\\s\n]*\\})");
-  s.replace(rx, "/* ¡¡ ERROR !! : LA CLASE HEREDA DE ELLA MISMA."
-            "\nCODIGO INHABILITADO AUTOMÁTICAMENTE POR AbanQ :\n\n"
-            "class \\1 extends \\1 \\2\n\n ¡¡ FIN ERROR !! */");
-#endif
   if (!s.startsWith("var form"))
     s.prepend("var form = this;\n");
   return s;

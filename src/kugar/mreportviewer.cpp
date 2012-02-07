@@ -232,10 +232,18 @@ bool MReportViewer::printGhostReport()
       stream << QString("      /DocumentRange [1 %1]").arg(cnt) << "\n";
       stream << QString("      /SelectedRange [1 %1]").arg(cnt) << "\n";
       stream << QString("      /MaxResolution %1").arg(dpi_) << "\n";
+      stream << QString("      /Copies %1").arg(numCopies_) << "\n";
       stream << "    >>" << "\n";
       stream << "  (mswinpr2) finddevice" << "\n";
       stream << "  putdeviceprops" << "\n";
       stream << "setdevice" << "\n";
+      if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom) {
+        QSize sz(report->pageDimensions());
+        stream << QString("<< /PageSize [%1 %2] /ImagingBBox null >> setpagedevice")
+               .arg(sz.width())
+               .arg(sz.height())
+               << "\n";
+      }
       fileSetup.close();
     }
 
@@ -245,6 +253,60 @@ bool MReportViewer::printGhostReport()
     proc->addArgument("-dNOPAUSE");
     proc->addArgument("-dNODISPLAY");
     proc->addArgument(QString("-r%1").arg(dpi_));
+
+    switch ((QPrinter::PageSize) report->pageSize()) {
+      case QPrinter::A0:
+        proc->addArgument("-sPAPERSIZE=a0");
+        break;
+      case QPrinter::A1:
+        proc->addArgument("-sPAPERSIZE=a1");
+        break;
+      case QPrinter::A2:
+        proc->addArgument("-sPAPERSIZE=a2");
+        break;
+      case QPrinter::A3:
+        proc->addArgument("-sPAPERSIZE=a3");
+        break;
+      case QPrinter::A4:
+        proc->addArgument("-sPAPERSIZE=a4");
+        break;
+      case QPrinter::A5:
+        proc->addArgument("-sPAPERSIZE=a5");
+        break;
+      case QPrinter::B0:
+        proc->addArgument("-sPAPERSIZE=b0");
+        break;
+      case QPrinter::B1:
+        proc->addArgument("-sPAPERSIZE=b1");
+        break;
+      case QPrinter::B2:
+        proc->addArgument("-sPAPERSIZE=b2");
+        break;
+      case QPrinter::B3:
+        proc->addArgument("-sPAPERSIZE=b3");
+        break;
+      case QPrinter::B4:
+        proc->addArgument("-sPAPERSIZE=b4");
+        break;
+      case QPrinter::B5:
+        proc->addArgument("-sPAPERSIZE=b5");
+        break;
+      case QPrinter::Legal:
+        proc->addArgument("-sPAPERSIZE=legal");
+        break;
+      case QPrinter::Letter:
+        proc->addArgument("-sPAPERSIZE=letter");
+        break;
+      case QPrinter::Executive:
+        proc->addArgument("-sPAPERSIZE=executive");
+        break;
+      default: {
+        QSize sz(report->pageDimensions());
+        proc->addArgument(QString("-dDEVICEWIDTHPOINTS=%1").arg(sz.width()));
+        proc->addArgument(QString("-dDEVICEHEIGHTPOINTS=%1").arg(sz.height()));
+      }
+    }
+
     proc->addArgument(setupPsFile);
     proc->addArgument(outPsFile);
   }
@@ -282,6 +344,8 @@ bool MReportViewer::printGhostReportToPS(const QString &outPsFile)
 
   psprinter = new PSPrinter(PSPrinter::HighResolution);
   psprinter->setPageSize((PSPrinter::PageSize) report->pageSize());
+  if ((PSPrinter::PageSize) report->pageSize() >= PSPrinter::Custom)
+    psprinter->setCustomPaperSize(report->pageDimensions());
   psprinter->setOrientation((PSPrinter::Orientation) report->pageOrientation());
   psprinter->setMinMax(1, cnt);
   psprinter->setFromTo(1, cnt);
@@ -489,8 +553,11 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
     case QPrinter::Executive:
       proc->addArgument("-sPAPERSIZE=executive");
       break;
-    default:
-      proc->addArgument("-sPAPERSIZE=a4");
+    default: {
+      QSize sz(report->pageDimensions());
+      proc->addArgument(QString("-dDEVICEWIDTHPOINTS=%1").arg(sz.width()));
+      proc->addArgument(QString("-dDEVICEHEIGHTPOINTS=%1").arg(sz.height()));
+    }
   }
 
   proc->addArgument("-dAutoRotatePages=/PageByPage");
@@ -562,6 +629,8 @@ bool MReportViewer::printReportToPS(const QString &outPsFile)
   // Set the printer dialog
   printer = new QPrinter(QPrinter::HighResolution);
   printer->setPageSize((QPrinter::PageSize) report->pageSize());
+  if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom)
+    printer->setCustomPaperSize(report->pageDimensions());
   printer->setOrientation((QPrinter::Orientation) report->pageOrientation());
   printer->setMinMax(1, cnt);
   printer->setFromTo(1, cnt);
@@ -609,22 +678,27 @@ bool MReportViewer::printReportToPS(const QString &outPsFile)
   painter.setViewport(0, 0, pdm.width(), pdm.height());
 
   // Print each page in the collection
-  for (int i = printFrom; i < printTo; i++, currentStep++) {
-    if (!printer->aborted()) {
-      progress.setProgress(currentStep);
-      qApp->processEvents();
-      if (printRev)
-        report->setCurrentPage((printCnt == 1) ? i : (printCnt - 1) - i);
-      else
-        report->setCurrentPage(i);
+  for (int j = 0; j < printCopies; j++) {
+    for (int i = printFrom; i < printTo; i++, currentStep++) {
+      if (!printer->aborted()) {
+        progress.setProgress(currentStep);
+        qApp->processEvents();
+        if (printRev)
+          report->setCurrentPage((printCnt == 1) ? i : (printCnt - 1) - i);
+        else
+          report->setCurrentPage(i);
 
-      page = report->getCurrentPage();
-      page->play(&painter);
-      if ((i - printFrom) < printCnt - 1)
-        printer->newPage();
-    } else {
-      break;
+        page = report->getCurrentPage();
+        page->play(&painter);
+        if ((i - printFrom) < printCnt - 1)
+          printer->newPage();
+      } else {
+        j = printCopies;
+        break;
+      }
     }
+    if (j < printCopies - 1)
+      printer->newPage();
   }
 
   // Cleanup printing
@@ -680,6 +754,8 @@ bool MReportViewer::printReport()
   // Set the printer dialog
   printer = new QPrinter(QPrinter::HighResolution);
   printer->setPageSize((QPrinter::PageSize) report->pageSize());
+  if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom)
+    printer->setCustomPaperSize(report->pageDimensions());
   printer->setOrientation((QPrinter::Orientation) report->pageOrientation());
   printer->setMinMax(1, cnt);
   printer->setFromTo(1, cnt);

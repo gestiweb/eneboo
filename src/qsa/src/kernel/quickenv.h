@@ -48,22 +48,25 @@ class QSApplicationClass;
 
 // to be used with multiple inheritance of convenient
 // QuickInterpreter access
-class QUICKCORE_EXPORT QuickEnvClass {
+class QUICKCORE_EXPORT QuickEnvClass
+{
 public:
-    QuickEnvClass( QSEnv *e );
-    QuickEnvClass( QuickInterpreter *i ) : ip( i ) { }
+  QuickEnvClass(QSEnv *e);
+  QuickEnvClass(QuickInterpreter *i) : ip(i) { }
 
-    QuickInterpreter *interpreter() const { return ip; }
-    static QuickInterpreter *interpreter( QSEnv *e );
+  QuickInterpreter *interpreter() const {
+    return ip;
+  }
+  static QuickInterpreter *interpreter(QSEnv *e);
 
-    QSPointClass *pointClass() const;
-    QSSizeClass *sizeClass() const;
-    QSRectClass *rectClass() const;
-    QSByteArrayClass *byteArrayClass() const;
-    QSPixmapClass *pixmapClass() const;
+  QSPointClass *pointClass() const;
+  QSSizeClass *sizeClass() const;
+  QSRectClass *rectClass() const;
+  QSByteArrayClass *byteArrayClass() const;
+  QSPixmapClass *pixmapClass() const;
 
 private:
-    QuickInterpreter *ip;
+  QuickInterpreter *ip;
 };
 
 #endif

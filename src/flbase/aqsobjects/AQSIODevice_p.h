@@ -19,7 +19,7 @@
 #ifndef AQSIODEVICE_P_H_
 #define AQSIODEVICE_P_H_
 
-#include "AQSVoidPtr_p.h"
+#include "AQSByteArray_p.h"
 #include <qiodevice.h>
 
 class AQSIODevice : public AQSVoidPtr
@@ -56,7 +56,12 @@ public slots:
   virtual bool at(uint);
   virtual bool atEnd() const;
   bool reset();
-  virtual QByteArray *readAll();
+  virtual long readBlock(char *, ulong);
+  virtual long writeBlock(const char *, ulong);
+  virtual long readLine(char *, ulong);
+  long writeBlock(QByteArray *);
+  long writeBlock(AQSByteArray *);
+  virtual QByteArray readAll();
   virtual int getch();
   virtual int putch(int);
   virtual int ungetch(int);
@@ -173,9 +178,29 @@ inline bool AQSIODevice::reset()
 {
   AQ_CALL_RET_V(reset(), bool);
 }
-inline QByteArray *AQSIODevice::readAll()
+inline long AQSIODevice::readBlock(char *arg0,  ulong arg1)
 {
-  AQ_CALL_RET_PTR(readAll(), QByteArray);
+  AQ_CALL_RET_V(readBlock(arg0, arg1), long);
+}
+inline long AQSIODevice::writeBlock(const char *arg0,  ulong arg1)
+{
+  AQ_CALL_RET_V(writeBlock(arg0, arg1), long);
+}
+inline long AQSIODevice::readLine(char *arg0,  ulong arg1)
+{
+  AQ_CALL_RET_V(readLine(arg0, arg1), long);
+}
+inline long AQSIODevice::writeBlock(QByteArray *arg0)
+{
+  AQ_CALL_RET_V(writeBlock(*arg0), long);
+}
+inline long AQSIODevice::writeBlock(AQSByteArray *arg0)
+{
+  AQ_CALL_RET_V(writeBlock(*arg0), long);
+}
+inline QByteArray AQSIODevice::readAll()
+{
+  AQ_CALL_RET_V(readAll(), QByteArray);
 }
 inline int AQSIODevice::getch()
 {

@@ -37,7 +37,7 @@ protected:
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   QString getText() const;
-  QByteArray *getBinary() const;
+  QByteArray getBinary() const;
   QStringList errorMessages() const;
 
 protected:
@@ -64,9 +64,9 @@ inline QString AQSUnpacker::getText() const
 {
   AQ_CALL_RET_V(getText(), QString);
 }
-inline QByteArray *AQSUnpacker::getBinary() const
+inline QByteArray AQSUnpacker::getBinary() const
 {
-  AQ_CALL_RET_PTR(getBinary(), QByteArray);
+  AQ_CALL_RET_V(getBinary(), QByteArray);
 }
 inline QStringList AQSUnpacker::errorMessages() const
 {

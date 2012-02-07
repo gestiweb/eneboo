@@ -150,7 +150,12 @@ private:
 	QGuardedPtr<QDockArea> area;
     };
 
+    // ### AbanQ
+public:
     int findDockWindow( QDockWindow *w );
+private:
+    // ### AbanQ
+    
     int lineOf( int index );
     DockWindowData *dockWindowData( QDockWindow *w );
     void dockWindow( QDockWindow *dockWindow, DockWindowData *data );

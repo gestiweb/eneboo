@@ -30,38 +30,45 @@
 #define QSLEXER_H
 
 #include <qintdict.h>
+#include <qptrlist.h>
 #include <qstring.h>
 #include <qlocale.h>
 
 class QSLexer
 {
 public:
+  enum State {
+    Start,
+    Identifier,
+    InIdentifier,
+    InSingleLineComment,
+    InMultiLineComment,
+    InNum,
+    InNum0,
+    InHex,
+    InOctal,
+    InDecimal,
+    InExponentIndicator,
+    InExponent,
+    Hex,
+    Octal,
+    Number,
+    String,
+    Eof,
+    InString,
+    InEscapeSequence,
+    InHexEscape,
+    InUnicodeEscape,
+    Other,
+    Bad,
+    KeywordNumber
+  };
 
-  enum State { Start,
-               Identifier,
-               InIdentifier,
-               InSingleLineComment,
-               InMultiLineComment,
-               InNum,
-               InNum0,
-               InHex,
-               InOctal,
-               InDecimal,
-               InExponentIndicator,
-               InExponent,
-               Hex,
-               Octal,
-               Number,
-               String,
-               Eof,
-               InString,
-               InEscapeSequence,
-               InHexEscape,
-               InUnicodeEscape,
-               Other,
-               Bad,
-               KeywordNumber
-             };
+  enum ParenthesesState {
+    IgnoreParentheses,
+    CountParentheses,
+    BalancedParentheses
+  };
 
   QSLexer();
   ~QSLexer();
@@ -85,35 +92,9 @@ public:
     return terminator;
   }
 
-
   QString pattern, flags;
-  bool scanRegExp() {
-    pos16 = 0;
-    bool lastWasEscape = FALSE;
 
-    while (1) {
-      if (isLineTerminator() || current == 0)
-        return FALSE;
-      else if (current != '/' || lastWasEscape == TRUE) {
-        record16(current);
-        lastWasEscape = !lastWasEscape && (current == '\\');
-      } else {
-        pattern = QString(buffer16, pos16);
-        pos16 = 0;
-        shift(1);
-        break;
-      }
-      shift(1);
-    }
-
-    while (isIdentLetter(current)) {
-      record16(current);
-      shift(1);
-    }
-    flags = QString(buffer16, pos16);
-
-    return TRUE;
-  }
+  bool scanRegExp();
 
   State lexerState() const {
     return state;
@@ -149,15 +130,6 @@ private:
   }
 
   uint pos;
-  void shift(uint p) {
-    while (p--) {
-      pos++;
-      current = next1;
-      next1 = next2;
-      next2 = next3;
-      next3 = (pos + 3 < length) ? code[pos + 3].unicode() : 0;
-    }
-  }
 
   bool isWhiteSpace() const {
     return (current == ' ' || current == '\t' ||
@@ -169,17 +141,14 @@ private:
   }
 
   bool isHexDigit(ushort c) const {
-    return (c >= '0' && c <= '9' ||
-            c >= 'a' && c <= 'f' ||
-            c >= 'A' && c <= 'F');
+    return ((c >= '0' && c <= '9') ||
+            (c >= 'a' && c <= 'f') ||
+            (c >= 'A' && c <= 'F'));
   }
 
   bool isOctalDigit(ushort c) const {
     return (c >= '0' && c <= '7');
   }
-
-  int matchPunctuator(ushort c1, ushort c2,
-                      ushort c3, ushort c4);
 
   ushort singleEscape(ushort c) const {
     switch (c) {
@@ -242,8 +211,10 @@ public:
     return (c >= '0' && c <= '9');
   }
 
-  void clearUstrHash() {
-    ustrHash.clear();
+  void clearUstr() {
+    if (ustrHash.count() > 401)
+      ustrHash.clear();
+    ustrList.clear();
   }
 
 private:
@@ -251,32 +222,8 @@ private:
   static QSLexer *lx;
   static int sid;
 
-  void record8(ushort c) {
-    // enlarge buffer if full
-    if (pos8 >= size8 - 1) {
-      char *tmp = new char[2 * size8];
-      memcpy(tmp, buffer8, size8 * sizeof(char));
-      delete [] buffer8;
-      buffer8 = tmp;
-      size8 *= 2;
-    }
-
-    buffer8[pos8++] = (char) c;
-  }
-
-  void record16(QChar c) {
-    // enlarge buffer if full
-    if (pos16 >= size16 - 1) {
-      QChar *tmp = new QChar[2 * size16];
-      memcpy(tmp, buffer16, size16 * sizeof(QChar));
-      delete [] buffer16;
-      buffer16 = tmp;
-      size16 *= 2;
-    }
-    buffer16[pos16++] = c;
-  }
-
   QIntDict<QString> ustrHash;
+  QPtrList<QString> ustrList;
 
   uint hashUstr(QChar *s, uint len) {
     uint hash = 0;
@@ -292,33 +239,47 @@ private:
   }
 
   const QString *newUstr(QChar *s, uint len) {
-    uint hash = hashUstr(s, len);
-    QString *us = ustrHash.find(hash);
-    if (!us) {
+    QString *us = 0;
+    if (len < 50) {
+      uint hash = hashUstr(s, len);
+      us = ustrHash.find(hash);
+      if (!us) {
+        us = new QString(s, len);
+        ustrHash.insert(hash, us);
+      }
+    } else {
       us = new QString(s, len);
-      ustrHash.insert(hash, us);
+      ustrList.append(us);
     }
     return us;
+  }
+
+  void syncProhibitAutomaticSemicolon() {
+    if (parenthesesState == BalancedParentheses) {
+      // we have seen something like "if (foo)", which means we should
+      // never insert an automatic semicolon at this point, since it would
+      // then be expanded into an empty statement (ECMA-262 7.9.1)
+      prohibitAutomaticSemicolon = true;
+      parenthesesState = IgnoreParentheses;
+    } else {
+      prohibitAutomaticSemicolon = false;
+    }
   }
 
   const QChar *code;
   uint length;
   int yycolumn;
-  int bol;     // begin of line
+  int bol;
 
   // current and following unicode characters
   ushort current, next1, next2, next3;
 
-#if 0
-  struct keyword {
-    const char *name;
-    int token;
-  };
-#endif
-
   QString errmsg;
-
   QLocale localeC;
+
+  ParenthesesState parenthesesState;
+  int parenthesesCount;
+  bool prohibitAutomaticSemicolon;
 };
 
 #endif

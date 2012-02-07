@@ -130,9 +130,15 @@ public:
   QStringList classes(const QString &context) const;
   QStringList classes(QObject *context) const;
 
-  QStringList variables() const;
-  QStringList variables(const QString &context) const;
-  QStringList variables(QObject *context) const;
+  QStringList variables(bool includeStatic = false,
+                        bool includeCustom = false,
+                        bool includeMemberVariables = false) const;
+  QStringList variables(const QString &context, bool includeStatic = false,
+                        bool includeCustom = false,
+                        bool includeMemberVariables = false) const;
+  QStringList variables(QObject *context, bool includeStatic = false,
+                        bool includeCustom = false,
+                        bool includeMemberVariables = false) const;
 
   bool hasFunction(const QString &function) const;
   bool hasClass(const QString &className) const;

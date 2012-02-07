@@ -31,29 +31,32 @@
 
 #include "qsclass.h"
 
-class QSFuncRefClass : public QSSharedClass {
+class QSFuncRefClass : public QSSharedClass
+{
 public:
-    QSFuncRefClass( QSClass *b ) : QSSharedClass( b, AttributeExecutable ) { }
-    QString name() const { return QString::fromLatin1("Function"); }
+  QSFuncRefClass(QSClass *b) : QSSharedClass(b, AttributeExecutable) { }
+  QString name() const {
+    return QString::fromLatin1("Function");
+  }
 
-    virtual QSEqualsResult isEqual( const QSObject &a, const QSObject &b ) const;
+  virtual QSEqualsResult isEqual(const QSObject &a, const QSObject &b) const;
 
-    bool toBoolean( const QSObject * ) const;
-    double toNumber( const QSObject *obj ) const;
-    QString toString( const QSObject * ) const;
+  bool toBoolean(const QSObject *) const;
+  double toNumber(const QSObject *obj) const;
+  QString toString(const QSObject *) const;
 
-    QSObject construct( const QSList &args ) const;
-    QSObject cast( const QSList &args ) const;
+  QSObject construct(const QSList &args) const;
+  QSObject cast(const QSList &args) const;
 
-    QSObject createReference( const QSObject &base, const QSMember &mem ) const;
+  QSObject createReference(const QSObject &base, const QSMember &mem) const;
 
 
-    static QSMember refMember( const QSObject &ref );
-    static ScopeChain refScope( const QSObject &ref );
-    static QSObject refBase( const QSObject &ref );
+  static QSMember refMember(const QSObject &ref);
+  static ScopeChain refScope(const QSObject &ref);
+  static QSObject refBase(const QSObject &ref);
 
 protected:
-    virtual QSObject invoke( QSObject * objPtr, const QSMember &mem ) const;
+  virtual QSObject invoke(QSObject *objPtr, const QSMember &mem) const;
 };
 
 #endif

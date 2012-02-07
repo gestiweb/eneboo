@@ -68,10 +68,10 @@ public slots:
   int certRSAKeyValue(const QString &, QByteArray *, AQSByteArray *);
   int certRSAKeyValue(const QString &, AQSByteArray *, QByteArray *);
   int certRSAKeyValue(const QString &, AQSByteArray *, AQSByteArray *);
-  QByteArray *encodeBase64(QByteArray *) const;
-  QByteArray *encodeBase64(AQSByteArray *) const;
-  QByteArray *decodeBase64(QByteArray *) const;
-  QByteArray *decodeBase64(AQSByteArray *) const;
+  QByteArray encodeBase64(QByteArray *) const;
+  QByteArray encodeBase64(AQSByteArray *) const;
+  QByteArray decodeBase64(QByteArray *) const;
+  QByteArray decodeBase64(AQSByteArray *) const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -225,21 +225,21 @@ inline int AQSDigiDoc::certRSAKeyValue(const QString &arg0, AQSByteArray *arg1, 
 {
   AQ_CALL_RET_V(certRSAKeyValue(arg0, *arg1, *arg2), int);
 }
-inline QByteArray *AQSDigiDoc::encodeBase64(QByteArray *arg0) const
+inline QByteArray AQSDigiDoc::encodeBase64(QByteArray *arg0) const
 {
-  AQ_CALL_RET_PTR(encodeBase64(*arg0), QByteArray);
+  AQ_CALL_RET_V(encodeBase64(*arg0), QByteArray);
 }
-inline QByteArray *AQSDigiDoc::encodeBase64(AQSByteArray *arg0) const
+inline QByteArray AQSDigiDoc::encodeBase64(AQSByteArray *arg0) const
 {
-  AQ_CALL_RET_PTR(encodeBase64(*arg0), QByteArray);
+  AQ_CALL_RET_V(encodeBase64(*arg0), QByteArray);
 }
-inline QByteArray *AQSDigiDoc::decodeBase64(QByteArray *arg0) const
+inline QByteArray AQSDigiDoc::decodeBase64(QByteArray *arg0) const
 {
-  AQ_CALL_RET_PTR(decodeBase64(*arg0), QByteArray);
+  AQ_CALL_RET_V(decodeBase64(*arg0), QByteArray);
 }
-inline QByteArray *AQSDigiDoc::decodeBase64(AQSByteArray *arg0) const
+inline QByteArray AQSDigiDoc::decodeBase64(AQSByteArray *arg0) const
 {
-  AQ_CALL_RET_PTR(decodeBase64(*arg0), QByteArray);
+  AQ_CALL_RET_V(decodeBase64(*arg0), QByteArray);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

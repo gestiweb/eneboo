@@ -829,11 +829,13 @@ QStringList QSInterpreter::classes(QObject *context) const
 
   \sa functions(), classes()
 */
-QStringList QSInterpreter::variables(const QString &context) const
+QStringList QSInterpreter::variables(const QString &context, bool includeStatic, bool includeCustom,
+                                     bool includeMemberVariables) const
 {
   startInterpreter();
   QSObject obj = d->interpreter->object(context);
-  QStringList lst = d->interpreter->variablesOf(obj);
+  QStringList lst = d->interpreter->variablesOf(obj, includeStatic, includeCustom,
+                                                includeMemberVariables);
   stopInterpreter();
   return lst;
 }
@@ -844,7 +846,8 @@ QStringList QSInterpreter::variables(const QString &context) const
 
   \sa functions(), classes()
 */
-QStringList QSInterpreter::variables(QObject *context) const
+QStringList QSInterpreter::variables(QObject *context, bool includeStatic, bool includeCustom,
+                                     bool includeMemberVariables) const
 {
   if (!context) {
 #if defined( QT_RANGE_CHECK )
@@ -856,7 +859,8 @@ QStringList QSInterpreter::variables(QObject *context) const
   QSObject obj = d->interpreter->wrap(context);
   QStringList lst;
   if (!obj.isUndefined())
-    lst = d->interpreter->variablesOf(obj);
+    lst = d->interpreter->variablesOf(obj, includeStatic, includeCustom,
+                                      includeMemberVariables);
   stopInterpreter();
   return lst;
 }
@@ -867,9 +871,11 @@ QStringList QSInterpreter::variables(QObject *context) const
 
   \sa functions(), classes()
 */
-QStringList QSInterpreter::variables() const
+QStringList QSInterpreter::variables(bool includeStatic, bool includeCustom,
+                                     bool includeMemberVariables) const
 {
-  return variables(QString::null);
+  return variables(QString::null, includeStatic, includeCustom,
+                   includeMemberVariables);
 }
 
 /*!

@@ -79,6 +79,8 @@ public slots:
   void startRename(int);
   void setEnabled(bool);
   bool isEnabled() const;
+  virtual void setMultiLinesEnabled(bool);
+  bool multiLinesEnabled() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -593,6 +595,14 @@ inline void AQSListViewItem::setEnabled(bool arg0)
 inline bool AQSListViewItem::isEnabled() const
 {
   AQ_CALL_RET_V(isEnabled(), bool);
+}
+inline void AQSListViewItem::setMultiLinesEnabled(bool arg0)
+{
+  AQ_CALL_VOID(setMultiLinesEnabled(arg0));
+}
+inline bool AQSListViewItem::multiLinesEnabled() const
+{
+  AQ_CALL_RET_V(multiLinesEnabled(), bool);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

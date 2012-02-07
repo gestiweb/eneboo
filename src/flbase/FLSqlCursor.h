@@ -213,6 +213,8 @@ public:
   QStringList fieldsNamesUnlock_;
   int idAc_, idAcos_, idCond_;
   QString id_;
+  bool isQuery_;
+  bool isSysTable_;
 };
 
 /**
@@ -975,6 +977,13 @@ public slots:
   @param  condVal   Valor que hace que la condicion sea cierta
   */
   void setAcosCondition(const QString &condName, AcosConditionEval cond, const QVariant &condVal);
+
+  /**
+  Comprueba si hay una colisión de campos editados por dos sesiones simultáneamente.
+
+  @return Lista con los nombres de los campos que colisionan
+  */
+  QStringList concurrencyFields();
 
 private:
 

@@ -26,6 +26,8 @@
 #include "AQSPicture_p.h"
 #include <qpainter.h>
 
+// @AQ_PTR_INDIRECTION@
+
 class AQSPainter : public AQSVoidPtr
 {
   Q_OBJECT

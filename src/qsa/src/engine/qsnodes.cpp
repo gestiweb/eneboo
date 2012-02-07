@@ -489,58 +489,61 @@ QSObject QSAccessorNode1::rhs(QSEnv *env) const
 
 QSReference QSAccessorNode2::lhs(QSEnv *env)
 {
-  bool b = false;
-  QString baseIdent(ident);
-  if (ident.startsWith("__")) {
-    baseIdent = ident.right(ident.length() - 2);
-    b = true;
-  }
-
   QSObject v = expr->rhs(env);
   QSMember mem;
   int offset = 0;
-  const QSClass *cl = v.resolveMember(baseIdent, &mem, v.objectType(), &offset);
-  if (b && cl && mem.isDefined()) {
-    const ScopeChain scope = env->scope();
-    ScopeChain::const_iterator it = scope.begin();
-    bool isFunc = false;
-    while (it != scope.end()) {
-      if ((*it).objectType()->name() == "FunctionScope") {
-        isFunc = true;
+  const QSClass *cl = 0;
+
+  if (ident.startsWith("__") && v.typeName() == "Class") {
+    const QSClass *baseClass = v.objectType()->base();
+    QString baseIdent(ident.right(ident.length() - 2));
+
+    int idx = -1;
+    const ScopeChain *sc = env->fullScopeChain();
+    ScopeChain::const_iterator it = sc->begin();
+    while (it != sc->end()) {
+      QSObject obj = *it;
+      const QSClass *clo = obj.objectType();
+      if (clo && clo->identifier() == baseIdent && clo->enclosingClass()) {
+        if (clo->name() == "FunctionScope")
+          idx = static_cast<const QSFunctionScopeClass *>(clo)->functionBodyNode()->index();
+        baseClass = clo->enclosingClass()->base();
         break;
       }
       it++;
     }
-    if (isFunc) {
-      QString funName = (*it).objectType()->identifier();
-      QString className = funName.left(funName.find('_'));
-      //### Parche temporal hasta sincronizar funcionalidad ren_asientos y ren_asientosPub
-      if (className == "ren")
-        className = funName.left(funName.find('_', 4));
-      //###
-      while (cl && !className.isEmpty() && cl->identifier() != className)
-        cl = cl->base();
+
+    if (!baseClass || baseClass->name() != "Class") {
+      cl = v.resolveMember(baseIdent, &mem, v.objectType(), &offset);
       if (cl) {
-        cl = cl->base();
-        if (cl) {
-          offset = 0;
-          cl = v.resolveMember(baseIdent, &mem, cl, &offset);
-          if (!cl || !mem.isDefined()) {
-            mem.setWritable(FALSE);
-            QSReference ref(v, mem, cl);
-            ref.setIdentifier("###flnoop");
-            return ref;
+        QSMember *mSuper = mem.super();
+        do {
+          if (!mSuper) {
+            cl = 0;
+            break;
           }
-        }
+          int supIdx = mSuper->scriptFunction->scopeDefinition()->functionBodyNode()->index();
+          if (supIdx < idx)
+            break;
+          mSuper = mSuper->super();
+        } while (true);
+        if (mSuper)
+          mem = *mSuper;
       }
-    }
+    } else
+      cl = v.resolveMember(baseIdent, &mem, baseClass, &offset);
+  }
+
+  if (!cl) {
+    mem = QSMember();
+    cl = v.resolveMember(ident, &mem, v.objectType(), &offset);
   }
 
   Q_ASSERT(!offset);
   if (!mem.isDefined()) {
     mem.setWritable(FALSE);
     QSReference ref(v, mem, cl);
-    ref.setIdentifier(baseIdent);
+    ref.setIdentifier(ident);
     return ref;
   }
   return QSReference(v, mem, cl);
@@ -645,13 +648,6 @@ QSObject QSFunctionCallNode::execute(QSEnv *env)
 QSObject QSFunctionCallNode::rhs(QSEnv *env) const
 {
   QSReference ref = expr->lhs(env);
-
-  if (ref.identifier() == "###flnoop") {
-    return env->throwError(TypeError,
-                           QString::fromLatin1("AbanQ : Member not defined in base class"),
-                           lineNo());
-  }
-
   QSList *argList = args->evaluateList(env);
 
   // bail out on error

@@ -33,6 +33,8 @@ email                : mail@infosial.com
 #include "FLFieldDB.h"
 #include "FLUtil.h"
 #include "FLSqlQuery.h"
+#include "FLDiskCache.h"
+#include "AQOds.h"
 
 extern void qt_set_table_clipper_enabled(bool enabled);
 
@@ -159,7 +161,6 @@ bool FLTableDB::eventFilter(QObject *obj, QEvent *ev)
 
 void FLTableDB::putFirstCol(const QString &c)
 {
-
   if (c == "*") {
     QComboBox *cb = (QComboBox *) child("comboBoxFieldToSearch");
     cb->setCurrentItem(cb->count() - 1);
@@ -183,13 +184,16 @@ void FLTableDB::moveCol(const QString &from, const QString &to)
     return ;
 
   QHeader *horizHeader = tableRecords()->horizontalHeader();
-
   int i = sortColumn_, hCount = horizHeader->count();
-  int iFrom = (from.isEmpty() ? sortColumn_ : sortColumn_ - 1), iTo = (to.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  int iFrom = (from.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  int iTo = (to.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  QString fromFieldName(tMD->fieldAliasToName(from));
+  QString toFieldName(tMD->fieldAliasToName(to));
+
   while (i < hCount && (iFrom < sortColumn_ || iTo < sortColumn_)) {
-    if (iFrom < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(from))
+    if (iFrom < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(fromFieldName))
       iFrom = i;
-    if (iTo < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(to))
+    if (iTo < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(toFieldName))
       iTo = i;
     ++i;
   }
@@ -225,7 +229,8 @@ void FLTableDB::moveCol(int from, int to)
   tableRecords_->hide();
 
   int fromS = from + sortColumn_, toS = to + sortColumn_;
-  QString fieldName = tMD->fieldAliasToName(horizHeader->label(fromS)), fieldNameItem;
+  QString fieldName(tMD->fieldAliasToName(horizHeader->label(fromS)));
+  QString fieldNameItem;
   QString textSearch(lineEditSearch->text());
 
   if (!textSearch.isEmpty())
@@ -484,9 +489,13 @@ void FLTableDB::filterRecords(const QString &p)
         if (!p.contains("'") && !p.contains("\\") && field->type() == QVariant::String) {
           if (!filter_.isEmpty())
             filter_ += " OR ";
+          else
+            filter_ = "(";
           filter_ += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
         }
       }
+      if (!filter_.isEmpty())
+        filter_ += ")";
     }
   }
 
@@ -1426,3 +1435,105 @@ void FLTableDB::setFunctionGetColor(const QString &f)
   }
 }
 
+void FLTableDB::exportToOds()
+{
+  if (!cursor_)
+    return ;
+  FLTableMetaData *mtd = cursor_->metadata();
+  if (!mtd)
+    return;
+
+  const AQOdsStyle titleStyle(Style::ALIGN_CENTER | Style::TEXT_BOLD);
+  const AQOdsStyle borderBot(Style::BORDER_BOTTOM);
+  const AQOdsStyle borderRight(Style::BORDER_RIGHT);
+  const AQOdsStyle borderLeft(Style::BORDER_LEFT);
+  const AQOdsStyle italic(Style::TEXT_ITALIC);
+
+  FLDataTable *tdb = tableRecords();
+  QHeader *horHeader = tdb->horizontalHeader();
+
+  AQOdsGenerator odsGen;
+  AQOdsSpreadSheet spreadsheet(odsGen);
+  AQOdsSheet sheet(spreadsheet, mtd->alias());
+
+  QProgressDialog progress(tr("Procesando..."),
+                           tr("Cancelar"), tdb->numRows(),
+                           this, tr("odsprogress"), true);
+  progress.setProgress(0);
+
+  {
+    AQOdsRow row(sheet);
+    row.addBgColor(AQOdsColor(0xe7e7e7));
+    for (int i = 0; i < horHeader->count(); ++i) {
+      row.opIn(titleStyle)
+      .opIn(borderBot)
+      .opIn(borderLeft)
+      .opIn(borderRight)
+      .opIn(horHeader->label(i));
+    }
+    row.close();
+  }
+
+  QSqlCursor *cur = tdb->sqlCursor();
+  int curRow = tdb->currentRow();
+
+  cur->QSqlCursor::first();
+
+  for (int r = 0; r < tdb->numRows(); ++r) {
+    if (progress.wasCanceled())
+      break;
+    AQOdsRow row(sheet);
+    for (int c = 0; c < tdb->numCols(); ++c) {
+      QVariant val(cur->QSqlCursor::value(tdb->indexOf(c)));
+      switch (val.type()) {
+        case QVariant::Double: {
+          row.opIn(val.toDouble());
+        }
+        break;
+
+        case QVariant::Date: {
+          QString str(val.toDate().toString("dd/MM/yyyy"));
+          if (str.isEmpty())
+            row.coveredCell();
+          else
+            row.opIn(str);
+        }
+        break;
+
+        case QVariant::Bool: {
+          QString str(val.toBool() ? tr("Sí") : tr("No"));
+          row.opIn(italic);
+          row.opIn(str);
+        }
+        break;
+
+        default: {
+          QString str(val.toString());
+          if (str.isEmpty())
+            row.coveredCell();
+          else
+            row.opIn(str);
+        }
+      }
+    }
+    row.close();
+    progress.setProgress(r);
+    qApp->processEvents();
+    cur->QSqlCursor::next();
+  }
+
+  cur->QSqlCursor::seek(curRow);
+
+  sheet.close();
+  spreadsheet.close();
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  QString fileName(AQ_DISKCACHE_DIRPATH + '/' + mtd->name() +
+                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                   QString::fromLatin1(".ods"));
+  odsGen.generateOds(fileName);
+  aqApp->call("sys.openUrl", QSArgumentList(fileName), 0);
+
+  QApplication::restoreOverrideCursor();
+}

@@ -1387,6 +1387,10 @@ Remove these functions?</source>
         <source>Importar M&#xf3;dulos desde Disco</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Copia de Seguridad</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FLApplicationInterface</name>
@@ -1623,6 +1627,35 @@ Remove these functions?</source>
     <message>
         <source>Se han detectado transacciones no finalizadas en la &#xfa;ltima operaci&#xf3;n.
 Se van a cancelar las transacciones pendientes.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>El campo &apos;%1&apos; con valor &apos;%2&apos; ha sido modificado
+por otro usuario con el valor &apos;%3&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aviso de concurrencia</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xbf; Desea realmente modificar este campo ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&#xed; : Ignora el cambio del otro usuario y utiliza el valor que acaba de introducir
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No : Respeta el cambio del otro usuario e ignora el valor que ha introducido
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelar : Cancela el guardado del registro y vuelve a la edici&#xf3;n del registro
+
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2322,6 +2355,18 @@ Se van a cancelar las transacciones pendientes.
     </message>
     <message>
         <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Procesando...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>odsprogress</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3733,6 +3778,10 @@ References
     <message>
         <source></source>
         <comment>Finde records in the table</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Hoja de cálculo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6874,6 +6923,50 @@ load these files?</source>
     </message>
     <message>
         <source>Binario</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Registro de instalaci&#xc3;&#xb3;n/actualizaci&#xc3;&#xb3;n de paquetes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instalado actualmente</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fecha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nombre del Paquete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modules Def.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Files Def.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SHA1 Global</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auxiliar Texto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auxiliar Binario</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hora</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10626,6 +10719,10 @@ antes de empezar.
     </message>
     <message>
         <source>PostScript Files (*.ps);;All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

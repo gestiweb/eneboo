@@ -21,6 +21,7 @@
 
 #include "AQSIODevice_p.h"
 #include "AQSByteArray_p.h"
+#include "AQSTextCodec_p.h"
 #include <qtextstream.h>
 
 // @AQ_PTR_INDIRECTION@
@@ -37,10 +38,51 @@ protected:
       delete o_;
   }
 
+public slots:
+  QString opOutString() const {
+    QString ret;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  int opOutInt() const {
+    int ret = 0;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  float opOutFloat() const {
+    float ret = 0;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  void opIn(const QString &str) {
+    if (o_)
+      (*o_) << str;
+  }
+
+  void opIn(int i) {
+    if (o_)
+      (*o_) << i;
+  }
+
+  void opIn(float f) {
+    if (o_)
+      (*o_) << f;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   void setEncoding(uint);
   void setCodec(QTextCodec *);
+  void setCodec(AQSTextCodec *);
   QTextCodec *codec();
   QIODevice *device() const;
   void setDevice(QIODevice *);
@@ -99,6 +141,10 @@ inline void AQSTextStream::setEncoding(uint arg0)
 inline void AQSTextStream::setCodec(QTextCodec *arg0)
 {
   AQ_CALL_VOID(setCodec(arg0));
+}
+inline void AQSTextStream::setCodec(AQSTextCodec *arg0)
+{
+  AQ_CALL_VOID(setCodec(*arg0));
 }
 inline QTextCodec *AQSTextStream::codec()
 {

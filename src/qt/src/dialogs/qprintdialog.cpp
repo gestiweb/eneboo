@@ -143,7 +143,7 @@ public:
 
     QBoxLayout *customLayout;
 
-    QPrinter::PageSize indexToPageSize[QPrinter::NPageSize];
+    QPrinter::PageSize indexToPageSize[QPrinter::NPageSize + 1];
 };
 
 
@@ -1285,10 +1285,10 @@ void isc( QPrintDialogPrivate * d,
 	  const QString & text,
 	  QPrinter::PageSize ps )
 {
-    if ( d && text && ps < QPrinter::NPageSize ) {
+    if ( d && text && ps <= QPrinter::NPageSize ) {
 	d->sizeCombo->insertItem( text, -1 );
 	int index = d->sizeCombo->count()-1;
-	if ( index >= 0 && index < QPrinter::NPageSize )
+	if ( index >= 0 && index <= QPrinter::NPageSize )
 	    d->indexToPageSize[index] = ps;
     }
 }
@@ -1315,7 +1315,7 @@ QGroupBox * QPrintDialog::setupPaper()
     d->sizeCombo = new QComboBox( FALSE, g );
 
     int n;
-    for( n=0; n<QPrinter::NPageSize; n++ )
+    for( n=0; n<=QPrinter::NPageSize; n++ )
 	d->indexToPageSize[n] = QPrinter::A4;
 
     isc( d, tr( "A0 (841 x 1189 mm)" ), QPrinter::A0 );
@@ -1348,6 +1348,7 @@ QGroupBox * QPrintDialog::setupPaper()
     isc( d, tr( "Letter (8.5x11 inches, 216x279 mm)" ), QPrinter::Letter );
     isc( d, tr( "Tabloid (279 x 432 mm)" ), QPrinter::Tabloid );
     isc( d, tr( "US Common #10 Envelope (105 x 241 mm)" ), QPrinter::Comm10E );
+    isc( d, tr( "Custom" ), QPrinter::Custom );
 
     connect( d->sizeCombo, SIGNAL( activated(int) ),
 	     this, SLOT( paperSizeSelected(int) ) );
@@ -1443,7 +1444,7 @@ void QPrintDialog::landscapeSelected( int id )
 
 void QPrintDialog::paperSizeSelected( int id )
 {
-    if ( id < QPrinter::NPageSize )
+    if ( id <= QPrinter::NPageSize )
 	d->pageSize = QPrinter::PageSize( d->indexToPageSize[id] );
 }
 
@@ -1577,7 +1578,7 @@ void QPrintDialog::setPrinter( QPrinter * p, bool pickUpSettings )
 
 	// page size
 	int n = 0;
-	while ( n < QPrinter::NPageSize &&
+	while ( n <= QPrinter::NPageSize &&
 		d->indexToPageSize[n] != p->pageSize() )
 	    n++;
 	d->sizeCombo->setCurrentItem( n );

@@ -63,6 +63,12 @@ public slots:
   QString driverNameToDriverAlias(const QString &);
   bool needConnOption(const QString &, int);
   QString defaultPort(const QString &);
+  bool isOpen() const;
+  bool isOpenError() const;
+  QStringList tables() const;
+  QStringList tables(uint) const;
+  QSqlError *lastError() const;
+  QString connectOptions() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -203,6 +209,30 @@ inline bool AQSSqlDatabase::needConnOption(const QString &arg0,  int arg1)
 inline QString AQSSqlDatabase::defaultPort(const QString &arg0)
 {
   AQ_CALL_RET_V(defaultPort(arg0), QString);
+}
+inline bool AQSSqlDatabase::isOpen() const
+{
+  AQ_CALL_RET_V(isOpen(), bool);
+}
+inline bool AQSSqlDatabase::isOpenError() const
+{
+  AQ_CALL_RET_V(isOpenError(), bool);
+}
+inline QStringList AQSSqlDatabase::tables() const
+{
+  AQ_CALL_RET_V(tables(), QStringList);
+}
+inline QStringList AQSSqlDatabase::tables(uint arg0) const
+{
+  AQ_CALL_RET_V(tables(static_cast<QSql::TableType>(arg0)), QStringList);
+}
+inline QSqlError *AQSSqlDatabase::lastError() const
+{
+  AQ_CALL_RET_PTR(lastError(), QSqlError);
+}
+inline QString AQSSqlDatabase::connectOptions() const
+{
+  AQ_CALL_RET_V(connectOptions(), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

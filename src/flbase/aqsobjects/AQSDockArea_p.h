@@ -37,6 +37,7 @@ public slots:
   bool isEmpty() const;
   bool isDockWindowAccepted(QDockWindow *);
   void setAcceptDockWindow(QDockWindow *, bool);
+  int findDockWindow(QDockWindow *);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -103,6 +104,10 @@ inline bool AQSDockArea::isDockWindowAccepted(QDockWindow *arg0)
 inline void AQSDockArea::setAcceptDockWindow(QDockWindow *arg0,  bool arg1)
 {
   AQ_CALL_VOID(setAcceptDockWindow(arg0, arg1));
+}
+inline int AQSDockArea::findDockWindow(QDockWindow *arg0)
+{
+  AQ_CALL_RET_V(findDockWindow(arg0), int);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

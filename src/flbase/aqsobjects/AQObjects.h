@@ -22,6 +22,9 @@
 #include "AQS_p.h"
 #include "AQPackager.h"
 #include "AQCompilerQSA.h"
+#include "AQZipReader.h"
+#include "AQZipWriter.h"
+#include "AQOds.h"
 
 #include "FLSqlDatabase.h"
 #include "FLManager.h"
@@ -33,6 +36,45 @@
 #include "FLSqlCursor.h"
 #include "FLSqlQuery.h"
 #include "FLSettings.h"
+#include "FLVar.h"
+#include "FLReportEngine.h"
+#include "FLReportViewer.h"
+#include "FLJasperEngine.h"
+#include "FLSqlConnections.h"
+
+class AQJasperEngine : public FLJasperEngine
+{
+  Q_OBJECT
+
+public:
+  AQJasperEngine(QObject *parent = 0) : FLJasperEngine(parent) {}
+};
+
+class AQReportViewer : public FLReportViewer
+{
+  Q_OBJECT
+
+public:
+  AQReportViewer(QWidget *parent = 0,
+                 const char *name = 0,
+                 bool embedInParent = false,
+                 FLReportEngine *rptEngine = 0) :
+    FLReportViewer(parent, name, embedInParent, rptEngine) {}
+};
+
+class AQReportEngine : public FLReportEngine
+{
+  Q_OBJECT
+
+public:
+  AQReportEngine(QObject *parent = 0) : FLReportEngine(parent) {}
+};
+
+class AQVar : public FLVar
+{
+public:
+  AQVar() : FLVar() {}
+};
 
 class AQSettings : public FLSettings
 {
@@ -96,8 +138,6 @@ public:
 
 class AQSqlCursor : public FLSqlCursor
 {
-  Q_OBJECT
-
 public:
   AQSqlCursor(const QString &name = QString::null, bool autopopulate = true,
               const QString &connectionName = "default", FLSqlCursor *cR = 0,
@@ -118,8 +158,6 @@ public:
 
 class AQSqlQuery : public FLSqlQuery
 {
-  Q_OBJECT
-
 public:
   AQSqlQuery(QObject *parent = 0, const QString &connectionName = "default") :
     FLSqlQuery(parent, connectionName) {}
@@ -133,6 +171,8 @@ class AQSql : public QObject
   Q_ENUMS(ConnOptions)
   Q_ENUMS(SpecialType)
   Q_ENUMS(Cardinality)
+  Q_ENUMS(TableType)
+  Q_ENUMS(SqlErrorType)
 
 public:
   enum ModeAccess {
@@ -160,13 +200,130 @@ public:
     RELATION_M1 = 1
   };
 
+  enum TableType {
+    Tables = 0x01,
+    SystemTables = 0x02,
+    Views = 0x04,
+    AllTables = 0xff
+  };
+
+  enum SqlErrorType {
+    SqlErrorNone,
+    SqlErrorConnection,
+    SqlErrorStatement,
+    SqlErrorTransaction,
+    SqlErrorUnknown
+  };
+
   AQSql() : QObject(0, "aqs_aqsql") {}
 
 public slots:
-  bool insert(AQSqlCursor *cur, const QStringList &fields,
-              const QValueList<QVariant> &values) {
-    if (!cur)
+  /**
+  Añade una base de datos a las conexiones disponibles.
+
+  La base de datos será abierta. Si ya existiera una conexión con el mismo nombre
+  la base datos correspondiente será cerrada y borrada, sustituyéndola por la nueva.
+
+  @param driverAlias Alias del driver ( PostgreSQL, MySQL, SQLite, ... ), ver FLSqlDatabase.
+  @param nameDB  Nombre de la base de datos a la que conectar
+  @param user  Usuario de la conexión
+  @param password Contraseña para el usuario
+  @param host  Nombre o dirección del servidor de la base de datos
+  @param port  Puerto TCP de conexion
+  @param connectionName Nombre de la conexion
+  @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
+  */
+  bool addDatabase(const QString &driverAlias, const QString &nameDB, const QString &user,
+                   const QString &password, const QString &host, int port,
+                   const QString &connectionName) {
+    return FLSqlConnections::addDatabase(driverAlias, nameDB, user, password, host, port, connectionName);
+  }
+
+  /**
+  Sobrecargada por conveniencia
+
+  Practicamente hace lo mismo que el método anterior pero utilizando una base de datos ya construida
+
+  @param db  Base datos a añadir a las conexiones disponibles, ver FLSqlDatabase.
+  @param connectionName Nombre de la conexion
+  @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
+  */
+  bool addDatabase(FLSqlDatabase *db, const QString &connectionName = "default") {
+    return FLSqlConnections::addDatabase(db, connectionName);
+  }
+
+  /**
+  Sobrecargada por conveniencia
+
+  Añade una base de datos a las conexiones disponibles utilizando los datos de otra conexión
+
+  @param newConnName    Nombre a utilizar para la nueva conexion
+  @param sourceConnName Nombre de una conexión existente a utilizar como origen de los datos de conexión
+  @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
+  */
+  bool addDatabase(const QString &newConnName, const QString &sourceConnName = "default") {
+    FLSqlDatabase *srcDb = FLSqlConnections::database(sourceConnName);
+    if (!srcDb)
       return false;
+    return FLSqlConnections::addDatabase(srcDb->driverName(), srcDb->database(),
+                                         srcDb->user(), srcDb->password(), srcDb->host(),
+                                         srcDb->port(), newConnName);
+  }
+
+  /**
+  Elimina una base de datos de las conexiones disponibles.
+
+  Cierra la base de datos correspondiente y la elimina.
+
+  @param connectionName Nombre de la conexion
+  @return TRUE si se pudo eliminar la base de datos, FALSE en caso contrario
+  */
+  bool removeDatabase(const QString &connectionName) {
+    return FLSqlConnections::removeDatabase(connectionName);
+  }
+
+  /**
+  Obtiene la base de datos de una conexion.
+
+  @param connectionNmae Nombre de la conexion
+  @return La base de datos correspondiente al nombre de conexion indicado
+  */
+  FLSqlDatabase *database(const QString &connectionName = "default") {
+    return FLSqlConnections::database(connectionName);
+  }
+
+  /**
+  Finalizar todas las conexiones
+  */
+  void finish() {
+    FLSqlConnections::finish();
+  }
+
+  /**
+  Inserta un registro en un cursor
+
+  Si hay un error SQL, eleva una excepción con el mensaje de error
+
+  Ejemplo:
+
+  var cur = new AQSqlCursor("clientes");
+  try {
+    AQSql.insert(cur,
+                 ["codcliente","nombre","cifnif","codserie"],
+                 ["1","pepe","XYZ","A"]);
+  } catch (e) {
+    sys.errorMsgBox("Error SQL: " + e);
+  }
+  */
+  bool insert(FLSqlCursor *cur, const QStringList &fields,
+              const QValueList<QVariant> &values) {
+    if (!cur) {
+      if (cur->lastError().type() != QSqlError::None) {
+        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                         cur->lastError().databaseText());
+      }
+      return false;
+    }
 
     int fieldsCount = fields.size();
     int valuesCount = values.size();
@@ -176,7 +333,12 @@ public slots:
     for (int i = 0; i < fieldsCount; ++i)
       cur->setValueBuffer(fields[i], (i < valuesCount ? values[i] : QVariant()));
 
-    return cur->commitBuffer();
+    bool ok = cur->commitBuffer();
+    if (!ok && cur->lastError().type() != QSqlError::None) {
+      globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                       cur->lastError().databaseText());
+    }
+    return ok;
   }
 
   bool insert(const QString &table, const QStringList &fields,
@@ -185,10 +347,32 @@ public slots:
     return insert(&cur, fields, values);
   }
 
-  bool update(AQSqlCursor *cur, const QStringList &fields,
+  /**
+  Actualiza un conjunto de registros de un cursor con nuevos valores
+
+  Si hay un error SQL, eleva una excepción con el mensaje de error
+
+  Ejemplo:
+
+  var cur = new AQSqlCursor("clientes");
+  try {
+    AQSql.update(cur,
+                 ["nombre","cifnif","codserie"],
+                 ["juan","ZYX","A"],
+                 "codcliente='1'");
+  } catch (e) {
+    sys.errorMsgBox("Error SQL: " + e);
+  }
+  */
+  bool update(FLSqlCursor *cur, const QStringList &fields,
               const QValueList<QVariant> &values, const QString &where = "") {
-    if (!cur || !cur->select(where))
+    if (!cur || !cur->select(where)) {
+      if (cur->lastError().type() != QSqlError::None) {
+        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                         cur->lastError().databaseText());
+      }
       return false;
+    }
 
     int fieldsCount = fields.size();
     int valuesCount = values.size();
@@ -198,8 +382,13 @@ public slots:
       cur->refreshBuffer();
       for (int i = 0; i < fieldsCount; ++i)
         cur->setValueBuffer(fields[i], (i < valuesCount ? values[i] : QVariant()));
-      if (!cur->commitBuffer())
+      if (!cur->commitBuffer()) {
+        if (cur->lastError().type() != QSqlError::None) {
+          globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                           cur->lastError().databaseText());
+        }
         return false;
+      }
     }
     return true;
   }
@@ -212,15 +401,39 @@ public slots:
     return update(&cur, fields, values, where);
   }
 
-  bool del(AQSqlCursor *cur, const QString &where = "") {
-    if (!cur || !cur->select(where))
+  /**
+  Elimina un conjunto de registros de un cursor
+
+  Si hay un error SQL, eleva una excepción con el mensaje de error
+
+  Ejemplo:
+
+  var cur = new AQSqlCursor("clientes");
+  try {
+    AQSql.del(cur, "codcliente='1'");
+  } catch (e) {
+    sys.errorMsgBox("Error SQL: " + e);
+  }
+  */
+  bool del(FLSqlCursor *cur, const QString &where = "") {
+    if (!cur || !cur->select(where)) {
+      if (cur->lastError().type() != QSqlError::None) {
+        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                         cur->lastError().databaseText());
+      }
       return false;
+    }
 
     while (cur->next()) {
       cur->setModeAccess(Del);
       cur->refreshBuffer();
-      if (!cur->commitBuffer())
+      if (!cur->commitBuffer()) {
+        if (cur->lastError().type() != QSqlError::None) {
+          globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
+                                           cur->lastError().databaseText());
+        }
         return false;
+      }
     }
     return true;
   }
@@ -231,6 +444,134 @@ public slots:
     cur.setForwardOnly(true);
     return del(&cur, where);
   }
+
+  /**
+  Ejecuta una consulta y devuelve información de la misma y el conjunto de
+  registros obtenidos
+
+  Si hay un error SQL, eleva una excepción con el mensaje de error
+
+  Devuelve un array 'A' donde:
+
+  -A[0] contiene el número de registros
+  -A[1] contiene el número de campos
+  -A[2] contiene otro array con los nombres de lo campos, en orden correlativo
+        al que aparecen en la consulta
+  -A[3..fin] los valores de los campos, en grupos de tamaño A[1]
+
+  Ejemplo:
+
+  var records;
+  try {
+    records = AQSql.select("bancos.*", "bancos");
+    if (!records.length)
+      return;
+
+    var size = records[0];
+    var nFields = records[1];
+    var fieldNames = records[2];
+
+    var rec = "";
+    for (var i = 0; i < nFields; ++i)
+      rec += fieldNames[i] + "    | ";
+    print(rec);
+    print("==============================================");
+
+    for (var i = 3; i <= size * nFields;  i += nFields) {
+      rec = "";
+      for (var j = 0; j < nFields; ++j) {
+        rec += records[i + j] + " | ";
+      }
+      print(rec);
+    }
+  } catch (e) {
+    sys.errorMsgBox("Error SQL: " + e);
+  }
+  */
+  QValueList<QVariant> select(const QString &select,
+                              const QString &from,
+                              const QString &where = QString::null,
+                              const QString &orderBy = QString::null,
+                              const QString &connName = "default") {
+    AQSqlQuery qry(0, connName);
+    qry.setTablesList(from);
+    qry.setSelect(select);
+    qry.setFrom(from);
+    qry.setWhere(where);
+    qry.setOrderBy(orderBy);
+    qry.setForwardOnly(true);
+    if (!qry.exec()) {
+      if (qry.lastError().type() != QSqlError::None) {
+        globalAQSInterpreter->throwError(qry.lastError().driverText() + ":" +
+                                         qry.lastError().databaseText());
+      }
+      return QVariantList();
+    }
+
+    QVariantList ret;
+    int countFields = qry.fieldList().count();
+
+    ret.append(qry.size());
+    ret.append(countFields);
+    ret.append(qry.fieldList());
+
+    while (qry.next()) {
+      for (int i = 0; i < countFields; ++i)
+        ret.append(qry.value(i));
+    }
+
+    return ret;
+  }
+
+  /**
+  Esencialmente hace lo mismo que AQSql::select(), pero con la diferencia que reservará
+  un bloqueo sobre los registros que devuelve la consulta.
+
+  Si hay otro selectForUpdate anterior sobre los mismos o algunos registros que obtiene la
+  consulta esta llamanda quedará en espera, bloqueada sobre esos registros, hasta que termine
+  la transacción que inició el otro selectForUpdate.
+
+  En PostgreSQL se puede utizar el parámetro 'nowait'. Si es TRUE y si al ejecutar la
+  consulta se detecta que se va a caer en un bloqueo, es decir hay otro selectForUpdate anterior,
+  no se bloqueará la llamada, y se elevará una excepción, terminando la transacción en curso.
+  El parámetro 'nowait' no tiene efecto para cualquier otra base de datos distinta a PostgreSQL.
+  */
+  QValueList<QVariant> selectForUpdate(const QString &select,
+                                       const QString &from,
+                                       const QString &where = QString::null,
+                                       bool nowait = false,
+                                       const QString &connName = "default") {
+    AQSqlQuery qry(0, connName);
+    qry.setTablesList(from);
+    qry.setSelect(select);
+    qry.setFrom(from);
+    QString w(where.isEmpty() ? "1=1" : w);
+    qry.setWhere(nowait ?
+                 w + QString::fromLatin1(" FOR UPDATE NOWAIT") :
+                 w + QString::fromLatin1(" FOR UPDATE"));
+    qry.setForwardOnly(true);
+    if (!qry.exec()) {
+      if (qry.lastError().type() != QSqlError::None) {
+        globalAQSInterpreter->throwError(qry.lastError().driverText() + ":" +
+                                         qry.lastError().databaseText());
+      }
+      return QVariantList();
+    }
+
+    QVariantList ret;
+    int countFields = qry.fieldList().count();
+
+    ret.append(qry.size());
+    ret.append(countFields);
+    ret.append(qry.fieldList());
+
+    while (qry.next()) {
+      for (int i = 0; i < countFields; ++i)
+        ret.append(qry.value(i));
+    }
+
+    return ret;
+  }
 };
 
 #include "FLFieldDB.h"
@@ -239,8 +580,6 @@ public slots:
 
 class AQFieldDB : public FLFieldDB
 {
-  Q_OBJECT
-
 public:
   AQFieldDB(QWidget *parent = 0, const char *name = 0) :
     FLFieldDB(parent, name) {}
@@ -248,8 +587,6 @@ public:
 
 class AQTableDB : public FLTableDB
 {
-  Q_OBJECT
-
 public:
   AQTableDB(QWidget *parent = 0, const char *name = 0) :
     FLTableDB(parent, name) {}
@@ -257,8 +594,6 @@ public:
 
 class AQDataTableDB : public FLDataTable
 {
-  Q_OBJECT
-
 public:
   AQDataTableDB(QWidget *parent = 0, const char *name = 0, bool popup = false) :
     FLDataTable(parent, name, popup) {}
@@ -279,8 +614,6 @@ public:
 
 class AQFormDB : public FLFormDB
 {
-  Q_OBJECT
-
 public:
   explicit AQFormDB(QWidget *parent = 0, const char *name = 0, WFlags f = 0) :
     FLFormDB(parent, name, f) {}
@@ -296,8 +629,6 @@ public:
 
 class AQFormRecordDB : public FLFormRecordDB
 {
-  Q_OBJECT
-
 public:
   AQFormRecordDB(FLSqlCursor *cursor, const QString &actionName = QString::null,
                  QWidget *parent = 0, bool showAcceptContinue = true):
@@ -306,8 +637,6 @@ public:
 
 class AQFormSearchDB : public FLFormSearchDB
 {
-  Q_OBJECT
-
 public:
   AQFormSearchDB(const QString &actionName, QWidget *parent = 0) :
     FLFormSearchDB(actionName, parent) {}

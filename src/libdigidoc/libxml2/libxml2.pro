@@ -14,6 +14,9 @@ win32 {
 	DLLDESTDIR = $$PREFIX/bin
 	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm -lws2_32
 }
+else {
+        LIBS += -lz
+}
 
 DESTDIR = $$PREFIX/lib
 

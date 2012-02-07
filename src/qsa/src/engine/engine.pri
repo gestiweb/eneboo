@@ -11,7 +11,6 @@ SOURCES += $$ENGDIR/qsclass.cpp \
 	$$ENGDIR/qsengine.cpp  \
 	$$ENGDIR/qsobject.cpp \
 	$$ENGDIR/qsfunction.cpp \
-	$$ENGDIR/qslookup.cpp \
 	$$ENGDIR/qsinternal.cpp \
 	$$ENGDIR/qsdebugger.cpp \
 	$$ENGDIR/qsglobal_object.cpp \
@@ -41,7 +40,6 @@ HEADERS += $$ENGDIR/qsclass.h \
 	$$ENGDIR/qsobject.h \
 	$$ENGDIR/qsreference.h \
 	$$ENGDIR/qsfunction.h \
-	$$ENGDIR/qslookup.h \
 	$$ENGDIR/qsinternal.h \
 	$$ENGDIR/qsdebugger.h \
 	$$ENGDIR/qsmath_object.h \

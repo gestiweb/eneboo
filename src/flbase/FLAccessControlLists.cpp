@@ -106,6 +106,11 @@ void FLAccessControlLists::process(QObject *obj)
   QString name(obj->name());
   QString user(FLSqlConnections::database()->user());
 
+#ifdef FL_DEBUG
+  qWarning("FLAccessControlLists::process: " +
+           type + " :: " + name + " :: " + user);
+#endif
+
   if (type.isEmpty() || name.isEmpty() || user.isEmpty())
     return;
   FLAccessControl *ac = (*accessControlList_)[type +

@@ -76,6 +76,7 @@ public slots:
   void setShowAllPixmaps(bool);
   QString functionGetColor() const;
   void setFunctionGetColor(const QString &);
+  void exportToOds();
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -289,6 +290,10 @@ inline QString AQSTableDB::functionGetColor() const
 inline void AQSTableDB::setFunctionGetColor(const QString &arg0)
 {
   AQ_CALL_VOID(setFunctionGetColor(arg0));
+}
+inline void AQSTableDB::exportToOds()
+{
+  AQ_CALL_VOID(exportToOds());
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

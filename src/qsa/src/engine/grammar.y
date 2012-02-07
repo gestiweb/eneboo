@@ -57,7 +57,7 @@ static bool automatic();
 %union {
   int                   ival;
   double                dval;
-  const QString               *ustr;
+  const QString         *ustr;
   QSNode                *node;
   QSStatementNode       *stat;
   QSParameterNode       *param;
@@ -425,9 +425,8 @@ ExprStatement:
                                      DBG($$, @1, @2); }
   | Expr error                     { if (automatic()) {
                                        $$ = new QSExprStatementNode($1);
-				       DBG($$, @1, @1);
-                                     } else
-				       YYABORT; }
+                                       DBG($$, @1, @1);
+                                     } else YYABORT; }
 ;
 
 IfStatement:
@@ -531,6 +530,7 @@ DefaultClause:
 LabelledStatement:
     IDENT ':' Statement            { if ($1) $3->pushLabel(*($1));
                                      $$ = new QSLabelNode(*($1), $3); }
+  | IDENT ':' IDENT '=' error      { DBG($$,@1,@3); YYABORT; }
 ;
 
 ThrowStatement:
@@ -608,8 +608,8 @@ ClassDefinition:
 ;
 
 Program:
-    /* empty */                    { $$ = new QSProgramNode(0L); QSLexer::lexer()->clearUstrHash(); }
-  | SourceElements                 { $$ = new QSProgramNode($1); QSLexer::lexer()->clearUstrHash(); }
+    /* empty */                    { $$ = new QSProgramNode(0L); QSLexer::lexer()->clearUstr(); }
+  | SourceElements                 { $$ = new QSProgramNode($1); QSLexer::lexer()->clearUstr(); }
 ;
 
 SourceElements:
@@ -679,7 +679,7 @@ TypeExpression:
 
 int yyerror ( const char *errstr )  /* Called by yyparse on error */
 {
-  QSLexer::lexer()->setErrorMessage( errstr );
+  QSLexer::lexer()->setErrorMessage(errstr);
   return 1;
 }
 

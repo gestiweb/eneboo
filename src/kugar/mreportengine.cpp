@@ -531,6 +531,8 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
   pages->setPageSize(pageSize);
   pages->setPageOrientation(pageOrientation);
   pages->setPrintToPos(printToPos);
+  pages->setPageMargins(topMargin, leftMargin, bottomMargin, rightMargin);
+
 
   fillRecords_ = false;
 
@@ -731,7 +733,8 @@ void MReportEngine::drawDetail(MPageCollection *pages, int level, uint &currReco
           newPage(pages, level);
         }
 
-        QDomNode *ptrRecord = &records.item(currRecord);
+        QDomNode record = records.item(currRecord);
+        QDomNode *ptrRecord = &record;
 
         setFieldValues(&fields, level, detail, ptrRecord);
 
@@ -1139,7 +1142,8 @@ QSize MReportEngine::getPageMetrics(int size, int orientation)
 {
   QSize ps;
   // Set the page size
-  if ((QPrinter::PageSize) size == QPrinter::Custom) {
+  if ((QPrinter::PageSize) size >= QPrinter::Custom) {
+    size = QPrinter::Custom;
     ps.setWidth(customWidthMM / 25.4 * 78.);
     ps.setHeight(customHeightMM / 25.4 * 78.);
     return ps;
@@ -1193,6 +1197,8 @@ void MReportEngine::setReportAttributes(QDomNode *report)
   QDomNamedNodeMap attributes = report->attributes();
 
   pageSize = attributes.namedItem("PageSize").nodeValue().toInt();
+  if ((QPrinter::PageSize) pageSize > QPrinter::Custom)
+    pageSize = QPrinter::Custom;
   pageOrientation = attributes.namedItem("PageOrientation").nodeValue().toInt();
   topMargin = attributes.namedItem("TopMargin").nodeValue().toInt();
   bottomMargin = attributes.namedItem("BottomMargin").nodeValue().toInt();
@@ -1210,7 +1216,7 @@ void MReportEngine::setReportAttributes(QDomNode *report)
     printToPos = (attributes.namedItem("PrintToPos").nodeValue().upper() == "TRUE");
 
   // Set the page metrics
-  QSize ps = getPageMetrics(pageSize, pageOrientation);
+  QSize ps(getPageMetrics(pageSize, pageOrientation));
   pageWidth = ps.width();
   pageHeight = ps.height();
 }

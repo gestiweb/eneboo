@@ -71,6 +71,14 @@ private:
   */
   bool printToPos_;
 
+  /**
+  Page margins
+  */
+  int topMargin;
+  int leftMargin;
+  int bottomMargin;
+  int rightMargin;
+
 public:
 
   /**
@@ -173,6 +181,16 @@ public:
   Set print to POS printer
   */
   void setPrintToPos(bool ptp);
+
+  /**
+  Set page margins
+  */
+  void setPageMargins(int top, int left, int bottom, int right);
+
+  /**
+  Return page margins
+  */
+  void pageMargins(int *top, int *left, int *bottom, int *right) const;
 
 private:
 
@@ -294,5 +312,21 @@ inline bool MPageCollection::printToPos() const
 inline void MPageCollection::setPrintToPos(bool ptp)
 {
   printToPos_ = ptp;
+}
+
+inline void MPageCollection::setPageMargins(int top, int left, int bottom, int right)
+{
+  topMargin = top;
+  leftMargin = left;
+  bottomMargin = bottom;
+  rightMargin = right;
+}
+
+inline void MPageCollection::pageMargins(int *top, int *left, int *bottom, int *right) const
+{
+  *top = topMargin;
+  *left = leftMargin;
+  *bottom = bottomMargin;
+  *right = rightMargin;
 }
 #endif

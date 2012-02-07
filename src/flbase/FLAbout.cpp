@@ -33,7 +33,7 @@ FLAbout::FLAbout(const QString &v,
                        "Este software se distribuye \"como está\", <br>"
                        "<b>sin garantías de ninguna clase</b><br>"
                        "<br>http://www.abanq.com<br>"
-                       "Copyright (C) 2003-2011 InfoSiAL, S.L. http://www.infosial.com</p>");
+                       "Copyright (C) 2003-2012 InfoSiAL, S.L. http://www.infosial.com</p>");
 }
 
 FLAbout::~FLAbout() {}

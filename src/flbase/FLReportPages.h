@@ -43,7 +43,7 @@ public:
     A4, B5, Letter, Legal, Executive,
     A0, A1, A2, A3, A5, A6, A7, A8, A9, B0, B1,
     B10, B2, B3, B4, B6, B7, B8, B9, C5E, Comm10E,
-    DLE, Folio, Ledger, Tabloid, NPageSize
+    DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom
   };
 
   void setPageCollection(MPageCollection *pages);

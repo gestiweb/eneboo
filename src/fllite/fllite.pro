@@ -30,7 +30,8 @@ LIBS *= -L$$PREFIX/lib
 enable_hoard:LIBS *= -lhoard
 enable_hoard:!win32:LIBS *= -L$$PREFIX/lib -ldl
 LIBS *= -L$$PREFIX/lib -lflbase
-mac:LIBS *= -ladvance -lqui -lflmail -lqwt
+mac:LIBS *= -ladvance -lqui -lflmail -lqwt -lxslt -lexslt -lxsltproc
+enable_digidoc:mac:LIBS *= -llibdigidoc -lcrypto -lssl -lxml2
 
 load(qsa)
 

@@ -60,6 +60,10 @@ public slots:
   QString fieldList(bool) const;
   QString fieldsNames() const;
   QStringList fieldsNamesUnlock() const;
+  bool concurWarn() const;
+  void setConcurWarn(bool = true);
+  bool detectLocks() const;
+  void setDetectLocks(bool = true);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -207,6 +211,22 @@ inline QString AQSTableMD::fieldsNames() const
 inline QStringList AQSTableMD::fieldsNamesUnlock() const
 {
   AQ_CALL_RET_V(fieldsNamesUnlock(), QStringList);
+}
+inline bool AQSTableMD::concurWarn() const
+{
+  AQ_CALL_RET_V(concurWarn(), bool);
+}
+inline void AQSTableMD::setConcurWarn(bool arg0)
+{
+  AQ_CALL_VOID(setConcurWarn(arg0));
+}
+inline bool AQSTableMD::detectLocks() const
+{
+  AQ_CALL_RET_V(detectLocks(), bool);
+}
+inline void AQSTableMD::setDetectLocks(bool arg0)
+{
+  AQ_CALL_VOID(setDetectLocks(arg0));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

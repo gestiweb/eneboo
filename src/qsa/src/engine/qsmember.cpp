@@ -28,28 +28,63 @@
 
 #include "qsmember.h"
 
+// ### AbanQ
+#include "qsnodes.h"
+
+QSMember::~QSMember()
+{
+  setSuper(0);
+}
+
+void QSMember::setSuper(QSMember *super)
+{
+  if (super_ == super)
+    return;
+
+  if (super_) {
+    Q_ASSERT(super_->type() == QSMember::ScriptFunction);
+    Q_ASSERT(super_->scriptFunction);
+
+    // ### Leak risk ?
+    if (super_->scriptFunction->deref()) {
+      delete super_->scriptFunction;
+      delete super_;
+    }
+  }
+
+  super_ = super;
+
+  if (super_) {
+    Q_ASSERT(super_->type() == QSMember::ScriptFunction);
+    Q_ASSERT(super_->scriptFunction);
+
+    super_->scriptFunction->ref();
+  }
+}
+
+// ### AbanQ
+
 /*!
   Returns a human readable description of this member's type.
  */
-
 QString QSMember::typeName() const
 {
-    switch( typ ) {
+  switch (typ) {
     case Variable:
-	return QString::fromLatin1("member variable");
+      return QString::fromLatin1("member variable");
     case NativeFunction:
-	return QString::fromLatin1("C++ function");
+      return QString::fromLatin1("C++ function");
     case NativeMemberFunction:
-	return QString::fromLatin1("C++ member function");
+      return QString::fromLatin1("C++ member function");
     case ScriptFunction:
-	return QString::fromLatin1("Function");
+      return QString::fromLatin1("Function");
     case Object:
-	return QString::fromLatin1("Object");
+      return QString::fromLatin1("Object");
     case Identifier:
-	return QString::fromLatin1("Identifier");
+      return QString::fromLatin1("Identifier");
     case Custom:
-	return QString::fromLatin1("Custom");
+      return QString::fromLatin1("Custom");
     default:
-	return QString::fromLatin1("<undefined>");
-    }
+      return QString::fromLatin1("<undefined>");
+  }
 }

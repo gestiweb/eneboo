@@ -31,31 +31,34 @@
 
 #include "qsclass.h"
 
-class QSMathClass : public QSClass {
+class QSMathClass : public QSClass
+{
 public:
-    QSMathClass( QSClass *b );
-    ~QSMathClass();
+  QSMathClass(QSClass *b);
+  ~QSMathClass();
 
-    QString name() const { return QString::fromLatin1("Math"); }
+  QString name() const {
+    return QString::fromLatin1("Math");
+  }
 
-    static QSObject abs( QSEnv * );
-    static QSObject acos( QSEnv * );
-    static QSObject asin( QSEnv * );
-    static QSObject atan( QSEnv * );
-    static QSObject atan2( QSEnv * );
-    static QSObject ceil( QSEnv * );
-    static QSObject cos( QSEnv * );
-    static QSObject exp( QSEnv * );
-    static QSObject floor( QSEnv * );
-    static QSObject log( QSEnv * );
-    static QSObject max( QSEnv * );
-    static QSObject min( QSEnv * );
-    static QSObject pow( QSEnv * );
-    static QSObject random( QSEnv * );
-    static QSObject round( QSEnv * );
-    static QSObject sin( QSEnv * );
-    static QSObject sqrt( QSEnv * );
-    static QSObject tan( QSEnv * );
+  static QSObject abs(QSEnv *);
+  static QSObject acos(QSEnv *);
+  static QSObject asin(QSEnv *);
+  static QSObject atan(QSEnv *);
+  static QSObject atan2(QSEnv *);
+  static QSObject ceil(QSEnv *);
+  static QSObject cos(QSEnv *);
+  static QSObject exp(QSEnv *);
+  static QSObject floor(QSEnv *);
+  static QSObject log(QSEnv *);
+  static QSObject max(QSEnv *);
+  static QSObject min(QSEnv *);
+  static QSObject pow(QSEnv *);
+  static QSObject random(QSEnv *);
+  static QSObject round(QSEnv *);
+  static QSObject sin(QSEnv *);
+  static QSObject sqrt(QSEnv *);
+  static QSObject tan(QSEnv *);
 };
 
 #endif

@@ -400,6 +400,14 @@ public:
   */
   bool regenTable(const QString &n, FLTableMetaData *tmd);
 
+  // Some Wrappers to QSqlDatabase
+  bool isOpen() const;
+  bool isOpenError() const;
+  QStringList tables() const;
+  QStringList tables(QSql::TableType type) const;
+  QSqlError lastError() const;
+  QString connectOptions() const;
+
 private:
 
   /** Conexión principal a la base de datos actual */

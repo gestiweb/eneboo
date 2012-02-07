@@ -574,7 +574,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
     return 0;
 
   QString name, a, q;
-  bool v = true, ed = true;
+  bool v = true, ed = true, cw = true, dl = false;
 
   QDomNode no = mtd->firstChild();
 
@@ -611,6 +611,16 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "concurWarn") {
+        cw = (e.text() == "true");
+        no = no.nextSibling();
+        continue;
+      }
+      if (e.tagName() == "detectLocks") {
+        dl = (e.text() == "true");
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
@@ -619,6 +629,8 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   FLCompoundKey *cK = 0;
   QStringList assocs;
 
+  tmd->setConcurWarn(cw);
+  tmd->setDetectLocks(dl);
   no = mtd->firstChild();
 
   while (!no.isNull()) {
@@ -770,6 +782,7 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
     if (db_->canRegenTables() && notSysTable) {
       QSqlRecord *buffer = 0;
       QString key2;
+      delete dictKey;
       dictKey = dictKeyMetaData_->find(n);
       if (dictKey)
         key2 = *dictKey;
@@ -845,13 +858,15 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
   if (dictKey) {
     if (cacheMetaData_ && notSysTable) {
       ret = cacheMetaData_->find(*dictKey);
-    } else if (cacheMetaDataSys_) {
+    } else if (cacheMetaDataSys_ && !notSysTable) {
       ret = cacheMetaDataSys_->find(*dictKey);
     }
     if (ret) {
       FLAccessControlLists *acl = aqApp ->acl();
       if (acl)
         acl->process(ret);
+      if (quick)
+        delete dictKey;
       return ret;
     }
   }
@@ -860,19 +875,29 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
 #ifdef FL_DEBUG
     qWarning("FLManager : " + QApplication::tr("Error al cargar los metadatos para la tabla %1").arg(n));
 #endif
+    if (quick)
+      delete dictKey;
+#ifdef FL_QUICK_CLIENT
+    else
+      delete dictKey;
+#endif
     return 0;
   }
 
   docElem = doc.documentElement();
   ret = metadata(&docElem, quick);
-  if (dictKey && !ret->isQuery()) {
+  if (dictKey &&
+      (!notSysTable || (!ret->isQuery() && ret->fieldsNamesUnlock().isEmpty()))) {
     if (cacheMetaData_ && notSysTable) {
       cacheMetaData_->insert(*dictKey, ret);
-    } else if (cacheMetaDataSys_) {
+    } else if (cacheMetaDataSys_ && !notSysTable) {
       cacheMetaDataSys_->insert(*dictKey, ret);
     }
+    if (quick)
+      delete dictKey;
 #ifdef FL_QUICK_CLIENT
-    delete dictKey;
+    else
+      delete dictKey;
 #endif
   }
   return ret;
@@ -1327,7 +1352,8 @@ bool FLManager::isSystemTable(const QString &n)
                       "flserial,"
                       "flvar,"
                       "flsettings,"
-                      "flseqs,");
+                      "flseqs,"
+                      "flupdates");
   if (n.endsWith(".mtd"))
     return systemTable.contains(n.left(n.length() - 4));
   return systemTable.contains(n);

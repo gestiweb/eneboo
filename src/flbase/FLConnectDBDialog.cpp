@@ -324,7 +324,7 @@ void FLConnectDBDialog::paintEvent(QPaintEvent *pe)
     QFont font8(qApp->font().family(), 8);
 #endif
     font8.setBold(true);
-    QString copyright("Copyright (C) 2003-2011 by InfoSiAL S.L.");
+    QString copyright("Copyright (C) 2003-2012 by InfoSiAL S.L.");
     int lineWidth = QFontMetrics(font8).width(copyright);
     int lineHeight = QFontMetrics(font8).height();
     p.setFont(font8);

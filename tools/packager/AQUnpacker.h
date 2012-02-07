@@ -21,7 +21,7 @@
 
 #include <qstringlist.h>
 
-#define AQPACKAGER_VERSION "AbanQ Packager 2.4.0"
+#define AQPACKAGER_VERSION "AbanQ Packager 2.4.1"
 
 #define AQ_STRERROR(V) \
   errMsgs_ << QString().sprintf("'%s': %s", V.latin1(), strerror(errno))

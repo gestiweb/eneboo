@@ -43,6 +43,7 @@ public slots:
   void setWhere(const QString &);
   void setOrderBy(const QString &);
   QString sql() const;
+  QStringList fieldList() const;
   QVariant value(int) const;
   QVariant value(const QString &) const;
   bool isNull(int) const;
@@ -59,6 +60,8 @@ public slots:
   void showDebug();
   int size() const;
   void setForwardOnly(bool);
+  QSqlError *lastError() const;
+  QString lastQuery() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -120,6 +123,10 @@ inline void AQSSqlQuery::setOrderBy(const QString &arg0)
 inline QString AQSSqlQuery::sql() const
 {
   AQ_CALL_RET_V(sql(), QString);
+}
+inline QStringList AQSSqlQuery::fieldList() const
+{
+  AQ_CALL_RET_V(fieldList(), QStringList);
 }
 inline QVariant AQSSqlQuery::value(int arg0) const
 {
@@ -184,6 +191,14 @@ inline int AQSSqlQuery::size() const
 inline void AQSSqlQuery::setForwardOnly(bool arg0)
 {
   AQ_CALL_VOID(setForwardOnly(arg0));
+}
+inline QSqlError *AQSSqlQuery::lastError() const
+{
+  AQ_CALL_RET_PTR(lastError(), QSqlError);
+}
+inline QString AQSSqlQuery::lastQuery() const
+{
+  AQ_CALL_RET_V(lastQuery(), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

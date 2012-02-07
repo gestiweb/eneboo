@@ -44,10 +44,13 @@ LIBS += -L$$PREFIX/lib \
     -lkugar \
     -ladvance \
     -lflmail \
-    -llrelease
+    -llrelease \
+    -lxsltproc
+mac:LIBS *= -ldl -lxml2 -lxslt -lexslt
 enable_qwt:LIBS += -lqwt
 enable_digidoc:LIBS += -llibdigidoc \
     -lcrypto
+enable_digidoc:mac:LIBS += -lssl -lxml2
 load(qsa)
 VERSION = 2.4
 include(../serialport/serialport.pri)
@@ -214,7 +217,13 @@ IMAGES += images/infosial.png \
     images/folder.png \
     images/check_x_on.png \
     images/export.png \
-    images/import.png
+    images/import.png \
+    images/fileexport.png
 include(aqsobjects/aqsobjects.pri)
 include(../../tools/qsac/qsac.pri)
 include(../../tools/packager/packager.pri)
+include(../../tools/aqzip/aqzip.pri)
+include(../../tools/aqods/aqods.pri)
+exists(../../tools/roller/roller.pri):include(../../tools/roller/roller.pri)
+
+

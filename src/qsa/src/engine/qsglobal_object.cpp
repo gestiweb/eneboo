@@ -46,7 +46,9 @@
 #include "qsregexp_object.h"
 #include "qserror_object.h"
 
+#if defined (QT_THREAD_SUPPORT)
 #include <private/qmutexpool_p.h>
+#endif
 #include <qregexp.h>
 
 #include <stdio.h>

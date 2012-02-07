@@ -62,6 +62,9 @@ public slots:
   void selectCells(int, int, int, int);
   void selectRow(int);
   void selectColumn(int);
+  virtual void takeItem(QTableItem *);
+  virtual void takeItem(AQSTableItem *);
+  virtual void setCellWidget(int, int, QWidget *);
   QWidget *cellWidget(int, int) const;
   void clearCellWidget(int, int);
   QRect cellRect(int, int) const;
@@ -236,6 +239,18 @@ inline void AQSTable::selectRow(int arg0)
 inline void AQSTable::selectColumn(int arg0)
 {
   AQ_CALL_VOID(selectColumn(arg0));
+}
+inline void AQSTable::takeItem(QTableItem *arg0)
+{
+  AQ_CALL_VOID(takeItem(arg0));
+}
+inline void AQSTable::takeItem(AQSTableItem *arg0)
+{
+  AQ_CALL_VOID(takeItem(*arg0));
+}
+inline void AQSTable::setCellWidget(int arg0,  int arg1,  QWidget *arg2)
+{
+  AQ_CALL_VOID(setCellWidget(arg0, arg1, arg2));
 }
 inline QWidget *AQSTable::cellWidget(int arg0,  int arg1) const
 {

@@ -28,17 +28,16 @@
 // If you're compiling big endian, just comment out the following line
 #define SHA1_LITTLE_ENDIAN
 
-typedef union
-{
+typedef union {
   Q_UINT8 c[ 64 ];
   Q_UINT32 l[ 16 ];
 } SHA1_WORKSPACE_BLOCK;
 
-class FL_EXPORT FLSha1 {
+class FL_EXPORT FLSha1
+{
 public:
   // Two different formats for ReportHash(...)
-  enum
-  {
+  enum {
     REPORT_HEX = 0,
     REPORT_DIGIT = 1
   };
@@ -55,22 +54,21 @@ public:
   void Reset();
 
   // Update the hash value
-  void Update( Q_UINT8 *data, unsigned int len );
-  bool HashFile( char *szFileName );
+  void Update(Q_UINT8 *data, unsigned int len);
+  bool HashFile(char *szFileName);
 
   // Finalize hash and report
   void Final();
-  void ReportHash( char *szReport, Q_UINT8 uReportType = REPORT_HEX );
-  void GetHash( Q_UINT8 *uDest );
+  void ReportHash(char *szReport, Q_UINT8 uReportType = REPORT_HEX);
+  void GetHash(Q_UINT8 *uDest);
 
 private:
   // Private SHA-1 transformation
-  void Transform( Q_UINT32 state[ 5 ], Q_UINT8 buffer[ 64 ] );
+  void Transform(Q_UINT32 state[ 5 ], Q_UINT8 buffer[ 64 ]);
 
   // Member variables
   Q_UINT8 m_workspace[ 64 ];
   SHA1_WORKSPACE_BLOCK *m_block; // SHA1 pointer to the byte array above
-}
-;
+};
 
 #endif

@@ -32,30 +32,45 @@
 #include "qsobject.h"
 #include "qsclass.h"
 
-class QSReference {
+class QSReference
+{
 public:
-    QSReference() : cls(0) { }
-    QSReference( const QSObject &b, const QSMember &m, const QSClass *c )
-	: bs( b ), mem( m ), cls(c) { }
-    QSReference( const QSObject &b ) : bs( b ), cls(0) { }
+  QSReference() : cls(0) { }
+  QSReference(const QSObject &b, const QSMember &m, const QSClass *c)
+    : bs(b), mem(m), cls(c) { }
+  QSReference(const QSObject &b) : bs(b), cls(0) { }
 
-    bool isWritable() const { return isReference() && mem.isWritable(); }
-    bool isDefined() const { return isReference() && mem.isDefined(); }
-    bool isReference() const { return cls!=0; }
-    QSObject base() const { return bs; }
-    QSMember member() const { return mem; }
-//     void setBase( const QSObject &b ) { bs = b; }
-    void setIdentifier( const QString &i ) { ident = i; }
-    QString identifier() const { return ident; }
-    QSObject dereference() const;
-    void assign( const QSObject &o );
-    bool deleteProperty();
+  bool isWritable() const {
+    return isReference() && mem.isWritable();
+  }
+  bool isDefined() const {
+    return isReference() && mem.isDefined();
+  }
+  bool isReference() const {
+    return cls != 0;
+  }
+  QSObject base() const {
+    return bs;
+  }
+  QSMember member() const {
+    return mem;
+  }
+  //     void setBase( const QSObject &b ) { bs = b; }
+  void setIdentifier(const QString &i) {
+    ident = i;
+  }
+  QString identifier() const {
+    return ident;
+  }
+  QSObject dereference() const;
+  void assign(const QSObject &o);
+  bool deleteProperty();
 
 private:
-    QSObject bs;
-    QSMember mem;
-    const QSClass *cls;
-    QString ident;
+  QSObject bs;
+  QSMember mem;
+  const QSClass *cls;
+  QString ident;
 };
 
 #endif
