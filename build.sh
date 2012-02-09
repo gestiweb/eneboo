@@ -161,7 +161,7 @@ BUILD_MACX="no"
 if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
   BUILD_MACX="yes"
   OPT_MULTICORE="no"
-  OPT_DIGIDOC="no"
+  # OPT_DIGIDOC="no"
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
