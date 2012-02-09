@@ -99,7 +99,8 @@ public:
     Version82 = 13,
     Version83 = 14,
     Version84 = 15,
-    Version9  = 16
+    Version9  = 16,
+    Version91 = 17
   };
 
   QPSQLDriver(QObject *parent = 0, const char *name = 0);
@@ -161,6 +162,7 @@ private:
   QSqlIndex primaryIndex2(const QString &tablename) const;
   QSqlRecord record2(const QString &tablename) const;
   QSqlRecord record(FLTableMetaData *mtd) const;
+  bool constraintExists(const QString &name) const;
   bool alterTable(FLTableMetaData *newMTD);
   QSqlRecordInfo recordInfo2(const QString &tablename) const;
   bool alterTable2(const QString &mtd1, const QString &mtd2, const QString &key = QString::null, bool force = false);

@@ -19,9 +19,8 @@
 #ifndef AQSSPROJECT_P_H_
 #define AQSSPROJECT_P_H_
 
-#include "AQSObject_p.h"
+#include "AQSSInterpreter_p.h"
 #include <qsproject.h>
-#include <qsinterpreter.h>
 #include <qsworkbench.h>
 #include <qtimer.h>
 
@@ -58,12 +57,23 @@ private:
   QString entryFunction_;
   QVariantList scriptInfos_;
   QSWorkbench *wb_;
+  int callTries_;
 
 private slots:
   void callEntryFunction() {
     if (entryFunction_.isEmpty())
       return;
-    o_->interpreter()->call(entryFunction_);
+    QSInterpreter *ip = o_->interpreter();
+    if (ip->isRunning()) {
+      QTimer::singleShot(50, this, SLOT(callEntryFunction()));
+      return;
+    }
+    if (callTries_ < 4 && !ip->hasFunction(entryFunction_)) {
+      ++callTries_;
+      QTimer::singleShot(50, this, SLOT(callEntryFunction()));
+      return;
+    }
+    ip->call(entryFunction_);
     entryFunction_ = QString::null;
   }
 
@@ -102,6 +112,7 @@ public slots:
       return;
     o_->commitEditorContents();
     entryFunction_ = entryFunction;
+    callTries_ = 0;
     QTimer::singleShot(0, o_, SLOT(evaluate()));
     QTimer::singleShot(0, this, SLOT(callEntryFunction()));
   }

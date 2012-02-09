@@ -1,7 +1,7 @@
 /***************************************************************************
  AQS_g.h
  -------------------
- begin                : 28/04/2011
+ begin                : 30/12/2011
  copyright            : (C) 2003-2011 by InfoSiAL S.L.
  email                : mail@infosial.com
  ***************************************************************************/
@@ -33,6 +33,20 @@
 #include "AQSButtonGroup_p.h"
 #include "AQSButton_p.h"
 #include "AQSByteArray_p.h"
+#include "AQSCanvasEllipse_p.h"
+#include "AQSCanvasItemList_p.h"
+#include "AQSCanvasItem_p.h"
+#include "AQSCanvasLine_p.h"
+#include "AQSCanvas_p.h"
+#include "AQSCanvasPixmapArray_p.h"
+#include "AQSCanvasPixmap_p.h"
+#include "AQSCanvasPolygonalItem_p.h"
+#include "AQSCanvasPolygon_p.h"
+#include "AQSCanvasRectangle_p.h"
+#include "AQSCanvasSpline_p.h"
+#include "AQSCanvasSprite_p.h"
+#include "AQSCanvasText_p.h"
+#include "AQSCanvasView_p.h"
 #include "AQSCheckBox_p.h"
 #include "AQSCheckListItem_p.h"
 #include "AQSCheckTableItem_p.h"
@@ -52,6 +66,7 @@
 #include "AQSDialog_p.h"
 #include "AQSDial_p.h"
 #include "AQSDigiDoc_p.h"
+#include "AQSDir_p.h"
 #include "AQSDockArea_p.h"
 #include "AQSDockWindow_p.h"
 #include "AQSDomAttr_p.h"
@@ -79,6 +94,7 @@
 #include "AQSEventLoop_p.h"
 #include "AQSFieldDB_p.h"
 #include "AQSFieldMD_p.h"
+#include "AQSFile_p.h"
 #include "AQSFocusEvent_p.h"
 #include "AQSFontMetrics_p.h"
 #include "AQSFormDB_p.h"
@@ -106,6 +122,7 @@
 #include "AQSImage_p.h"
 #include "AQSIMEvent_p.h"
 #include "AQSIODevice_p.h"
+#include "AQSJasperEngine_p.h"
 #include "AQSKeyEvent_p.h"
 #include "AQSLabel_p.h"
 #include "AQSLayout_p.h"
@@ -124,6 +141,20 @@
 #include "AQSMoveEvent_p.h"
 #include "AQSNetworkOperation_p.h"
 #include "AQSNetworkProtocol_p.h"
+#include "AQSOdsAutoChart_p.h"
+#include "AQSOdsCellAddress_p.h"
+#include "AQSOdsCellRange_p.h"
+#include "AQSOdsCentimeters_p.h"
+#include "AQSOdsChart_p.h"
+#include "AQSOdsColor_p.h"
+#include "AQSOdsGenerator_p.h"
+#include "AQSOdsImage_p.h"
+#include "AQSOdsLength_p.h"
+#include "AQSOdsRow_p.h"
+#include "AQSOdsSeries_p.h"
+#include "AQSOdsSheet_p.h"
+#include "AQSOdsSpreadSheet_p.h"
+#include "AQSOdsStyle_p.h"
 #include "AQSPackager_p.h"
 #include "AQSPainter_p.h"
 #include "AQSPaintEvent_p.h"
@@ -133,23 +164,29 @@
 #include "AQSPointArray_p.h"
 #include "AQSPopupMenu_p.h"
 #include "AQSPrinter_p.h"
+#include "AQSProcess_p.h"
 #include "AQSProgressBar_p.h"
 #include "AQSProgressDialog_p.h"
 #include "AQSPushButton_p.h"
 #include "AQSRadioButton_p.h"
 #include "AQSRegion_p.h"
 #include "AQSRelationMD_p.h"
+#include "AQSReportEngine_p.h"
+#include "AQSReportViewer_p.h"
 #include "AQSResizeEvent_p.h"
 #include "AQSScrollView_p.h"
 #include "AQSSEditor_p.h"
 #include "AQSSettings_p.h"
 #include "AQSShowEvent_p.h"
 #include "AQSSignalMapper_p.h"
+#include "AQSSInterpreter_p.h"
 #include "AQSSocketNotifier_p.h"
 #include "AQSSpinBox_p.h"
+#include "AQSSplitter_p.h"
 #include "AQSSProject_p.h"
 #include "AQSSqlCursor_p.h"
 #include "AQSSqlDatabase_p.h"
+#include "AQSSqlError_p.h"
 #include "AQSSqlQuery_p.h"
 #include "AQSSScript_p.h"
 #include "AQSStatusBar_p.h"
@@ -161,8 +198,11 @@
 #include "AQSTable_p.h"
 #include "AQSTab_p.h"
 #include "AQSTabWidget_p.h"
+#include "AQSTextCodec_p.h"
+#include "AQSTextDecoder_p.h"
 #include "AQSTextDrag_p.h"
 #include "AQSTextEdit_p.h"
+#include "AQSTextEncoder_p.h"
 #include "AQSTextStream_p.h"
 #include "AQSTimeEdit_p.h"
 #include "AQSTimerEvent_p.h"
@@ -172,7 +212,10 @@
 #include "AQSToolButton_p.h"
 #include "AQSUnpacker_p.h"
 #include "AQSUriDrag_p.h"
+#include "AQSUrlInfo_p.h"
 #include "AQSUrlOperator_p.h"
+#include "AQSUrl_p.h"
+#include "AQSVar_p.h"
 #include "AQSVBoxLayout_p.h"
 #include "AQSVButtonGroup_p.h"
 #include "AQSVGroupBox_p.h"
@@ -181,6 +224,8 @@
 #include "AQSWidgetStack_p.h"
 #include "AQSWizard_p.h"
 #include "AQSWMatrix_p.h"
+#include "AQSZipReader_p.h"
+#include "AQSZipWriter_p.h"
 
 #define  AQ_GEN_REG_WRAP \
          AQ_REG_WRAP(ActionGroup); \
@@ -192,6 +237,20 @@
          AQ_REG_WRAP(ButtonGroup); \
          AQ_REG_WRAP(Button); \
          AQ_REG_WRAP(ByteArray); \
+         AQ_REG_WRAP(CanvasEllipse); \
+         AQ_REG_WRAP(CanvasItemList); \
+         AQ_REG_WRAP(CanvasItem); \
+         AQ_REG_WRAP(CanvasLine); \
+         AQ_REG_WRAP(Canvas); \
+         AQ_REG_WRAP(CanvasPixmapArray); \
+         AQ_REG_WRAP(CanvasPixmap); \
+         AQ_REG_WRAP(CanvasPolygonalItem); \
+         AQ_REG_WRAP(CanvasPolygon); \
+         AQ_REG_WRAP(CanvasRectangle); \
+         AQ_REG_WRAP(CanvasSpline); \
+         AQ_REG_WRAP(CanvasSprite); \
+         AQ_REG_WRAP(CanvasText); \
+         AQ_REG_WRAP(CanvasView); \
          AQ_REG_WRAP(CheckBox); \
          AQ_REG_WRAP(CheckListItem); \
          AQ_REG_WRAP(CheckTableItem); \
@@ -211,6 +270,7 @@
          AQ_REG_WRAP(Dialog); \
          AQ_REG_WRAP(Dial); \
          AQ_REG_WRAP_AQOBJECT(DigiDoc); \
+         AQ_REG_WRAP(Dir); \
          AQ_REG_WRAP(DockArea); \
          AQ_REG_WRAP(DockWindow); \
          AQ_REG_WRAP(DomAttr); \
@@ -239,6 +299,7 @@
          AQ_REG_WRAP(Event); \
          AQ_REG_WRAP_AQOBJECT(FieldDB); \
          AQ_REG_WRAP_AQOBJECT(FieldMD); \
+         AQ_REG_WRAP(File); \
          AQ_REG_WRAP(FocusEvent); \
          AQ_REG_WRAP(FontMetrics); \
          AQ_REG_WRAP_AQOBJECT(FormDB); \
@@ -266,6 +327,7 @@
          AQ_REG_WRAP(Image); \
          AQ_REG_WRAP(IMEvent); \
          AQ_REG_WRAP(IODevice); \
+         AQ_REG_WRAP_AQOBJECT(JasperEngine); \
          AQ_REG_WRAP(KeyEvent); \
          AQ_REG_WRAP(Label); \
          AQ_REG_WRAP(Layout); \
@@ -285,6 +347,20 @@
          AQ_REG_WRAP(NetworkOperation); \
          AQ_REG_WRAP(NetworkProtocol); \
          AQ_REG_WRAP(Object); \
+         AQ_REG_WRAP_AQOBJECT(OdsAutoChart); \
+         AQ_REG_WRAP_AQOBJECT(OdsCellAddress); \
+         AQ_REG_WRAP_AQOBJECT(OdsCellRange); \
+         AQ_REG_WRAP_AQOBJECT(OdsCentimeters); \
+         AQ_REG_WRAP_AQOBJECT(OdsChart); \
+         AQ_REG_WRAP_AQOBJECT(OdsColor); \
+         AQ_REG_WRAP_AQOBJECT(OdsGenerator); \
+         AQ_REG_WRAP_AQOBJECT(OdsImage); \
+         AQ_REG_WRAP_AQOBJECT(OdsLength); \
+         AQ_REG_WRAP_AQOBJECT(OdsRow); \
+         AQ_REG_WRAP_AQOBJECT(OdsSeries); \
+         AQ_REG_WRAP_AQOBJECT(OdsSheet); \
+         AQ_REG_WRAP_AQOBJECT(OdsSpreadSheet); \
+         AQ_REG_WRAP_AQOBJECT(OdsStyle); \
          AQ_REG_WRAP_AQOBJECT(Packager); \
          AQ_REG_WRAP(Painter); \
          AQ_REG_WRAP(PaintEvent); \
@@ -294,12 +370,15 @@
          AQ_REG_WRAP(PointArray); \
          AQ_REG_WRAP(PopupMenu); \
          AQ_REG_WRAP(Printer); \
+         AQ_REG_WRAP(Process); \
          AQ_REG_WRAP(ProgressBar); \
          AQ_REG_WRAP(ProgressDialog); \
          AQ_REG_WRAP(PushButton); \
          AQ_REG_WRAP(RadioButton); \
          AQ_REG_WRAP(Region); \
          AQ_REG_WRAP_AQOBJECT(RelationMD); \
+         AQ_REG_WRAP_AQOBJECT(ReportEngine); \
+         AQ_REG_WRAP_AQOBJECT(ReportViewer); \
          AQ_REG_WRAP(ResizeEvent); \
          AQ_REG_WRAP(ScrollView); \
          AQ_REG_WRAP(SEditor); \
@@ -308,8 +387,10 @@
          AQ_REG_WRAP(SignalMapper); \
          AQ_REG_WRAP(SocketNotifier); \
          AQ_REG_WRAP(SpinBox); \
+         AQ_REG_WRAP(Splitter); \
          AQ_REG_WRAP_AQOBJECT(SqlCursor); \
          AQ_REG_WRAP_AQOBJECT(SqlDatabase); \
+         AQ_REG_WRAP(SqlError); \
          AQ_REG_WRAP_AQOBJECT(SqlQuery); \
          AQ_REG_WRAP(SScript); \
          AQ_REG_WRAP(StatusBar); \
@@ -321,8 +402,11 @@
          AQ_REG_WRAP(Table); \
          AQ_REG_WRAP(Tab); \
          AQ_REG_WRAP(TabWidget); \
+         AQ_REG_WRAP(TextCodec); \
+         AQ_REG_WRAP(TextDecoder); \
          AQ_REG_WRAP(TextDrag); \
          AQ_REG_WRAP(TextEdit); \
+         AQ_REG_WRAP(TextEncoder); \
          AQ_REG_WRAP(TextStream); \
          AQ_REG_WRAP(TimeEdit); \
          AQ_REG_WRAP(TimerEvent); \
@@ -332,7 +416,10 @@
          AQ_REG_WRAP(ToolButton); \
          AQ_REG_WRAP_AQOBJECT(Unpacker); \
          AQ_REG_WRAP(UriDrag); \
+         AQ_REG_WRAP(UrlInfo); \
          AQ_REG_WRAP(UrlOperator); \
+         AQ_REG_WRAP(Url); \
+         AQ_REG_WRAP_AQOBJECT(Var); \
          AQ_REG_WRAP(VBoxLayout); \
          AQ_REG_WRAP(VButtonGroup); \
          AQ_REG_WRAP(VGroupBox); \
@@ -341,6 +428,8 @@
          AQ_REG_WRAP(WidgetStack); \
          AQ_REG_WRAP(Wizard); \
          AQ_REG_WRAP(WMatrix); \
+         AQ_REG_WRAP_AQOBJECT(ZipReader); \
+         AQ_REG_WRAP_AQOBJECT(ZipWriter); \
 
 #define  AQ_GEN_CRE_WRAP \
          AQ_CRE_WRAP_OBJECT(ActionGroup); \
@@ -352,6 +441,20 @@
          AQ_CRE_WRAP_OBJECT(ButtonGroup); \
          AQ_CRE_WRAP_OBJECT(Button); \
          AQ_CRE_WRAP_VOIDPTR(ByteArray); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasEllipse); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasItemList); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasItem); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasLine); \
+         AQ_CRE_WRAP_OBJECT(Canvas); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasPixmapArray); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasPixmap); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasPolygonalItem); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasPolygon); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasRectangle); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasSpline); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasSprite); \
+         AQ_CRE_WRAP_VOIDPTR(CanvasText); \
+         AQ_CRE_WRAP_OBJECT(CanvasView); \
          AQ_CRE_WRAP_OBJECT(CheckBox); \
          AQ_CRE_WRAP_VOIDPTR(CheckListItem); \
          AQ_CRE_WRAP_VOIDPTR(CheckTableItem); \
@@ -371,6 +474,7 @@
          AQ_CRE_WRAP_OBJECT(Dialog); \
          AQ_CRE_WRAP_OBJECT(Dial); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(DigiDoc); \
+         AQ_CRE_WRAP_VOIDPTR(Dir); \
          AQ_CRE_WRAP_OBJECT(DockArea); \
          AQ_CRE_WRAP_OBJECT(DockWindow); \
          AQ_CRE_WRAP_VOIDPTR(DomAttr); \
@@ -399,6 +503,7 @@
          AQ_CRE_WRAP_VOIDPTR(Event); \
          AQ_CRE_WRAP_AQOBJECT(FieldDB); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(FieldMD); \
+         AQ_CRE_WRAP_VOIDPTR(File); \
          AQ_CRE_WRAP_VOIDPTR(FocusEvent); \
          AQ_CRE_WRAP_VOIDPTR(FontMetrics); \
          AQ_CRE_WRAP_AQOBJECT(FormDB); \
@@ -426,6 +531,7 @@
          AQ_CRE_WRAP_VOIDPTR(Image); \
          AQ_CRE_WRAP_VOIDPTR(IMEvent); \
          AQ_CRE_WRAP_VOIDPTR(IODevice); \
+         AQ_CRE_WRAP_AQOBJECT(JasperEngine); \
          AQ_CRE_WRAP_VOIDPTR(KeyEvent); \
          AQ_CRE_WRAP_OBJECT(Label); \
          AQ_CRE_WRAP_OBJECT(Layout); \
@@ -445,6 +551,20 @@
          AQ_CRE_WRAP_OBJECT(NetworkOperation); \
          AQ_CRE_WRAP_OBJECT(NetworkProtocol); \
          AQ_CRE_WRAP_OBJECT(Object); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsAutoChart); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsCellAddress); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsCellRange); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsCentimeters); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsChart); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsColor); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsGenerator); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsImage); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsLength); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsRow); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsSeries); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsSheet); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsSpreadSheet); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(OdsStyle); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(Packager); \
          AQ_CRE_WRAP_VOIDPTR(Painter); \
          AQ_CRE_WRAP_VOIDPTR(PaintEvent); \
@@ -454,12 +574,15 @@
          AQ_CRE_WRAP_VOIDPTR(PointArray); \
          AQ_CRE_WRAP_OBJECT(PopupMenu); \
          AQ_CRE_WRAP_VOIDPTR(Printer); \
+         AQ_CRE_WRAP_OBJECT(Process); \
          AQ_CRE_WRAP_OBJECT(ProgressBar); \
          AQ_CRE_WRAP_OBJECT(ProgressDialog); \
          AQ_CRE_WRAP_OBJECT(PushButton); \
          AQ_CRE_WRAP_OBJECT(RadioButton); \
          AQ_CRE_WRAP_VOIDPTR(Region); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(RelationMD); \
+         AQ_CRE_WRAP_AQOBJECT(ReportEngine); \
+         AQ_CRE_WRAP_AQOBJECT(ReportViewer); \
          AQ_CRE_WRAP_VOIDPTR(ResizeEvent); \
          AQ_CRE_WRAP_OBJECT(ScrollView); \
          AQ_CRE_WRAP_OBJECT(SEditor); \
@@ -468,8 +591,10 @@
          AQ_CRE_WRAP_OBJECT(SignalMapper); \
          AQ_CRE_WRAP_OBJECT(SocketNotifier); \
          AQ_CRE_WRAP_OBJECT(SpinBox); \
+         AQ_CRE_WRAP_OBJECT(Splitter); \
          AQ_CRE_WRAP_AQOBJECT(SqlCursor); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(SqlDatabase); \
+         AQ_CRE_WRAP_VOIDPTR(SqlError); \
          AQ_CRE_WRAP_AQOBJECT(SqlQuery); \
          AQ_CRE_WRAP_OBJECT(SScript); \
          AQ_CRE_WRAP_OBJECT(StatusBar); \
@@ -481,8 +606,11 @@
          AQ_CRE_WRAP_OBJECT(Table); \
          AQ_CRE_WRAP_VOIDPTR(Tab); \
          AQ_CRE_WRAP_OBJECT(TabWidget); \
+         AQ_CRE_WRAP_VOIDPTR(TextCodec); \
+         AQ_CRE_WRAP_VOIDPTR(TextDecoder); \
          AQ_CRE_WRAP_OBJECT(TextDrag); \
          AQ_CRE_WRAP_OBJECT(TextEdit); \
+         AQ_CRE_WRAP_VOIDPTR(TextEncoder); \
          AQ_CRE_WRAP_VOIDPTR(TextStream); \
          AQ_CRE_WRAP_OBJECT(TimeEdit); \
          AQ_CRE_WRAP_VOIDPTR(TimerEvent); \
@@ -492,7 +620,10 @@
          AQ_CRE_WRAP_OBJECT(ToolButton); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(Unpacker); \
          AQ_CRE_WRAP_OBJECT(UriDrag); \
+         AQ_CRE_WRAP_VOIDPTR(UrlInfo); \
          AQ_CRE_WRAP_OBJECT(UrlOperator); \
+         AQ_CRE_WRAP_VOIDPTR(Url); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(Var); \
          AQ_CRE_WRAP_OBJECT(VBoxLayout); \
          AQ_CRE_WRAP_OBJECT(VButtonGroup); \
          AQ_CRE_WRAP_OBJECT(VGroupBox); \
@@ -501,6 +632,8 @@
          AQ_CRE_WRAP_OBJECT(WidgetStack); \
          AQ_CRE_WRAP_OBJECT(Wizard); \
          AQ_CRE_WRAP_VOIDPTR(WMatrix); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(ZipReader); \
+         AQ_CRE_WRAP_VOIDPTR_AQOBJECT(ZipWriter); \
 
 #define  AQ_GEN_REG_CLASS \
          AQ_REG_CLASS(ActionGroup); \
@@ -512,6 +645,20 @@
          AQ_REG_CLASS(ButtonGroup); \
          AQ_REG_CLASS(Button); \
          AQ_REG_CLASS(ByteArray); \
+         AQ_REG_CLASS(CanvasEllipse); \
+         AQ_REG_CLASS(CanvasItemList); \
+         AQ_REG_CLASS(CanvasItem); \
+         AQ_REG_CLASS(CanvasLine); \
+         AQ_REG_CLASS(Canvas); \
+         AQ_REG_CLASS(CanvasPixmapArray); \
+         AQ_REG_CLASS(CanvasPixmap); \
+         AQ_REG_CLASS(CanvasPolygonalItem); \
+         AQ_REG_CLASS(CanvasPolygon); \
+         AQ_REG_CLASS(CanvasRectangle); \
+         AQ_REG_CLASS(CanvasSpline); \
+         AQ_REG_CLASS(CanvasSprite); \
+         AQ_REG_CLASS(CanvasText); \
+         AQ_REG_CLASS(CanvasView); \
          AQ_REG_CLASS(CheckBox); \
          AQ_REG_CLASS(CheckListItem); \
          AQ_REG_CLASS(CheckTableItem); \
@@ -531,6 +678,7 @@
          AQ_REG_CLASS(Dialog); \
          AQ_REG_CLASS(Dial); \
          AQ_REG_CLASS_AQOBJECT(DigiDoc); \
+         AQ_REG_CLASS(Dir); \
          AQ_REG_CLASS(DockArea); \
          AQ_REG_CLASS(DockWindow); \
          AQ_REG_CLASS(DomAttr); \
@@ -558,6 +706,7 @@
          AQ_REG_CLASS(Event); \
          AQ_REG_CLASS_AQOBJECT(FieldDB); \
          AQ_REG_CLASS_AQOBJECT(FieldMD); \
+         AQ_REG_CLASS(File); \
          AQ_REG_CLASS(FocusEvent); \
          AQ_REG_CLASS(FontMetrics); \
          AQ_REG_CLASS_AQOBJECT(FormDB); \
@@ -585,6 +734,7 @@
          AQ_REG_CLASS(Image); \
          AQ_REG_CLASS(IMEvent); \
          AQ_REG_CLASS(IODevice); \
+         AQ_REG_CLASS_AQOBJECT(JasperEngine); \
          AQ_REG_CLASS(KeyEvent); \
          AQ_REG_CLASS(Label); \
          AQ_REG_CLASS(Layout); \
@@ -602,6 +752,20 @@
          AQ_REG_CLASS(NetworkOperation); \
          AQ_REG_CLASS(NetworkProtocol); \
          AQ_REG_CLASS(Object); \
+         AQ_REG_CLASS_AQOBJECT(OdsAutoChart); \
+         AQ_REG_CLASS_AQOBJECT(OdsCellAddress); \
+         AQ_REG_CLASS_AQOBJECT(OdsCellRange); \
+         AQ_REG_CLASS_AQOBJECT(OdsCentimeters); \
+         AQ_REG_CLASS_AQOBJECT(OdsChart); \
+         AQ_REG_CLASS_AQOBJECT(OdsColor); \
+         AQ_REG_CLASS_AQOBJECT(OdsGenerator); \
+         AQ_REG_CLASS_AQOBJECT(OdsImage); \
+         AQ_REG_CLASS_AQOBJECT(OdsLength); \
+         AQ_REG_CLASS_AQOBJECT(OdsRow); \
+         AQ_REG_CLASS_AQOBJECT(OdsSeries); \
+         AQ_REG_CLASS_AQOBJECT(OdsSheet); \
+         AQ_REG_CLASS_AQOBJECT(OdsSpreadSheet); \
+         AQ_REG_CLASS_AQOBJECT(OdsStyle); \
          AQ_REG_CLASS_AQOBJECT(Packager); \
          AQ_REG_CLASS(Painter); \
          AQ_REG_CLASS(PaintEvent); \
@@ -611,12 +775,15 @@
          AQ_REG_CLASS(PointArray); \
          AQ_REG_CLASS(PopupMenu); \
          AQ_REG_CLASS(Printer); \
+         AQ_REG_CLASS(Process); \
          AQ_REG_CLASS(ProgressBar); \
          AQ_REG_CLASS(ProgressDialog); \
          AQ_REG_CLASS(PushButton); \
          AQ_REG_CLASS(RadioButton); \
          AQ_REG_CLASS(Region); \
          AQ_REG_CLASS_AQOBJECT(RelationMD); \
+         AQ_REG_CLASS_AQOBJECT(ReportEngine); \
+         AQ_REG_CLASS_AQOBJECT(ReportViewer); \
          AQ_REG_CLASS(ResizeEvent); \
          AQ_REG_CLASS(ScrollView); \
          AQ_REG_CLASS(SEditor); \
@@ -625,7 +792,9 @@
          AQ_REG_CLASS(SignalMapper); \
          AQ_REG_CLASS(SocketNotifier); \
          AQ_REG_CLASS(SpinBox); \
+         AQ_REG_CLASS(Splitter); \
          AQ_REG_CLASS_AQOBJECT(SqlCursor); \
+         AQ_REG_CLASS(SqlError); \
          AQ_REG_CLASS_AQOBJECT(SqlQuery); \
          AQ_REG_CLASS(StatusBar); \
          AQ_REG_CLASS(StoredDrag); \
@@ -636,8 +805,11 @@
          AQ_REG_CLASS(Table); \
          AQ_REG_CLASS(Tab); \
          AQ_REG_CLASS(TabWidget); \
+         AQ_REG_CLASS(TextCodec); \
+         AQ_REG_CLASS(TextDecoder); \
          AQ_REG_CLASS(TextDrag); \
          AQ_REG_CLASS(TextEdit); \
+         AQ_REG_CLASS(TextEncoder); \
          AQ_REG_CLASS(TextStream); \
          AQ_REG_CLASS(TimeEdit); \
          AQ_REG_CLASS(TimerEvent); \
@@ -647,7 +819,10 @@
          AQ_REG_CLASS(ToolButton); \
          AQ_REG_CLASS_AQOBJECT(Unpacker); \
          AQ_REG_CLASS(UriDrag); \
+         AQ_REG_CLASS(UrlInfo); \
          AQ_REG_CLASS(UrlOperator); \
+         AQ_REG_CLASS(Url); \
+         AQ_REG_CLASS_AQOBJECT(Var); \
          AQ_REG_CLASS(VBoxLayout); \
          AQ_REG_CLASS(VButtonGroup); \
          AQ_REG_CLASS(VGroupBox); \
@@ -656,6 +831,8 @@
          AQ_REG_CLASS(WidgetStack); \
          AQ_REG_CLASS(Wizard); \
          AQ_REG_CLASS(WMatrix); \
+         AQ_REG_CLASS_AQOBJECT(ZipReader); \
+         AQ_REG_CLASS_AQOBJECT(ZipWriter); \
 
 #define  AQ_GEN_CRE_CLASS \
          AQ_CRE_OBJECT(ActionGroup); \
@@ -667,6 +844,20 @@
          AQ_CRE_WIDGET(ButtonGroup); \
          AQ_CRE_WIDGET(Button); \
          AQ_CRE_VOIDPTR(ByteArray); \
+         AQ_CRE_VOIDPTR(CanvasEllipse); \
+         AQ_CRE_VOIDPTR(CanvasItemList); \
+         AQ_CRE_VOIDPTR(CanvasItem); \
+         AQ_CRE_VOIDPTR(CanvasLine); \
+         AQ_CRE_OBJECT(Canvas); \
+         AQ_CRE_VOIDPTR(CanvasPixmapArray); \
+         AQ_CRE_VOIDPTR(CanvasPixmap); \
+         AQ_CRE_VOIDPTR(CanvasPolygonalItem); \
+         AQ_CRE_VOIDPTR(CanvasPolygon); \
+         AQ_CRE_VOIDPTR(CanvasRectangle); \
+         AQ_CRE_VOIDPTR(CanvasSpline); \
+         AQ_CRE_VOIDPTR(CanvasSprite); \
+         AQ_CRE_VOIDPTR(CanvasText); \
+         AQ_CRE_OBJECT(CanvasView); \
          AQ_CRE_WIDGET(CheckBox); \
          AQ_CRE_VOIDPTR(CheckListItem); \
          AQ_CRE_VOIDPTR(CheckTableItem); \
@@ -686,6 +877,7 @@
          AQ_CRE_WIDGET(Dialog); \
          AQ_CRE_WIDGET(Dial); \
          AQ_CRE_VOIDPTR_AQOBJECT(DigiDoc); \
+         AQ_CRE_VOIDPTR(Dir); \
          AQ_CRE_WIDGET(DockArea); \
          AQ_CRE_WIDGET(DockWindow); \
          AQ_CRE_VOIDPTR(DomAttr); \
@@ -713,6 +905,7 @@
          AQ_CRE_VOIDPTR(Event); \
          AQ_CRE_AQWIDGET(FieldDB); \
          AQ_CRE_VOIDPTR_AQOBJECT(FieldMD); \
+         AQ_CRE_VOIDPTR(File); \
          AQ_CRE_VOIDPTR(FocusEvent); \
          AQ_CRE_VOIDPTR(FontMetrics); \
          AQ_CRE_AQWIDGET(FormDB); \
@@ -740,6 +933,7 @@
          AQ_CRE_VOIDPTR(Image); \
          AQ_CRE_VOIDPTR(IMEvent); \
          AQ_CRE_VOIDPTR(IODevice); \
+         AQ_CRE_AQOBJECT(JasperEngine); \
          AQ_CRE_VOIDPTR(KeyEvent); \
          AQ_CRE_WIDGET(Label); \
          AQ_CRE_OBJECT(Layout); \
@@ -757,6 +951,20 @@
          AQ_CRE_OBJECT(NetworkOperation); \
          AQ_CRE_OBJECT(NetworkProtocol); \
          AQ_CRE_OBJECT(Object); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsAutoChart); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsCellAddress); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsCellRange); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsCentimeters); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsChart); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsColor); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsGenerator); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsImage); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsLength); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsRow); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsSeries); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsSheet); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsSpreadSheet); \
+         AQ_CRE_VOIDPTR_AQOBJECT(OdsStyle); \
          AQ_CRE_VOIDPTR_AQOBJECT(Packager); \
          AQ_CRE_VOIDPTR(Painter); \
          AQ_CRE_VOIDPTR(PaintEvent); \
@@ -766,12 +974,15 @@
          AQ_CRE_VOIDPTR(PointArray); \
          AQ_CRE_WIDGET(PopupMenu); \
          AQ_CRE_VOIDPTR(Printer); \
+         AQ_CRE_OBJECT(Process); \
          AQ_CRE_WIDGET(ProgressBar); \
          AQ_CRE_WIDGET(ProgressDialog); \
          AQ_CRE_WIDGET(PushButton); \
          AQ_CRE_WIDGET(RadioButton); \
          AQ_CRE_VOIDPTR(Region); \
          AQ_CRE_VOIDPTR_AQOBJECT(RelationMD); \
+         AQ_CRE_AQOBJECT(ReportEngine); \
+         AQ_CRE_AQWIDGET(ReportViewer); \
          AQ_CRE_VOIDPTR(ResizeEvent); \
          AQ_CRE_WIDGET(ScrollView); \
          AQ_CRE_WIDGET(SEditor); \
@@ -780,7 +991,9 @@
          AQ_CRE_OBJECT(SignalMapper); \
          AQ_CRE_OBJECT(SocketNotifier); \
          AQ_CRE_WIDGET(SpinBox); \
+         AQ_CRE_WIDGET(Splitter); \
          AQ_CRE_AQOBJECT(SqlCursor); \
+         AQ_CRE_VOIDPTR(SqlError); \
          AQ_CRE_AQOBJECT(SqlQuery); \
          AQ_CRE_WIDGET(StatusBar); \
          AQ_CRE_OBJECT(StoredDrag); \
@@ -791,8 +1004,11 @@
          AQ_CRE_WIDGET(Table); \
          AQ_CRE_VOIDPTR(Tab); \
          AQ_CRE_WIDGET(TabWidget); \
+         AQ_CRE_VOIDPTR(TextCodec); \
+         AQ_CRE_VOIDPTR(TextDecoder); \
          AQ_CRE_OBJECT(TextDrag); \
          AQ_CRE_WIDGET(TextEdit); \
+         AQ_CRE_VOIDPTR(TextEncoder); \
          AQ_CRE_VOIDPTR(TextStream); \
          AQ_CRE_WIDGET(TimeEdit); \
          AQ_CRE_VOIDPTR(TimerEvent); \
@@ -802,7 +1018,10 @@
          AQ_CRE_WIDGET(ToolButton); \
          AQ_CRE_VOIDPTR_AQOBJECT(Unpacker); \
          AQ_CRE_OBJECT(UriDrag); \
+         AQ_CRE_VOIDPTR(UrlInfo); \
          AQ_CRE_OBJECT(UrlOperator); \
+         AQ_CRE_VOIDPTR(Url); \
+         AQ_CRE_VOIDPTR_AQOBJECT(Var); \
          AQ_CRE_OBJECT(VBoxLayout); \
          AQ_CRE_WIDGET(VButtonGroup); \
          AQ_CRE_WIDGET(VGroupBox); \
@@ -811,5 +1030,7 @@
          AQ_CRE_WIDGET(WidgetStack); \
          AQ_CRE_WIDGET(Wizard); \
          AQ_CRE_VOIDPTR(WMatrix); \
+         AQ_CRE_VOIDPTR_AQOBJECT(ZipReader); \
+         AQ_CRE_VOIDPTR_AQOBJECT(ZipWriter); \
 
 #endif /*AQS_G_H_*/

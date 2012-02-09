@@ -35,7 +35,9 @@
 #include "qsnodes.h"
 #include "qstypes.h"
 
+#if defined (QT_THREAD_SUPPORT)
 #include <private/qmutexpool_p.h>
+#endif
 
 QSEngine::QSEngine(QObject *parent, const char *name)
   : QObject(parent, name), timer(0)

@@ -118,7 +118,7 @@ FLApplication::FLApplication(int &argc, char **argv) :
   toggleBars(0), project_(0), wb_(0), dictMainWidgets(0),
   formAlone_(false), notExit_(false), acl_(0), popupWarn_(0),
   noGUI_(false), mngLoader_(0), sysTr_(0), initializing_(false),
-  flFactory_(0)
+  flFactory_(0), opCheckUpdate_(0)
 {
   aqApp = this;
 
@@ -131,6 +131,10 @@ FLApplication::FLApplication(int &argc, char **argv) :
   timeUser_ = QDateTime::currentDateTime();
   multiLangEnabled_ = false;
   multiLangId_ = QString(QTextCodec::locale()).left(2).upper();
+
+  localeSystem_ = QLocale::system();
+  double v = 1.1;
+  commaSeparator_ = localeSystem_.toString(v, 'f', 1).at(1);
 
   QObject::setName("aqApp");
 }
@@ -164,22 +168,26 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
   if (initializing_)
     return QApplication::eventFilter(obj, ev);
 
+  if (activeModalWidget() || activePopupWidget())
+    return QApplication::eventFilter(obj, ev);
+
+  QEvent::Type evt = ev->type();
+
   if (formAlone_) {
-    if (ev->type() == QEvent::Close) {
+    if (evt == QEvent::Close) {
       generalExit();
       return true;
     }
     return QApplication::eventFilter(obj, ev);
   }
 
-#if defined(Q_OS_WIN32)
   if (obj != mainWidget_ && !::qt_cast<QMainWindow *>(obj))
     return QApplication::eventFilter(obj, ev);
 
   QWidget *aw = (pWorkspace ? pWorkspace->activeWindow() : 0);
-  if (aw && aw != obj && ev->type() != QEvent::Resize && ev->type() != QEvent::Close) {
+  if (aw && aw != obj && evt != QEvent::Resize && evt != QEvent::Close) {
     obj->removeEventFilter(this);
-    if (ev->type() == QEvent::WindowActivate) {
+    if (evt == QEvent::WindowActivate) {
       if (obj == container)
         activateModule("");
       else
@@ -191,9 +199,8 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
     }
     obj->installEventFilter(this);
   }
-#endif
   FLApplicationInterface *ap2 = new FLApplicationInterface(this);
-  switch (ev->type()) {
+  switch (evt) {
     case QEvent::KeyPress:
       if (obj == container) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
@@ -256,6 +263,57 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
   return QApplication::eventFilter(obj, ev);
 }
 
+void FLApplication::checkForUpdate()
+{
+  QSArgument v = call("sys.decryptFromBase64",
+                      QSArgumentList("68Su+eg2qjFAItaejAcLlOFBiXPFJUbZKEWeCczeIDU="), 0);
+  QString key(v.variant().toString());
+  hashUpdate_ = "VOID";
+
+  QString fileName(AQ_DISKCACHE_FILEPATH(key));
+  if (fileName.isEmpty()) {
+    AQ_DISKCACHE_INS(key, hashUpdate_);
+    fileName = AQ_DISKCACHE_FILEPATH(key);
+  } else {
+    QFileInfo fi(fileName);
+    QString now(QDateTime::currentDateTime().toString("ddMMyyyy"));
+    if (fi.lastModified().toString("ddMMyyyy") == now)
+      return;
+    AQ_DISKCACHE_FIND(key, hashUpdate_);
+  }
+
+  QFile::remove(fileName);
+  v = call("sys.decryptFromBase64",
+           QSArgumentList("lKvF+hkDxk2dS6hrf0jVURL4EceyJIFPeigGw6lZAU/3ovk/v0iZfhklru4Q6t6M"), 0);
+  opCheckUpdate_ = new QUrlOperator(v.variant().toString());
+  opCheckUpdate_->copy(key, "file://" + fileName, false, false);
+  connect(opCheckUpdate_, SIGNAL(finished(QNetworkOperation *)),
+          this, SLOT(checkForUpdateFinish(QNetworkOperation *)));
+}
+
+void FLApplication::checkForUpdateFinish(QNetworkOperation *op)
+{
+  if (!opCheckUpdate_)
+    return;
+  if (op->state() != QNetworkProtocol::StDone) {
+    opCheckUpdate_->deleteLater();
+    opCheckUpdate_ = 0;
+    return;
+  }
+
+  QSArgument v = call("sys.decryptFromBase64",
+                      QSArgumentList("68Su+eg2qjFAItaejAcLlOFBiXPFJUbZKEWeCczeIDU="), 0);
+  QString key(v.variant().toString());
+  QString newHash;
+  AQ_DISKCACHE_FIND(key, newHash);
+
+  if (newHash != hashUpdate_)
+    QTimer::singleShot(0, this, SLOT(updateAbanQ()));
+
+  opCheckUpdate_->deleteLater();
+  opCheckUpdate_ = 0;
+}
+
 void FLApplication::init(const QString &n, const QString &callFunction,
                          const QString &arguments, bool quitAfterCall, bool noMax)
 {
@@ -267,7 +325,8 @@ void FLApplication::init(const QString &n, const QString &callFunction,
   container->setCaption("Eneboo " AQ_VERSION);
 
   FLDiskCache::init(this);
-#ifndef QSDEBUGGER
+#if 0
+  //#ifndef QSDEBUGGER
   AQ_DISKCACHE_CLR();
 #endif
 
@@ -370,21 +429,26 @@ void FLApplication::init(const QString &n, const QString &callFunction,
       initToolBox();
       readState();
       container->installEventFilter(this);
+#if 0
+      //#ifndef QSDEBUGGER
+      checkForUpdate();
+#endif
     } else {
       FLFormDB *f = new FLFormDB(n, 0, (noMax ? 0 : Qt::WStyle_Customize));
       formAlone_ = true;
-      f->installEventFilter(this);
-      f->setMainWidget();
-      QApplication::setMainWidget(f);
-      if (f->mainWidget()) {
-        if (noMax) {
-          f->show();
+      if (f) {
+        f->installEventFilter(this);
+        f->setMainWidget();
+        QApplication::setMainWidget(f);
+        if (f->mainWidget()) {
+          if (noMax) {
+            f->show();
+          } else {
+            f->showMaximized();
+          }
         } else {
-          f->showMaximized();
+          f->close();
         }
-      }
-      else {
-        f->close();
       }
     }
   }
@@ -652,6 +716,18 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
         ++c;
         */
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Copia de Seguridad");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("fileexport.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(dumpDatabase()));
+        
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 
   if (ap2->isDebuggerMode())
@@ -2105,8 +2181,8 @@ void FLApplication::setScriptEntryFunction(const QString &scriptEntryFunction)
 void FLApplication::setDatabaseLockDetection(bool on, int msecLapsus, int limChecks,
                                              bool showWarn, const QString &msgWarn, const QString &connectionName)
 {
-
-  QString timerId("TimerDbLock_" + connectionName);
+  QString connName(connectionName.isEmpty() ? "default" : connectionName);
+  QString timerId("TimerDbLock_" + connName);
   FLTimerDbLock *timerDbLock = ::qt_cast<FLTimerDbLock *>(child(timerId, "FLTimerDbLock", false));
 
   if (timerDbLock) {
@@ -2124,7 +2200,7 @@ void FLApplication::setDatabaseLockDetection(bool on, int msecLapsus, int limChe
       timerDbLock->dbLocksLapsus_ = (msecLapsus < 0 ? 0 : msecLapsus);
       timerDbLock->dbLocksShowWarn_ = showWarn;
       timerDbLock->dbLocksMsgWarn_ = (!msgWarn.isEmpty() ? msgWarn : defaultMsgWarn) + moreInfo;
-      timerDbLock->dbLocksConn_ = connectionName;
+      timerDbLock->dbLocksConn_ = connName;
       if (timerDbLock->dbLocksLapsus_)
         timerDbLock->start(timerDbLock->dbLocksLapsus_);
       else
@@ -2145,7 +2221,7 @@ void FLApplication::setDatabaseLockDetection(bool on, int msecLapsus, int limChe
     timerDbLock->dbLocksLapsus_ = (msecLapsus < 0 ? 0 : msecLapsus);
     timerDbLock->dbLocksShowWarn_ = showWarn;
     timerDbLock->dbLocksMsgWarn_ = (!msgWarn.isEmpty() ? msgWarn : defaultMsgWarn) + moreInfo;
-    timerDbLock->dbLocksConn_ = connectionName;
+    timerDbLock->dbLocksConn_ = connName;
     connect(timerDbLock, SIGNAL(timeout()), this, SLOT(checkDatabaseLocks()));
     if (timerDbLock->dbLocksLapsus_)
       timerDbLock->start(timerDbLock->dbLocksLapsus_);
@@ -2252,6 +2328,11 @@ void FLApplication::importModules()
 void FLApplication::updateAbanQ()
 {
   call("sys.updateAbanQ", QSArgumentList(), 0);
+}
+
+void FLApplication::dumpDatabase()
+{
+  call("sys.dumpDatabase", QSArgumentList(), 0);
 }
 
 QWidget *FLApplication::modMainWidget(const QString &idModulo) const

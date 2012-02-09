@@ -311,6 +311,26 @@ public:
   */
   QStringList fieldsNamesUnlock() const;
 
+  /**
+  @return El indicador FLTableMetaData::concurWarn_
+  */
+  bool concurWarn() const;
+
+  /**
+  Establece el indicador FLTableMetaData::concurWarn_
+  */
+  void setConcurWarn(bool b = true);
+
+  /**
+  @return El indicador FLTableMetaData::detectLocks_
+  */
+  bool detectLocks() const;
+
+  /**
+  Establece el indicador FLTableMetaData::detectLocks_
+  */
+  void setDetectLocks(bool b = true);
+
 private:
 
   /**
@@ -392,6 +412,27 @@ public:
   Clave primaria
   */
   QString primaryKey_;
+
+  /**
+  Indica si se debe avisar de colisión de concurrencia entre sesiones.
+
+  Si este flag es true y dos o mas sesiones/usuarios están modificando los
+  mismos campos,al validar un formulario (FLFormRecordDB::validateForm)
+  mostrará un aviso de advertencia.
+
+  Ver también FLSqlCursor::concurrencyFields().
+  */
+  bool concurWarn_;
+
+  /**
+  Indica si se deben comprobar riesgos de bloqueos para esta tabla
+
+  Si este flag es true FLSqlCursor::commitBuffer() chequeará siempre
+  los riesgos de bloqueo para esta tabla.
+
+  Ver también FLSqlDatabase::detectRisksLocks
+  */
+  bool detectLocks_;
 };
 
 inline void FLTableMetaData::setCompoundKey(FLCompoundKey *cK)
@@ -442,6 +483,26 @@ inline void FLTableMetaData::setQuery(const QString &q)
 inline QStringList FLTableMetaData::fieldsNamesUnlock() const
 {
   return d->fieldsNamesUnlock_;
+}
+
+inline bool FLTableMetaData::concurWarn() const
+{
+  return d->concurWarn_;
+}
+
+inline void FLTableMetaData::setConcurWarn(bool b)
+{
+  d->concurWarn_ = b;
+}
+
+inline bool FLTableMetaData::detectLocks() const
+{
+  return d->detectLocks_;
+}
+
+inline void FLTableMetaData::setDetectLocks(bool b)
+{
+  d->detectLocks_ = b;
 }
 
 #endif

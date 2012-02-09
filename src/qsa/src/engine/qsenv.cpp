@@ -104,7 +104,9 @@ void QSEnv::clear()
 {
   shutDown = TRUE;
 
-  Q_ASSERT(scopeChain);   // protection against consecutive calls
+  //Q_ASSERT(scopeChain);   // protection against consecutive calls
+  if (!scopeChain)
+    return;
   delete scopeChain;
   scopeChain = 0;
 
@@ -139,9 +141,11 @@ void QSEnv::clear()
   qs_finalDeletion = FALSE;
 #endif
 
+#ifdef QSDEBUGGER
   it = QPtrListIterator<QSClass>(classList);
   while ((cur = it()))
     cur->clear();
+#endif
 
   classList.clear();
 

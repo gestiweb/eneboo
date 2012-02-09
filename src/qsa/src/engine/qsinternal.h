@@ -51,8 +51,8 @@ class Debugger;
 #endif
 
 /**
-   * @short The "label set" in Ecma-262 spec
-   */
+* @short The "label set" in Ecma-262 spec
+*/
 class LabelStack
 {
 public:

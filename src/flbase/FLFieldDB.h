@@ -299,6 +299,11 @@ public:
   */
   void setShowEditor(const bool show);
 
+  /**
+  Establece el número de decimales
+  */
+  void setPartDecimal(int d);
+
 protected slots:
 
   /**
@@ -627,6 +632,11 @@ private:
   bool showEditor_;
 
   /**
+  Valor de cifras decimales en caso de ser distinto del definido en los metadatos del campo
+  */
+  int partDecimal_;
+
+  /**
   Tamaños maximo y minimos iniciales
   */
   QSize initMaxSize_;
@@ -712,7 +722,14 @@ class FLLineEdit: public QLineEdit
 public:
 
   FLLineEdit(QWidget *parent, const char *name = 0);
+
+  QString text() const;
+
   int type;
+  int partDecimal;
+
+public slots:
+  virtual void setText(const QString &);
 
 protected:
 

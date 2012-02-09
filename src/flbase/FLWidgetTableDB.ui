@@ -386,7 +386,7 @@
                             <number>0</number>
                         </property>
                         <property name="spacing">
-                            <number>1</number>
+                            <number>2</number>
                         </property>
                         <widget class="QPushButton">
                             <property name="name">
@@ -480,6 +480,52 @@
                                 <string>Ver/Ocultar filtro</string>
                             </property>
                         </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbExcel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>20</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                            <property name="focusPolicy">
+                                <enum>NoFocus</enum>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>false</bool>
+                            </property>
+                            <property name="on">
+                                <bool>false</bool>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image40964</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Hoja de cálculo</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Hoja de cálculo</string>
+                            </property>
+                        </widget>
                     </vbox>
                 </widget>
             </hbox>
@@ -495,6 +541,9 @@
     </image>
     <image name="image54645">
         <data format="PNG" length="464">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000019749444154789ca593b18b13411487bfb7d930d358d8052c048b5d0e943412c1269ac3cadd54572b5606025e6da59558aa8d9bceca4e10922b0477dc431bfd03520cd86bbd4d86dc30367bc77ae6c2a9bf66e60def7d7cc51bf8cf48bb188fc77742088f8061f374184278b1582ccab3009de34b9ee7cf81199068ada34ea7137bef7744e45e9224ca5abb1122005996ed8ac847adb59b4ea75f87c3e14f00634caf288ac16ab552c0ee7c3e37a701118088ec03b4870146a3d18fc964f20d2084b0bfc9206acedb4aa9757bb80d514aad45e4d636c03f276af48c73ae6b8ce99d6e28cbb2e79ceb8610aa330122f212a0288a411b628ce9cd66b301401cc7af36014ef620cbb26722f2184029b50670ce755bbd6febbabe5f55d5511b70b207d6da3249922f2272d17b7fc97b7f1442f81045d127e03a704d2975b5dfefbf5f2e97fe0f836dc9b2ec89883c6dca83baaef7aaaa5afd66b02dd6dac3344d2f003781442975234dd377d6daf5b90c8e6df33c7f0d3c041091cfc0dd7319b44c0ed234bd02f481cbc0f7f86f0040d05a3f68fe8668addffc0213b6957558a77edf0000000049454e44ae426082</data>
+    </image>
+    <image name="image40964">
+        <data format="PNG" length="727">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000029e49444154789c7d93416f546514869fb9f7cebd851698d2814699c2021315c1b068e29480091a42300142081a4262620c2b57eedcf02b5c1b97c685c118121746bb70a11819b5036307082552663ad3329ddbdbceccbddff9bee302244c289ed5494ef2e47d9fe4e400ae7cfe89f23f33f3ea49fa596fa9d34b8e5c7efff2c2b3b7004044f8f0c245bc9c0f80e2700aaa8aaab270ef01a59daf4c8e75e3bb5f7df3c5b98be73ffeee3f800720560068756fb3d4add35cadd3ecccf3b0f3378b9d1acbeb0b1c3a7038373e5ef08a85d2d5afbffdf2f4304004b10671827516e714a78af238419a654451c4d4cbfb708857dc5eba3a3b3b1b0c5510278873cc556e53af2df0ee89b729ecde4aa3d1e4c76bbf325fbdc4bed75f626ac7217ebb7ec3ffe0bd8f4681d803b02264d620ce512e1f251ad9c28ddfe718c96f67befa80c93d45de397594b1629eb098929836d3d3d3f1d30a460c6233ac2a61b0856333c7692eb5f8e9879f69365a94cb4748dd0025472629562d430eac1532316c0d0bf4fa03764f4e3231b18bfa9dbb4c1477b163e718265346c371c26014fb44fa900387623288d73b98ccd04dba88157a831e493fc638877a0ee30b22329c4044304679b4da663dedf267f50fe2b598e3c74ed06eb7a9ddba431084a8fa64e90b00ed4e83b534e6d1ea0a376fd638f0da41f6ee9fa254da4b75ae462fe9e38ce29cdb1cb061d619d8944ae5164e95836fbec162fb3ee5b76648b394ebbf54c8e502fc2018023c7590a4096284b367cfb06da4c0fc3f55005c94f1d9a757d81824747acba4926d02b0868d740dd51cb58715b03ebe97270a235a9d162bab2b4461443e1f716fb98e58f37c82b54142e0e5f1d4270c429c2ad237045e00fe08a9cd68741789d395cd2bfcf57d0d5505057df289f0784715053c2f871f783c3bff024a7d920255cfaae60000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -540,6 +589,12 @@
         <receiver>FLWidgetTableDB</receiver>
         <slot>activeTabFilter(bool)</slot>
     </connection>
+    <connection>
+        <sender>pbExcel</sender>
+        <signal>clicked()</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>exportToOds()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>lineEditSearch</tabstop>
@@ -553,6 +608,7 @@
     <slot access="protected">tdbFilterClear()</slot>
     <slot access="protected">activeTabData( bool )</slot>
     <slot access="protected">activeTabFilter( bool )</slot>
+    <slot>exportToOds()</slot>
 </slots>
 <exportmacro>FL_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>

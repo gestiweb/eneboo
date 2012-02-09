@@ -101,7 +101,12 @@ public:
   @param n Nombre del fichero.
   @return QString con el contenido del fichero o vacía en caso de error.
   */
+  QString byteCodeToStr(const QByteArray &byteCode) const;
+#ifndef QSDEBUGGER
+  QString contentCode(const QString &n) const;
+#else
   QString contentCode(const QString &n);
+#endif
 
   /**
   Obtiene el contenido de un fichero almacenado en el sistema de ficheros.

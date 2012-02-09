@@ -94,6 +94,24 @@ public slots:
     return qUncompress(*o_);
   }
 
+  QByteArray encryptInternal() const {
+    if (!o_)
+      return QByteArray();
+    return globalAQS->encryptInternal(o_);
+  }
+
+  QByteArray decryptInternal() const {
+    if (!o_)
+      return QByteArray();
+    return globalAQS->decryptInternal(o_);
+  }
+
+  QString sha1() const {
+    if (!o_)
+      return QByteArray();
+    return globalAQS->sha1(o_);
+  }
+
   int rand() {
     if (!o_)
       return 0;
@@ -144,16 +162,16 @@ public slots:
   bool resize(uint);
   bool truncate(uint);
   bool fill(char, int = -1);
-  QByteArray *assign(QByteArray *);
-  QByteArray *assign(AQSByteArray *);
-  QByteArray *duplicate(QByteArray *);
-  QByteArray *duplicate(AQSByteArray *);
+  QByteArray assign(QByteArray *);
+  QByteArray assign(AQSByteArray *);
+  QByteArray duplicate(QByteArray *);
+  QByteArray duplicate(AQSByteArray *);
   int find(char, uint = 0) const;
   int contains(char) const;
   void sort();
   int bsearch(char) const;
   virtual void detach();
-  QByteArray *copy() const;
+  QByteArray copy() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -219,21 +237,21 @@ inline bool AQSByteArray::fill(char arg0,  int arg1)
 {
   AQ_CALL_RET_V(fill(arg0, arg1), bool);
 }
-inline QByteArray *AQSByteArray::assign(QByteArray *arg0)
+inline QByteArray AQSByteArray::assign(QByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(assign(*arg0), QByteArray);
+  AQ_CALL_RET_V(assign(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::assign(AQSByteArray *arg0)
+inline QByteArray AQSByteArray::assign(AQSByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(assign(*arg0), QByteArray);
+  AQ_CALL_RET_V(assign(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::duplicate(QByteArray *arg0)
+inline QByteArray AQSByteArray::duplicate(QByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(duplicate(*arg0), QByteArray);
+  AQ_CALL_RET_V(duplicate(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::duplicate(AQSByteArray *arg0)
+inline QByteArray AQSByteArray::duplicate(AQSByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(duplicate(*arg0), QByteArray);
+  AQ_CALL_RET_V(duplicate(*arg0), QByteArray);
 }
 inline int AQSByteArray::find(char arg0,  uint arg1) const
 {
@@ -255,9 +273,9 @@ inline void AQSByteArray::detach()
 {
   AQ_CALL_VOID(detach());
 }
-inline QByteArray *AQSByteArray::copy() const
+inline QByteArray AQSByteArray::copy() const
 {
-  AQ_CALL_RET_PTR(copy(), QByteArray);
+  AQ_CALL_RET_V(copy(), QByteArray);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

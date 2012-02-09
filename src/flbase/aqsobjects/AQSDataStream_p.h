@@ -37,6 +37,51 @@ protected:
       delete o_;
   }
 
+public slots:
+  QString opOutString() const {
+    QString ret;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  int opOutInt() const {
+    int ret = 0;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  float opOutFloat() const {
+    float ret = 0;
+    if (!o_)
+      return ret;
+    (*o_) >> ret;
+    return ret;
+  }
+
+  void opIn(const QString &str) {
+    if (o_)
+      (*o_) << str;
+  }
+
+  void opIn(int i) {
+    if (o_)
+      (*o_) << i;
+  }
+
+  void opIn(float f) {
+    if (o_)
+      (*o_) << f;
+  }
+
+  void opInByteArray(const QByteArray &ba) {
+    if (o_)
+      (*o_) << ba;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   QIODevice *device() const;

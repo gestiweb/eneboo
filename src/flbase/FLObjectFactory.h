@@ -465,8 +465,7 @@ public slots:
    Añade una base de datos a las conexiones disponibles utilizando los datos de otra conexión
 
    @param newConnName    Nombre a utilizar para la nueva conexion
-   @param sourceConnName Nombre de una conexión existente a utilizar como origen de los datos
-   de conexión
+   @param sourceConnName Nombre de una conexión existente a utilizar como origen de los datos de conexión
    @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
    */
   bool addDatabase(const QString &newConnName, const QString &sourceConnName = "default") {
@@ -1741,6 +1740,15 @@ public slots:
     obj_->setForwardOnly(forward);
   }
 
+  /**
+  Comprueba si hay una colisión de campos editados por dos sesiones simultáneamente.
+
+  @return Lista con los nombres de los campos que colisionan
+  */
+  QStringList concurrencyFields() {
+    return obj_->concurrencyFields();
+  }
+
   FLSqlCursor *obj() {
     return obj_;
   }
@@ -2454,6 +2462,10 @@ public slots:
    */
   void setShowEditor(const bool show) {
     obj_->setShowEditor(show);
+  }
+
+  void setPartDecimal(int d) {
+    obj_->setPartDecimal(d);
   }
 
   FLFieldDB *obj() {

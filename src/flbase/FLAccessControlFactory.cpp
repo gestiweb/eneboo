@@ -83,7 +83,7 @@ void FLAccessControlMainWindow::processObject(QObject *obj)
     QAction *a;
     while ((a = ::qt_cast<QAction *>(ito.current())) != 0) {
       ++ito;
-      if ((*acosPerms_)[ a->name()])
+      if ((*acosPerms_)[a->name()])
         continue;
       if (perm_ == "-w" || perm_ == "--")
         a->setVisible(false);

@@ -569,23 +569,26 @@ bool QMYSQLResult::reset(const QString &query)
     return false;
 
   QString q(query.stripWhiteSpace());
-  QString qLimit;
-
   q.replace("'true'", "'1'");
   q.replace("'false'", "'0'");
   q.replace("=;", "= NULL;");
   while (q.endsWith(";"))
     q.truncate(q.length() - 1);
+  if (q.upper().endsWith("NOWAIT"))
+    q.truncate(q.length() - 6);
 
-  if (q.left(7).upper().contains("SELECT")) {
+  QString qLimit(q);
+  QString qUpper(q.upper());
+  bool forUpdate = false;
+
+  if (qUpper.left(7).contains("SELECT")) {
     if (isForwardOnly())
       return resetF(q);
-    qLimit = q;
     qLimit.insert(7, "SQL_CALC_FOUND_ROWS ");
-    if (!qLimit.upper().contains(" LIMIT "))
+    forUpdate = qUpper.endsWith("FOR UPDATE");
+    if (!forUpdate && !qUpper.contains(" LIMIT "))
       qLimit += " LIMIT 0," + QString::number(LIMIT_RESULT);
-  } else
-    qLimit = q;
+  }
 
   cleanup();
 
@@ -616,7 +619,7 @@ bool QMYSQLResult::reset(const QString &query)
       d->fieldTypes[ i ] = qDecodeMYSQLType(field);
     }
 
-    if (d->numRows >= LIMIT_RESULT && !q.left(7).upper().contains("SHOW")) {
+    if (!forUpdate && d->numRows >= LIMIT_RESULT && !qUpper.left(7).contains("SHOW")) {
       d->numRows = calcSize();
       d->limited = true;
     }
@@ -1973,7 +1976,7 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
             v = QDate::currentDate();
             break;
           default:
-            v = QString("NULL");
+            v = QString("NULL").left(newField->length());
             break;
         }
       }
@@ -2315,6 +2318,21 @@ void QMYSQLDriver::Mr_Proper() {
         break;
       }
     }
+
+#if 0
+    for (int i = 0; i < recBd.count(); ++i) {
+      fieldBd = recBd.field(i);
+      fieldMtd = recMtd.field(fieldBd->name());
+      if (!fieldMtd) {
+#ifdef FL_DEBUG
+        qWarning("No fieldMtd " +  fieldBd->name());
+#endif
+        mustAlter = true;
+        break;
+      }
+    }
+#endif
+
     if (mustAlter) {
 #ifdef FL_DEBUG
       qWarning("mustAlter " + item);

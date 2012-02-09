@@ -212,25 +212,31 @@ int MLabelObject::draw(FLStylePainter *p)
   if (wordWrap)
     tf = tf | QPainter::WordBreak;
 
-  int nw = width * 4;
-  int nh = height * 4;
-  QPixmap pm(nw, nh);
-  pm.fill(backgroundColor);
-  pt->painter()->begin(&pm);
-
   fnt.setFamily(fontFamily);
-  fnt.setPointSizeFloat(fontSize * 4);
+  fnt.setPointSizeFloat(fontSize);
   fnt.setWeight(fontWeight);
   fnt.setItalic(fontItalic);
-  pt->painter()->setFont(fnt);
+  p->painter()->setFont(fnt);
 
   if (changeHeight) {
-    QRect maxRect(p->painter()->boundingRect(0, 0, nw, nh, tf, text));
+    QRect maxRect(p->painter()->boundingRect(0, 0, width, height, tf, text));
     if (maxRect.height() > height) {
       height = maxRect.height();
       retVal = height;
     }
   }
+
+  width *= 4;
+  height *= 4;
+  fontSize *= 4;
+  QPixmap pm(width, height);
+  pm.fill(backgroundColor);
+  pt->painter()->begin(&pm);
+  fnt.setFamily(fontFamily);
+  fnt.setPointSizeFloat(fontSize);
+  fnt.setWeight(fontWeight);
+  fnt.setItalic(fontItalic);
+  pt->painter()->setFont(fnt);
 
   drawBase(pt);
 
@@ -242,19 +248,22 @@ int MLabelObject::draw(FLStylePainter *p)
   }
 
   if (adjustFontSize && !wordWrap && !changeHeight) {
-    float factor = (float)nw / (float)p->painter()->fontMetrics().width(text);
+    float factor = (float)width / (float)pt->painter()->fontMetrics().width(text);
     if (factor < 1.0) {
-      QFont f = p->painter()->font();
+      QFont f = pt->painter()->font();
       f.setPointSizeFloat(f.pointSizeFloat() * factor);
-      p->painter()->setFont(f);
+      pt->painter()->setFont(f);
     }
   }
 
-  pt->painter()->drawText(0, 0, nw, nh, tf, text);
+  pt->painter()->drawText(0, 0, width, height, tf, text);
 
   pt->painter()->end();
   delete pt;
 
+  width /= 4;
+  height /= 4;
+  fontSize /= 4;
   drawPixmap(p, &pm);
 
   height = originalHeight;

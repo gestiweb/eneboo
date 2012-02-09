@@ -409,3 +409,33 @@ bool FLSqlDatabase::regenTable(const QString &n, FLTableMetaData *tmd)
   FLSqlDriver *dr = ::qt_cast<FLSqlDriver *>(dbAux_->driver());
   return dr->regenTable(n, tmd);
 }
+
+bool FLSqlDatabase::isOpen() const
+{
+  return db_ ? db_->isOpen() : false;
+}
+
+bool FLSqlDatabase::isOpenError() const
+{
+  return db_ ? db_->isOpenError() : true;
+}
+
+QStringList FLSqlDatabase::tables() const
+{
+  return db_ ? db_->tables() : QStringList();
+}
+
+QStringList FLSqlDatabase::tables(QSql::TableType type) const
+{
+  return db_ ? db_->tables(type) : QStringList();
+}
+
+QSqlError FLSqlDatabase::lastError() const
+{
+  return db_ ? db_->lastError() : QSqlError();
+}
+
+QString FLSqlDatabase::connectOptions() const
+{
+  return db_ ? db_->connectOptions() : QString();
+}

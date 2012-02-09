@@ -10,7 +10,7 @@
 		<pk>true</pk>
 		<type>string</type>
 		<length>255</length>
-		<regexp>\w+\.(mtd|ts|ui|qs|qry|kut|xml|jrxml)</regexp>
+		<regexp>\w+\.(mtd|ts|ui|qs|qry|kut|xml|jrxml|svg)</regexp>
 	</field>
 
 	<field>

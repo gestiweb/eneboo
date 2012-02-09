@@ -26,11 +26,11 @@
 class AQCompilerQSA
 {
 public:
-  QByteArray byteCode(const QString &code, int id = 0, int lineno = 0) { return QByteArray(); }
+  QByteArray byteCode(const QString &, int = 0, int = 0, bool = false) { return QByteArray(); }
   int errorType() const { return 0; }
   QValueList<int> errorLines() const { return QValueList<int>(); }
   QStringList errorMessages() const { return QStringList(); }
-  static QString code(const QByteArray &byteCode) { return QString::null; }
+  static QString code(const QByteArray &) { return QString::null; }
 };
 
 #endif /*AQCOMPILERQSA_H_*/

@@ -36,12 +36,15 @@ protected:
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
-  bool pack(const QString &, bool = true);
+  bool pack(const QString &, bool = true, bool = false, bool = false, bool = true, bool = false);
   bool unpack(const QString &);
   QString output() const;
   QString outputPackage() const;
   void setEncodeUtf8(bool = true);
   QStringList errorMessages() const;
+  QStringList logMessages() const;
+  void setFilter(const QStringList &);
+  QStringList filter() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -67,9 +70,9 @@ public:
 };
 
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline bool AQSPackager::pack(const QString &arg0,  bool arg1)
+inline bool AQSPackager::pack(const QString &arg0,  bool arg1,  bool arg2,  bool arg3,  bool arg4,  bool arg5)
 {
-  AQ_CALL_RET_V(pack(arg0, arg1), bool);
+  AQ_CALL_RET_V(pack(arg0, arg1, arg2, arg3, arg4, arg5), bool);
 }
 inline bool AQSPackager::unpack(const QString &arg0)
 {
@@ -90,6 +93,18 @@ inline void AQSPackager::setEncodeUtf8(bool arg0)
 inline QStringList AQSPackager::errorMessages() const
 {
   AQ_CALL_RET_V(errorMessages(), QStringList);
+}
+inline QStringList AQSPackager::logMessages() const
+{
+  AQ_CALL_RET_V(logMessages(), QStringList);
+}
+inline void AQSPackager::setFilter(const QStringList &arg0)
+{
+  AQ_CALL_VOID(setFilter(arg0));
+}
+inline QStringList AQSPackager::filter() const
+{
+  AQ_CALL_RET_V(filter(), QStringList);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

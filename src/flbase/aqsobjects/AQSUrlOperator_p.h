@@ -28,6 +28,11 @@ class AQSUrlOperator : public AQSObject
 
   AQ_DECLARE_AQS_OBJECT(UrlOperator, Object);
 
+public slots:
+  QUrl *url() const {
+    return static_cast<QUrl *>(o_);
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   virtual const QNetworkOperation *listChildren();
@@ -41,7 +46,7 @@ public slots:
   virtual bool isDir(bool* = 0);
   virtual void setNameFilter(const QString &);
   QString nameFilter() const;
-  virtual QUrlInfo info(const QString &) const;
+  virtual QUrlInfo *info(const QString &) const;
   virtual void stop();
   QString protocol() const;
   virtual void setProtocol(const QString &);
@@ -84,6 +89,9 @@ protected:
     QMap<int, QStringList> candidates;
     candidates[0].append(QString::null);
     candidates[1].append(QString::fromLatin1("QString"));
+    candidates[1].append(QString::fromLatin1("QUrlOperator"));
+    candidates[2].append(QString::fromLatin1("QUrlOperator,QString"));
+    candidates[3].append(QString::fromLatin1("QUrlOperator,QString,bool"));
     candidates[1].append(QString::fromLatin1("QUrl"));
     candidates[1].append(QString::fromLatin1("QString"));
     candidates[1].append(QString::fromLatin1("QUrl"));
@@ -93,6 +101,15 @@ protected:
       return new QUrlOperator;
     if (sgt == QString::fromLatin1("QString"))
       return new QUrlOperator(*(argValue<QString *>(args[0])));
+    if (sgt == QString::fromLatin1("QUrlOperator"))
+      return new QUrlOperator(*(argValue<QUrlOperator *>(args[0])));
+    if (sgt == QString::fromLatin1("QUrlOperator,QString"))
+      return new QUrlOperator(*(argValue<QUrlOperator *>(args[0])),
+                              *(argValue<QString *>(args[1])));
+    if (sgt == QString::fromLatin1("QUrlOperator,QString,bool"))
+      return new QUrlOperator(*(argValue<QUrlOperator *>(args[0])),
+                              *(argValue<QString *>(args[1])),
+                              args[2].variant().toBool());
     if (sgt == QString::fromLatin1("QUrl"))
       return new QUrlOperator(*(argValue<QUrl *>(args[0])));
     if (sgt == QString::fromLatin1("QString"))
@@ -109,6 +126,9 @@ public:
     QMap<int, QStringList> candidates;
     candidates[0].append(QString::null);
     candidates[1].append(QString::fromLatin1("QString"));
+    candidates[1].append(QString::fromLatin1("QUrlOperator"));
+    candidates[2].append(QString::fromLatin1("QUrlOperator,QString"));
+    candidates[3].append(QString::fromLatin1("QUrlOperator,QString,bool"));
     candidates[1].append(QString::fromLatin1("QUrl"));
     candidates[1].append(QString::fromLatin1("QString"));
     candidates[1].append(QString::fromLatin1("QUrl"));
@@ -163,9 +183,9 @@ inline QString AQSUrlOperator::nameFilter() const
 {
   AQ_CALL_RET_V(nameFilter(), QString);
 }
-inline QUrlInfo AQSUrlOperator::info(const QString &arg0) const
+inline QUrlInfo *AQSUrlOperator::info(const QString &arg0) const
 {
-  AQ_CALL_RET_V(info(arg0), QUrlInfo);
+  AQ_CALL_RET_PTR(info(arg0), QUrlInfo);
 }
 inline void AQSUrlOperator::stop()
 {

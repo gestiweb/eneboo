@@ -112,6 +112,11 @@ public:
     functionGetColor_ = f;
   }
 
+  /**
+  Redefinida por conveniencia
+  */
+  int indexOf(uint i) const;
+
 protected:
 
   /**

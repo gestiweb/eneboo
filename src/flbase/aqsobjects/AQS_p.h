@@ -19,11 +19,9 @@
 #ifndef AQS_P_H_
 #define AQS_P_H_
 
-#ifndef Q_OS_MACX
 #include <openssl/rand.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
-#endif
 
 #include <qdom.h>
 #include <qsinterpreter.h>
@@ -36,6 +34,13 @@
 #include <qiconview.h>
 #include <qiconset.h>
 #include <qtooltip.h>
+#include <qtextcodec.h>
+#include <qurl.h>
+#include <qnetworkprotocol.h>
+#include <qurlinfo.h>
+#include <quuid.h>
+#include <qsobjectfactory.h>
+#include <qswrapperfactory.h>
 
 #ifdef AQ_DEBUG
 #define AQS_IF_DEBUG(T) T
@@ -49,9 +54,12 @@ class AQSObject;
 class AQSColor;
 class AQSImage;
 class AQSPixmap;
+class AQSUrlInfo;
 
 extern AQS *globalAQS;
 extern QSInterpreter *globalAQSInterpreter;
+extern QSObjectFactory *globalAQSFactory;
+extern QSWrapperFactory *globalAQSWrapper;
 
 typedef QValueList<QVariant> QVariantList;
 
@@ -594,6 +602,16 @@ class AQS : public QObject
   Q_ENUMS(ToolButtonTextPosition)
   Q_ENUMS(Corner)
   Q_ENUMS(HttpState HttpError)
+  Q_ENUMS(CanvasRttiValues CanvasFrameAnimationType)
+  Q_ENUMS(RenderReportFlags)
+  Q_ENUMS(AQReportsMsgType)
+  Q_ENUMS(SplitterResizeMode)
+  Q_ENUMS(FilterSpec SortSpec PermissionSpec)
+  Q_ENUMS(Communication)
+  Q_ENUMS(SizeType)
+  Q_ENUMS(ZipStatus ZipCompressionPolicy)
+  Q_ENUMS(OdsStyleFlags)
+  Q_ENUMS(ClassFlags FunctionFlags)
 
 public:
 
@@ -922,6 +940,152 @@ public:
     HttpWrongContentLength,
     HttpAborted
   };
+
+  enum CanvasRttiValues {
+    CanvasRtti_Item = 0,
+    CanvasRtti_Sprite = 1,
+    CanvasRtti_PolygonalItem = 2,
+    CanvasRtti_Text = 3,
+    CanvasRtti_Polygon = 4,
+    CanvasRtti_Rectangle = 5,
+    CanvasRtti_Ellipse = 6,
+    CanvasRtti_Line = 7,
+    CanvasRtti_Spline = 8
+  };
+
+  enum CanvasFrameAnimationType {
+    CanvasCycle,
+    CanvasOscillate
+  };
+
+  enum RenderReportFlags {
+    Append        = 0x00000001,
+    Display       = 0x00000002,
+    PageBreak     = 0x00000004,
+    FillRecords   = 0x00000008
+  };
+
+  enum AQReportsMsgType {
+    AQErrorMsg,
+    AQLogMsg,
+    AQSysMsg
+  };
+
+  enum SplitterResizeMode {
+    SplitterStretch,
+    SplitterKeepSize,
+    SplitterFollowSizeHint,
+    SplitterAuto
+  };
+
+  enum PermissionSpec {
+    ReadOwner = 00400,
+    WriteOwner = 00200,
+    ExeOwner = 00100,
+    ReadGroup = 00040,
+    WriteGroup = 00020,
+    ExeGroup = 00010,
+    ReadOther = 00004,
+    WriteOther = 00002,
+    ExeOther = 00001
+  };
+
+  enum FilterSpec {
+    Dirs         = 0x001,
+    Files        = 0x002,
+    Drives       = 0x004,
+    NoSymLinks   = 0x008,
+    All          = 0x007,
+    TypeMask     = 0x00F,
+    Readable     = 0x010,
+    Writable     = 0x020,
+    Executable   = 0x040,
+    RWEMask      = 0x070,
+    Modified     = 0x080,
+    Hidden       = 0x100,
+    System       = 0x200,
+    AccessMask   = 0x3F0,
+    DefaultFilter = -1
+  };
+
+  enum SortSpec   {
+    Name         = 0x00,
+    Time         = 0x01,
+    Size         = 0x02,
+    Unsorted     = 0x03,
+    SortByMask   = 0x03,
+    DirsFirst    = 0x04,
+    Reversed     = 0x08,
+    IgnoreCase   = 0x10,
+    LocaleAwar   = 0x20,
+    DefaultSort  = -1
+  };
+
+  enum Communication {
+    Stdin = 0x01,
+    Stdout = 0x02,
+    Stderr = 0x04,
+    DupStderr = 0x08
+  };
+
+  enum SizePolicy_Internal {
+    HSize = 6,
+    HMask = 0x3f,
+    VMask = HMask << HSize,
+    MayGrow = 1,
+    ExpMask = 2,
+    MayShrink = 4
+  };
+
+  enum SizeType {
+    Fixed = 0,
+    Minimum = MayGrow,
+    Maximum = MayShrink,
+    Preferred = MayGrow | MayShrink,
+    MinimumExpanding = MayGrow | ExpMask,
+    Expanding = MayGrow | MayShrink | ExpMask,
+    Ignored = ExpMask
+  };
+
+  enum ZipStatus {
+    ZipNoError,
+    ZipFileWriteError,
+    ZipFileOpenError,
+    ZipFilePermissionsError,
+    ZipFileError
+  };
+
+  enum ZipCompressionPolicy {
+    ZipAlwaysCompress,
+    ZipNeverCompress,
+    ZipAutoCompress
+  };
+
+  enum OdsStyleFlags {
+    ODS_NONE           = 0,
+    ODS_BORDER_BOTTOM  = (1 <<  0),
+    ODS_BORDER_LEFT    = (1 <<  1),
+    ODS_BORDER_RIGHT   = (1 <<  2),
+    ODS_BORDER_TOP     = (1 <<  3),
+    ODS_ALIGN_LEFT     = (1 <<  4),
+    ODS_ALIGN_CENTER   = (1 <<  5),
+    ODS_ALIGN_RIGHT    = (1 <<  6),
+    ODS_TEXT_BOLD      = (1 <<  7),
+    ODS_TEXT_ITALIC    = (1 <<  8),
+    ODS_TEXT_UNDERLINE = (1 <<  9),
+  };
+
+  enum ClassFlags {
+    AllClasses,
+    GlobalClasses
+  };
+
+  enum FunctionFlags {
+    FunctionNames = 0,
+    FunctionSignatures = 1,
+    IncludeMemberFunctions = 2
+  };
+
 
   AQS() : QObject(0, "aqs_namespace"), objectsCount_(0) {
     AQS_IF_DEBUG(printf("Global AQS Namespace created\n"));
@@ -2595,14 +2759,124 @@ public slots:
     return ret;
   }
 
+  QTextCodec *TextCodec_loadCharmap(QIODevice *iod) {
+    return QTextCodec::loadCharmap(iod);
+  }
+
+  QTextCodec *TextCodec_loadCharmapFile(QString filename) {
+    return QTextCodec::loadCharmapFile(filename);
+  }
+
+  QTextCodec *TextCodec_codecForMib(int mib) {
+    return QTextCodec::codecForMib(mib);
+  }
+
+  QTextCodec *TextCodec_codecForName(const char *name, int accuracy = 0) {
+    return QTextCodec::codecForName(name, accuracy);
+  }
+
+  QTextCodec *TextCodec_codecForContent(const char *chars, int len) {
+    return QTextCodec::codecForContent(chars, len);
+  }
+
+  QTextCodec *TextCodec_codecForIndex(int i) {
+    return QTextCodec::codecForIndex(i);
+  }
+
+  QTextCodec *TextCodec_codecForLocale() {
+    return QTextCodec::codecForLocale();
+  }
+
+  void TextCodec_setCodecForLocale(QTextCodec *c) {
+    QTextCodec::setCodecForLocale(c);
+  }
+
+  QTextCodec *TextCodec_codecForTr() {
+    return QTextCodec::codecForTr();
+  }
+
+  void TextCodec_setCodecForTr(QTextCodec *c) {
+    QTextCodec::setCodecForTr(c);
+  }
+
+  QTextCodec *TextCodec_codecForCStrings() {
+    return QTextCodec::codecForCStrings();
+  }
+
+  void TextCodec_setCodecForCStrings(QTextCodec *c) {
+    QTextCodec::setCodecForCStrings(c);
+  }
+
+  void TextCodec_deleteAllCodecs() {
+    QTextCodec::deleteAllCodecs();
+  }
+
+  const char *TextCodec_locale() {
+    return QTextCodec::locale();
+  }
+
   void ToolTip_add(QWidget *widget, const QString &text) {
     QToolTip::add(widget, text);
+  }
+
+  QString Url_decode(QString &url) {
+    QUrl::decode(url);
+    return url;
+  }
+
+  QString Url_encode(QString &url) {
+    QUrl::encode(url);
+    return url;
+  }
+
+  bool Url_isRelativeUrl(const QString &url) {
+    return QUrl::isRelativeUrl(url);
+  }
+
+  QNetworkProtocol *NetworkProtocol_getNetworkProtocol(const QString &protocol) {
+    return QNetworkProtocol::getNetworkProtocol(protocol);
+  }
+
+  bool NetworkProtocol_hasOnlyLocalFileSystem() {
+    return QNetworkProtocol::hasOnlyLocalFileSystem();
+  }
+
+  bool UrlInfo_greaterThan(QUrlInfo *i1, QUrlInfo *i2, int sortBy) {
+    return (i1 && i2) ? QUrlInfo::greaterThan(*i1, *i2, sortBy) : false;
+  }
+  bool UrlInfo_greaterThan(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy);
+
+  bool UrlInfo_lessThan(QUrlInfo *i1, QUrlInfo *i2, int sortBy) {
+    return (i1 && i2) ? QUrlInfo::lessThan(*i1, *i2, sortBy) : false;
+  }
+  bool UrlInfo_lessThan(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy);
+
+  bool UrlInfo_equal(QUrlInfo *i1, QUrlInfo *i2, int sortBy) {
+    return (i1 && i2) ? QUrlInfo::equal(*i1, *i2, sortBy) : true;
+  }
+  bool UrlInfo_equal(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy);
+
+  QString createUuid() const {
+    return QUuid::createUuid().toString();
   }
 
   QDomNode *toXml(AQSObject *o, bool includeChildren = true,
                   bool includeComplexTypes = false) const;
   QDomNode *toXml(QObject *o, bool includeChildren = true,
                   bool includeComplexTypes = false) const;
+
+  QByteArray toHex(QByteArray *ba) const;
+  QByteArray fromHex(QByteArray *ba) const;
+  QByteArray toBase64(QByteArray *ba) const;
+  QByteArray fromBase64(QByteArray *ba) const;
+  QByteArray compress(QByteArray *ba) const;
+  QByteArray uncompress(QByteArray *ba) const;
+  QByteArray encryptInternal(QByteArray *ba) const;
+  QByteArray decryptInternal(QByteArray *ba) const;
+  QString sha1(QByteArray *ba) const;
+
+  int xsltproc(const QStringList &args) const;
+  QByteArray xsltproc(QByteArray *xslt, QByteArray *xml) const;
 
 private:
 
@@ -2686,8 +2960,10 @@ static inline QString argsSignature(const QSArgumentList &args)
 
     if (arg.type() == QSArgument::QObjectPtr || arg.type() == QSArgument::VoidPointer) {
       QString typeName(arg.typeName());
-      if (typeName.startsWith("AQS"))
-        typeName = QString::fromLatin1("Q") + typeName.mid(3);
+      if (typeName.startsWith("AQS")) {
+        if (globalAQSFactory->instanceDescriptors()[typeName].isEmpty())
+          typeName = QString::fromLatin1("AQ") + typeName.mid(3);
+      }
       ret.append(typeName);
       ret.append("*");
     } else
@@ -2888,21 +3164,13 @@ static inline QByteArray byteArrayFromBase64(QByteArray *ba)
 // Ver openssl/RAND_bytes
 static inline int rand_bytes(QByteArray *ba)
 {
-#if defined(Q_OS_MACX)
-  return 0;
-#else
   return RAND_bytes((uchar *)ba->data(), ba->size());
-#endif
 }
 
 // Ver openssl/RAND_pseudo_bytes
 static inline int rand_pseudo_bytes(QByteArray *ba)
 {
-#if defined(Q_OS_MACX)
-  return 0;
-#else
   return RAND_pseudo_bytes((uchar *)ba->data(), ba->size());
-#endif
 }
 
 static inline QByteArray aes_256_encrypt(QByteArray *ba,
@@ -2910,9 +3178,6 @@ static inline QByteArray aes_256_encrypt(QByteArray *ba,
                                          const QByteArray &iv // Espera 256 bits (32 bytes)
                                         )
 {
-#if defined(Q_OS_MACX)
-  return *ba;
-#else
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
@@ -2947,7 +3212,6 @@ static inline QByteArray aes_256_encrypt(QByteArray *ba,
   EVP_CIPHER_CTX_cleanup(&ctx);
   res.truncate(c_len + f_len);
   return res;
-#endif
 }
 
 static inline QByteArray aes_256_decrypt(QByteArray *ba,
@@ -2955,9 +3219,6 @@ static inline QByteArray aes_256_decrypt(QByteArray *ba,
                                          const QByteArray &iv // Espera 256 bits (32 bytes)
                                         )
 {
-#if defined(Q_OS_MACX)
-  return *ba;
-#else
   EVP_CIPHER_CTX ctx;
   EVP_CIPHER_CTX_init(&ctx);
 
@@ -2992,7 +3253,6 @@ static inline QByteArray aes_256_decrypt(QByteArray *ba,
   EVP_CIPHER_CTX_cleanup(&ctx);
   res.truncate(p_len + f_len);
   return res;
-#endif
 }
 
 class AQSBaseObject : public QObject

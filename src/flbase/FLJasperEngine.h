@@ -81,6 +81,7 @@ public slots:
           Se debe llamar despues de establecer los datos para el informe con
           set*ReportData, de lo contrario el resultado será indefinido.
   */
+  QDomDocument rptXmlData() const;
   FLDomNodeInterface *reportData() const;
 
   /**
@@ -88,6 +89,7 @@ public slots:
           Se debe llamar despues de establecer los datos para el informe con
           set*ReportTemplate, de lo contrario el resultado será indefinido.
   */
+  QDomDocument rptXmlTemplate() const;
   FLDomNodeInterface *reportTemplate() const;
 
   /**

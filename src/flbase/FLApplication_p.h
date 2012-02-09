@@ -60,6 +60,7 @@
 #include <qmutex.h>
 #include <qgroupbox.h>
 #include <qnetwork.h>
+#include <qlocale.h>
 #include "../qt/include/aqapplication.h"
 
 #define AQ_SET_MNGLOADER                 \
@@ -77,6 +78,8 @@ class FLSqlDatabase;
 class FLWorkspace;
 class FLPopupWarn;
 class FLManagerModules;
+class QUrlOperator;
+class QNetworkOperation;
 
 /**
 Clase aplicación para AbanQ.
@@ -486,6 +489,12 @@ public slots:
   Muestra la venta de ayuda con el índice
   */
   void helpIndex();
+  QLocale localeSystem() const {
+    return localeSystem_;
+  }
+  QChar commaSeparator() const {
+    return commaSeparator_;
+  }
 
 protected:
 
@@ -515,7 +524,7 @@ protected:
   */
   bool eventFilter(QObject *obj, QEvent *ev);
 
-private slots:
+protected slots:
 
   /**
   Lee el estado general
@@ -620,6 +629,9 @@ private slots:
   void exportModules();
   void importModules();
   void updateAbanQ();
+  void dumpDatabase();
+  void checkForUpdate();
+  void checkForUpdateFinish(QNetworkOperation * op);
 
 private:
 
@@ -824,6 +836,10 @@ protected:
   Uso interno
   */
   QSObjectFactory *flFactory_;
+  QLocale localeSystem_;
+  QChar commaSeparator_;
+  QUrlOperator *opCheckUpdate_;
+  QString hashUpdate_;
 };
 
 #endif

@@ -39,25 +39,107 @@
 #include "vdatepopup.h"
 
 FLLineEdit::FLLineEdit(QWidget *parent, const char *name) :
-  QLineEdit(parent, name)
+  QLineEdit(parent, name),
+  type(QVariant::Invalid), partDecimal(0)
 {
+}
+
+QString FLLineEdit::text() const
+{
+  QString text(QLineEdit::text());
+  if (text.isEmpty())
+    return text;
+
+  bool ok = false;
+
+  switch (type) {
+    case QVariant::Double: {
+      double val = aqApp->localeSystem().toDouble(text, &ok);
+      if (ok)
+        text.setNum(val, 'f', partDecimal);
+    }
+    break;
+    case QVariant::UInt: {
+      uint val = aqApp->localeSystem().toUInt(text, &ok);
+      if (ok)
+        text.setNum(val);
+    }
+    break;
+    case QVariant::Int: {
+      int val = aqApp->localeSystem().toInt(text, &ok);
+      if (ok)
+        text.setNum(val);
+    }
+    break;
+  }
+
+  return text;
+}
+
+void FLLineEdit::setText(const QString &text)
+{
+  if (text.isEmpty() || hasFocus()) {
+    QLineEdit::setText(text);
+    return;
+  }
+
+  bool ok = false;
+  QString s(text);
+
+  switch (type) {
+    case QVariant::Double: {
+      double val = s.toDouble(&ok);
+      if (ok)
+        s = aqApp->localeSystem().toString(val, 'f', partDecimal);
+    }
+    break;
+    case QVariant::UInt: {
+      uint val = s.toUInt(&ok);
+      if (ok)
+        s = aqApp->localeSystem().toString(val);
+    }
+    break;
+    case QVariant::Int: {
+      int val = s.toInt(&ok);
+      if (ok)
+        s = aqApp->localeSystem().toString(val);
+    }
+    break;
+  }
+
+  QLineEdit::setText(s);
 }
 
 void FLLineEdit::focusOutEvent(QFocusEvent *f)
 {
-  QString s = text();
 #ifndef Q_OS_WIN32
   const QValidator *v = validator();
   if (v) {
+    QString s(text());
     v->fixup(s);
     setText(s);
-  }
+  } else if (type == QVariant::Double || type == QVariant::Int || type == QVariant::UInt)
+    setText(text());
+#else
+  if (type == QVariant::Double || type == QVariant::Int || type == QVariant::UInt)
+    setText(text());
 #endif
   QLineEdit::focusOutEvent(f);
 }
 
 void FLLineEdit::focusInEvent(QFocusEvent *f)
 {
+  if (type == QVariant::Double || type == QVariant::Int || type == QVariant::UInt) {
+    blockSignals(true);
+    QString s(text());
+    const QValidator *v = validator();
+    if (v) {
+      int pos = 0;
+      v->validate(s, pos);
+    }
+    QLineEdit::setText(s);
+    blockSignals(false);
+  }
   if (selectedText().isEmpty())
     selectAll();
   QLineEdit::focusInEvent(f);
@@ -186,6 +268,7 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
     setName("FLFieldDB");
 
   cursorBackup_ = 0;
+  partDecimal_ = -1;
 }
 
 bool FLFieldDB::eventFilter(QObject *obj, QEvent *ev)
@@ -324,13 +407,19 @@ void FLFieldDB::updateValue(const QString &t)
     s.replace("'", "\'");
   }
 
+  if (editor_ && (field->type() == QVariant::Double ||
+                  field->type() == QVariant::Int ||
+                  field->type() == QVariant::UInt)) {
+    s = ::qt_cast<FLLineEdit *>(editor_)->text();
+  }
+
   if (s.isEmpty())
     cursor_->setValueBuffer(fieldName_, QVariant());
   else
     cursor_->setValueBuffer(fieldName_, s);
 
-  if (isVisible() && hasFocus() && field->type() == QVariant::String && field->length()
-      == s.length())
+  if (isVisible() && hasFocus() && field->type() == QVariant::String &&
+      field->length() == s.length())
     focusNextPrevChild(true);
 }
 
@@ -460,7 +549,7 @@ void FLFieldDB::setValue(const QVariant &cv)
       if (editor_) {
         QString s;
         if (!isNull)
-          s.setNum(v.toDouble(), 'f', field->partDecimal());
+          s.setNum(v.toDouble(), 'f', partDecimal_ != -1 ? partDecimal_ : field->partDecimal());
         ::qt_cast<FLLineEdit *>(editor_)->setText(s);
       }
       break;
@@ -750,7 +839,7 @@ void FLFieldDB::initEditor()
   int type = field->type();
   int len = field->length();
   int partInteger = field->partInteger();
-  int partDecimal = field->partDecimal();
+  int partDecimal = partDecimal_ > -1 ? partDecimal_ : field->partDecimal();
   QString rX = field->regExpValidator();
   bool ol = field->hasOptionsList();
 
@@ -811,31 +900,26 @@ void FLFieldDB::initEditor()
 
         ::qt_cast<FLLineEdit *>(editor_)->setFont(qApp->font());
         ::qt_cast<FLLineEdit *>(editor_)->type = type;
+        ::qt_cast<FLLineEdit *>(editor_)->partDecimal = partDecimal;
         editor_->installEventFilter(this);
 
         if (type == QVariant::Double) {
-          ::qt_cast<FLLineEdit *>(editor_)->setValidator(new FLDoubleValidator(0, pow(10,
-                                                                               partInteger)
-                                                                               - 1, partDecimal, editor_));
+          ::qt_cast<FLLineEdit *>(editor_)->setValidator(
+            new FLDoubleValidator(0, pow(10, partInteger) - 1, partDecimal, editor_)
+          );
           ::qt_cast<FLLineEdit *>(editor_)->setAlignment(Qt::AlignRight);
         } else {
           if (type == QVariant::UInt || type == QVariant::Int) {
-            if (type == QVariant::UInt)
+            if (type == QVariant::UInt) {
               ::qt_cast<FLLineEdit *>(editor_)->setValidator(
-                new FLUIntValidator(
-                  0,
-                  ((int) pow(10,
-                             partInteger)
-                   - 1), editor_));
-            else
+                new FLUIntValidator(0, ((int) pow(10, partInteger) - 1), editor_)
+              );
+            } else {
               ::qt_cast<FLLineEdit *>(editor_)->setValidator(
-                new FLIntValidator(
-                  ((int)(pow(10,
-                             partInteger)
-                         - 1) * (-1)),
-                  ((int) pow(10,
-                             partInteger)
-                   - 1), editor_));
+                new FLIntValidator(((int)(pow(10, partInteger) - 1) * (-1)),
+                                   ((int) pow(10, partInteger) - 1), editor_)
+              );
+            }
             ::qt_cast<FLLineEdit *>(editor_)->setAlignment(Qt::AlignRight);
           } else {
             ::qt_cast<FLLineEdit *>(editor_)->setMaxLength(len);
@@ -1120,6 +1204,17 @@ void FLFieldDB::initEditor()
   else
     setShowEditor(showEditor_);
 
+}
+
+void FLFieldDB::setPartDecimal(int d)
+{
+  FLLineEdit *editor = ::qt_cast<FLLineEdit *>(editor_);
+  if (editor && editor->type == QVariant::Double) {
+    partDecimal_ = d;
+    editor->partDecimal = d;
+    refreshQuick(fieldName_);
+    editor->setText(editor->text());
+  }
 }
 
 void FLFieldDB::openFormRecordRelation()
@@ -1417,7 +1512,7 @@ void FLFieldDB::refreshQuick(const QString &fN)
 
   QVariant v(cursor_->valueBuffer(fieldName_));
   bool null = cursor_->bufferIsNull(fieldName_);
-  int partDecimal = field->partDecimal();
+  int partDecimal = partDecimal_ != -1 ? partDecimal_ : field->partDecimal();
   bool ol = field->hasOptionsList();
 
   switch (type) {
@@ -1645,11 +1740,12 @@ void FLFieldDB::refresh(const QString &fN)
     return;
 
   int modeAccess = cursor_->modeAccess();
-  int partDecimal = field->partDecimal();
+  int partDecimal = partDecimal_ != -1 ? partDecimal_ : field->partDecimal();
   bool ol = field->hasOptionsList();
 
-  setDisabled(keepDisabled_ || cursor_->fieldDisabled(fieldName_) || (modeAccess
-                                                                      == FLSqlCursor::EDIT && (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
+  setDisabled(keepDisabled_ || cursor_->fieldDisabled(fieldName_) ||
+              (modeAccess == FLSqlCursor::EDIT &&
+               (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
               || !field->editable() || modeAccess == FLSqlCursor::BROWSE);
 
   switch (type) {
@@ -1896,16 +1992,25 @@ QValidator::State FLDoubleValidator::validate(QString &input, int &i) const
   if (input.isEmpty())
     return QValidator::Acceptable;
   input.replace(",", ".");
-  QValidator::State state = QDoubleValidator::validate(input, i);
-  if (state == QValidator::Invalid || state == QValidator::Intermediate) {
-    QString s = input.right(input.length() - 1);
 
-    if (input.left(1) == "-" && (QDoubleValidator::validate(s, i) == QValidator::Acceptable
-                                 || s.isEmpty()))
-      return QValidator::Acceptable;
-    return QValidator::Invalid;
+  QValidator::State state = QDoubleValidator::validate(input, i);
+
+  if (state == QValidator::Invalid || state == QValidator::Intermediate) {
+    QString s(input.right(input.length() - 1));
+    if (input.left(1) == "-" &&
+        (QDoubleValidator::validate(s, i) == QValidator::Acceptable || s.isEmpty())) {
+      state = QValidator::Acceptable;
+    } else
+      state =  QValidator::Invalid;
   } else
-    return QValidator::Acceptable;
+    state = QValidator::Acceptable;
+
+  if (aqApp->commaSeparator() == ',')
+    input.replace(".", ",");
+  else
+    input.replace(",", ".");
+
+  return state;
 }
 
 FLIntValidator::FLIntValidator(int minimum, int maximum, QObject *parent, const char *name) :
@@ -1972,15 +2077,9 @@ void FLFieldDB::showWidget()
             q.setSelect(fieldName_);
             q.setFrom(tableName_);
             if (filter_.isEmpty())
-              q.setWhere(cursor_->db()->manager()->formatAssignValue(tMD->field(fieldRelation_), v,
-                                                                     true));
+              q.setWhere(cursor_->db()->manager()->formatAssignValue(tMD->field(fieldRelation_), v, true));
             else
-              q.setWhere(
-                filter_ + " AND "
-                + cursor_->db()->manager()->formatAssignValue(
-                  tMD->field(
-                    fieldRelation_),
-                  v, true));
+              q.setWhere(filter_ + " AND " + cursor_->db()->manager()->formatAssignValue(tMD->field(fieldRelation_), v, true));
             if (q.exec() && q.next())
               setValue(q.value(0));
           }

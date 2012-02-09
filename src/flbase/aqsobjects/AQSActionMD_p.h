@@ -28,6 +28,12 @@ class AQSActionMD : public AQSVoidPtr
 
   AQ_DECLARE_AQS_VOID_AQOBJECT(ActionMD, VoidPtr);
 
+protected:
+  void specializedInternalFinish() {
+    if (!wrap_)
+      delete o_;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   void setName(const QString &);
