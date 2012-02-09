@@ -301,7 +301,7 @@ inline void FLSTableDB::setFunctionGetColor(const QString &arg0)
 {
   AQ_CALL_VOID(setFunctionGetColor(arg0));
 }
-inline void AQSTableDB::exportToOds()
+inline void FLSTableDB::exportToOds()
 {
   AQ_CALL_VOID(exportToOds());
 }
