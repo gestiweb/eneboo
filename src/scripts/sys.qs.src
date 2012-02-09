@@ -1377,7 +1377,7 @@ function exportModule(idMod, dirBasePath)
     if (content.isEmpty())
       continue;
 
-    case (type) {
+    switch (type) {
       case ".xml":
         sys.fileWriteIso(dirPath + "/" + name, content);
         break;
@@ -1904,7 +1904,7 @@ class AbanQDbDumper
     }
 
     var ok = true;
-    case (typeBd) {
+    switch (typeBd) {
       case 1:
         ok = this.dumpPostgreSQL();
         break;
@@ -2088,7 +2088,7 @@ function setObjText(container, component, value)
   var clase = "editor" in c ?
               "FLFieldDB" :
               c.className();
-  case (clase) {
+  switch (clase) {
     case "QPushButton":
     case "QToolButton":
     case "QLabel": {
@@ -2116,7 +2116,7 @@ function disableObj(container, component)
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  case (clase) {
+  switch (clase) {
     case "QPushButton":
     case "QToolButton": {
       runObjMethod(container, component, "setEnabled", false);
@@ -2143,7 +2143,7 @@ function filterObj(container, component, filter)
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  case (clase) {
+  switch (clase) {
     case "FLTableDB":
     case "FLFieldDB": {
       runObjMethod(container, component, "setFilter", filter);
@@ -2241,7 +2241,7 @@ function openUrl(url)
   if (!url || (typeof url) != "string" || url.isEmpty())
     return false;
   
-  case (sys.osName()) {
+  switch (sys.osName()) {
     case "LINUX": {
       if (launchCommand(["xdg-open", url]))
         return true;

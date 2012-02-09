@@ -202,7 +202,7 @@ class MainWindow
 
   function eventFilter(o, e)
   {
-    case (e.type) {
+    switch (e.type) {
       case AQS.ContextMenu: {
         if (o.isEqual(this.dckMod_.w_)) {
           return this.addMarkFromItem(this.dckMod_.lw_.currentItem(),
@@ -893,7 +893,7 @@ function triggerAction(signature)
     debug("triggerAction: Action not found: " + signature);
   }
 
-  case (sgt[0]) {
+  switch (sgt[0]) {
     case "activated()":
       if (!ac.visible || !ac.enabled)
         ok = false;
@@ -905,7 +905,7 @@ function triggerAction(signature)
       break;
   }
 
-  case (sgt[1]) {
+  switch (sgt[1]) {
     case "initModule()":
       if (ok)
         mw.initModule(ac.name);
