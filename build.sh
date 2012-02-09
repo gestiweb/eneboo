@@ -202,9 +202,9 @@ fi
 VERSION="$VER (Build $BUILD_NUMBER)"
 BUILD_KEY="$VER-Build"
 
-echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION"
-echo -e "(C) 2003-2011 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
-echo -e "(C) 2011 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
+echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - BETA - )"
+echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
+echo -e "(C) 2012 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   export CC=${CROSS}gcc
