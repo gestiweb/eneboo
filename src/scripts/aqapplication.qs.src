@@ -623,6 +623,12 @@ class MainWindow
                 connect(wb, "activated()", this.actSigMap_, "map()");
 				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
               }
+    var dumpDb = new QAction(ag);
+    dumpDb.name = "dumpDatabaseAction";
+    dumpDb.menuText = sys.translate("Copia de Seguridad");
+    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
+    connect(dumpDb, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     var load = new QAction(ac);
     load.name = "loadAbanQPackageAction";
@@ -655,12 +661,6 @@ class MainWindow
            }
       }
     }
-    var dumpDb = new QAction(agm);
-    dumpDb.name = "dumpDatabaseAction";
-    dumpDb.menuText = sys.translate("Copia de Seguridad");
-    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
-    connect(dumpDb, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     agm.addSeparator();
 
