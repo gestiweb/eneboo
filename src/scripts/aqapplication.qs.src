@@ -556,7 +556,7 @@ class MainWindow
     if (this.agMenu_ != undefined)
     {
       var list = new AQObjectQueryList(this.agMenu_, "QAction", "",
-                                       true, Cierto);
+                                       true, true);
       var obj;
       while ((obj = list.current()) != undefined) {
         this.agMenu_.removeChild(obj);
