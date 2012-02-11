@@ -334,6 +334,9 @@ function registerUpdate(input)
     errorMsgBox(msg);
     return;
   }
+  unpacker.jump(); //Espacio1
+  unpacker.jump(); //Espacio2
+  unpacker.jump(); //Espacio3
 
   var now = new Date;
   var file = new File(input);
