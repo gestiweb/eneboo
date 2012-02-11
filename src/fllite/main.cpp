@@ -220,7 +220,11 @@ void aq_main(int argc, char **argv)
       if(!img.isNull()) // Load succeded ?
              splash = new QSplashScreen(QPixmap(img)); 
                else
-             splash = new QSplashScreen(QPixmap::fromMimeSource("splashabanq.png"));
+#ifdef QSDEBUGGER
+ splash = new QSplashScreen(QPixmap::fromMimeSource("splashdebugger.png"));
+#else
+ splash = new QSplashScreen(QPixmap::fromMimeSource("splashclient.png"));
+#endif
     splash->show();
     splash->message(QT_TR_NOOP("Inicializando..."), Qt::AlignRight, QColor(0, 0, 0));
   } else if (!silentConnect(silentConn)) {
