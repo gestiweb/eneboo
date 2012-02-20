@@ -161,7 +161,7 @@ BUILD_MACX="no"
 if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
   BUILD_MACX="yes"
   OPT_MULTICORE="no"
-  OPT_DIGIDOC="no"
+  # OPT_DIGIDOC="no"
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
@@ -655,17 +655,17 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
-	${CROSS}install_name_tool -change libhoard.3.dylib @executable_path/../../../../lib/libhoard.3.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libcrypto.0.dylib @executable_path/../../../../lib/libcrypto.0.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change liblibdigidoc.2.dylib @executable_path/../../../../lib/liblibdigidoc.2.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libssl.0.dylib @executable_path/../../../../lib/libssl.0.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libxml2.2.dylib @executable_path/../../../../lib/libxml2.2.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libxslt.1.dylib @executable_path/../../../../lib/libxslt.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
+	${CROSS}install_name_tool -change libhoard.3.dylib @executable_path/../../../../lib/libhoard.3.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libcrypto.0.dylib @executable_path/../../../../lib/libcrypto.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change liblibdigidoc.2.dylib @executable_path/../../../../lib/liblibdigidoc.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libssl.0.dylib @executable_path/../../../../lib/libssl.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libxml2.2.dylib @executable_path/../../../../lib/libxml2.2.dylib $PREFIX/bin/Enenboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libxslt.1.dylib @executable_path/../../../../lib/libxslt.1.dylib $PREFIX/bin/Enenboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/linguist.app/Contents/MacOS/linguist
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../lib/libqt-mt.3.dylib $PREFIX/bin/lupdate
-	${CROSS}install_name_tool -change libexslt.0.dylib @executable_path/../../../../lib/libexslt.0.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
-	${CROSS}install_name_tool -change libxsltproc.1.dylib @executable_path/../../../../lib/libxsltproc.1.dylib $PREFIX/bin/AbanQ.app/Contents/MacOS/AbanQ
+	${CROSS}install_name_tool -change libexslt.0.dylib @executable_path/../../../../lib/libexslt.0.dylib $PREFIX/bin/Enenboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libxsltproc.1.dylib @executable_path/../../../../lib/libxsltproc.1.dylib $PREFIX/bin/Enenboo.app/Contents/MacOS/Eneboo
 	
         mkdir -p $PREFIX/bin/designer.app/Contents/plugins/designer
         cp -f $PREFIX/plugins/designer/*.dylib $PREFIX/bin/designer.app/Contents/plugins/designer 2> /dev/null

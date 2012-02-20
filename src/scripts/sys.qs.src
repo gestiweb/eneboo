@@ -334,6 +334,9 @@ function registerUpdate(input)
     errorMsgBox(msg);
     return;
   }
+  unpacker.jump(); //Espacio1
+  unpacker.jump(); //Espacio2
+  unpacker.jump(); //Espacio3
 
   var now = new Date;
   var file = new File(input);
@@ -364,10 +367,8 @@ function warnLocalChanges(changes)
   txt += sys.translate("¡¡ CUIDADO !! DETECTADOS CAMBIOS LOCALES\n\n");
   txt += sys.translate("Se han detectado cambios locales en los módulos desde\n");
   txt += sys.translate("la última actualización/instalación de un paquete de módulos.\n");
-  txt += sys.translate("if continua es posible que estos cambios sean sobreescritos por\n");
+  txt += sys.translate("Si continua es posible que estos cambios sean sobreescritos por\n");
   txt += sys.translate("los cambios que incluye el paquete que quiere cargar.\n\n");
-  txt += sys.translate("Obtenga soporte en");
-  txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
   txt += "\n\n";
   txt += sys.translate("Registro de cambios");
 
@@ -419,9 +420,9 @@ function reportChanges(changes)
     ret += "Nombre: " + chg[0] + "\n";
     ret += "Estado: " + chg[1] + "\n";
     ret += "ShaOldTxt: " + chg[2] + "\n";
-    ret += "ShaOldBin: " + chg[3] + "\n";
+    //ret += "ShaOldBin: " + chg[3] + "\n";
     ret += "ShaNewTxt: " + chg[4] + "\n";
-    ret += "ShaNewBin: " + chg[5] + "\n";
+    //ret += "ShaNewBin: " + chg[5] + "\n";
     ret += "###########################################\n";
   }
 
@@ -539,7 +540,7 @@ function xmlFilesDefBd()
   doc.appendChild(root);
 
   var qry = new AQSqlQuery;
-  qry.setSelect("idmodulo,nombre,contenido,binario");
+  qry.setSelect("idmodulo,nombre,contenido");
   qry.setFrom("flfiles");
 
   if (!qry.exec())
@@ -715,8 +716,6 @@ function loadAbanQPackage(input, warnBackup)
 {
   if (warnBackup) {
     var txt = "";
-    txt += sys.translate("IMPORTANTE: if carga este paquete ya no podrá utilizar sobre\n");
-    txt += sys.translate("esta base de datos motores de AbanQ versión 2.3 y anteriores.\n\n");
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
     txt += sys.translate("datos mientras se realiza la carga.\n\n");
@@ -894,11 +893,9 @@ function checkProjectName(proName)
   txt += sys.translate("nombre difiere del instalado actualmente en la base de datos.\n");
   txt += sys.translate("Es posible que la estructura de los módulos que quiere cargar\n");
   txt += sys.translate("sea completamente distinta a la instalada actualmente, y si continua\n");
-  txt += sys.translate("podría dañar el código, datos y la estructura de tablas de AbanQ.\n\n");
+  txt += sys.translate("podría dañar el código, datos y la estructura de tablas de Eneboo.\n\n");
   txt += sys.translate("- Nombre del proyecto instalado: %1\n").arg(dbProName);
   txt += sys.translate("- Nombre del proyecto a cargar: %1\n\n").arg(proName);
-  txt += sys.translate("Obtenga soporte en");
-  txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
   txt += "\n\n";
   txt += sys.translate("¿Desea continuar?");
   return (MessageBox.Yes == MessageBox.warning(txt, MessageBox.No, MessageBox.Yes,
@@ -1013,7 +1010,7 @@ function questionMsgBox(msg, keyRemember, txtRemember, forceShow,
   }
 
   var diag = new QDialog;
-  diag.caption = txtCaption ? txtCaption : "AbanQ";
+  diag.caption = txtCaption ? txtCaption : "Eneboo";
   diag.modal = true;
 
   var lay = new QVBoxLayout(diag);
@@ -1377,7 +1374,7 @@ function exportModule(idMod, dirBasePath)
     if (content.isEmpty())
       continue;
 
-    case (type) {
+    switch (type) {
       case ".xml":
         sys.fileWriteIso(dirPath + "/" + name, content);
         break;
@@ -1904,7 +1901,7 @@ class AbanQDbDumper
     }
 
     var ok = true;
-    case (typeBd) {
+    switch (typeBd) {
       case 1:
         ok = this.dumpPostgreSQL();
         break;
@@ -2088,7 +2085,7 @@ function setObjText(container, component, value)
   var clase = "editor" in c ?
               "FLFieldDB" :
               c.className();
-  case (clase) {
+  switch (clase) {
     case "QPushButton":
     case "QToolButton":
     case "QLabel": {
@@ -2116,7 +2113,7 @@ function disableObj(container, component)
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  case (clase) {
+  switch (clase) {
     case "QPushButton":
     case "QToolButton": {
       runObjMethod(container, component, "setEnabled", false);
@@ -2143,7 +2140,7 @@ function filterObj(container, component, filter)
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  case (clase) {
+  switch (clase) {
     case "FLTableDB":
     case "FLFieldDB": {
       runObjMethod(container, component, "setFilter", filter);
@@ -2241,7 +2238,7 @@ function openUrl(url)
   if (!url || (typeof url) != "string" || url.isEmpty())
     return false;
   
-  case (sys.osName()) {
+  switch (sys.osName()) {
     case "LINUX": {
       if (launchCommand(["xdg-open", url]))
         return true;

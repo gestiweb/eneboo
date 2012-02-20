@@ -202,7 +202,7 @@ class MainWindow
 
   function eventFilter(o, e)
   {
-    case (e.type) {
+    switch (e.type) {
       case AQS.ContextMenu: {
         if (o.isEqual(this.dckMod_.w_)) {
           return this.addMarkFromItem(this.dckMod_.lw_.currentItem(),
@@ -556,7 +556,7 @@ class MainWindow
     if (this.agMenu_ != undefined)
     {
       var list = new AQObjectQueryList(this.agMenu_, "QAction", "",
-                                       true, Cierto);
+                                       true, true);
       var obj;
       while ((obj = list.current()) != undefined) {
         this.agMenu_.removeChild(obj);
@@ -623,6 +623,12 @@ class MainWindow
                 connect(wb, "activated()", this.actSigMap_, "map()");
 				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
               }
+    var dumpDb = new QAction(ag);
+    dumpDb.name = "dumpDatabaseAction";
+    dumpDb.menuText = sys.translate("Copia de Seguridad");
+    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
+    connect(dumpDb, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     var load = new QAction(ac);
     load.name = "loadAbanQPackageAction";
@@ -655,12 +661,6 @@ class MainWindow
            }
       }
     }
-    var dumpDb = new QAction(agm);
-    dumpDb.name = "dumpDatabaseAction";
-    dumpDb.menuText = sys.translate("Copia de Seguridad");
-    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
-    connect(dumpDb, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     agm.addSeparator();
 
@@ -893,7 +893,7 @@ function triggerAction(signature)
     debug("triggerAction: Action not found: " + signature);
   }
 
-  case (sgt[0]) {
+  switch (sgt[0]) {
     case "activated()":
       if (!ac.visible || !ac.enabled)
         ok = false;
@@ -905,7 +905,7 @@ function triggerAction(signature)
       break;
   }
 
-  case (sgt[1]) {
+  switch (sgt[1]) {
     case "initModule()":
       if (ok)
         mw.initModule(ac.name);
