@@ -96,15 +96,19 @@ bool FLFormDB::close()
 void FLFormDB::initForm()
 {
   if (cursor_ && cursor_->metadata()) {
+    bool captionIsSet = false;
     QString caption = " [ " + aqApp->lastTextCaption() + " ]";
     if (action_) {
       cursor_->setAction(action_);
-      if (action_->caption() != QString::null)
+      if (action_->caption() != QString::null) {
+        captionIsSet = true;
         setCaption(action_->caption() + caption);
+      }
       idMDI_ = action_->name();
     }
-
-    setCaption(cursor_->metadata()->alias() + caption);
+    if (!captionIsSet) {
+        setCaption(cursor_->metadata()->alias() + caption);
+    }
     setName("form" + idMDI_);
     QSProject *p = aqApp->project();
     iface = static_cast<FLFormDBInterface *>(p->object(name()));
