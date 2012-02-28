@@ -2871,8 +2871,6 @@ public slots:
   QByteArray fromBase64(QByteArray *ba) const;
   QByteArray compress(QByteArray *ba) const;
   QByteArray uncompress(QByteArray *ba) const;
-  QByteArray encryptInternal(QByteArray *ba) const;
-  QByteArray decryptInternal(QByteArray *ba) const;
   QString sha1(QByteArray *ba) const;
 
   int xsltproc(const QStringList &args) const;

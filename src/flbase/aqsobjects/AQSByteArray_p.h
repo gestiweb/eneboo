@@ -94,18 +94,6 @@ public slots:
     return qUncompress(*o_);
   }
 
-  QByteArray encryptInternal() const {
-    if (!o_)
-      return QByteArray();
-    return globalAQS->encryptInternal(o_);
-  }
-
-  QByteArray decryptInternal() const {
-    if (!o_)
-      return QByteArray();
-    return globalAQS->decryptInternal(o_);
-  }
-
   QString sha1() const {
     if (!o_)
       return QByteArray();
