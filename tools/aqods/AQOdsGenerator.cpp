@@ -357,6 +357,9 @@ static inline QString imageLink(const QString &image)
 
 bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
 {
+  qWarning("Función no soportada");
+  return false;
+/*
   AQS *aqs = globalAQS;
 
   QByteArray baAux;
@@ -490,5 +493,5 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
   zip.addFile("META-INF/manifest.xml", mf);
   zip.close();
 
-  return true;
+  return true; */
 }
