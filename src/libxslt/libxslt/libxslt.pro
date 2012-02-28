@@ -1,3 +1,5 @@
+PRJ_MODULE      = LibXSLT
+
 exists(../../../settings.pro) {
 	include(../../../settings.pro)
 }
