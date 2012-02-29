@@ -24,7 +24,7 @@
 #include <qtextedit.h>
 #include <qcheckbox.h>
 #include <qspinbox.h>
-
+#include <qclipboard.h> /// Añadimos libreria de portapapeles
 #include "mreportviewer.h"
 #include "FLReportViewer.h"
 #include "FLReportEngine.h"
@@ -148,6 +148,11 @@ void FLReportViewer::setReportEngine(FLReportEngine *r)
 
 void FLReportViewer::exec()
 {
+    soyGuaca_ = false;
+    soyGuaca_ = FLUtil::readSettingEntry( "Eneboo/SoyGuaca", "false" ).toBool();
+    if (!soyGuaca_) /// Si no soy Guaca , me comporto normalmente.
+    {
+
   if (loop) {
 #ifdef FL_DEBUG
     qWarning(tr("FLReportViewer::exec(): Se ha detectado una llamada recursiva"));
@@ -160,6 +165,21 @@ void FLReportViewer::exec()
   loop = true;
   QApplication::eventLoop()->enterLoop();
   clearWFlags(WShowModal);
+} else /// de lo contrario, soy Guaca
+          {
+          QClipboard *clipboard = QApplication::clipboard();
+          clipboard->setText("");  /// Limpio , para que detecte guaca que cambiamos el contenido
+           slotPrintReportToPDF( AQ_USRHOME + "/.Guacamole/outprintps.pdf"); /// Creamos el pdf.
+          
+           while ( proc->isRunning() )
+             qApp->processEvents();
+
+           delete proc;
+
+           qApp->processEvents();
+
+           clipboard->setText("STORM_IMPRIME");  /// Pongo en el portapapeles la bandera
+           } 
 }
 
 QString FLReportViewer::csvData()
