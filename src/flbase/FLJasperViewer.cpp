@@ -22,7 +22,8 @@
 #include "FLJasperViewer.h"
 #include "FLJasperEngine.h"
 #include "FLJasperEngine_p.h"
-
+#include "FLSqlDatabase.h"
+#include "FLManagerModules.h"
 
 class FLJasperViewerPrivate
 {
@@ -200,10 +201,98 @@ bool FLJasperViewer::setReportData(FLDomNodeInterface *n)
 
 bool FLJasperViewer::setReportTemplate(const QString &t)
 {
-  QString xml(d->qry_ ? d->qry_->db()->managerModules()->content(t + ".jrxml")
-              : FLSqlConnections::database()->managerModules()->content(t + ".jrxml"));
+     FLSqlDatabase *db = d->qry_->db();
+    char *packageVersion_;
+    bool ret;
+    QByteArray cabeceraBa;
+    QByteArray datosFichero;
+    QString cabecera;
+    qWarning("Cargando reporte " +t+".");
+    QByteArray byteCode;
+    QByteArray datosFicheroExpandido;
+    QByteArray Nuevo;
+    QString jrxml;
+    char *space;
+    QDomDocument enebooReportHead;
+    if (!db->dbAux())
+      return false;
+    QSqlQuery reportQry(QString::null, db->dbAux());
+    reportQry.setForwardOnly(true);
+    if(!reportQry.exec("SELECT data FROM flreports WHERE name = '" + t + "'"))
+        {
+        qWarning("No se ha ejecutado la consulta");
+        return false;
+        }
+
+    else
+    {
+    while (reportQry.next())
+           {
+         byteCode = reportQry.value(0).toByteArray();
+           }
+     QDataStream reportePkg_(byteCode, IO_ReadOnly);
+
+     reportePkg_ >> packageVersion_;
+
+    reportePkg_ >> cabeceraBa;
+    QTextIStream ti(qUncompress(cabeceraBa));
+    cabecera = ti.read(); //Recogemos la cabecera
+    bool maestro = false;
+    QTextCodec *codecReport = QTextCodec::codecForName("utf8");
+    ret = FLUtil::domDocumentSetContent(enebooReportHead, codecReport->toUnicode(cabecera));
+    if (ret) {
+              QDomElement enebooReportFile(enebooReportHead.documentElement());
+              if (enebooReportFile.tagName().lower() != "files") {
+#ifdef FL_DEBUG
+              qWarning("FLJasperViewer: " + tr("La cabecera de fichero no es del tipo Eneboo Report"));
+#endif
+              ret = false;
+                                             }
+              else
+                                             { //Procesamos la cebecera
+              QDomElement nodoLista;
+              QString nombreFichero;
+
+              QDomNodeList lista(enebooReportFile.elementsByTagName("name"));
+                        for (int i = 0; i < lista.count(); ++i) {
+                                                                 nodoLista = lista.item(i).toElement();
+                                                                 nombreFichero = nodoLista.text();
+                                                                 nombreFichero =  AQ_DISKCACHE_DIRPATH + "/" + nombreFichero;
+                                                                 qWarning(nombreFichero);
+                                                                 reportePkg_ >> datosFichero;
+
+                                                                 if (nombreFichero.endsWith(".jrxml"))
+                                                                                    {
+                                                                                     maestro = true;
+                                                                                     qWarning("Encontrado fichero jrxml");
+                                                                                     QTextIStream contenidoJrxml(qUncompress(datosFichero));
+                                                                                     jrxml = contenidoJrxml.read();
+                                                                                    // qWarning(jrxml);
+                                                                                     }
+                                                                                     else
+                                                                                     {
+                                                                                      QFile fir(nombreFichero);
+                                                                                      if (fir.open(IO_WriteOnly))
+                                                                                           {
+                                                                                            fir.writeBlock(qUncompress(datosFichero));
+                                                                                            fir.close();
+                                                                                              } else return false;
+
+
+
+
+                                                                                      }
+                                                               }
+                        if (maestro == false) return false; //Si no encuentro un frxml cancelo.
+
+
+                                     }
+             }
+    }
+
   QTextCodec *codec = QTextCodec::codecForName("utf8");
-  bool ret = FLUtil::domDocumentSetContent(d->xml_, codec->toUnicode(xml));
+  QString xml = jrxml;
+    ret = FLUtil::domDocumentSetContent(d->xml_, codec->toUnicode(xml));
   if (ret) {
     QDomElement e(d->xml_.documentElement());
     if (e.isNull() || e.tagName().lower() != "jasperreport") {
