@@ -77,6 +77,7 @@ void FLManager::init()
 
   tmpTMD = createSystemTable("flmetadata");
   tmpTMD = createSystemTable("flseqs");
+  tmpTMD = createSystemTable("flreports");
 
   if (!db_->dbAux())
     return;
