@@ -702,7 +702,7 @@ function loadModules(input, warnBackup)
     var dir = new Dir(sys.installPrefix() + "/share/eneboo/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
-              "Eneboo Packages (*.eneboopkg)\nAbanQ Packages (*.abanq)",
+              "Eneboo Packages (*.eneboopkg)\nEneboo Reports (*.enebooreport)\nAbanQ Packages (*.abanq)",
               AQUtil.translate("scripts", "Seleccionar Fichero")
             );
   }
@@ -724,7 +724,21 @@ function loadAbanQPackage(input, warnBackup)
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
       return;
   } 
-  
+  var dataReport:ByteArray;
+  if (input.endsWith(".enebooreport")) {
+   var fileReport = new File(input);
+   try {
+    fileReport.open(File.ReadOnly);
+      dataReport = fileReport.read(); 
+      } catch (e) {
+               errorMsgBox(sys.translate("Error leyendo fichero.") + "\n" + e);
+               return;
+               }
+  importReport(fileReport.name,dataReport);
+  return;
+  }   
+                                   
+
   if (input) {
     var ok = true;
    
@@ -836,6 +850,11 @@ function loadFilesDef(un)
 function registerFile(fil, un)
 {
 var Dump;
+  if (fil.id.endsWith(".enebooreport")) // Si es un .enebooreport , voy por otro camino.
+         {
+          importReport(fil.id,un.getBinary());
+          return true;
+         }
   if (fil.id.endsWith(".xpm")) {
     var cur = new AQSqlCursor("flmodules");
     if (!cur.select("idmodulo='" + fil.module + "'"))
@@ -2232,6 +2251,46 @@ function runTransaction(f, oParam)
   }
   return valor;
 }
+
+function importReport(filename,data)
+{
+ 
+ var util: FLUtil = new FLUtil();
+ debug(util.sha1(data));
+ var cursorReports = new FLSqlCursor("flreports");
+ filename = filename.toString().left(filename.length - 13);
+ cursorReports.select("name = '" + filename + "'");
+  if (!cursorReports.first()) {
+    debug("Se añade el report " + filename + ".");
+    cursorReports.setModeAccess(cursorReports.Insert);
+    cursorReports.refreshBuffer();
+    cursorReports.setValueBuffer("name", filename);
+    //cursorReports.setValueBuffer("sha", util.sha1(data));
+    cursorReports.setValueBuffer("data", data);
+    cursorReports.commitBuffer();
+  } else {
+    cursorReports.setModeAccess(cursorReports.Edit);
+    debug("Se actualiza el report " + filename + ".");
+    cursorReports.refreshBuffer();
+    var contenidoCopia = cursorReports.valueBuffer("data");
+    if (contenidoCopia != data) {
+      cursorReports.setModeAccess(cursorReports.Insert);
+      cursorReports.refreshBuffer();
+      var d = new Date;
+      cursorReports.setValueBuffer("name", filename + d.toString());
+      cursorReports.setValueBuffer("data", contenidoCopia);
+      cursorReports.commitBuffer();
+      cursorReports.select("name = '" + filename + "'");
+      cursorReports.first();
+      cursorReports.setModeAccess(cursorReports.Edit);
+      cursorReports.refreshBuffer();
+      //cursorReports.setValueBuffer("sha", util.sha1(data));
+      cursorReports.setValueBuffer("data", data);
+      cursorReports.commitBuffer();
+	                          } 
+          }
+}
+
 
 function openUrl(url)
 {
