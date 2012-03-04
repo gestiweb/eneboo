@@ -17,11 +17,12 @@
  ***************************************************************************/
 
 #include <qlibrary.h>
-
+#include <qprocess.h>
 #include "FLObjectFactory.h"
 #include "FLJasperViewer.h"
 #include "FLJasperEngine.h"
 #include "FLJasperEngine_p.h"
+
 
 class FLJasperViewerPrivate
 {
@@ -55,24 +56,53 @@ bool FLJasperViewerPrivate::viewReport(const QString &sourceFile)
 
   FLSqlDatabase *db = qry_->db();
   QString connStr;
+  QString driver;
+  QString Argumentos;
 
   if (db->driverName().contains("QMYSQL")) {
-    connStr = "jdbc:mysql://%1:%2/%3?user=%4&password=%5";
+    connStr = "jdbc:mysql://%1:%2/%3";
+      driver = "com.mysql.jdbc.Driver";
   } else {
-    connStr = "jdbc:postgresql://%1:%2/%3?user=%4&password=%5";
+    connStr = "jdbc:postgresql://%1:%2/%3";
+      driver = "org.postgresql.Driver";
   }
-  connStr = connStr.arg(db->host())
-            .arg(db->port())
-            .arg(db->database())
-            .arg(db->user())
-            .arg(db->password());
 
-  if (!aqReports->setConnection(connStr.local8Bit()))
+  connStr = connStr.arg(db->host()).arg(db->port()).arg(db->database());
+  connStr.local8Bit();
+   QString prefix(QString(AQ_LIB) + "/enebooreports.jar" );
+
+  QString comando = "java -jar "+ prefix +" "+ sourceFile + " " + driver +" "+ connStr +" "+db->user()+" "+db->password();
+
+  #ifdef FL_DEBUG
+   qWarning(comando);
+  #endif
+
+   QDir pathActual;
+   pathActual.setCurrent(AQ_DISKCACHE_DIRPATH);
+
+   QProcess *proc;
+   proc = new QProcess();
+   proc->addArgument( "java" );
+   proc->addArgument( "-jar" );
+   proc->addArgument( prefix );
+   proc->addArgument( sourceFile.local8Bit());
+   proc->addArgument( driver );
+   proc->addArgument( connStr.local8Bit());
+   proc->addArgument( db->user() );
+   proc->addArgument( db->password() );
+  if ( !proc->start() ) {
+    delete proc;
+      QMessageBox::warning(0, QApplication::tr("Aviso"),
+                           QApplication::tr("No se ha ejecutado el comnado de llamada a la librería Eneboo Reports.\n")
+                               + QApplication::tr("Se necesita para poder usar informes de JaperReports."),
+                           QMessageBox::Ok, 0, 0);
     return false;
+   }  
+   pathActual.setCurrent(AQ_USRHOME);
+   while ( proc->isRunning() )
+    qApp->processEvents();
 
-  bool ret = aqReports->viewReport(sourceFile.local8Bit());
-  delete aqReports;
-  return ret;
+  return true;
 }
 
 bool FLJasperViewerPrivate::viewReport(const QString &sourceFile,
@@ -88,10 +118,33 @@ bool FLJasperViewerPrivate::viewReport(const QString &sourceFile,
     return false;
   }
 
-  bool ret = aqReports->viewReport(sourceFile.local8Bit(),
-                                   xmlDataSourceFile.local8Bit());
-  delete aqReports;
-  return ret;
+   QString prefix(QString(AQ_LIB) + "/enebooreports.jar" );
+   QString driver = "XMLDAT";
+
+QProcess *proc;
+   proc = new QProcess();
+   proc->addArgument( "java" );
+   proc->addArgument( "-jar" );
+   proc->addArgument( prefix );
+   proc->addArgument( sourceFile.local8Bit());
+   proc->addArgument( driver );
+   proc->addArgument( xmlDataSourceFile.local8Bit());
+
+ if ( !proc->start() ) {
+    delete proc;
+      QMessageBox::warning(0, QApplication::tr("Aviso"),
+                           QApplication::tr("No se ha ejecutado el comnado de llamada a la librería Eneboo Reports.\n")
+                               + QApplication::tr("Se necesita para poder usar informes de JaperReports."),
+                           QMessageBox::Ok, 0, 0);
+    return false;
+   } 
+
+ while ( proc->isRunning() )
+    qApp->processEvents();
+
+  return true;
+
+
 }
 
 FLJasperViewer::FLJasperViewer(QObject *parent, const char *name) :
