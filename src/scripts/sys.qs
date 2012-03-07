@@ -410,7 +410,8 @@ function registerFile(fil, un)
   if (fil.text.length > 0)
     cur.setValueBuffer("contenido", un.getText());
   if (fil.binary.length > 0)
-    cur.setValueBuffer("binario", un.getBinary());
+    un.getBinary() // drop the binary data.
+    
   return cur.commitBuffer();
 }
 
