@@ -102,7 +102,12 @@ void FLFormDB::initForm()
       cursor_->setAction(action_);
       if (action_->caption() != QString::null) {
         captionIsSet = true;
-        setCaption(action_->caption() + caption);
+        QString action_caption = action_->caption(); 
+        if (action_caption.contains("TRANSLATE", false) != 0) {
+            action_caption = FLUtil::translate("MetaData", action_caption.mid(30, action_caption.length() - 32));
+        }
+
+        setCaption(action_caption + caption); 
       }
       idMDI_ = action_->name();
     }
