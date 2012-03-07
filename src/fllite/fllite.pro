@@ -37,11 +37,9 @@ load(qsa)
 
 SOURCES += main.cpp
 
-contains(DEFINES, FL_QUICK_CLIENT) {
-	IMAGES += images/splashabanq.png
-} else {
-	IMAGES += images/splashabanq.png
-}
+IMAGES += images/splashdebugger.png \
+          images/splashclient.png
+
 
 win32:QMAKE_LFLAGS += -mconsole -mwindows
 

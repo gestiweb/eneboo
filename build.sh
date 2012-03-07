@@ -370,13 +370,6 @@ if [ "$AQ_PACK_VER" == "" ]; then
     AQ_PACK_VER="(qstrlen(V) > 0 && qstrcmp(AQPACKAGER_VERSION, V) == 0)"
 fi
 
-if [ "$AQ_ENC_KEY" == "" ]; then
-  AQ_ENC_KEY="char enckey[32]"
-fi
-
-if [ "$AQ_ENC_KEYVI" == "" ]; then
-  AQ_ENC_KEYVI="char enckeyvi[32]"
-fi
 
 echo -e "\n\nRecopilando datos de la compilación \n"
 DATOS_COMPILACION="\n Versión eneboo: $VERSION \n Mkspecs: $OPT_QMAKESPEC \n Make: $CMD_MAKE \n Versión GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilación : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT \n QT_DEBUG_OPT: $QT_DEBUG_OPT" 
@@ -404,8 +397,6 @@ cat > AQConfig.h <<EOF
 #define AQ_CIN(C)                   $AQ_CIN
 #define AQPACKAGER_VERSION_CHECK(V) $AQ_PACK_VER
 #define ENB_DATOS_COMP              "$DATOS_COMPILACION"
-#define AQ_ENC_KEY                  $AQ_ENC_KEY
-#define AQ_ENC_KEYVI                $AQ_ENC_KEYVI
 
 class QApplication;
 class FLApplication;
