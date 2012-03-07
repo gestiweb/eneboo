@@ -930,7 +930,7 @@ QVariant SqliteResult::data(int i)
     return QVariant();
   }
 
-  if (qstrcmp(dataSet->fieldName(i), "binario") == 0) {
+  if (qstrcmp(dataSet->fieldName(i), "binario") == 0) { // <- esto es un hack para guardar hexadecimal y interpretar binario.
     QString str(dataSet->fv(dataSet->fieldName(i)).get_asString().c_str());
     QByteArray ba;
     QDataStream dts(ba, IO_WriteOnly);

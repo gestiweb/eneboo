@@ -131,20 +131,12 @@ void FLManagerModules::loadKeyFiles()
 
   QSqlQuery q(QString::null, db_->dbAux());
   q.setForwardOnly(true);
-#ifndef QSDEBUGGER
-  q.exec("SELECT nombre,sha,idmodulo,binario FROM flfiles");
-#else
   q.exec("SELECT nombre,sha,idmodulo FROM flfiles");
-#endif
   QString name;
   while (q.next()) {
     name = q.value(0).toString();
     dictKeyFiles->replace(name, new QString(q.value(1).toString()));
     dictModFiles->replace(name.upper(), new QString(q.value(2).toString()));
-#ifndef QSDEBUGGER
-    if (name.endsWith(".qs") && !q.isNull(3))
-      FLMemCache::insert(name, byteCodeToStr(q.value(3).toByteArray()));
-#endif
   }
 }
 
@@ -448,8 +440,6 @@ QString FLManagerModules::contentCode(const QString &n) const
     QSqlQuery q(QString::null, db_->dbAux());
     q.setForwardOnly(true);
     if (!q.exec(
-          QString::fromLatin1("SELECT binario FROM flfiles WHERE upper(nombre)='") +
-          n.upper() + QString::fromLatin1("'")
         )
        )
       return QString::null;
