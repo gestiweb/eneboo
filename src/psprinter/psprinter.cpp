@@ -98,13 +98,10 @@ PSPrinter::PSPrinter( PrinterMode m )
   paper_source = OnlyOne;
   buffer = 0;
   switch ( m ) {
-    case Compatible:
-    case PrinterResolution:
-    case ScreenResolution:
-    case HighResolution: {
-      res = 72;
-    }
-    break;
+    case Compatible:            res = 96;   break;
+    case PrinterResolution:     res = 200;  break;
+    case ScreenResolution:      res = 72;   break;
+    case HighResolution:        res = 300;  break;
   }
 
   D = new PSPrinterUnixPrivate;
@@ -477,7 +474,7 @@ int PSPrinter::metric( int m ) const {
       break;
     case QPaintDeviceMetrics::PdmPhysicalDpiX:
     case QPaintDeviceMetrics::PdmPhysicalDpiY:
-      val = 72;
+        val = res;
       break;
     case QPaintDeviceMetrics::PdmWidthMM:
       // double rounding error here.  hooray.
