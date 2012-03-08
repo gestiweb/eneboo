@@ -209,8 +209,6 @@ static QSqlError qMakeError(const QString &err, int type, const QPSQLPrivate *p)
     msg += QString::fromLatin1(s);
   else
     msg += QString::fromUtf8(s);
-  msg += "\n\n";
-  msg += QApplication::tr("Obtenga ayuda y soporte en") + " http://www.infosial.com\n(c) InfoSiAL S.L.";
   return QSqlError("QPSQL: " + err, msg, type);
 }
 

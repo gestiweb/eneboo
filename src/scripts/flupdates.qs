@@ -123,7 +123,7 @@ function oficial_finDatos() {
     sys.reinit();
   } else {
     MessageBox.critical(
-    this.iface.util.translate("scripts", "Actualización cancelada.\n" + "Se ha producido un error al intentar obtener la herramienta de actualización.\n" + "Pruebe a repetir la actualización más tarde y si el problema persiste\n" + "puede obtener ayuda y soporte en http://www.infosial.com InfoSiAL S.L."), MessageBox.Ok);
+    this.iface.util.translate("scripts", "Actualización cancelada.\n" + "Se ha producido un error al intentar obtener la herramienta de actualización.\n" + "Pruebe a repetir la actualización más tarde."), MessageBox.Ok);
   }
 }
 
