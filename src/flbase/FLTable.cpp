@@ -75,3 +75,18 @@ void FLTable::setCellAlignment(int row, int col, const int a)
   QString key(QString("%1,%2").arg(row).arg(col));
   cellAlignments_[key] = a;
 }
+
+// [d5] Versión 1 para pintado de celda. DC 17/03/2010
+/*
+void FLTable::chgCellBackgroundColor( int row, int col, const QColor & color , const FLTable & obj) {
+  setCellBackgroundColor( row,col,color );
+	QPainter p( this ); // Primera prueba para declaración de QPainter. En teoría This es el QTable...
+	//QPainter p( parent ); // Probamos con parent...
+	const QColorGroup &cg  = colorGroup();
+	
+	QRect cr = obj.cellGeometry( row, col );			
+	bool selected = obj.isSelected( row, col );
+	
+	paintCell( p, row, col, cr, selected, &cg );
+}
+*/
