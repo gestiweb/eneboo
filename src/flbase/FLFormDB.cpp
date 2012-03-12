@@ -15,7 +15,7 @@
  bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
  versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
-
+#include <stdio.h>
 #include "FLFormDB.h"
 #include "FLSqlCursor.h"
 #include "FLTableMetaData.h"
@@ -284,62 +284,77 @@ void FLFormDB::initMainWidget(QWidget *w)
       acl->process(this);
 
     QWidget *pW = this->parentWidget();
+    QRect desk;
     if (!(pW && pW->isA("QWorkspaceChild"))) {
-      pW = this;
+        desk = QApplication::desktop()->availableGeometry(this);
+        pW = this;
+    } else {
+        desk = pW->parentWidget()->rect();
     }
 
     QRect geo(aqApp->geometryForm(QObject::name()));
-    if (geo.width() == 9999) {
-    } else if (geo.width() == 1) {
-    } else if (geo.isValid()) {
-      QRect desk = QApplication::desktop()->availableGeometry(this);
-      int border = 5, border_b = 48;
-      
-      
-      // Exceeds available horizontal area:
-      if (geo.width() > desk.width() - border * 2) {
-        geo.setWidth(desk.width() - border * 2 - 5);
-      }
-      // Exceeds available vertical area:
-      if (geo.height() > desk.height() - border - border_b) {
-        geo.setHeight(desk.height() - border - border_b - 5);
-      }
-      
-      if ( geo.top() < desk.top() + border)  {
+    pW->show();
+    mWidget->updateGeometry();
+    // QSize minSz = mWidget->baseSize();
+    int border = 5, border_b = 48;
+    QSize SzH = mWidget->sizeHint();
+
+    if (geo.width() < SzH.width() || geo.width()>9000) {
+        geo.setWidth(SzH.width());
         geo.moveTop(desk.top() + border - geo.top()+1);
-      }
-      
-      if ( geo.left() < desk.left() + border) {
+    }
+    if (geo.height() < SzH.height() || geo.width()>9000) {
+        geo.setHeight(SzH.height());
+    }
+    // Exceeds available horizontal area:
+    if (geo.width() > desk.width() - border * 2) {
+        geo.setWidth(desk.width() - border * 2 - 5);
+    }
+    // Exceeds available vertical area:
+    if (geo.height() > desk.height() - border - border_b) {
+        geo.setHeight(desk.height() - border - border_b - 5);
+    }
+
+    if ( geo.top() < desk.top() + border)  {
+        geo.moveTop(desk.top() + border - geo.top()+1);
+    }
+
+    if ( geo.left() < desk.left() + border) {
         geo.moveLeft(desk.left() + border - geo.left()+1);
-      }
-      
-      if ( geo.bottom() > desk.bottom() - border_b ) {
+    }
+
+    if ( geo.bottom() > desk.bottom() - border_b ) {
         int diff = geo.bottom() - desk.bottom() - border_b;
         geo.moveTop(-diff-1);
-      }
-      
-      if ( geo.right() > desk.right() - border) {
+    }
+
+    if ( geo.right() > desk.right() - border) {
         int diff = geo.right() - desk.right() - border;
         geo.moveLeft(-diff-1);
-      }
-      
-      // Outside of screen, re-center:
-      if (  geo.right() > desk.right() - border  
-         || geo.left() < desk.left() + border
-         || geo.bottom() > desk.bottom() - border_b
-         || geo.top() < desk.top() + border ) {
-        geo.moveCenter(desk.center());
-      }
-        
-      pW->resize(geo.size());
-      pW->move(geo.topLeft());
-    } else {
-      pW->resize(size().expandedTo(mWidget->size()));
-#if defined(Q_OS_WIN32)
-          this->setGeometry(geo);
-#else
-#endif
     }
+
+    // Outside of screen, re-center:
+    if (  geo.right() > desk.right() - border  
+     || geo.left() < desk.left() + border
+     || geo.bottom() > desk.bottom() - border_b
+     || geo.top() < desk.top() + border ) {
+        geo.moveCenter(desk.center());
+    }
+
+    mWidget->resize(geo.size());
+
+    pW->updateGeometry();
+    QSize tSz= pW->size();
+    QSize tSzH = pW->sizeHint();
+    if (tSz.width() < tSzH.width()) {
+        tSz.setWidth(tSzH.width());
+    }
+    if (tSz.height() < tSzH.height()) {
+        tSz.setHeight(tSzH.height());
+    }
+    pW->resize(tSz.expandedTo(mWidget->size()));
+    
+    pW->move(geo.topLeft());
 
     if (!initFocusWidget_) {
       itf.toFirst();
@@ -369,8 +384,8 @@ void FLFormDB::initMainWidget(QWidget *w)
       }
       if (topWidget != this)
         setFocus();
-    } else
-      setFocus();
+    } else setFocus();
+    
   }
 }
 
