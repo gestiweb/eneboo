@@ -733,7 +733,7 @@ void FLApplication::initToolBox()
   connect(helpIndexAction, SIGNAL(activated()), this, SLOT(helpIndex()));
   helpIndexAction->addTo(helpToolBar);
 
-  FLWidgetAction *aboutAction = new FLWidgetAction(tr("Ayuda"), tr("Acerca de AbanQ"), tr("&Acerca de AbanQ"), QKeySequence(), helpToolBar, "acercaabanq");
+  FLWidgetAction *aboutAction = new FLWidgetAction(tr("Ayuda"), tr("Acerca de Eneboo"), tr("&Acerca de Eneboo"), QKeySequence(), helpToolBar, "acercaeneboo");
   aboutAction->setIconSet(QPixmap::fromMimeSource("about.png"));
   connect(aboutAction, SIGNAL(activated()), this, SLOT(aboutAbanQ()));
   aboutAction->addTo(helpToolBar);
