@@ -6,7 +6,7 @@ VER="2.4"
 REBUILD_QT=auto
 OPT_PREFIX=""
 OPT_QMAKESPEC=""
-OPT_DEBUG=no
+OPT_DEBUG=yes
 OPT_SQLLOG=no
 
 OPT_HOARD=no
@@ -19,7 +19,7 @@ OPT_QWT=yes
 OPT_DIGIDOC=yes
 OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
-OPT_QUICK_CLIENT=no
+OPT_QUICK_CLIENT=yes
 OPT_MAKE_SILENT=yes
 OPT_DEBUGGER=no
 OPT_NEBULA_BUILD=no
@@ -34,10 +34,8 @@ if [ -e ".svn" -a "$BUILD_NUMBER" == "" ]; then
 fi
 
 if [ -e ".git" -a "$BUILD_NUMBER" == "" ]; then
-  APPEND="$(git diff --quiet || echo '-dev')"
+  APPEND="$(git diff --quiet -- src/flbase || echo '-dev')"
   BUILD_NUMBER="$(git describe --tags)$APPEND"
-  
-  
 fi
 
 if [ "$BUILD_NUMBER" == "" ]; then
@@ -69,6 +67,9 @@ for a in "$@"; do
     -quick)
       OPT_QUICK_CLIENT=yes  
     ;;
+    -dbadmin)
+      OPT_QUICK_CLIENT=no
+    ;;
     -single)
       OPT_MULTICORE=no
     ;;
@@ -80,7 +81,10 @@ for a in "$@"; do
     ;;
     -debug)
       OPT_DEBUG=yes
-      BUILD_NUMBER="$BUILD_NUMBER-debug"
+    ;;
+    -no-debug)
+      OPT_DEBUG=no
+      BUILD_NUMBER="$BUILD_NUMBER-nodbg"
     ;;
     -debugger)
       OPT_DEBUGGER=yes
@@ -165,7 +169,8 @@ if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; t
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
-  BUILD_NUMBER="$BUILD_NUMBER-quick"
+else
+  BUILD_NUMBER="$BUILD_NUMBER-dba"
 fi
 if [ "$OPT_NEBULA_BUILD" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DAQ_NEBULA_BUILD"
