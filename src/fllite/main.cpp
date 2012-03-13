@@ -220,7 +220,7 @@ void aq_main(int argc, char **argv)
       if(!img.isNull()) // Load succeded ?
              splash = new QSplashScreen(QPixmap(img)); 
                else
-#ifdef QSDEBUGGER
+#ifndef FL_QUICK_CLIENT
  splash = new QSplashScreen(QPixmap::fromMimeSource("splashdebugger.png"));
 #else
  splash = new QSplashScreen(QPixmap::fromMimeSource("splashclient.png"));
