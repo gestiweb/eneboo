@@ -1275,19 +1275,26 @@ QString QPSQLDriver::formatValueLike(int t, const QVariant &v, const bool upper)
     default: {
       res = v.toString();
       res.replace(QChar('\''), "''");
-      if (upper)
-        res = "'" + res.upper();
-      else
-        res = "'" + res;
-      if (protocol() < QPSQLDriver::Version82)
-        res.replace("\\", "\\\\");
-      else  {
-        if (res.contains("\\")) {
-          res.replace("\\", "\\\\");
-          res.prepend('E');
-        }
+      res.replace("\\", "\\\\");
+      if (protocol() >= QPSQLDriver::Version82) {
+        res.replace("\b", "\\b"); // \b - backspace
+        res.replace("\f", "\\f"); // \f - form feed
+        res.replace("\n", "\\n"); // \n - newline
+        res.replace("\r", "\\r"); // \r - carriage return
+        res.replace("\t", "\\t"); // \t - tab
       }
-      res = "::text LIKE " + res + "%%'";
+
+      if (upper) {
+        res = res.upper();
+      } 
+      
+      res = "'" + res + "%%'";
+        
+      if (protocol() >= QPSQLDriver::Version82) {
+          res.prepend('E');
+      }
+      
+      res = "::text LIKE " + res;
       break;
     }
   }
@@ -1329,18 +1336,25 @@ QString QPSQLDriver::formatValue(int t, const QVariant &v, const bool upper)
     default: {
       res = v.toString();
       res.replace(QChar('\''), "''");
-      if (upper)
-        res = "'" + res.upper() + "'";
-      else
-        res = "'" + res + "'";
-      if (protocol() < QPSQLDriver::Version82)
-        res.replace("\\", "\\\\");
-      else  {
-        if (res.contains("\\")) {
-          res.replace("\\", "\\\\");
-          res.prepend('E');
-        }
+      res.replace("\\", "\\\\");
+      if (protocol() >= QPSQLDriver::Version82) {
+        res.replace("\b", "\\b"); // \b - backspace
+        res.replace("\f", "\\f"); // \f - form feed
+        res.replace("\n", "\\n"); // \n - newline
+        res.replace("\r", "\\r"); // \r - carriage return
+        res.replace("\t", "\\t"); // \t - tab
       }
+
+      if (upper) {
+        res = res.upper();
+      } 
+      
+      res = "'" + res + "'";
+        
+      if (protocol() >= QPSQLDriver::Version82) {
+          res.prepend('E');
+      }
+        
       break;
     }
 
@@ -2533,14 +2547,20 @@ QString QPSQLDriver::formatValue(const QSqlField *field, bool) const
             break;
           }
           default:
-            r = QSqlDriver::formatValue(field);
-            if (protocol() < QPSQLDriver::Version82)
-              r.replace("\\", "\\\\");
-            else  {
-              if (r.contains("\\")) {
-                r.replace("\\", "\\\\");
+            r = field->value().toString();
+            r.replace(QChar('\''), "''");
+            r.replace("\\", "\\\\");
+            if (protocol() >= QPSQLDriver::Version82) {
+              r.replace("\b", "\\b"); // \b - backspace
+              r.replace("\f", "\\f"); // \f - form feed
+              r.replace("\n", "\\n"); // \n - newline
+              r.replace("\r", "\\r"); // \r - carriage return
+              r.replace("\t", "\\t"); // \t - tab
+            }
+            r = "'" + r + "'";
+        
+            if (protocol() >= QPSQLDriver::Version82) {
                 r.prepend('E');
-              }
             }
             break;
         }
@@ -2843,10 +2863,10 @@ void QPSQLDriver::Mr_Proper()
 
   steps = 0;
   qry.exec("select tablename from pg_tables where schemaname='public'");
-  FLUtil::createProgressDialog(tr("Vacunando base de datos"), qry.size());
+  FLUtil::createProgressDialog(tr("Compactando base de datos"), qry.size());
   while (qry.next()) {
     item = qry.value(0).toString();
-    FLUtil::setLabelText(tr("Vacunando tabla %1").arg(item));
+    FLUtil::setLabelText(tr("Compactando tabla %1").arg(item));
     qry2.exec("vacuum " + item);
 #ifdef FL_DEBUG
     qWarning("vacuum " + item);
@@ -2874,7 +2894,7 @@ void QPSQLDriver::Mr_Proper()
         }
       } else {
 #ifdef FL_DEBUG
-        qWarning("No fieldBd " +  fieldMtd->name());
+        qWarning("No fielddb " +  fieldMtd->name());
 #endif
         mustAlter = true;
         break;
