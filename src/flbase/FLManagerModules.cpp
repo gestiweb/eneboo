@@ -83,6 +83,7 @@ void FLManagerModules::loadAllIdModules()
   q.setForwardOnly(true);
   q.exec("SELECT idmodulo,flmodules.idarea,flmodules.descripcion,version,icono,flareas.descripcion "
          "FROM flmodules left join flareas on flmodules.idarea = flareas.idarea");
+  bool sysModuleFound = false;
   while (q.next()) {
     FLInfoMod *infoMod = new FLInfoMod();
     infoMod->idModulo = q.value(0).toString();
@@ -94,6 +95,18 @@ void FLManagerModules::loadAllIdModules()
     dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
     if (infoMod->idModulo != "sys")
       listAllIdModules_->append(infoMod->idModulo);
+    else
+      sysModuleFound = true;
+  }
+  if (!sysModuleFound) {
+    FLInfoMod *infoMod = new FLInfoMod();
+    infoMod->idModulo = QString("sys");
+    infoMod->idArea = QString("sys");
+    infoMod->descripcion = QString("Administración");
+    infoMod->version = QString("0.0");
+    infoMod->icono = contentFS(AQ_DATA + "/sys.xpm");
+    infoMod->areaDescripcion = QString("Sistema");
+    dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
   }
 }
 
