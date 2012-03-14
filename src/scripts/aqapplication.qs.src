@@ -557,7 +557,7 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
         var ac = new QActionGroup(ag);
         ac.name = modules[j];
         if (sys.isQuickBuild()) {
-            if (ac.name == "sys" || ag.name == "sys") {
+            if (ac.name == "sys") {
                 continue;
             }
         }
