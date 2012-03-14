@@ -1118,7 +1118,7 @@ FLAction *FLManager::action(const QString &n)
               continue;
             }
             if (e2.tagName() == "description") {
-              a->setCaption(e2.text());
+              //a->setCaption(e2.text());
               no2 = no2.nextSibling();
               continue;
             }
