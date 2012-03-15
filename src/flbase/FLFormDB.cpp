@@ -290,25 +290,36 @@ void FLFormDB::initMainWidget(QWidget *w)
 
     QWidget *pW = this->parentWidget();
     QRect desk;
+    bool parentIsDesktop = true;
+    
     if (!(pW && pW->isA("QWorkspaceChild"))) {
         desk = QApplication::desktop()->availableGeometry(this);
         pW = this;
     } else {
         desk = pW->parentWidget()->rect();
+        parentIsDesktop = false;
     }
 
     QRect geo(aqApp->geometryForm(QObject::name()));
     pW->show();
     mWidget->updateGeometry();
-    // QSize minSz = mWidget->baseSize();
-    int border = 5, border_b = 48;
+    QSize bSz = mWidget->baseSize();
     QSize SzH = mWidget->sizeHint();
-
-    if (geo.width() < SzH.width() || geo.width()>9000) {
-        geo.setWidth(SzH.width());
-        geo.moveTop(desk.top() + border - geo.top()+1);
+    int border = 5, border_b = 48;
+    
+    if (geo.width() < 100 || geo.width()>9000) {
+        geo.setWidth(bSz.width());
+        geo.setHeight(bSz.height());
+        geo.moveCenter(desk.center());
+        if (!parentIsDesktop) {
+            geo.moveTop(desk.top() + border - geo.top()+1);
+        }
     }
-    if (geo.height() < SzH.height() || geo.width()>9000) {
+
+    if (geo.width() < SzH.width()) {
+        geo.setWidth(SzH.width());
+    }
+    if (geo.height() < SzH.height()) {
         geo.setHeight(SzH.height());
     }
     // Exceeds available horizontal area:
