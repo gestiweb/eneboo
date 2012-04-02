@@ -551,7 +551,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
             v = QDate::currentDate();
             break;
           default:
-            v = QString("NULL");
+            v = QString("NULL").left(newField->length());
             break;
         }
       }
@@ -881,6 +881,10 @@ bool SqliteResult::reset(const QString &q)
   query.replace("=;", "= NULL;");
   while (query.endsWith(";"))
     query.truncate(query.length() - 1);
+  if (query.upper().endsWith("NOWAIT"))
+    query.truncate(query.length() - 6);
+  if (query.upper().endsWith("FOR UPDATE"))
+    query.truncate(query.length() - 10);
   if (!isSelect()) {
     if (query.find("CREATE TABLE", 0, false) == 0) {
       Dataset *ds = ((SqliteDriver *) driver) ->dataBase() ->CreateDataset();
