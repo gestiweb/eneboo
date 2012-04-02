@@ -355,7 +355,8 @@ bool QPSQLResult::openCursor()
       return true;
     } else {
       setLastError(qMakeError(QApplication::tr("La consulta a la base de datos ha fallado"), QSqlError::Statement, d));
-      qWarning(QString(PQresultErrorMessage(result)) + "\n" + q + "\n");
+      //qWarning(QString(PQresultErrorMessage(result)) + "\n" + q + "\n");
+      fprintf(stderr, "%s\n%s\n", PQresultErrorMessage(result), q.latin1());
       PQclear(result);
       cleanupCache();
     }
@@ -781,16 +782,18 @@ bool QPSQLResult::reset(const QString &query)
   if (!dr || !dr->isOpen() || dr->isOpenError())
     return false;
 
-  QString q = query.stripWhiteSpace();
-  QString qLimit;
-
+  QString q(query.stripWhiteSpace());
   q.replace("=;", "= NULL;");
   while (q.endsWith(";"))
     q.truncate(q.length() - 1);
 
-  qLimit = q;
-  if (q.left(7).upper().contains("SELECT")) {
-    if (!qLimit.upper().contains(" LIMIT "))
+  QString qLimit(q);
+  QString qUpper(q.upper());
+  bool forUpdate = false;
+
+  if (qUpper.left(7).contains("SELECT")) {
+    forUpdate = qUpper.endsWith("FOR UPDATE") || qUpper.endsWith("NOWAIT");
+    if (!forUpdate && !qUpper.contains(" LIMIT "))
       qLimit += " LIMIT " + QString::number(LIMIT_RESULT + 1);
   }
 
@@ -817,12 +820,13 @@ bool QPSQLResult::reset(const QString &query)
   } else {
     QString msgError = PQresultErrorMessage(d->result);
     setLastError(qMakeError(QApplication::tr("La consulta a la base de datos ha fallado"), QSqlError::Statement, d));
-    qWarning("QPSQLResult::reset: " + msgError + "\n" + q + "\n");
+    //qWarning("QPSQLResult::reset: " + msgError + "\n" + q + "\n");
+    fprintf(stderr, "%s\n%s\n", msgError.latin1(), q.latin1());
     cleanupCache();
     return false;
   }
 
-  if (currentSize >= LIMIT_RESULT) {
+  if (!forUpdate && currentSize >= LIMIT_RESULT) {
     d->qry = q;
     d->idCursor = "C" + QString::number(d->idConn) + QString::number(cursorCounter++);
     if (!openCursor())
@@ -860,7 +864,8 @@ static inline void setDatestyle(PGconn *connection)
 #ifdef QT_CHECK_RANGE
   int status = PQresultStatus(result);
   if (status != PGRES_COMMAND_OK)
-    qWarning("%s", PQerrorMessage(connection));
+    //qWarning("%s", PQerrorMessage(connection));
+    fprintf(stderr, "%s\n%", PQerrorMessage(connection));
 #endif
   PQclear(result);
 }
@@ -917,8 +922,11 @@ static inline QPSQLDriver::Protocol getPSQLVersion(PGconn *connection)
         else if (vMin < 4)
           return QPSQLDriver::Version83;
         return QPSQLDriver::Version84;
-      } else if (vMaj == 9)
-        return QPSQLDriver::Version9;
+      } else if (vMaj == 9) {
+        if (vMin < 1)
+          return QPSQLDriver::Version9;
+        return QPSQLDriver::Version91;
+      }
       return QPSQLDriver::Version7;
     }
   } else {
@@ -1224,7 +1232,10 @@ QString QPSQLDriver::sqlCreateTable(FLTableMetaData *tmd)
         primaryKey = field->name();
       } else {
 #ifdef FL_DEBUG
-        qWarning(QApplication::tr("FLManager : Tabla-> ") + tmd->name() + QApplication::tr(" . Se ha intentado poner una segunda clave primaria para el campo ") + field->name() + QApplication::tr(" , pero el campo ") + primaryKey + QApplication::tr(" ya es clave primaria. Sólo puede existir una clave primaria en FLTableMetaData, use FLCompoundKey para crear claves compuestas."));
+        qWarning(QApplication::tr("FLManager : Tabla-> ") + tmd->name() +
+                 QApplication::tr(" . Se ha intentado poner una segunda clave primaria para el campo ") +
+                 field->name() + QApplication::tr(" , pero el campo ") + primaryKey +
+                 QApplication::tr(" ya es clave primaria. Sólo puede existir una clave primaria en FLTableMetaData, use FLCompoundKey para crear claves compuestas."));
 #endif
         return QString::null;
       }
@@ -1395,6 +1406,16 @@ bool QPSQLDriver::alterTable(const QString &mtd1, const QString &mtd2, const QSt
   return alterTable2(mtd1, mtd2, key);
 }
 
+bool QPSQLDriver::constraintExists(const QString &name) const
+{
+  QString sql = "SELECT constraint_name FROM ";
+  sql += "information_schema.table_constraints where ";
+  sql += "constraint_name='%1'";
+
+  QSqlQuery q(QString::null, db_->dbAux());
+  return q.exec(sql.arg(name)) && q.size() > 0;
+}
+
 bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
 {
   FLTableMetaData *oldMTD = newMTD;
@@ -1406,7 +1427,9 @@ bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
 
   QSqlQuery q(QString::null, db_->dbAux());
 
-  if (!q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + oldMTD->name() + "_pkey")) {
+  QString constraintName(oldMTD->name() + "_pkey");
+  if (constraintExists(constraintName) &&
+      !q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + constraintName)) {
     db_->dbAux()->rollback();
     return false;
   }
@@ -1415,7 +1438,9 @@ bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
   while ((oldField = it.current()) != 0) {
     ++it;
     if (oldField->isUnique()) {
-      if (!q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + oldMTD->name() + "_" + oldField->name() + "_key")) {
+      constraintName = oldMTD->name() + "_" + oldField->name() + "_key";
+      if (constraintExists(constraintName) &&
+          !q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + constraintName)) {
         db_->dbAux()->rollback();
         return false;
       }
@@ -1517,7 +1542,7 @@ bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
             v = QDate::currentDate();
             break;
           default:
-            v = QString("NULL");
+            v = QString("NULL").left(newField->length());
             break;
         }
       }
@@ -1688,8 +1713,10 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
   }
 
   QSqlQuery q(QString::null, db_->dbAux());
+  QString constraintName(oldMTD->name() + "_pkey");
 
-  if (!q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + oldMTD->name() + "_pkey")) {
+  if (constraintExists(constraintName) &&
+      !q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + constraintName)) {
 #ifdef FL_DEBUG
     qWarning("FLManager : " + QApplication::tr("En método alterTable, no se ha podido borrar el índice %1_pkey de la tabla antigua.").arg(oldMTD->name()));
 #endif
@@ -1706,7 +1733,9 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
   while ((oldField = it.current()) != 0) {
     ++it;
     if (oldField->isUnique()) {
-      if (!q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + oldMTD->name() + "_" + oldField->name() + "_key")) {
+      constraintName = oldMTD->name() + "_" + oldField->name() + "_key";
+      if (constraintExists(constraintName) &&
+          !q.exec("ALTER TABLE " + oldMTD->name() + " DROP CONSTRAINT " + constraintName)) {
 #ifdef FL_DEBUG
         qWarning("FLManager : " +
                  QApplication::tr("En método alterTable, no se ha podido borrar el índice %1_%2_key de la tabla antigua.")
@@ -1858,7 +1887,7 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
             v = QDate::currentDate();
             break;
           default:
-            v = QString("NULL");
+            v = QString("NULL").left(newField->length());
             break;
         }
       }
@@ -2140,6 +2169,7 @@ QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const
     case QPSQLDriver::Version83:
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
+    case QPSQLDriver::Version91:
       stmt = "select pg_att1.attname, pg_att1.atttypid::int, pg_cl.relname "
              "from pg_attribute pg_att1, pg_attribute pg_att2, pg_class pg_cl, pg_index pg_ind "
              "where lower(pg_cl.relname) = '%1_pkey' "
@@ -2217,6 +2247,7 @@ QSqlRecord QPSQLDriver::record2(const QString &tablename) const
     case QPSQLDriver::Version83:
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
+    case QPSQLDriver::Version91:
       stmt = "select pg_attribute.attname, pg_attribute.atttypid::int "
              "from pg_class, pg_attribute "
              "where lower(pg_class.relname) = '%1' "
@@ -2350,6 +2381,7 @@ QSqlRecordInfo QPSQLDriver::recordInfo2(const QString &tablename) const
     case QPSQLDriver::Version83:
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
+    case QPSQLDriver::Version91:
       stmt = "select pg_attribute.attname, pg_attribute.atttypid::int, pg_attribute.attnotnull, "
              "pg_attribute.attlen, pg_attribute.atttypmod, pg_attrdef.adsrc "
              "from pg_class, pg_attribute "
@@ -2579,8 +2611,9 @@ QString QPSQLDriver::formatValue(const QSqlField *field, bool) const
         r += QChar('\'');
         r += QString::fromLatin1((const char *) data);
         r += QChar('\'');
-        if (protocol() >= QPSQLDriver::Version82)
-          r.prepend(QChar('E'));
+        if (protocol() >= QPSQLDriver::Version82 &&
+            protocol() < QPSQLDriver::Version9)
+          r.prepend('E');
         qPQfreemem(data);
         break;
       }
@@ -2900,6 +2933,21 @@ void QPSQLDriver::Mr_Proper()
         break;
       }
     }
+
+#if 0
+    for (int i = 0; i < recBd.count(); ++i) {
+      fieldBd = recBd.field(i);
+      fieldMtd = recMtd.field(fieldBd->name());
+      if (!fieldMtd) {
+#ifdef FL_DEBUG
+        qWarning("No fieldMtd " +  fieldBd->name());
+#endif
+        mustAlter = true;
+        break;
+      }
+    }
+#endif
+
     if (mustAlter) {
 #ifdef FL_DEBUG
       qWarning("mustAlter " + item);
