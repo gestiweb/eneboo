@@ -1,6 +1,6 @@
 /*
 odf-gen: Simple API to generate OpenDocument documents.
-    Copyright (C) 2009  Pablo Jorge, FuDePAN
+    Copyright (C) 2012  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
 
@@ -18,11 +18,21 @@ odf-gen: Simple API to generate OpenDocument documents.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*  As a special exception, you may create a larger work that contains
+    part of all of the odf-gen project and distribute that work under
+    the terms of the GNU General Public License as published by the
+    Free Software Foundation; version 2 of the License
+
+    Alternatively, if you modify or redistribute the ODF generator
+    itself, you may (ar your option) remove this special exception
+
+    This special exception was added by Pablo Jorge in 
+    version 1.3 of odf-gen. 
+*/
+
 #ifndef ODFGEN_H
 #define ODFGEN_H
 
-//#define ODFGEN_NAMESPACE
- 
 #ifdef ODFGEN_NAMESPACE
 namespace odfgen
 {
