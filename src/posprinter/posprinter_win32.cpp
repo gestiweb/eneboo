@@ -47,7 +47,6 @@ void FLPosPrinter::flush()
   QString server = printerName_.left(posdots);
   QString name = printerName_.right(printerName_.length() - posdots - 1);
 
-#ifdef AQ_LPR_EXTERNAL
   QProcess *proc = new QProcess();
 
   proc->addArgument("lpr.exe");
@@ -69,18 +68,4 @@ void FLPosPrinter::flush()
 
   if (proc)
     delete proc;
-#else
-  int optc = 6;
-  char *optv[optc];
-
-  optv[0] = (char *) "-H";
-  optv[1] = (char *) server.latin1();
-  optv[2] = (char *) "-P";
-  optv[3] = (char *) name.latin1();
-  optv[4] = (char *) "-l";
-  optv[5] = (char *) fileName.latin1();
-
-  if (lpr_main(optc, optv) != 0)
-    qWarning("FLPosPrinter::flush() : Error escribiendo en impresora /usr/bin/lpr -P " + printerName_);
-#endif
 }
