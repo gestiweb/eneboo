@@ -205,16 +205,16 @@ void FLReportViewer::showEvent(QShowEvent *e)
 
 bool FLReportViewer::renderReport(const int initRow, const int initCol, const bool append, const bool displayReport)
 {
-	uint flags = 0;
-	if (append) {
-		flags = flags | MReportViewer::Append;
-	}
-	if (displayReport) {
-		flags = flags | MReportViewer::Display;
-	}
-	
-	bool ret = renderReport(initRow, initCol, flags);
-	return ret;
+  uint flags = 0;
+  if (append) {
+    flags = flags | MReportViewer::Append;
+  }
+  if (displayReport) {
+    flags = flags | MReportViewer::Display;
+  }
+
+  bool ret = renderReport(initRow, initCol, flags);
+  return ret;
 }
 
 bool FLReportViewer::renderReport(const int initRow, const int initCol, const uint flags)
@@ -446,7 +446,7 @@ void FLReportViewer::slotPrintReportToPS(const QString &outPsFile)
     return;
   reportPrinted_ = rptViewer_->printReportToPS(outPsFile);
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
 }
 
 void FLReportViewer::slotPrintReportToPDF(const QString &outPdfFile)
@@ -455,7 +455,7 @@ void FLReportViewer::slotPrintReportToPDF(const QString &outPdfFile)
     return;
   reportPrinted_ = rptViewer_->printReportToPDF(outPdfFile);
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
 }
 
 void FLReportViewer::slotPrintReport()
@@ -464,7 +464,7 @@ void FLReportViewer::slotPrintReport()
     return;
   reportPrinted_ = rptViewer_->printReport();
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
 }
 
 bool FLReportViewer::setReportData(FLSqlQuery *q)
