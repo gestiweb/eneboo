@@ -99,7 +99,11 @@ public:
     ColorGenerator()
         : _idx( 0 )
     {
+#if defined(Q_OS_WIN)
+        srand( time( NULL ) );
+#else
         srandom( time( NULL ) );
+#endif
     }
     
     Color next()
@@ -109,8 +113,11 @@ public:
         
         if( _idx < sizeof(palette) / sizeof(palette[0]) )
             return Color( palette[_idx++] );
-            
+#if defined(Q_OS_WIN)
+        return Color( rand() );
+#else
         return Color( random() );
+#endif
     }
 
 private:
