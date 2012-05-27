@@ -16,17 +16,17 @@ var form = this;
  * Licencia Pública General de GNU en su versión 2, publicada por la Free Software Foundation.
  **************************************************************************************************/
 
-Funcion init() {
+function init() {
   var qry = new AQSqlQuery;
   qry.setSelect("valor");
   qry.setFrom("flsettings");
   qry.setWhere("flkey='sysmodver'");
 
-  Si (!qry.exec() OR !qry.next())
-    Retornar;
+  if (!qry.exec() || !qry.next())
+    return;
 
   var modVer = qry.value(0).toString();
-  Si (modVer.charAt(0) == '@') {
+  if (modVer.charAt(0) == '@') {
     var txt = "";
     txt += sys.translate("La versión instalada de los módulos en esta  base\n");
     txt += sys.translate("de datos está desactualizada, le recomendamos que\n");
@@ -43,18 +43,18 @@ Funcion init() {
     txt += sys.translate("¿Desea continuar?");
 
     var res = MessageBox.warning(txt, MessageBox.No, MessageBox.Yes);
-    Si (res == MessageBox.No) {
+    if (res == MessageBox.No) {
       sys.AQTimer.singleShot(0, aqApp.quit);  
-      Retornar;
+      return;
     }
     
     modVer = '#' + modVer.mid(1);
     AQSql.update("flsettings", ["valor"], [modVer], "flkey='sysmodver'");
     sys.AQTimer.singleShot(0, sys.reinit);
-    Retornar;
+    return;
   }
   
-  Si (isLoadedModule("flfactppal")) {
+  if (isLoadedModule("flfactppal")) {
     var codEjercicio = flfactppal.iface.pub_ejercicioActual();
     var nombreEjercicio = AQUtil.sqlSelect("ejercicios", "nombre", 
                                            "codejercicio='" + codEjercicio + "'");
@@ -62,7 +62,7 @@ Funcion init() {
   }
 }
 
-Funcion statusDbLocksDialog( locks ) {
+function statusDbLocksDialog( locks ) {
   var util = new FLUtil;
   var diag = new Dialog;
   var txtEdit = new TextEdit;
@@ -72,48 +72,48 @@ Funcion statusDbLocksDialog( locks ) {
 
   var html = "<html><table border=\"1\">";
       
-  Si ( locks != undefined AND locks.length ) {
+  if ( locks != undefined && locks.length ) {
     var i = 0;
     var j = 0;
     var item = "";
     var fields = locks[0].split( "@" );
-    var closeInfo = Falso;
-    var closeRecord = Falso;
+    var closeInfo = false;
+    var closeRecord = false;
         
     var headInfo = "<table border=\"1\"><tr>";
-    Para ( i = 0; i < fields.length; ++i )
+    for ( i = 0; i < fields.length; ++i )
       headInfo += "<td><b>" + fields[i] + "</b></td>";
     headInfo += "</tr>";
     
     var headRecord = "<table border=\"1\"><tr><td><b>" + util.translate( "scripts", "Registro bloqueado" ) + "</b></td></tr>";
     
-    Para ( i = 1; i < locks.length; ++i ) {
+    for ( i = 1; i < locks.length; ++i ) {
         item = locks[i];
         
-        Si ( item.left( 2 ) == "##" ) {
-            Si ( closeInfo )
+        if ( item.left( 2 ) == "##" ) {
+            if ( closeInfo )
                 html += "</table>";
-            Si ( !closeRecord )
+            if ( !closeRecord )
                 html += headRecord;
             
             html += "<tr><td>" + item.right( item.length - 2 ) + "</td></tr>";
             
-            closeRecord = Cierto;
-            closeInfo = Falso
-        } SiNo {
-            Si ( closeRecord )
+            closeRecord = true;
+            closeInfo = false
+        } else {
+            if ( closeRecord )
                 html += "</table>";
-            Si ( !closeInfo )
+            if ( !closeInfo )
                 html += headInfo;
             
             html += "<tr>";
             fields = item.split( "@" );
-            Para ( j = 0; j < fields.length; ++j )
+            for ( j = 0; j < fields.length; ++j )
               html += "<td>" + fields[j] + "</td>";
             html += "</tr>";
             
-            closeRecord = Falso;
-            closeInfo = Cierto
+            closeRecord = false;
+            closeInfo = true
         }
     }
   }
@@ -125,46 +125,46 @@ Funcion statusDbLocksDialog( locks ) {
   diag.exec();
 }
 
-Funcion terminateChecksLocks( sqlCursor ) {
-   Si ( sqlCursor != undefined )
-    sqlCursor.checkRisksLocks( Cierto );
+function terminateChecksLocks( sqlCursor ) {
+   if ( sqlCursor != undefined )
+    sqlCursor.checkRisksLocks( true );
 }
 
-Funcion execQSA(fileQSA, args) {
+function execQSA(fileQSA, args) {
   var file = new File(fileQSA);
   try {
     file.open(File.ReadOnly);
   } catch(e) {
     debug(e);
-    Retornar;
+    return;
   }
   var fn = new Function(file.read());
   fn(args);
 }
 
-Clase AQGlobalFunctions {
+class AQGlobalFunctions {
   static var functions_ = [];
   static var mappers_ = [];
   static var count_ = 0;
   
-  static Funcion set(functionName, globalFunction) {
+  static function set(functionName, globalFunction) {
     functions_[functionName] = globalFunction;
   }
   
-  static Funcion get(functionName) {
-    Retornar functions_[functionName];
+  static function get(functionName) {
+    return functions_[functionName];
   }
 
-  static Funcion exec(functionName) {
+  static function exec(functionName) {
     var fn = functions_[functionName];
-    Si (fn != undefined)
+    if (fn != undefined)
       fn();
   }
   
-  static Funcion mapConnect(obj, signal, functionName) {
+  static function mapConnect(obj, signal, functionName) {
     const c = count_ % 100;
     var sigMap = mappers_[c] = new AQSignalMapper(obj);
-    var killMapper = Funcion() {
+    var killMapper = function() {
       mappers_[c] = undefined;
     }
     connect(sigMap, "mapped(QString)", sys.AQGlobalFunctions, "exec()");
@@ -174,13 +174,13 @@ Clase AQGlobalFunctions {
   }
 }
 
-Clase AQTimer {
+class AQTimer {
   static var timers_ = [];
   static var count_ = 0;
   
-  static Funcion singleShot(msec, timeoutFunction) {
+  static function singleShot(msec, timeoutFunction) {
     const c = count_ % 100;
-    var callback = Funcion() {
+    var callback = function() {
       killTimer(timers_[c]);
       timers_[c] = undefined;
       timeoutFunction();
@@ -190,46 +190,46 @@ Clase AQTimer {
   }
 }
 
-Funcion mvProjectXml()
+function mvProjectXml()
 {
   var docRet = new QDomDocument;
 
   var strXml = AQUtil.sqlSelect("flupdates", "modulesdef", "actual='true'");
-  Si (!strXml)
-    Retornar docRet;
+  if (!strXml)
+    return docRet;
 
   var doc = new QDomDocument;
-  Si (!doc.setContent(strXml))
-    Retornar docRet;
+  if (!doc.setContent(strXml))
+    return docRet;
 
   strXml = "";
   var nodes = doc.childNodes();
 
-  Para (var i = 0; i < nodes.length(); ++i) {
+  for (var i = 0; i < nodes.length(); ++i) {
     var it = nodes.item(i);
-    Si (it.isComment()) {
+    if (it.isComment()) {
       var data = it.toComment().data();
-      Si (!data.isEmpty() AND data.startsWith("<mvproject ")) {
+      if (!data.isEmpty() && data.startsWith("<mvproject ")) {
         strXml = data;
-        Romper;
+        break;
       }
     }
   }
 
-  Si (strXml.isEmpty())
-    Retornar docRet;
+  if (strXml.isEmpty())
+    return docRet;
 
   docRet.setContent(strXml);
-  Retornar docRet;
+  return docRet;
 }
 
-Funcion mvProjectModules()
+function mvProjectModules()
 {
   var ret = [];
   var doc = mvProjectXml();
 
   var mods = doc.elementsByTagName("module");
-  Para (var i = 0; i < mods.length(); ++i) {
+  for (var i = 0; i < mods.length(); ++i) {
     var it = mods.item(i).toElement();
 
     var mod = {
@@ -237,22 +237,22 @@ Funcion mvProjectModules()
       version: it.attribute("version")
     }
 
-    Si (mod.name.length == 0)
-      Continuar;
+    if (mod.name.length == 0)
+      continue;
 
     ret[mod.name] = mod;
   }
 
-  Retornar ret;
+  return ret;
 }
 
-Funcion mvProjectExtensions()
+function mvProjectExtensions()
 {
   var ret = [];
   var doc = mvProjectXml();
 
   var exts = doc.elementsByTagName("extension");
-  Para (var i = 0; i < exts.length(); ++i) {
+  for (var i = 0; i < exts.length(); ++i) {
     var it = exts.item(i).toElement();
 
     var ext = {
@@ -260,45 +260,45 @@ Funcion mvProjectExtensions()
       version: it.attribute("version")
     }
 
-    Si (ext.name.length == 0)
-      Continuar;
+    if (ext.name.length == 0)
+      continue;
 
     ret[ext.name] = ext;
   }
 
-  Retornar ret;
+  return ret;
 }
 
-Funcion calculateShaGlobal()
+function calculateShaGlobal()
 {
   var v = "";
   var qry = new AQSqlQuery;
   qry.setSelect("sha");
   qry.setFrom("flfiles");
-  Si (qry.exec() AND qry.first()) {
+  if (qry.exec() && qry.first()) {
     v = AQUtil.sha1(qry.value(0).toString());
-    Mientras (qry.next())
+    while (qry.next())
       v = AQUtil.sha1(v + qry.value(0).toString());
   }
-  Retornar v;
+  return v;
 }
 
-Funcion registerUpdate(input)
+function registerUpdate(input)
 {
-  Si (!input)
-    Retornar;
+  if (!input)
+    return;
 
   var unpacker = new AQUnpacker(input);
   var errors = unpacker.errorMessages();
-  Si (errors.length != 0) {
+  if (errors.length != 0) {
     var msg = sys.translate(
                 "Hubo los siguientes errores al intentar cargar los módulos:"
               );
     msg += "\n";
-    Para (var i = 0; i < errors.length; ++i)
+    for (var i = 0; i < errors.length; ++i)
       msg += errors[i] + "\n";
     errorMsgBox(msg);
-    Retornar;
+    return;
   }
 
   var now = new Date;
@@ -308,23 +308,23 @@ Funcion registerUpdate(input)
   var filesDef = sys.toUnicode(unpacker.getText(), "utf8");
   var shaGlobal = calculateShaGlobal();
 
-  AQSql.update("flupdates", ["actual"], [Falso]);
+  AQSql.update("flupdates", ["actual"], [false]);
   AQSql.insert("flupdates",
                ["fecha", "hora", "nombre", "modulesdef", "filesdef", "shaglobal"],
                [now, now.toString().right(8), fileName, modulesDef, filesDef, shaGlobal]);
 }
 
-Funcion warnLocalChanges(changes)
+function warnLocalChanges(changes)
 {
-  Si (changes == undefined)
+  if (changes == undefined)
     changes = localChanges();
 
-  Si (changes.size == 0)
-    Retornar Cierto;
+  if (changes.size == 0)
+    return true;
 
   var diag = new QDialog;
   diag.caption = sys.translate("Detectados cambios locales");
-  diag.modal = Cierto;
+  diag.modal = true;
 
   var txt = "";
   txt += sys.translate("¡¡ CUIDADO !! DETECTADOS CAMBIOS LOCALES\n\n");
@@ -371,16 +371,16 @@ Funcion warnLocalChanges(changes)
   connect(pbAccept, "clicked()", diag, "accept()");
   connect(pbCancel, "clicked()", diag, "reject()");
 
-  Retornar diag.exec() == 0 ? Falso : Cierto;
+  return diag.exec() == 0 ? false : true;
 }
 
-Funcion reportChanges(changes)
+function reportChanges(changes)
 {
   var ret = "";
 
-  Para (var key in changes) {
-    Si (key == "size")
-      Continuar;
+  for (var key in changes) {
+    if (key == "size")
+      continue;
     var chg = changes[key].split('@');
     ret += "Nombre: " + chg[0] + "\n";
     ret += "Estado: " + chg[1] + "\n";
@@ -391,41 +391,41 @@ Funcion reportChanges(changes)
     ret += "###########################################\n";
   }
 
-  Retornar ret;
+  return ret;
 }
 
-Funcion localChanges()
+function localChanges()
 {
   var ret = [];
   ret["size"] = 0;
 
   var strXmlUpt = AQUtil.sqlSelect("flupdates", "filesdef", "actual='true'");
-  Si (!strXmlUpt)
-    Retornar ret;
+  if (!strXmlUpt)
+    return ret;
 
   var docUpt = new QDomDocument;
-  Si (!docUpt.setContent(strXmlUpt)) {
+  if (!docUpt.setContent(strXmlUpt)) {
     errorMsgBox(sys.translate(
                       "Error XML al intentar cargar la definición de los ficheros."
                     ));
-    Retornar ret;
+    return ret;
   }
 
   var docBd = xmlFilesDefBd();
 
   ret = diffXmlFilesDef(docBd, docUpt);
-  Retornar ret;
+  return ret;
 }
 
-Funcion diffXmlFilesDef(xmlOld, xmlNew)
+function diffXmlFilesDef(xmlOld, xmlNew)
 {
   var arrOld = filesDefToArray(xmlOld);
   var arrNew = filesDefToArray(xmlNew);
   var ret = [];
   var size = 0;
   
-  Para (var key in arrOld) {
-    Si (!(key in arrNew)) {
+  for (var key in arrOld) {
+    if (!(key in arrNew)) {
       var info = [
         key,
         "del",
@@ -439,8 +439,8 @@ Funcion diffXmlFilesDef(xmlOld, xmlNew)
     }
   }
 
-  Para (var key in arrNew) {
-    Si (!(key in arrOld)) {
+  for (var key in arrNew) {
+    if (!(key in arrOld)) {
       var info = [
         key,
         "new",
@@ -451,7 +451,7 @@ Funcion diffXmlFilesDef(xmlOld, xmlNew)
       ]
       ret[key] = info.join('@');
       ++size;
-    } SiNo Si (arrNew[key].shatext != arrOld[key].shatext OR 
+    } else if (arrNew[key].shatext != arrOld[key].shatext ||
                arrNew[key].shabinary != arrOld[key].shabinary) {
       var info = [
         key,
@@ -467,16 +467,16 @@ Funcion diffXmlFilesDef(xmlOld, xmlNew)
   }
 
   ret["size"] = size;
-  Retornar ret;
+  return ret;
 }
 
-Funcion filesDefToArray(xml)
+function filesDefToArray(xml)
 {
   var root = xml.firstChild();
   var files = root.childNodes();
   var ret = [];
 
-  Para (var i = 0; i < files.length(); ++i) {
+  for (var i = 0; i < files.length(); ++i) {
     var it = files.item(i);
 
     var fil = {
@@ -488,16 +488,16 @@ Funcion filesDefToArray(xml)
       shabinary:  it.namedItem("shabinary").toElement().text()
     }
 
-    Si (fil.id.length == 0)
-      Continuar;
+    if (fil.id.length == 0)
+      continue;
 
     ret[fil.id] = fil;
   }
 
-  Retornar ret;
+  return ret;
 }
 
-Funcion xmlFilesDefBd()
+function xmlFilesDefBd()
 {
   var doc = new QDomDocument("files_def");
   var root = doc.createElement("files");
@@ -508,17 +508,17 @@ Funcion xmlFilesDefBd()
   qry.setSelect("idmodulo,nombre,contenido,binario");
   qry.setFrom("flfiles");
 
-  Si (!qry.exec())
-    Retornar doc;
+  if (!qry.exec())
+    return doc;
 
   var shaSum = "";
   var shaSumTxt = "";
   var shaSumBin = "";
   
-  Mientras (qry.next()) {
+  while (qry.next()) {
     var idMod = qry.value(0).toString();
-    Si (idMod == "sys")
-      Continuar;
+    if (idMod == "sys")
+      continue;
 
     var fName = qry.value(1).toString();
     var ba = new QByteArray;
@@ -538,7 +538,7 @@ Funcion xmlFilesDefBd()
     nt = doc.createTextNode(fName);
     ne.appendChild(nt);
 
-    Si (textPacking(fName)) {
+    if (textPacking(fName)) {
       ne = doc.createElement("text");
       nf.appendChild(ne);
       nt = doc.createTextNode(fName);
@@ -557,7 +557,7 @@ Funcion xmlFilesDefBd()
       shaSumTxt = ba.sha1();
     }
 
-    Si (binaryPacking(fName)) {
+    if (binaryPacking(fName)) {
       ne = doc.createElement("binary");
       nf.appendChild(ne);
       nt = doc.createTextNode(fName + ".qso");
@@ -582,11 +582,11 @@ Funcion xmlFilesDefBd()
   qry.setSelect("idmodulo,icono");
   qry.setFrom("flmodules");
 
-  Si (qry.exec()) {
-    Mientras (qry.next()) {
+  if (qry.exec()) {
+    while (qry.next()) {
       var idMod = qry.value(0).toString();
-      Si (idMod == "sys")
-        Continuar;
+      if (idMod == "sys")
+        continue;
       var fName = idMod + ".xpm";
       var ba = new QByteArray;
       ba.string = qry.value(1).toString();
@@ -605,7 +605,7 @@ Funcion xmlFilesDefBd()
       nt = doc.createTextNode(fName);
       ne.appendChild(nt);
 
-      Si (textPacking(fName)) {
+      if (textPacking(fName)) {
         ne = doc.createElement("text");
         nf.appendChild(ne);
         nt = doc.createTextNode(fName);
@@ -638,32 +638,32 @@ Funcion xmlFilesDefBd()
   ns.appendChild(doc.createTextNode(shaSumBin));
   root.appendChild(ns);
 
-  Retornar doc;
+  return doc;
 }
 
-Funcion textPacking(ext)
+function textPacking(ext)
 {
-  Retornar ext.endsWith(".ui") OR 
-         ext.endsWith(".qry") OR 
-         ext.endsWith(".kut") OR 
-         ext.endsWith(".jrxml") OR 
-         ext.endsWith(".ar") OR 
-         ext.endsWith(".mtd") OR 
-         ext.endsWith(".ts") OR 
-         ext.endsWith(".qs") OR 
-         ext.endsWith(".xml") OR 
-         ext.endsWith(".xpm") OR 
+  return ext.endsWith(".ui") ||
+         ext.endsWith(".qry") ||
+         ext.endsWith(".kut") ||
+         ext.endsWith(".jrxml") ||
+         ext.endsWith(".ar") ||
+         ext.endsWith(".mtd") ||
+         ext.endsWith(".ts") ||
+         ext.endsWith(".qs") ||
+         ext.endsWith(".xml") ||
+         ext.endsWith(".xpm") ||
          ext.endsWith(".svg");
 }
 
-Funcion binaryPacking(ext)
+function binaryPacking(ext)
 {
-  Retornar ext.endsWith(".qs");
+  return ext.endsWith(".qs");
 }
 
-Funcion loadModules(input, warnBackup)
+function loadModules(input, warnBackup)
 {
-  Si (input == undefined) {
+  if (input == undefined) {
     var dir = new Dir(sys.installPrefix() + "/share/abanq/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
@@ -671,15 +671,15 @@ Funcion loadModules(input, warnBackup)
               AQUtil.translate("scripts", "Seleccionar Fichero")
             );
   }
-  Si (warnBackup == undefined)
-    warnBackup = Cierto;
-  Si (input)
+  if (warnBackup == undefined)
+    warnBackup = true;
+  if (input)
     loadAbanQPackage(input, warnBackup);
 }
 
-Funcion loadAbanQPackage(input, warnBackup)
+function loadAbanQPackage(input, warnBackup)
 {
-  Si (warnBackup) {
+  if (warnBackup) {
     var txt = "";
     txt += sys.translate("IMPORTANTE: Si carga este paquete ya no podrá utilizar sobre\n");
     txt += sys.translate("esta base de datos motores de AbanQ versión 2.3 y anteriores.\n\n");
@@ -690,51 +690,51 @@ Funcion loadAbanQPackage(input, warnBackup)
     txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
-    Si (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
-      Retornar;
+    if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
+      return;
   } 
   
-  Si (input) {
-    var ok = Cierto;
+  if (input) {
+    var ok = true;
    
     var changes = localChanges();
-    Si (changes.size != 0) {
-      Si (!warnLocalChanges(changes))
-        Retornar;
+    if (changes.size != 0) {
+      if (!warnLocalChanges(changes))
+        return;
         
       var tmpVar = new FLVar;
       tmpVar.set("mrproper", "dirty");
       sys.Mr_Proper();
-      Si (tmpVar.get("mrproper") == "dirty")
-        ok = Falso;
+      if (tmpVar.get("mrproper") == "dirty")
+        ok = false;
     }
 
-    Si (ok) {
+    if (ok) {
       var unpacker = new AQUnpacker(input);
       var errors = unpacker.errorMessages();
-      Si (errors.length != 0) {
+      if (errors.length != 0) {
         var msg = sys.translate(
                     "Hubo los siguientes errores al intentar cargar los módulos:"
                   );
         msg += "\n";
-        Para (var i = 0; i < errors.length; ++i)
+        for (var i = 0; i < errors.length; ++i)
           msg += errors[i] + "\n";
         errorMsgBox(msg);
-        ok = Falso;
+        ok = false;
       }
 
-      Si (ok)
+      if (ok)
         ok = loadModulesDef(unpacker);
 
-      Si (ok)
+      if (ok)
         ok = loadFilesDef(unpacker);
     }
 
-    Si (!ok) {
+    if (!ok) {
       errorMsgBox(sys.translate(
                     "No se ha podido realizar la carga de los módulos."
                   ));
-    } SiNo {
+    } else {
       sys.Mr_Proper();
       registerUpdate(input);
       MessageBox.information(sys.translate("La carga de módulos se ha realizado con éxito."),
@@ -745,25 +745,25 @@ Funcion loadAbanQPackage(input, warnBackup)
   }
 }
 
-Funcion loadFilesDef(un)
+function loadFilesDef(un)
 {
   var filesDef = sys.toUnicode(un.getText(), "utf8");
   var doc = new QDomDocument;
 
-  Si (!doc.setContent(filesDef)) {
+  if (!doc.setContent(filesDef)) {
     errorMsgBox(sys.translate(
                   "Error XML al intentar cargar la definición de los ficheros."
                 ));
-    Retornar Falso;
+    return false;
   }
 
-  var ok = Cierto;
+  var ok = true;
   var root = doc.firstChild();
   var files = root.childNodes();
 
   AQUtil.createProgressDialog(sys.translate("Registrando ficheros"), files.length());
 
-  Para (var i = 0; i < files.length(); ++i) {
+  for (var i = 0; i < files.length(); ++i) {
     var it = files.item(i);
 
     var fil = {
@@ -779,75 +779,75 @@ Funcion loadFilesDef(un)
     AQUtil.setProgress(i);
     AQUtil.setLabelText(sys.translate("Registrando fichero") + " " + fil.id);
 
-    Si (fil.id.length == 0 OR fil.skip == "true")
-      Continuar;
+    if (fil.id.length == 0 || fil.skip == "true")
+      continue;
 
-    Si (!registerFile(fil, un)) {
+    if (!registerFile(fil, un)) {
       errorMsgBox(sys.translate(
                     "Error registrando el fichero"
                   ) + " " + fil.id);
-      ok = Falso;
-      Romper;
+      ok = false;
+      break;
     }
   }
 
   AQUtil.destroyProgressDialog();
 
-  Retornar ok;
+  return ok;
 }
 
-Funcion registerFile(fil, un)
+function registerFile(fil, un)
 {
-  Si (fil.id.endsWith(".xpm")) {
+  if (fil.id.endsWith(".xpm")) {
     var cur = new AQSqlCursor("flmodules");
-    Si (!cur.select("idmodulo='" + fil.module + "'"))
-      Retornar Falso;
-    Si (!cur.first())
-      Retornar Falso;
+    if (!cur.select("idmodulo='" + fil.module + "'"))
+      return false;
+    if (!cur.first())
+      return false;
 
     cur.setModeAccess(AQSql.Edit);
     cur.refreshBuffer();
     cur.setValueBuffer("icono", un.getText());
-    Retornar cur.commitBuffer();
+    return cur.commitBuffer();
   }
 
   var cur = new AQSqlCursor("flfiles");
-  Si (!cur.select("nombre='" + fil.id + "'"))
-    Retornar Falso;
+  if (!cur.select("nombre='" + fil.id + "'"))
+    return false;
 
   cur.setModeAccess(cur.first() ? AQSql.Edit : AQSql.Insert);
   cur.refreshBuffer();
   cur.setValueBuffer("nombre", fil.id);
   cur.setValueBuffer("idmodulo", fil.module);
   cur.setValueBuffer("sha", fil.shatext);
-  Si (fil.text.length > 0) {
-    Si (fil.id.endsWith(".qs"))
+  if (fil.text.length > 0) {
+    if (fil.id.endsWith(".qs"))
       cur.setValueBuffer("contenido", sys.toUnicode(un.getText(), "ISO8859-15"));
-    SiNo
+    else
       cur.setValueBuffer("contenido", un.getText());
   }
-  Si (fil.binary.length > 0) {
+  if (fil.binary.length > 0) {
     cur.setValueBuffer("binario", un.getBinary());
-    Si (fil.id.endsWith(".qs"))
+    if (fil.id.endsWith(".qs"))
       AQUtil.writeDBSettingEntry(fil.id.left(30), fil.shatext);
   }
-  Retornar cur.commitBuffer();
+  return cur.commitBuffer();
 }
 
-Funcion checkProjectName(proName)
+function checkProjectName(proName)
 {
-  Si (!proName OR proName == undefined)
+  if (!proName || proName == undefined)
     proName = "";
 
   var dbProName = AQUtil.readDBSettingEntry("projectname");
-  Si (!dbProName)
+  if (!dbProName)
     dbProName = "";
 
-  Si (proName == dbProName)
-    Retornar Cierto;
+  if (proName == dbProName)
+    return true;
 
-  Si (!proName.isEmpty() AND dbProName.isEmpty())
-    Retornar AQUtil.writeDBSettingEntry("projectname", proName);
+  if (!proName.isEmpty() && dbProName.isEmpty())
+    return AQUtil.writeDBSettingEntry("projectname", proName);
 
   var txt = "";
   txt += sys.translate("¡¡ CUIDADO !! POSIBLE INCOHERENCIA EN LOS MÓDULOS\n\n");
@@ -862,33 +862,33 @@ Funcion checkProjectName(proName)
   txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
   txt += "\n\n";
   txt += sys.translate("¿Desea continuar?");
-  Retornar (MessageBox.Yes == MessageBox.warning(txt, MessageBox.No, MessageBox.Yes,
+  return (MessageBox.Yes == MessageBox.warning(txt, MessageBox.No, MessageBox.Yes,
                                                MessageBox.NoButton, "AbanQ"));
 }
 
-Funcion loadModulesDef(un)
+function loadModulesDef(un)
 {
   var modulesDef = sys.toUnicode(un.getText(), "utf8");
   var doc = new QDomDocument;
 
-  Si (!doc.setContent(modulesDef)) {
+  if (!doc.setContent(modulesDef)) {
     errorMsgBox(sys.translate(
                   "Error XML al intentar cargar la definición de los módulos."
                 ));
-    Retornar Falso;
+    return false;
   }
 
   var root = doc.firstChild();
 
-  Si (!checkProjectName(root.toElement().attribute("projectname", "")))
-    Retornar Falso;
+  if (!checkProjectName(root.toElement().attribute("projectname", "")))
+    return false;
   
-  var ok = Cierto;  
+  var ok = true;  
   var modules = root.childNodes();
 
   AQUtil.createProgressDialog(sys.translate("Registrando módulos"), modules.length());
 
-  Para (var i = 0; i < modules.length(); ++i) {
+  for (var i = 0; i < modules.length(); ++i) {
     var it = modules.item(i);
     var mod = {
       id:       it.namedItem("name").toElement().text(),
@@ -901,38 +901,38 @@ Funcion loadModulesDef(un)
     AQUtil.setProgress(i);
     AQUtil.setLabelText(sys.translate("Registrando módulo") + " " + mod.id);
 
-    Si (!registerArea(mod) OR !registerModule(mod)) {
+    if (!registerArea(mod) || !registerModule(mod)) {
       errorMsgBox(sys.translate(
                     "Error registrando el módulo"
                   ) + " " + mod.id);
-      ok = Falso;
-      Romper;
+      ok = false;
+      break;
     }
   }
 
   AQUtil.destroyProgressDialog();
 
-  Retornar ok;
+  return ok;
 }
 
-Funcion registerArea(mod)
+function registerArea(mod)
 {
   var cur = new AQSqlCursor("flareas");
-  Si (!cur.select("idarea='" + mod.area + "'"))
-    Retornar Falso;
+  if (!cur.select("idarea='" + mod.area + "'"))
+    return false;
 
   cur.setModeAccess(cur.first() ? AQSql.Edit : AQSql.Insert);
   cur.refreshBuffer();
   cur.setValueBuffer("idarea", mod.area);
   cur.setValueBuffer("descripcion", mod.areaname);
-  Retornar cur.commitBuffer();
+  return cur.commitBuffer();
 }
 
-Funcion registerModule(mod)
+function registerModule(mod)
 {
   var cur = new AQSqlCursor("flmodules");
-  Si (!cur.select("idmodulo='" + mod.id + "'"))
-    Retornar Falso;
+  if (!cur.select("idmodulo='" + mod.id + "'"))
+    return false;
 
   cur.setModeAccess(cur.first() ? AQSql.Edit : AQSql.Insert);
   cur.refreshBuffer();
@@ -940,42 +940,42 @@ Funcion registerModule(mod)
   cur.setValueBuffer("idarea", mod.area);
   cur.setValueBuffer("descripcion", mod.alias);
   cur.setValueBuffer("version", mod.version);
-  Retornar cur.commitBuffer();
+  return cur.commitBuffer();
 }
 
-Funcion errorMsgBox(msg)
+function errorMsgBox(msg)
 {
   msg += "\n";
   MessageBox.critical(msg, MessageBox.Ok, MessageBox.NoButton,
                       MessageBox.NoButton, "AbanQ");
 }
 
-Funcion trTagText(tagText)
+function trTagText(tagText)
 {
-  Si (!tagText.startsWith("QT_TRANSLATE_NOOP"))
-    Retornar tagText;
+  if (!tagText.startsWith("QT_TRANSLATE_NOOP"))
+    return tagText;
   var txt = tagText.mid(String("QT_TRANSLATE_NOOP").length + 1);
   txt = "[" + txt.mid(0, txt.length - 1) + "]";
   var arr = eval(txt);
-  Retornar sys.translate(arr[0], arr[1]);
+  return sys.translate(arr[0], arr[1]);
 }
 
-Funcion questionMsgBox(msg, keyRemember, txtRemember, forceShow,
+function questionMsgBox(msg, keyRemember, txtRemember, forceShow,
                         txtCaption, txtYes, txtNo)
 {
   var settings = new AQSettings;
   var key = "QuestionMsgBox/";
-  var valRemember = Falso;
+  var valRemember = false;
 
-  Si (keyRemember) {
+  if (keyRemember) {
     valRemember = settings.readBoolEntry(key + keyRemember);
-    Si (valRemember AND !forceShow)
-      Retornar MessageBox.Yes;
+    if (valRemember && !forceShow)
+      return MessageBox.Yes;
   }
 
   var diag = new QDialog;
   diag.caption = txtCaption ? txtCaption : "AbanQ";
-  diag.modal = Cierto;
+  diag.modal = true;
 
   var lay = new QVBoxLayout(diag);
   lay.margin = 6;
@@ -1010,7 +1010,7 @@ Funcion questionMsgBox(msg, keyRemember, txtRemember, forceShow,
   connect(pbNo, "clicked()", diag, "reject()");
 
   var chkRemember;
-  Si (keyRemember AND txtRemember) {
+  if (keyRemember && txtRemember) {
     chkRemember = new QCheckBox(txtRemember, diag);
     chkRemember.checked = valRemember;
     lay.addWidget(chkRemember);
@@ -1018,20 +1018,20 @@ Funcion questionMsgBox(msg, keyRemember, txtRemember, forceShow,
 
   var ret = (diag.exec() == 0) ? MessageBox.No : MessageBox.Yes;
 
-  Si (chkRemember != undefined)
+  if (chkRemember != undefined)
     settings.writeEntry(key + keyRemember, chkRemember.checked);
 
-  Retornar ret;
+  return ret;
 }
 
-Funcion decryptFromBase64(str) 
+function decryptFromBase64(str) 
 {
   var ba = new QByteArray;
   ba.string = str;
-  Retornar AQS.decryptInternal(AQS.fromBase64(ba)).toString();
+  return AQS.decryptInternal(AQS.fromBase64(ba)).toString();
 }
 
-Clase AbanQUpdater
+class AbanQUpdater
 {
   var w_;
   var prBar_;
@@ -1039,19 +1039,19 @@ Clase AbanQUpdater
   var state_;
   var data_;
 
-  Funcion AbanQUpdater()
+  function AbanQUpdater()
   {
     this.w_ = new QDialog;
     this.w_.caption = "AbanQ";
     this.w_.name = "abanqUpdaterDialog";
-    this.w_.modal = Cierto;
+    this.w_.modal = true;
 
     var lay = new QVBoxLayout(this.w_);
     lay.margin = 0;
     lay.spacing = 0;
     
     this.prBar_ = new QProgressBar(this.w_);
-    this.prBar_.setCenterIndicator(Cierto);
+    this.prBar_.setCenterIndicator(true);
     this.prBar_.setTotalSteps(100);
     lay.addWidget(this.prBar_);
 
@@ -1072,31 +1072,31 @@ Clase AbanQUpdater
     );
   }
 
-  Funcion transferFinished(netOp)
+  function transferFinished(netOp)
   {
     this.state_ = netOp.state();
     this.w_.close();
-    Si (this.state_ == AQS.StFailed) {
+    if (this.state_ == AQS.StFailed) {
       MessageBox.critical(netOp.protocolDetail(), MessageBox.Ok,
                           MessageBox.NoButton, MessageBox.NoButton, "Error");
     }
   }
 
-  Funcion transferProgress(bytesDone, bytesTotal, netOp)
+  function transferProgress(bytesDone, bytesTotal, netOp)
   {
-    Si (bytesTotal > 0)
+    if (bytesTotal > 0)
       this.prBar_.setTotalSteps(bytesTotal);
     this.prBar_.setProgress(bytesDone);
   }
 
-  Funcion transferData(data, netOp)
+  function transferData(data, netOp)
   {
     var dat = new QByteArray(data);
     this.data_ += dat.toVariant;
   }
 }
 
-Funcion updateAbanQ()
+function updateAbanQ()
 {
   var msg = "";
   msg += sys.translate("Se va a proceder a conectar a través de Internet\n");
@@ -1113,13 +1113,13 @@ Funcion updateAbanQ()
   txtRem += sys.translate("No volver a mostrar este mensaje, permitir siempre\n");
   txtRem += sys.translate("conectar automáticamente con InfoSiAL");
 
-  Si (questionMsgBox(msg, "autoConnectInfoSiAL", txtRem) != MessageBox.Yes)
-    Retornar;
+  if (questionMsgBox(msg, "autoConnectInfoSiAL", txtRem) != MessageBox.Yes)
+    return;
         
   var updater = new AbanQUpdater;
   updater.w_.exec();
 
-  Si (updater.state_ != AQS.StFailed) {
+  if (updater.state_ != AQS.StFailed) {
     var scriptInfos = [];
     var scrName = "abanqUpdaterScript";
     var baCode = new QByteArray;
@@ -1129,60 +1129,60 @@ Funcion updateAbanQ()
     var scrCode = mng.byteCodeToStr(baCode);
     var scr = QSProject.script(scrName);
     
-    Si (!scr) {
+    if (!scr) {
       scriptInfos.push([scrName, scrCode, QSProject.New, ""]);
-    } SiNo Si (scr.code() != scrCode) {
+    } else if (scr.code() != scrCode) {
       scriptInfos.push([scrName, scrCode, QSProject.Changed, ""]);
     }
 
-    Si (scriptInfos.length > 0) {
+    if (scriptInfos.length > 0) {
       var scrInfo = scriptInfos[0];
-      Si (scrInfo[2] == QSProject.New) {
+      if (scrInfo[2] == QSProject.New) {
         var obj = new QObject(scrInfo[0]);
         QSProject.addObject(obj);
       }
       QSProject.evaluateScripts(scriptInfos, "aqUpdaterMain24");
-    } SiNo
+    } else
       aqUpdaterMain24();
   }
 }
 
-Funcion exportModules()
+function exportModules()
 {
   var dirBasePath = FileDialog.getExistingDirectory(Dir.home);
-  Si (!dirBasePath)
-    Retornar;
+  if (!dirBasePath)
+    return;
   dirBasePath = Dir.cleanDirPath(dirBasePath + "/modulos_exportados_" +
                                  aqApp.db().database());
 
   var dir = new Dir;
-  Si (!dir.fileExists(dirBasePath)) {
+  if (!dir.fileExists(dirBasePath)) {
     try {
       dir.mkdir(dirBasePath);
     } catch (e) {
       MessageBox.critical("" + e, MessageBox.Ok);
-      Retornar;
+      return;
     }
-  } SiNo {
+  } else {
     MessageBox.warning(dirBasePath + 
                        sys.translate(" ya existe,\ndebe borrarlo antes de continuar"),
                        MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
-    Retornar;
+    return;
   }
 
   var qry = new AQSqlQuery;
   qry.setSelect("idmodulo");
   qry.setFrom("flmodules");
-  Si (!qry.exec() OR qry.size() == 0)
-    Retornar;
+  if (!qry.exec() || qry.size() == 0)
+    return;
 
   var p = 0;
   AQUtil.createProgressDialog(sys.translate("Exportando módulos"), qry.size() - 1);
 
-  Mientras (qry.next()) {
+  while (qry.next()) {
     var idMod = qry.value(0);
-    Si (idMod == "sys")
-      Continuar;
+    if (idMod == "sys")
+      continue;
 
     AQUtil.setLabelText(String("%1").arg(idMod));
     AQUtil.setProgress(++p);
@@ -1192,14 +1192,14 @@ Funcion exportModules()
     } catch (e) {
       AQUtil.destroyProgressDialog();
       MessageBox.critical("" + e, MessageBox.Ok);
-      Retornar;
+      return;
     }
   }
 
   var dbProName = AQUtil.readDBSettingEntry("projectname");
-  Si (!dbProName)
+  if (!dbProName)
     dbProName = "";
-  Si (!dbProName.isEmpty()) {
+  if (!dbProName.isEmpty()) {
     var doc = new QDomDocument;
     var tag = doc.createElement("mvproject");
     tag.toElement().setAttribute("name", dbProName);
@@ -1209,7 +1209,7 @@ Funcion exportModules()
     } catch (e) {
       AQUtil.destroyProgressDialog();
       MessageBox.critical("" + e, MessageBox.Ok);
-      Retornar;
+      return;
     }
   }
   
@@ -1219,14 +1219,14 @@ Funcion exportModules()
                          MessageBox.NoButton, "AbanQ");
 }
  
-Funcion xmlModule(idMod)
+function xmlModule(idMod)
 {
   var qry = new AQSqlQuery;
   qry.setSelect("descripcion,idarea,version");
   qry.setFrom("flmodules");
   qry.setWhere("idmodulo='" + idMod + "'");
-  Si (!qry.exec() OR !qry.next())
-    Retornar;
+  if (!qry.exec() || !qry.next())
+    return;
 
   var doc = new QDomDocument("MODULE");
   var tagMod = doc.createElement("MODULE");
@@ -1263,15 +1263,15 @@ Funcion xmlModule(idMod)
   tag.appendChild(doc.createTextNode(idMod + ".xpm"));
   tagMod.appendChild(tag);
 
-  Retornar doc;
+  return doc;
 }
 
-Funcion fileWriteIso(fileName, content)
+function fileWriteIso(fileName, content)
 {  
   var fileISO = new QFile(fileName);
-  Si (!fileISO.open(File.WriteOnly)) {
+  if (!fileISO.open(File.WriteOnly)) {
     debug("Error abriendo fichero " + fileName + " para escritura");
-    Retornar Falso;
+    return false;
   }
   var tsISO = new QTextStream(fileISO.ioDevice());
   tsISO.setCodec(AQS.TextCodec_codecForName("ISO8859-15"));
@@ -1279,12 +1279,12 @@ Funcion fileWriteIso(fileName, content)
   fileISO.close();
 }
 
-Funcion fileWriteUtf8(fileName, content)
+function fileWriteUtf8(fileName, content)
 {  
   var fileUTF = new QFile(fileName);
-  Si (!fileUTF.open(File.WriteOnly)) {
+  if (!fileUTF.open(File.WriteOnly)) {
     debug("Error abriendo fichero " + fileName + " para escritura");
-    Retornar Falso;
+    return false;
   }
   var tsUTF = new QTextStream(fileUTF.ioDevice());
   tsUTF.setCodec(AQS.TextCodec_codecForName("utf8"));
@@ -1292,24 +1292,24 @@ Funcion fileWriteUtf8(fileName, content)
   fileUTF.close();
 }
 
-Funcion exportModule(idMod, dirBasePath)
+function exportModule(idMod, dirBasePath)
 {
   var dir = new Dir;
   var dirPath = Dir.cleanDirPath(dirBasePath + "/" + idMod);
 
-  Si (!dir.fileExists(dirPath))
+  if (!dir.fileExists(dirPath))
     dir.mkdir(dirPath);
-  Si (!dir.fileExists(dirPath + "/forms"))
+  if (!dir.fileExists(dirPath + "/forms"))
     dir.mkdir(dirPath + "/forms");
-  Si (!dir.fileExists(dirPath + "/scripts"))
+  if (!dir.fileExists(dirPath + "/scripts"))
     dir.mkdir(dirPath + "/scripts");
-  Si (!dir.fileExists(dirPath + "/queries"))
+  if (!dir.fileExists(dirPath + "/queries"))
     dir.mkdir(dirPath + "/queries");
-  Si (!dir.fileExists(dirPath + "/tables"))
+  if (!dir.fileExists(dirPath + "/tables"))
     dir.mkdir(dirPath + "/tables");
-  Si (!dir.fileExists(dirPath + "/reports"))
+  if (!dir.fileExists(dirPath + "/reports"))
     dir.mkdir(dirPath + "/reports");
-  Si (!dir.fileExists(dirPath + "/translations"))
+  if (!dir.fileExists(dirPath + "/translations"))
     dir.mkdir(dirPath + "/translations");
 
   var xmlMod = xmlModule(idMod);
@@ -1323,51 +1323,51 @@ Funcion exportModule(idMod, dirBasePath)
   qry.setSelect("nombre,contenido");
   qry.setFrom("flfiles");
   qry.setWhere("idmodulo='" + idMod + "'");
-  Si (!qry.exec() OR qry.size() == 0)
-    Retornar;
+  if (!qry.exec() || qry.size() == 0)
+    return;
 
-  Mientras (qry.next()) {
+  while (qry.next()) {
     var name = qry.value(0);
     var content = qry.value(1);
     var type = name.right(name.length - name.lastIndexOf("."));
 
-    Si (content.isEmpty())
-      Continuar;
+    if (content.isEmpty())
+      continue;
 
-    Segun (type) {
-      Caso ".xml":
+    switch (type) {
+      case ".xml":
         sys.fileWriteIso(dirPath + "/" + name, content);
-        Romper;
-      Caso ".ui":
+        break;
+      case ".ui":
         sys.fileWriteIso(dirPath + "/forms/" + name, content);
-        Romper;
-      Caso ".qs":
+        break;
+      case ".qs":
         sys.fileWriteIso(dirPath + "/scripts/" + name, content);
-        Romper;
-      Caso ".qry":
+        break;
+      case ".qry":
         sys.fileWriteIso(dirPath + "/queries/" + name, content);
-        Romper;
-      Caso ".mtd":
+        break;
+      case ".mtd":
         sys.fileWriteIso(dirPath + "/tables/" + name, content);
-        Romper;
-      Caso ".kut":
-      Caso ".ar":
-      Caso ".jrxml":
-      Caso ".svg":
+        break;
+      case ".kut":
+      case ".ar":
+      case ".jrxml":
+      case ".svg":
         sys.fileWriteIso(dirPath + "/reports/" + name, content);
-        Romper;
-      Caso ".ts":
+        break;
+      case ".ts":
         sys.fileWriteIso(dirPath + "/translations/" + name, content);
-        Romper;
+        break;
     }
   }
 }
 
-Funcion importModules(warnBackup)
+function importModules(warnBackup)
 {
-  Si (warnBackup == undefined)
-    warnBackup = Cierto;
-  Si (warnBackup) {
+  if (warnBackup == undefined)
+    warnBackup = true;
+  if (warnBackup) {
     var txt = "";
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
@@ -1376,32 +1376,32 @@ Funcion importModules(warnBackup)
     txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
-    Si (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
-      Retornar;
+    if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
+      return;
   }
 
   var key = "scripts/sys/modLastDirModules_" + sys.nameBD();
 
   var dirAnt = AQUtil.readSettingEntry(key);
-  var dirMods = FileDialog.getExistingDirectory(dirAnt ? dirAnt : Falso,
+  var dirMods = FileDialog.getExistingDirectory(dirAnt ? dirAnt : false,
                                                 sys.translate("Directorio de Módulos"));
-  Si (!dirMods)
-    Retornar;
+  if (!dirMods)
+    return;
   dirMods = Dir.cleanDirPath(dirMods);
   dirMods = Dir.convertSeparators(dirMods);
   Dir.current = dirMods;
 
-  var listFilesMod = selectModsDialog(AQUtil.findFiles([dirMods], "*.mod", Falso));
+  var listFilesMod = selectModsDialog(AQUtil.findFiles([dirMods], "*.mod", false));
   AQUtil.createProgressDialog(sys.translate("Importando"), listFilesMod.length);
   AQUtil.setProgress(1);
   
-  Para (var i = 0; i < listFilesMod.length; ++i) {
+  for (var i = 0; i < listFilesMod.length; ++i) {
     AQUtil.setLabelText(listFilesMod[i]);
     AQUtil.setProgress(i);
     
-    Si (!importModule(listFilesMod[i])) {
+    if (!importModule(listFilesMod[i])) {
       errorMsgBox(sys.translate("Error al cargar el módulo:\n") + listFilesMod[i]);
-      Romper;
+      break;
     }
   }
 
@@ -1413,7 +1413,7 @@ Funcion importModules(warnBackup)
   sys.AQTimer.singleShot(0, sys.reinit);
 }
 
-Funcion selectModsDialog(listFilesMod)
+function selectModsDialog(listFilesMod)
 {
   var dialog = new Dialog;
   dialog.okButtonText = sys.translate("Aceptar");
@@ -1425,23 +1425,23 @@ Funcion selectModsDialog(listFilesMod)
 
   var res = [];
   var cB = [];
-  Para (var i = 0; i < listFilesMod.length; ++i) {
+  for (var i = 0; i < listFilesMod.length; ++i) {
     cB[i] = new CheckBox;
     bgroup.add(cB[i]);
     cB[i].text = listFilesMod[i];
-    cB[i].checked = Cierto;
+    cB[i].checked = true;
   }
 
   var idx = 0;
-  Si (dialog.exec()) {
-    Para (var i = 0; i < listFilesMod.length; ++i)
-      Si (cB[i].checked == Cierto) res[idx++] = listFilesMod[i];
+  if (dialog.exec()) {
+    for (var i = 0; i < listFilesMod.length; ++i)
+      if (cB[i].checked == true) res[idx++] = listFilesMod[i];
   }
 
-  Retornar res;
+  return res;
 }
 
-Funcion importModule(modPath)
+function importModule(modPath)
 {
   var fileMod = new File(modPath);
   var contentMod = "";
@@ -1450,16 +1450,16 @@ Funcion importModule(modPath)
     contentMod = fileMod.read();
   } catch (e) {
     errorMsgBox(sys.translate("Error leyendo fichero.") + "\n" + e);
-    Retornar Falso;
+    return false;
   }
 
   var mod;
   var xmlMod = new QDomDocument;
-  Si (xmlMod.setContent(contentMod)) {
+  if (xmlMod.setContent(contentMod)) {
     var nodeMod = xmlMod.namedItem("MODULE");
-    Si (!nodeMod) {
+    if (!nodeMod) {
       errorMsgBox(sys.translate("Error en la carga del fichero xml .mod"));
-      Retornar Falso;
+      return false;
     }
 
     var mod = {
@@ -1470,63 +1470,63 @@ Funcion importModule(modPath)
       version:  nodeMod.namedItem("version").toElement().text()
     }
 
-    Si (!registerArea(mod) OR !registerModule(mod)) {
+    if (!registerArea(mod) || !registerModule(mod)) {
       errorMsgBox(sys.translate("Error registrando el módulo") + " " + mod.id);
-      Retornar Falso;
+      return false;
     }
 
-    Si (!importFiles(fileMod.path, "*.xml", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.ui", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.qs", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.qry", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.mtd", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.kut", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.ar", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.jrxml", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.svg", mod.id))
-      Retornar Falso;
-    Si (!importFiles(fileMod.path, "*.ts", mod.id))
-      Retornar Falso;
-  } SiNo {
+    if (!importFiles(fileMod.path, "*.xml", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.ui", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.qs", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.qry", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.mtd", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.kut", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.ar", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.jrxml", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.svg", mod.id))
+      return false;
+    if (!importFiles(fileMod.path, "*.ts", mod.id))
+      return false;
+  } else {
     errorMsgBox(sys.translate("Error en la carga del fichero xml .mod"));
-    Retornar Falso;
+    return false;
   }
 
-  Retornar Cierto;
+  return true;
 }
 
-Funcion importFiles(dirPath, ext, idMod)
+function importFiles(dirPath, ext, idMod)
 {
-  var ok = Cierto;
-  var listFiles = AQUtil.findFiles([dirPath], ext, Falso);
+  var ok = true;
+  var listFiles = AQUtil.findFiles([dirPath], ext, false);
 
   AQUtil.createProgressDialog(sys.translate("Importando"), listFiles.length);
   AQUtil.setProgress(1);
   
-  Para (var i = 0; i < listFiles.length; ++i) {
+  for (var i = 0; i < listFiles.length; ++i) {
     AQUtil.setLabelText(listFiles[i]);
     AQUtil.setProgress(i);
 
-    Si (!importFile(listFiles[i], idMod)) {
+    if (!importFile(listFiles[i], idMod)) {
       errorMsgBox(sys.translate("Error al cargar :\n") + listFiles[i]);
-      ok = Falso;
-      Romper;
+      ok = false;
+      break;
     }
   }
 
   AQUtil.destroyProgressDialog();
-  Retornar ok;
+  return ok;
 }
 
-Funcion importFile(filePath, idMod)
+function importFile(filePath, idMod)
 {
   var file = new File(filePath);
   var content = "";
@@ -1535,24 +1535,24 @@ Funcion importFile(filePath, idMod)
     content = file.read();
   } catch (e) {
     errorMsgBox(sys.translate("Error leyendo fichero.") + "\n" + e);
-    Retornar Falso;
+    return false;
   }
 
-  var ok = Cierto;
+  var ok = true;
   var name = file.name;
-  Si ((!AQUtil.isFLDefFile(content) AND 
-       !name.endsWith(".qs") AND 
-       !name.endsWith(".ar") AND 
-       !name.endsWith(".svg")) OR 
+  if ((!AQUtil.isFLDefFile(content) &&
+       !name.endsWith(".qs") &&
+       !name.endsWith(".ar") &&
+       !name.endsWith(".svg")) ||
       name.endsWith("untranslated.ts"))
-    Retornar ok;
+    return ok;
 
   var cur = new AQSqlCursor("flfiles");
   cur.select("nombre = '" + name + "'");
-  Si (!cur.first()) {
-    Si (name.endsWith(".ar")) {
-      Si (!importReportAr(filePath, idMod, content))
-        Retornar Cierto;
+  if (!cur.first()) {
+    if (name.endsWith(".ar")) {
+      if (!importReportAr(filePath, idMod, content))
+        return true;
     }
     cur.setModeAccess(AQSql.Insert);
     cur.refreshBuffer();
@@ -1563,13 +1563,13 @@ Funcion importFile(filePath, idMod)
     cur.setValueBuffer("sha", ba.sha1());
     cur.setValueBuffer("contenido", content);
     ok = cur.commitBuffer();
-  } SiNo {
+  } else {
     cur.setModeAccess(AQSql.Edit);
     cur.refreshBuffer();
     var ba = new QByteArray;
     ba.string = content;
     var shaCnt = ba.sha1();
-    Si (cur.valueBuffer("sha") != shaCnt) {
+    if (cur.valueBuffer("sha") != shaCnt) {
       var contenidoCopia = cur.valueBuffer("contenido");
       cur.setModeAccess(AQSql.Insert);
       cur.refreshBuffer();
@@ -1586,31 +1586,31 @@ Funcion importFile(filePath, idMod)
       cur.setValueBuffer("sha", shaCnt);
       cur.setValueBuffer("contenido", content);
       ok = cur.commitBuffer();
-      Si (name.endsWith(".ar")) {
-        Si (!importReportAr(filePath, idMod, content))
-          Retornar Cierto;
+      if (name.endsWith(".ar")) {
+        if (!importReportAr(filePath, idMod, content))
+          return true;
       }
     }
   }
 
-  Retornar ok;
+  return ok;
 }
 
-Funcion importReportAr(filePath, idMod, content)
+function importReportAr(filePath, idMod, content)
 {
-  Si (!sys.isLoadedModule("flar2kut"))
-    Retornar Falso;
+  if (!sys.isLoadedModule("flar2kut"))
+    return false;
 
-  Si (AQUtil.readSettingEntry("scripts/sys/conversionAr") != "true")
-    Retornar Falso;
+  if (AQUtil.readSettingEntry("scripts/sys/conversionAr") != "true")
+    return false;
 
   content = sys.toUnicode(content, "UTF-8");
   content = flar2kut.iface.pub_ar2kut(content);
 
   filePath = filePath.left(filePath.length - 3) + ".kut";
-  Si (content) {
+  if (content) {
     var localEnc = util.readSettingEntry("scripts/sys/conversionArENC");
-    Si (!localEnc)
+    if (!localEnc)
       var localEnc = "ISO-8859-15";
 
     content = sys.fromUnicode(content, localEnc);
@@ -1618,15 +1618,15 @@ Funcion importReportAr(filePath, idMod, content)
       File.write(filePath, content);
     } catch (e) {
       errorMsgBox(sys.translate("Error escribiendo fichero.") + "\n" + e);
-      Retornar Falso;
+      return false;
     }
-    Retornar importFile(filePath, idMod);
+    return importFile(filePath, idMod);
   }
 
-  Retornar Falso;
+  return false;
 }
 
-Clase AbanQDbDumper
+class AbanQDbDumper
 {
   const SEP_CSV = '\u00b6';
   
@@ -1643,28 +1643,28 @@ Clase AbanQDbDumper
   var funLog_;
   var proc_;
 
-  Funcion AbanQDbDumper(db, dirBase, showGui, funLog)
+  function AbanQDbDumper(db, dirBase, showGui, funLog)
   {
     this.db_ = (db == undefined ? aqApp.db() : db);
-    this.showGui_ = (showGui == undefined) ? Cierto : showGui;
+    this.showGui_ = (showGui == undefined) ? true : showGui;
     this.dirBase_ = (dirBase == undefined) ? Dir.home : dirBase;
     this.funLog_ = (funLog == undefined) ? this.addLog : funLog;
     this.fileName_ = this.genFileName();
   }
 
-  Funcion init()
+  function init()
   {
-    Si (this.showGui_) {
+    if (this.showGui_) {
       this.buildGui();
       this.w_.exec();
     }
   }
   
-  Funcion buildGui()
+  function buildGui()
   {
     this.w_ = new QDialog;
     this.w_.caption = sys.translate("Copias de seguridad");
-    this.w_.modal = Cierto;
+    this.w_.modal = true;
     this.w_.resize(800, 600);
 
     var lay = new QVBoxLayout(this.w_, 6, 6);
@@ -1732,64 +1732,64 @@ Clase AbanQDbDumper
     lay.addWidget(this.tedLog_);
   }
 
-  Funcion initDump()
+  function initDump()
   {
-    var gui = this.showGui_ AND this.w_ != undefined;
-    Si (gui)
-      this.w_.enabled = Falso;
+    var gui = this.showGui_ && this.w_ != undefined;
+    if (gui)
+      this.w_.enabled = false;
     this.dumpDatabase();
-    Si (gui)
-      this.w_.enabled = Cierto;
-    Si (this.state_.ok) {
-      Si (gui) {
+    if (gui)
+      this.w_.enabled = true;
+    if (this.state_.ok) {
+      if (gui) {
         MessageBox.information(this.state_.msg,
                                MessageBox.Ok, MessageBox.NoButton,
                                MessageBox.NoButton, "AbanQ");
       }
       this.w_.close();
-    } SiNo Si (gui)
+    } else if (gui)
       sys.errorMsgBox(this.state_.msg);
   }
 
-  Funcion genFileName()
+  function genFileName()
   {
     var now = new Date;
     var timeStamp = now.toString();
     var regExp = new RegExp("[-|:]");
-    regExp.global = Cierto;
+    regExp.global = true;
     timeStamp = timeStamp.replace(regExp, "");
     var fileName = this.dirBase_ + "/dump_" +
                    this.db_.database() + "_" +
                    timeStamp;
     fileName = Dir.cleanDirPath(fileName);
     fileName = Dir.convertSeparators(fileName);
-    Retornar fileName;
+    return fileName;
   }
 
-  Funcion changeDirBase(dir)
+  function changeDirBase(dir)
   {
     var dirBasePath = dir;
-    Si (!dirBasePath) {
+    if (!dirBasePath) {
       dirBasePath = FileDialog.getExistingDirectory(this.dirBase_);
-      Si (!dirBasePath)
-        Retornar;
+      if (!dirBasePath)
+        return;
     }
     this.dirBase_ = dirBasePath;
-    Si (this.showGui_ AND this.lblDirBase_ != undefined)
+    if (this.showGui_ && this.lblDirBase_ != undefined)
       this.lblDirBase_.text = sys.translate("Directorio Destino: %1")
                               .arg(this.dirBase_);
     this.fileName_ = this.genFileName();
   }
 
-  Funcion addLog(msg)
+  function addLog(msg)
   {
-    Si (this.showGui_ AND this.tedLog_ != undefined)
+    if (this.showGui_ && this.tedLog_ != undefined)
       this.tedLog_.append(msg);
-    SiNo
+    else
       debug(msg);
   }
 
-  Funcion setState(ok, msg)
+  function setState(ok, msg)
   {
     this.state_ = {
       ok: ok,
@@ -1797,12 +1797,12 @@ Clase AbanQDbDumper
     };
   }
 
-  Funcion state()
+  function state()
   {
-    Retornar this.state_;
+    return this.state_;
   }
 
-  Funcion launchProc(command)
+  function launchProc(command)
   {
     this.proc_ = new QProcess;
     this.proc_.setArguments(command);
@@ -1811,39 +1811,39 @@ Clase AbanQDbDumper
     connect(this.proc_, "readyReadStderr()", this, "readFromStderr()");
 
     var ok = this.proc_.start();
-    Mientras (ok AND this.proc_.isRunning())
+    while (ok && this.proc_.isRunning())
       sys.processEvents();
-    Retornar ok;
+    return ok;
   }
 
-  Funcion readFromStdout()
+  function readFromStdout()
   {
     this.funLog_(this.proc_.readStdout().toString());
   }
 
-  Funcion readFromStderr()
+  function readFromStderr()
   {
     this.funLog_(this.proc_.readStderr().toString());
   }
 
-  Funcion dumpDatabase()
+  function dumpDatabase()
   {
     var driver = this.db_.driverName();
     var typeBd = 0;
 
-    Si (driver.startsWith("FLQPSQL"))
+    if (driver.startsWith("FLQPSQL"))
       typeBd = 1;
-    SiNo Si (driver.startsWith("FLQMYSQL"))
+    else if (driver.startsWith("FLQMYSQL"))
       typeBd = 2;
 
-    Si (typeBd == 0) {
+    if (typeBd == 0) {
       this.setState(
-        Falso,
+        false,
         sys.translate("Este tipo de base de datos no soporta el volcado a disco.")
       );
       this.funLog_(this.state_.msg);
       this.dumpAllTablesToCsv();
-      Retornar Falso;
+      return false;
     }
 
     var file = new File(this.fileName_);
@@ -1855,49 +1855,49 @@ Clase AbanQDbDumper
       dir.mkdir();
       dir.rmdir();
     } catch (e) {
-      this.setState(Falso, "" + e);
+      this.setState(false, "" + e);
       this.funLog_(this.state_.msg);
-      Retornar Falso;
+      return false;
     }
 
-    var ok = Cierto;
-    Segun (typeBd) {
-      Caso 1:
+    var ok = true;
+    switch (typeBd) {
+      case 1:
         ok = this.dumpPostgreSQL();
-        Romper;
-      Caso 2:
+        break;
+      case 2:
         ok = this.dumpMySQL();
-        Romper;
+        break;
     }
 
-    Si (!ok)
+    if (!ok)
       this.dumpAllTablesToCsv();
       
-    Si (!ok) {
+    if (!ok) {
       this.setState(
-        Falso,
+        false,
         sys.translate("No se ha podido realizar la copia de seguridad.")
       );
       this.funLog_(this.state_.msg);
-    } SiNo {
+    } else {
       this.setState(
-        Cierto,
+        true,
         sys.translate("Copia de seguridad realizada con éxito en:\n%1").arg(this.fileName_)
       );
       this.funLog_(this.state_.msg);
     }
 
-    Retornar ok;
+    return ok;
   }
 
-  Funcion dumpPostgreSQL()
+  function dumpPostgreSQL()
   {
     var pgDump = "pg_dump";
     var command;
     var fileName = this.fileName_ + ".sql";
     var db = this.db_;
 
-    Si (sys.osName() == "WIN32") {
+    if (sys.osName() == "WIN32") {
       pgDump += ".exe";
       System.setenv("PGPASSWORD", db.password());
       command = [pgDump,
@@ -1906,7 +1906,7 @@ Clase AbanQDbDumper
                  "-p", db.port(),
                  "-U", db.user(),
                  db.database()];
-    } SiNo {
+    } else {
       System.setenv("PGPASSWORD", db.password());
       command = [pgDump, "-v",
                  "-f", fileName,
@@ -1916,27 +1916,27 @@ Clase AbanQDbDumper
                  db.database()];
     }
 
-    Si (!this.launchProc(command)) {
+    if (!this.launchProc(command)) {
       this.setState(
-        Falso,
+        false,
         sys.translate("No se ha podido volcar la base de datos a disco.\n") +
         sys.translate("Es posible que no tenga instalada la herramienta ") + pgDump
       );
       this.funLog_(this.state_.msg);
-      Retornar Falso;
+      return false;
     }
-    this.setState(Cierto, "");
-    Retornar Cierto;
+    this.setState(true, "");
+    return true;
   }
 
-  Funcion dumpMySQL()
+  function dumpMySQL()
   {
     var myDump = "mysqldump";
     var command;
     var fileName = this.fileName_ + ".sql";
     var db = this.db_;
 
-    Si (sys.osName() == "WIN32") {
+    if (sys.osName() == "WIN32") {
       myDump += ".exe";
       command = [myDump, "-v",
                  "--result-file=" + fileName,
@@ -1945,7 +1945,7 @@ Clase AbanQDbDumper
                  "--password=" + db.password(),
                  "--user=" + db.user(),
                  db.database()];
-    } SiNo {
+    } else {
       command = [myDump, "-v",
                  "--result-file=" + fileName,
                  "--host=" + db.host(),
@@ -1955,25 +1955,25 @@ Clase AbanQDbDumper
                  db.database()];
     }
 
-    Si (!this.launchProc(command)) {
+    if (!this.launchProc(command)) {
       this.setState(
-        Falso,
+        false,
         sys.translate("No se ha podido volcar la base de datos a disco.\n") +
         sys.translate("Es posible que no tenga instalada la herramienta ") + myDump
       );
       this.funLog_(this.state_.msg);
-      Retornar Falso;
+      return false;
     }
-    this.setState(Cierto, "");
-    Retornar Cierto;
+    this.setState(true, "");
+    return true;
   }
   
-  Funcion dumpTableToCsv(table, dirBase)
+  function dumpTableToCsv(table, dirBase)
   {
     var fileName = dirBase + table + ".csv";
     var file = new QFile(fileName);
-    Si (!file.open(File.WriteOnly))
-      Retornar Falso;
+    if (!file.open(File.WriteOnly))
+      return false;
 
     var ts = new QTextStream(file.ioDevice());
     ts.setCodec(AQS.TextCodec_codecForName("utf8"));
@@ -1981,14 +1981,14 @@ Clase AbanQDbDumper
     var qry = new AQSqlQuery;
     qry.setSelect(table + ".*");
     qry.setFrom(table);
-    Si (!qry.exec())
-      Retornar Falso;
+    if (!qry.exec())
+      return false;
 
     var rec = "";
     var fieldNames = qry.fieldList();
 
-    Para (var i = 0; i < fieldNames.length; ++i) {
-      Si (i > 0)
+    for (var i = 0; i < fieldNames.length; ++i) {
+      if (i > 0)
         rec += this.SEP_CSV;
       rec += fieldNames[i];
     }
@@ -1997,10 +1997,10 @@ Clase AbanQDbDumper
     AQUtil.createProgressDialog(sys.translate("Haciendo copia en CSV de ") + table, qry.size());
     var p = 0;
     
-    Mientras (qry.next()) {
+    while (qry.next()) {
       rec = "";
-      Para (var i = 0; i < fieldNames.length; ++i) {
-        Si (i > 0)
+      for (var i = 0; i < fieldNames.length; ++i) {
+        if (i > 0)
           rec += this.SEP_CSV;
         rec += qry.value(i).toString();
       }
@@ -2010,10 +2010,10 @@ Clase AbanQDbDumper
 
     file.close();
     AQUtil.destroyProgressDialog();
-    Retornar Cierto;
+    return true;
   }
 
-  Funcion dumpAllTablesToCsv()
+  function dumpAllTablesToCsv()
   {
     var fileName = this.fileName_;
     var db = this.db_;
@@ -2023,136 +2023,136 @@ Clase AbanQDbDumper
     dir.mkdir();
     var dirBase = Dir.convertSeparators(fileName + "/");
 
-    Para (var i = 0; i < tables.length; ++i)
+    for (var i = 0; i < tables.length; ++i)
       this.dumpTableToCsv(tables[i], dirBase);
-    Retornar Cierto;
+    return true;
   }
 }
 
-Funcion dumpDatabase()
+function dumpDatabase()
 {
   var aqDumper = new AbanQDbDumper;
   aqDumper.init();
 }
 
-Funcion setObjText(container, component, value)
+function setObjText(container, component, value)
 {
   var c = testObj(container, component)
-  Si (!c) {
-    Retornar Falso;
+  if (!c) {
+    return false;
   }
   // Temporal hasta que los FL... dispongan de className()
   var clase = "editor" in c ?
               "FLFieldDB" :
               c.className();
-  Segun (clase) {
-    Caso "QPushButton":
-    Caso "QToolButton":
-    Caso "QLabel": {
+  switch (clase) {
+    case "QPushButton":
+    case "QToolButton":
+    case "QLabel": {
       runObjMethod(container, component, "text", "\"" + value + "\"");
-      Romper;
+      break;
     }
-    Caso "FLFieldDB": {
+    case "FLFieldDB": {
       runObjMethod(container, component, "setValue", value);
-      Romper;
+      break;
     }
-    Defecto: {
-      Retornar Falso;
+    default: {
+      return false;
     }
   }
-  Retornar Cierto;
+  return true;
 }
 
-Funcion disableObj(container, component)
+function disableObj(container, component)
 {
   var c = testObj(container, component);
-  Si (!c) {
-    Retornar Falso;
+  if (!c) {
+    return false;
   }
   // Temporal hasta que ls FL... dispongan de className()
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  Segun (clase) {
-    Caso "QPushButton":
-    Caso "QToolButton": {
-      runObjMethod(container, component, "setEnabled", Falso);
-      Romper;
+  switch (clase) {
+    case "QPushButton":
+    case "QToolButton": {
+      runObjMethod(container, component, "setEnabled", false);
+      break;
     }
-    Caso "FLFieldDB": {
-      runObjMethod(container, component, "setDisabled", Cierto);
-      Romper;
+    case "FLFieldDB": {
+      runObjMethod(container, component, "setDisabled", true);
+      break;
     }
-    Defecto : {
-      Retornar Falso;
+    default : {
+      return false;
     }
   }
-  Retornar Cierto;
+  return true;
 }
 
-Funcion filterObj(container, component, filter)
+function filterObj(container, component, filter)
 {
   var c = testObj(container, component)
-  Si (!c) {
-    Retornar Falso;
+  if (!c) {
+    return false;
   }
   // Temporal hasta que ls FL... dispongan de className()
   var clase = "editor" in c ?
               "FLFieldDB" :
               ("tableName" in c ? "FLTableDB" : c.className());
-  Segun (clase) {
-    Caso "FLTableDB":
-    Caso "FLFieldDB": {
+  switch (clase) {
+    case "FLTableDB":
+    case "FLFieldDB": {
       runObjMethod(container, component, "setFilter", filter);
-      Romper;
+      break;
     }
-    Defecto: {
-      Retornar Falso;
+    default: {
+      return false;
     }
   }
-  Retornar Cierto;
+  return true;
 }
 
-Funcion testObj(container, component)
+function testObj(container, component)
 {
-  Si (!container OR container == undefined) {
-    Retornar Falso;
+  if (!container || container == undefined) {
+    return false;
   }
   var c = container.child(component);
-  Si (!c OR c == undefined) {
+  if (!c || c == undefined) {
     debug(component + " no existe");
-    Retornar Falso;
+    return false;
   }
-  Retornar c;
+  return c;
 }
 
-Funcion testAndRun(container, component, method, param)
+function testAndRun(container, component, method, param)
 {
   var c = testObj(container, component)
-  Si (!c) {
-    Retornar Falso;
+  if (!c) {
+    return false;
   }
-  Si (!runObjMethod(container, component, method, param)) {
-    Retornar Falso;
+  if (!runObjMethod(container, component, method, param)) {
+    return false;
   }
-  Retornar Cierto;
+  return true;
 }
 
-Funcion runObjMethod(container, component, method, param)
+function runObjMethod(container, component, method, param)
 {
   var c = container.child(component);
-  Si (method in c) {
+  if (method in c) {
     var s = container.name + ".child(\"" + component + "\")." + method;
     var m = eval(s);
-    Si (typeof m == "function") { // Método
+    if (typeof m == "function") { // Método
       m(param);
-    } SiNo { // Propiedad
+    } else { // Propiedad
       eval(s + " = " + param);
     }
-  } SiNo {
+  } else {
     debug(method  + " no existe");
   }
-  Retornar Cierto;
+  return true;
 }
 
 /** Encapsula una función en una transacción.
@@ -2165,89 +2165,89 @@ Ejemplo de uso:
       return false;
     }
 */
-Funcion runTransaction(f, oParam)
+function runTransaction(f, oParam)
 {
-  var errorMsg = "errorMsg" in oParam ? oParam.errorMsg : Falso;
+  var errorMsg = "errorMsg" in oParam ? oParam.errorMsg : false;
   
   var curT = new FLSqlCursor("flfiles");
-  curT.transaction(Falso);
+  curT.transaction(false);
   var valor;
   try {
     valor = f(oParam);
-    Si (valor) {
+    if (valor) {
       curT.commit();
-    } SiNo {
+    } else {
       curT.rollback();
-      Si (errorMsg ) {
+      if (errorMsg ) {
         MessageBox.warning(errorMsg , MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
-        Retornar Falso;
+        return false;
       }
     }
   } catch (e) {
     curT.rollback();
-    Si (errorMsg ) {
+    if (errorMsg ) {
       MessageBox.warning(errorMsg  + ": " + e, MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
     }
-    Retornar Falso;
+    return false;
   }
-  Retornar valor;
+  return valor;
 }
 
-Funcion openUrl(url)
+function openUrl(url)
 {
-  Si (!url OR (typeof url) != "string" OR url.isEmpty())
-    Retornar Falso;
+  if (!url || (typeof url) != "string" || url.isEmpty())
+    return false;
   
-  Segun (sys.osName()) {
-    Caso "LINUX": {
-      Si (launchCommand(["xdg-open", url]))
-        Retornar Cierto;
-      Si (launchCommand(["gnome-open", url]))
-        Retornar Cierto;
-      Si (launchCommand(["kfmclient openURL", url]))
-        Retornar Cierto;
-      Si (launchCommand(["kfmclient exec", url]))
-        Retornar Cierto;
-      Si (launchCommand(["firefox", url]))
-        Retornar Cierto;
-      Si (launchCommand(["mozilla", url]))
-        Retornar Cierto;
-      Si (launchCommand(["opera", url]))
-        Retornar Cierto;
-      Si (launchCommand(["google-chrome", url]))
-        Retornar Cierto;
+  switch (sys.osName()) {
+    case "LINUX": {
+      if (launchCommand(["xdg-open", url]))
+        return true;
+      if (launchCommand(["gnome-open", url]))
+        return true;
+      if (launchCommand(["kfmclient openURL", url]))
+        return true;
+      if (launchCommand(["kfmclient exec", url]))
+        return true;
+      if (launchCommand(["firefox", url]))
+        return true;
+      if (launchCommand(["mozilla", url]))
+        return true;
+      if (launchCommand(["opera", url]))
+        return true;
+      if (launchCommand(["google-chrome", url]))
+        return true;
     }
-    Romper;
+    break;
 
-    Caso "WIN32": {
-      Si (url.startsWith("mailto")) {
+    case "WIN32": {
+      if (url.startsWith("mailto")) {
         var rxp = new RegExp("&");
-        rxp.global = Cierto;
+        rxp.global = true;
         url = url.replace(rxp, "^&");
       }
-      Retornar launchCommand(["cmd.exe", "/C", "start", "", url]);
+      return launchCommand(["cmd.exe", "/C", "start", "", url]);
     }
-    Romper;
+    break;
 
-    Caso "MACX": {
-      Retornar launchCommand(["open", url]);
+    case "MACX": {
+      return launchCommand(["open", url]);
     }
-    Romper;
+    break;
   }
 
-  Retornar Falso;
+  return false;
 }
 
-Funcion launchCommand(command)
+function launchCommand(command)
 {
-  Si (!command OR (typeof command) != "object" OR command.length == 0)
-    Retornar Falso;
+  if (!command || (typeof command) != "object" || command.length == 0)
+    return false;
 
   try {
     Process.execute(command);
-    Retornar Cierto;
+    return true;
   } catch (e) {
-    Retornar Falso;
+    return false;
   }
 }
 
