@@ -548,6 +548,7 @@ if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName];
     for (var i = 0; i < areas.length; ++i) {
       var ag = new QActionGroup(agm);
       ag.name = areas[i];
+      if (!sys.isDebuggerEnabled() && ag.name == "sys") break;
       ag.menuText = ag.text = mng.idAreaToDescription(ag.name);
       ag.usesDropDown = true;
       ag.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("folder.png")));
