@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build.sh -prefix "$(pwd)/eneboo-build-macx" -platform "macx-g++" 
+./build.sh -prefix "$(pwd)/eneboo-build-macx" -platform "macx-g++" -quick
