@@ -169,6 +169,7 @@ if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; t
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
+  BUILD_NUMBER="$BUILD_NUMBER-quick"
 else
   BUILD_NUMBER="$BUILD_NUMBER-dba"
 fi
