@@ -665,7 +665,7 @@ void FLApplication::initToolBox()
     for (QStringList::Iterator itM = listModules.begin(); itM != listModules.end(); ++itM, ++c) {
       if (QChar(c) == 'Q')
         ++c;
-      if (*itM == "sys") {
+      if (*itM == "sys" && ap2->isDebuggerMode()) {
        
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
