@@ -583,13 +583,13 @@ static bool readKdeGlobals()
 
     lastCheck=now;
 
-    if(useQt3)
-        kdeSettings.hover=kdeSettings.focus=highlight;
-    else
-    {
-        kdeSettings.hover=QColor(119, 183, 255);
-        kdeSettings.focus=QColor( 43, 116, 199);
-    }
+ //   if(useQt3)
+ //       kdeSettings.hover=kdeSettings.focus=highlight;
+  //  else
+   // {
+        kdeSettings.hover=QColor(255, 110, 1);
+        kdeSettings.focus=QColor( 255, 167, 102);
+   // }
 
     if(f.open(IO_ReadOnly))
     {
