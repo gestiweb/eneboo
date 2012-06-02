@@ -1638,14 +1638,14 @@ function importFile(filePath, idMod)
 
 function importReportAr(filePath, idMod, content)
 {
-  if (!sys.isLoadedModule("eneboodev"))
+  if (!sys.isLoadedModule("flar2kut"))
     return false;
 
   if (AQUtil.readSettingEntry("scripts/sys/conversionAr") != "true")
     return false;
 
   content = sys.toUnicode(content, "UTF-8");
-  content = eneboodev.iface.pub_ar2kut(content);
+  content = flar2kut.iface.pub_ar2kut(content);
 
   filePath = filePath.left(filePath.length - 3) + ".kut";
   if (content) {
