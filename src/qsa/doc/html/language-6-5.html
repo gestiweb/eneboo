@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:161 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>default</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-4.html">Prev: continue</a>] [<a href="language.html">Home</a>] [<a href="language-6-6.html">Next: do</a>]</p>
+<h3 align="center">default</h3>
+<pre>
+switch ( expression ) {
+    case 1 :
+        Statements1;
+        break;
+    default :
+        DefaultStatements;
+        break;
+}
+</pre>
+<p>This keyword is used in <a href="language-6-13.html">switch</a> statements. It is used instead of <a href="language-6-2.html">case</a> to match <em>anything</em> that the <tt>switch</tt> statement's expression has evaluated to. If no <tt>default</tt> is used, and none of the cases match, then the <tt>switch</tt> statement will not execute anything and control will pass on to the following statement. If <tt>default</tt> is used, it <em>must</em> be the last case in the <tt>switch</tt> statement. This is because each <tt>case</tt> is evaluated in order, and since <tt>default</tt> matches any value, it will always be executed if the interpreter reaches it, and any following cases would always be ignored. When the <tt>default</tt> case is encountered its <em>DefaultStatements</em> are executed. It is customary to end a <tt>default</tt> statement with a <a href="language-6-1.html">break</a>.</p>
+<p>See <a href="language-6-13.html">switch</a> for an example.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-4.html">Prev: continue</a>] [<a href="language.html">Home</a>] [<a href="language-6-6.html">Next: do</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

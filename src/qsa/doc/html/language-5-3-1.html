@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:686 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-3.html">Prev: Declarations</a>] [<a href="language.html">Home</a>] [<a href="language-5-3-2.html">Next: const</a>]</p>
+<h4 align="center">class</h4>
+<pre>
+class ClassName {
+    static var ClassVariable;
+    var MemberVariable;
+    static function ClassFunction { Statements; }
+    function ClassName() { Statements; } // constructor
+    function MemberFunction() { Statements; }
+}
+</pre>
+<p>This keyword is used to define new classes. After the keyword <tt>class</tt> comes the <em>ClassName</em>, then optionally, the keyword <tt>extends</tt> followed by a class name from which this class derives, then an opening brace. Class variables are declared with <tt>static</tt> <a href="language-5-3-4.html">var</a> (<em>ClassVariable</em>). Only one instance of these variables exists per class. Member variables (<em>MemberVariable</em>), are declared with <a href="language-5-3-4.html">var</a>; each instance (object) of the class has its own copy of each member variable. Functions declared with the keywords <tt>static</tt> <a href="language-5-3-3.html">function</a> are class functions (<em>ClassFunction</em>); these functions are called using the name of the class rather than from an object. In the standard library, the <a href="language-3-2-1.html">Math</a> functions are all static, for example <tt>Math.sin()</tt>. Member functions (methods) are called by objects and are declared with <a href="language-5-3-3.html">function</a>. The constructor is the member function with the same name as the class; constructors must not contain an explicit <a href="language-6-12.html">return</a> statement, or have an explicit return type, since <font color=darkmagenta>Qt Script for Applications</font> handles these automatically.</p>
+<p>A class that only contains <tt>static</tt> <a href="language-5-3-2.html">const</a>, <a href="language-5-3-4.html">var</a> and <a href="language-5-3-3.html">function</a> definitions does not need a constructor.</p>
+<p>Example:</p>
+<pre>
+    class Area {
+        static var count = 0;
+        var _name;
+        function Area( name ) { this._name = name; this.count++ }
+        function destroy() { this.count--; }
+        static function count() { return this.count; }
+        function name() { return this._name; }
+        function setName( name ) { this._name = name; }
+    }
+</pre>
+<p>In this example we define the "Area" class. When an instance of the class is constructed:</p>
+<pre>
+    var area = new Area( "Berkshire" );
+</pre>
+<p>the given name is assigned to the object's <tt>_name</tt> variable, and the class's <tt>static</tt> <tt>count</tt> is incremented. The <tt>destroy()</tt> function is <em>not</em> called automatically; it must be called explicitly if there is any clean-up to do.</p>
+<p>All the class's variables and functions must be defined within the class definition. <font color=brown>ECMAScript</font> does not have destructors. But for <font color=darkmagenta>Qt Script for Applications</font> forms, <font color=darkmagenta>Qt Script for Applications</font> will call a class's <tt>destroy()</tt> function, if it has one, before deleting the form. This occurs because <font color=darkmagenta>Qt Script for Applications</font> automatically connects the form's <tt>destroyed()</tt> signal to the <tt>destroy()</tt> function. If you want a destructor you must create your own and call it explicitly.</p>
+<p>Classes are all derived from <a href="language-3-1-6.html">Object</a>. It is possible to derive a class from another class using the <tt>extends</tt> keyword, for example:</p>
+<pre>
+    class City extends Area {
+        var _population;
+        function City( name, population )
+        {
+            Area( name );
+            _population = population;
+        }
+        function population() { return _population; }
+        function setPopulation( population ) { _population = population; }
+    }
+</pre>
+<p>See also <a href="language-5-3-3.html">function</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-5-3.html">Prev: Declarations</a>] [<a href="language.html">Home</a>] [<a href="language-5-3-2.html">Next: const</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

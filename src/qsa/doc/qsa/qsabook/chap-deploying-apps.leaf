@@ -1,0 +1,69 @@
+\chapter Deploying QSA-enabled Applications
+
+\section1 Introduction
+
+This chapter explains how to deploy QSA-enabled applications, meaning
+which libraries and files have to be shipped with the application.
+
+\section1 Reuqired Libraries from Qt
+
+\QSA requires and uses Qt. This means following libraries from your Qt
+installation have to be shipped with your application and installed in
+the user's library path, so that the operating system can locate these
+libraries:
+
+\table
+\row
+	\i <b>Unix filename</b>
+	\i <b>Windows filename</b>
+	\i <b>Description</b>
+\row
+	\i $QTDIR/lib/libqt.so
+	\i %QTDIR%\lib\qt{%VERSION%}.dll
+	\i The Qt library
+\row
+	\i $QTDIR/lib/libqui.so
+	\i Built static on windows,doesn't need to be shipped on windows.
+	\i Includes QWidgetFactory, which is required by QSA
+\endtable
+
+
+\section1 Reuqired Libraries from QSA
+
+Following libraries from your QSA installation have to be shipped with
+your application and installed in the user's library path, so that the
+operating system can locate these libraries:
+
+\table
+\row
+	\i <b>Unix filename</b>
+	\i <b>Windows filename</b>
+	\i <b>Description</b>
+\row
+	\i $QTDIR/lib/libqsa.so
+	\i %QTDIR%\lib\qsa{%VERSION%}.dll
+	\i The QSA library (scripting engine, bindings, etc.)
+\endtable
+
+
+\section1 Reuqired Plugins from QSA
+
+Following plugins from your QSA installation have to be shipped with
+your application. They have to be installed in the Qt plugin path
+under the directory qsa. See QApplication::setLibraryPath() for
+details.
+
+\table
+\row
+	\i <b>Unix filename</b>
+	\i <b>Windows filename</b>
+	\i <b>Description</b>
+\row
+	\i $QTDIR/plugins/qsa/libquickide.so
+	\i %QTDIR%\plugins\qsa\quickide.dll
+	\i The QSA-specifc features for \QSAD.
+\row
+	\i $QTDIR/plugins/qsa/libquickcustom.so
+	\i %QTDIR%\plugins\qsa\quickcustom.dll
+	\i Some custom classes (PaintWidget, etc.) provided by QSA
+\endtable

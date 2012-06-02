@@ -1,0 +1,400 @@
+\chapter Reference: Toolbar Buttons
+
+\section1 Introduction
+
+\QSAD's toolbar buttons provide fast access to common functionality.
+Toolbar buttons are grouped in several toolbars. Toolbars have a
+handle at the left hand side which can be clicked to minimize the
+toolbar. Toolbars that have been minimized have their handle appear
+just under the menu bar; click the handle to restore the toolbar to
+the last position it occupied. You can drag a toolbar's handle to move
+the toolbar to a different position in the toolbar area. Toolbars can
+be dragged out of the toolbar area entirely and made into stand-alone
+tool dock windows. To hide a tool dock window click its close button.
+To restore a hidden tool dock window, right click the tool area, then
+click the name of the tool dock window you wish to restore.
+
+\section1 The File Toolbar Buttons
+
+\img rtb-file.png
+\caption File Toolbuttons
+
+\list
+\i \Toolbutton New\BR Click this toolbar button (or press \Key Ctrl+N)
+to create a new dialog or source file. Clicking File invokes the
+\l{Name of File} message box
+
+\i \Toolbutton Save\BR Click this toolbar button (or press \Key Ctrl+S) to
+save the project, forms and files. 
+
+\endlist
+
+\section1 The Edit Toolbar Buttons
+
+\img rtb-edit.png
+\caption Edit Toolbuttons
+
+\list
+\i \Toolbutton Undo\BR Click this toolbar button (or press \Key Ctrl+Z) to
+undo an action. The name of the last action that was performed appears
+after the word 'Undo' in this toolbar button's tooltip. 
+
+\i \Toolbutton Redo\BR Click this toolbar button (or press \Key Ctrl+Y) to
+redo an action. The name of the last action that was performed appears
+after the word 'Redo' in this toolbar button's tooltip.
+
+\i \Toolbutton Cut\BR Click this toolbar button (or press \Key
+Ctrl+X) to delete the selected item from the current form or file and
+copy it to the clipboard.
+
+\i \Toolbutton Copy\BR Click this toolbar button (or press \Key Ctrl+C) to
+copy the selected item from the current form or file to the clipboard.
+
+\i \Toolbutton {Paste}\BR Click this toolbar button (or press \Key
+Ctrl+V) to paste the selected item (if any) from the clipboard into
+the current form or file.
+
+\endlist
+
+\section1 The Search Toolbar Buttons
+
+\img rtb-search.png
+\caption Search Toolbuttons
+
+\list
+\i \Toolbutton Find\BR Click this toolbar button (or press \Key Ctrl+F) to
+invoke the \l{Find Text Dialog}. 
+
+\i \Toolbutton{Find Incremental}\BR Click this toolbar button (or press
+\Key Alt+I) to place the cursor in the text box located next to the
+\Toolbutton {Find} toolbar button. Type characters into the text box; as
+you type, \QD will highlight the first occurrence of the text that it
+finds in the file. Press the \Key Enter key to go to the next
+occurrence of the text. Press the \Key Esc key once you have found the
+word you are looking for to place the cursor in the editor.
+
+\endlist
+
+\section1 The Tools Toolbar Buttons
+
+The tools toolbar buttons are available through toolbars (as they have
+always been prior to Qt 3.1), and also via the new Toolbox. From Qt
+3.1, the tools toolbars are hidden and the Toolbox is shown. The
+Toolbox is divided into groups, with the first group being "Common
+Widgets" which contains the widgets you're likely to use most often.
+If you prefer to use the original toolbar setup, you can access the
+toolbars by clicking \Menu{Windows|Toolbars} and then selecting the
+toolbars you want to be visible from the context menu. 
+
+\img rtb-toolbox.png
+\caption The Toolbox
+
+The Toolbox contains categories describing the type of toolbuttons you
+can find within each catgory. Click a category name to access the
+toolbuttons in that category. To use a widget in a category, click the
+widget to activate it. Click the 'x' in the right hand corner of the
+Toolbox to close it. To make the Toolbox appear again, click
+\Menu{Window|Views|Toolbox}.
+
+If you want to add the same kind of widget several times to a form,
+for example, several push buttons, \e{double click} the widget's
+toolbar button. After this, each time you click the form a new widget
+will be added. Click the \Toolbutton Pointer toolbar button to leave
+this mode. 
+
+\section2 Tools
+
+\img  rtb-tools.png
+\caption Tools
+
+\list
+\i \Toolbutton Pointer\BR Click this toolbar button (or press \Key F2) to
+de-select any selected widget toolbar button. The pointer is also used
+to stop inserting new widgets if you double clicked a widget toolbar
+button. Press the \Key Esc key to return to the pointer at any time.
+
+\i \Toolbutton{Connect Signals and Slots}\BR Click this toolbar button (or
+press \Key F3) to connect signals and slots. Then click on a widget and
+drag the connection line to the widget (or the form) that you want to
+connect to. Release the mouse button and the \l{View and Edit Connections
+Dialog} will appear.
+
+\i \Toolbutton {Tab Order}\BR Click this toolbar button (or press \Key F4) to
+set the tab order for all the widgets on the form that can accept
+keyboard focus. Click this toolbar button and blue circles with numbers on
+them appear next to the widgets. Click the widget that you want to be
+first in the tab order, then click the widget that should be next in
+the tab order, and continue until all the widgets have the tab order
+numbers you want. If you make a mistake, double click the first widget
+and start again. Press \Key Esc to leave tab order mode. If you want
+to revert your changes, leave tab order mode, then undo.
+
+\i \Toolbutton {Set Buddy}\BR Click this toolbar button to set a buddy
+to a label. Then click on a label and drag the line to the widget that
+you want to be the buddy. Release the mouse button and the buddy is
+set.
+
+\endlist
+
+\section2 Buttons
+
+\img rtbq-tbbuttons.png
+\caption Buttons
+
+\list
+\i \Toolbutton PushButton\BR Click this toolbar button, then click the form,
+to place a Pushbutton on the form.
+
+\i \Toolbutton ToolButton\BR Click this toolbar button, then click the form,
+to place a Toolbutton on the form.
+
+\i \Toolbutton RadioButton\BR Click this toolbar button, then click
+the form, to place a Radiobutton on the form. It is recommended that
+you place RadioButtons inside ButtonGroups so that Qt will
+automatically ensure that only one RadioButton in the group is active
+at any one time.
+
+\i \Toolbutton CheckBox\BR Click this toolbar button, then click the
+form, to place a CheckBox on the form.
+
+\i \Toolbutton ColorButton\BR Click this toolbar button, then click
+the form to place a ColorBUtton on the form.
+
+\endlist
+
+\section2 Containers
+
+\img rtb-tbcontain.png
+\caption Containers
+
+\list
+\i \Toolbutton GroupBox\BR Click this toolbar button, then 
+click the form, to place a GroupBox on the form.
+
+\i \Toolbutton ButtonGroup\BR Click this toolbar button, then
+click the form, to place a ButtonGroup on the form.
+
+\i \Toolbutton Frame\BR Click this toolbar button, then
+click the form, to place a Frame on the form.
+
+\i \Toolbutton TabWidget\BR Click this toolbar button, then
+click the form, to place a TabWidget on the form. To add or remove
+tabs, right click the tab widget and choose 'Add Page' or 'Remove
+Page'. 
+
+\endlist
+
+\section2 Views
+
+\img rtb-tbviews.png
+\caption Views 
+
+\list
+\i \Toolbutton ListBox\BR Click this toolbar button, then click the
+form, to place a ListBox on the form.
+
+\i \Toolbutton ListView\BR Click this toolbar button, then click the
+form, to place a ListView on the form.
+
+\i \Toolbutton {Icon View}\BR Click this toolbar button, then click the
+form, to place an IconView on the form.
+
+\i \Toolbutton Table\BR Click this toolbar button, then click the form to
+place a Table on the form.
+
+\endlist
+
+\section2 Database
+
+\img rtb-tbdatabase.png
+\caption Database Toolbuttons
+
+\list
+\i \Toolbutton DataTable\BR Click this toolbar button, then click the
+form, to place a DataTable on the form.
+
+\i \Toolbutton DataBrowser\BR Click this toolbar button, then click the
+form, to place a DataBrowser on the form.
+
+\i \Toolbutton DataView\BR Click this toolbar button, then click the
+form, to place a DataView on the form.
+
+\endlist
+
+\section2 Input
+
+\img rtb-tbinput.png
+\caption Input Toolbuttons
+
+\list
+\i \Toolbutton LineEdit\BR Click this toolbar button, then click the
+form, to place a LineEdit on the form.
+
+\i \Toolbutton SpinBox\BR Click this toolbar button, then click the
+form, to place a SpinBox on the form.
+
+\i \Toolbutton DateEdit\BR Click this toolbar button, then click the
+form, to place a DateEdit on the form.
+
+\i \Toolbutton TimeEdit\BR Click this toolbar button, then click the
+form, to place a TimeEdit on the form.
+
+\i \Toolbutton DateTimeEdit\BR Click this toolbar button, then click the
+form, to place a DateTimeEdit on the form.
+
+\i \Toolbutton TextEdit\BR Click this toolbar button, then click the
+form, to place a TextEdit on the form.
+
+\i \Toolbutton ComboBox\BR Click this toolbar button, then click the
+form, to place a ComboBox on the form.
+
+\i \Toolbutton Slider\BR Click this toolbar button, then click the
+form, to place a Slider on the form.
+
+\i \Toolbutton ScrollBar\BR Click this toolbar button, then click the
+form, to place a Scrollbar on the form.
+
+\i \Toolbutton Dial\BR Click this toolbar button, then click the
+form, to place a Dial on the form.
+
+\i \Toolbutton PaintWidget\BR 
+
+\endlist
+
+\section2 Display
+
+\img rtb-tbdisplay.png
+\caption Display Toolbuttons
+
+\list
+\i \Toolbutton TextLabel\BR Click this toolbar button, then click the
+form, to place a TextLabel on the form.
+
+\i \Toolbutton PixmapLabel\BR Click this toolbar button, then click the
+form, to place a PixmapLabel on the form.
+
+\i \Toolbutton LCDNumber\BR Click this toolbar button, then click the
+form, to place a LCDNumber on the form.
+
+\i \Toolbutton Line\BR Click this toolbar button, then click the
+form, to place a Line on the form.
+
+\i \Toolbutton ProgressBar\BR Click this toolbar button, then click the
+form, to place a ProgressBar on the form.
+
+\i \Toolbutton TextBrowser\BR Click this toolbar button, then click the
+form, to place a TextBrowser on the form.
+
+\endlist
+
+\section2 Custom
+
+\img rtb-tbcustom.png
+\caption Custom Widget Toolbutton
+
+\list 
+\i \Toolbutton {My Custom Widget}\BR Click this toolbar button,
+then click the form, to place a Custom Widget on the form. Note: this
+toolbar button only appears if you have created a custom widget using
+\Menu{Tools|Custom|Edit Custom Widgets}.
+
+\endlist
+
+\section2 The Layout Toolbar Buttons
+
+\img rtb-layout.png
+\caption Layout Toolbuttons
+
+\list
+\i \Toolbutton {Adjust Size}\BR Click this toolbar button (or press \Key
+Ctrl+J) to adjust the size of the widget to it's recommended size.
+
+\i \Toolbutton {Lay Out Horizontally}\BR Click this toolbar button (or
+press \Key Ctrl+H) to lay out the selected widgets or layouts side by
+side. Use \Key Shift+Click to select each widget or layout, and then
+choose this toolbar button to group them horizontally. Note that for
+complex widgets it is sometimes easiest to select widgets and layouts
+by clicking them in the Widgets tab of the \l{Object Explorer Window}.
+
+\i \Toolbutton {Lay Out Vertically}\BR Click this toolbar button (or press
+\Key Ctrl+L) to lay out the selected widgets one above the other. Use
+\Key Shift+Click to select each widget or layout, and then choose this
+toolbar button to group them vertically. Note that for complex widgets it
+is sometimes easiest to select widgets and layouts by clicking them in
+the Widgets tab of the \l{Object Explorer Window}.
+
+\i \Toolbutton {Lay out in a Grid}\BR Click the widgets you want and
+then click this toolbar button (or press \Key Ctrl+G) to lay out
+widgets in a grid.  
+
+\i \Toolbutton {Lay Out Horizontally (in Splitter)}\BR Click this toolbar
+button to lay out the selected groups of widgets or layouts side by
+side with a splitter between each group. Use \Key Shift+Click to
+select each widget or layout, and then choose this toolbar button to
+group them horizontally. Note that for complex widgets it is sometimes
+easiest to select widgets and layouts by clicking them in the Widgets
+tab of the \l{Object Explorer Window}.
+
+\i \Toolbutton {Lay Out Vertically (in Splitter)}\BR Click this toolbar
+button to lay out the selected groups of widgets or layouts one above
+the other with a splitter between each group. Use \Key{Shift+Click} to
+select each widget or layout, and then choose this toolbar button to
+group them vertically. Note that for complex widgets it is sometimes
+easiest to select widgets and layouts by clicking them in the Widgets
+tab of the \l{Object Explorer Window}.
+
+\i \Toolbutton {Break Layout}\BR Click this toolbar button (or press
+\Key Ctrl+B) to break a layout. Click on the layout and select this
+option; the layout is deleted. 
+
+\i \Toolbutton {Add Spacer}\BR Click this toolbar button to add a spacer
+to widgets that take up too much space on the form. The spacer
+consumes extra space in the layout.
+
+\endlist
+
+\section1 The Qt Script Editor Toolbar Button
+
+\img rtbq-toggle.png
+\caption Toggle Breakpoint Toolbutton
+
+\list
+\i \Toolbutton{Toggle Breakpoint}\BR Click this toolbar button to
+toggle (set or unset) a breakpoint at the current line in the
+currently opened editor.
+\endlist 
+
+\section1 The Qt Script Project Toolbar Button
+
+\img rtbq-project.png
+\caption Qt Script Project Toolbuttons
+
+\list
+
+\i \Toolbutton {Step Into}\BR Click this menu option (or
+press \Key F11) to step into the next function when a debugging session is active.
+  
+\i \Toolbutton {Step Over}\BR Click this menu option (or press \Key
+F10) to step over a function, execute it, then go to the next
+statement in the code when a debugging session is active. 
+
+\i \Toolbutton {Run Function}\BR Click this menu option (or press \Key
+F5) to invoke the \Dialog {Choose a function to run} dialog.
+
+\i \Toolbutton {Stop Execution/Debugger}\BR Click this menu option to
+stop the debugger when a debugging session is active.
+
+\endlist
+
+\section1 The Help Toolbar Button
+
+\img rtb-help.png
+\caption Help Toolbutton
+
+\list
+\i \Toolbutton{What's This?}\BR Click this toolbar button to invoke a small
+question mark that is attached to the mouse pointer. Click on a
+feature which you would like more information about. A message box
+appears with information about the feature. 
+\endlist
+

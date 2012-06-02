@@ -1,0 +1,17 @@
+#
+# Don't use this file in your application. It's meant for building the
+# examples shipped with QSA only. Instead just specify
+#
+#   load( qsa )
+#
+# in your .pro file and qmake will pick up qsa.prf from
+# $(QTDIR)/mkspecs/features or any path described in the optional
+# QMAKEFEATURES environment variable.
+
+win32 {
+    load( qsa )
+} else {
+    include( ../../src/qsa/qsa.prf )
+    INCLUDEPATH += ../../src/qsa ../../src/ide
+    LIBS += -L../../lib
+}

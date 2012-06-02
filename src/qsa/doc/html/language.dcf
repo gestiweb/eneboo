@@ -1,0 +1,85 @@
+<!DOCTYPE DCF>
+<DCF ref="language.html" icon="language.png" imagedir="../../gif" title="Qt Script: Language Reference">
+<section ref="language-1.html" title="Introduction">
+    <section ref="language-2.html" title="Qt Script Language Concepts">
+        <section ref="language-2-1.html" title="Identifiers, Variables and Constants"/>
+        <section ref="language-2-2.html" title="Classes and Methods"/>
+        <section ref="language-2-2-1.html" title="Class Properties"/>
+        <section ref="language-2-3.html" title="Comments"/>
+        <section ref="language-3.html" title="Built-in Types and Objects"/>
+        <section ref="language-3-1.html" title="Built-in Types"/>
+        <section ref="language-3-1-1.html" title="Array"/>
+        <section ref="language-3-1-2.html" title="Boolean"/>
+        <section ref="language-3-1-3.html" title="Date"/>
+        <section ref="language-3-1-4.html" title="Function Type"/>
+        <section ref="language-3-1-5.html" title="Number"/>
+        <section ref="language-3-1-6.html" title="Object"/>
+        <section ref="language-3-1-7.html" title="Point"/>
+        <section ref="language-3-1-8.html" title="Rect"/>
+        <section ref="language-3-1-9.html" title="Size"/>
+        <section ref="language-3-1-10.html" title="RegExp"/>
+        <section ref="language-3-1-11.html" title="String"/>
+        <section ref="language-3-1-12.html" title="Color"/>
+        <section ref="language-3-1-13.html" title="Palette"/>
+        <section ref="language-3-1-14.html" title="ColorGroup"/>
+        <section ref="language-3-1-15.html" title="ByteArray"/>
+        <section ref="language-3-1-16.html" title="Font"/>
+        <section ref="language-3-1-17.html" title="Pixmap"/>
+        <section ref="language-3-2.html" title="Built-in Objects"/>
+        <section ref="language-3-2-1.html" title="Math"/>
+        <section ref="language-3-2-2.html" title="System"/>
+        <section ref="language-4.html" title="Built-in Variables and Constants"/>
+        <section ref="language-4-1.html" title="Built-in Variables"/>
+        <section ref="language-4-1-1.html" title="arguments"/>
+        <section ref="language-4-2.html" title="Built-in Constants"/>
+        <section ref="language-4-2-1.html" title="Infinity"/>
+        <section ref="language-4-2-2.html" title="NaN"/>
+        <section ref="language-4-2-3.html" title="undefined"/>
+        <section ref="language-5.html" title="Built-in Functions and Operators"/>
+        <section ref="language-5-1.html" title="Built-in Functions"/>
+        <section ref="language-5-1-1.html" title="connect()"/>
+        <section ref="language-5-1-2.html" title="debug()"/>
+        <section ref="language-5-1-3.html" title="eval()"/>
+        <section ref="language-5-1-4.html" title="isFinite()"/>
+        <section ref="language-5-1-5.html" title="isNaN()"/>
+        <section ref="language-5-1-6.html" title="killTimer()"/>
+        <section ref="language-5-1-7.html" title="killTimers()"/>
+        <section ref="language-5-1-8.html" title="parseFloat()"/>
+        <section ref="language-5-1-9.html" title="parseInt()"/>
+        <section ref="language-5-1-10.html" title="startTimer()"/>
+        <section ref="language-5-1-11.html" title="print()"/>
+        <section ref="language-5-1-12.html" title="escape()"/>
+        <section ref="language-5-2.html" title="Built-in Operators"/>
+        <section ref="language-5-2-1.html" title="Assignment Operators"/>
+        <section ref="language-5-2-2.html" title="Arithmetic Operators"/>
+        <section ref="language-5-2-3.html" title="String Operators"/>
+        <section ref="language-5-2-4.html" title="Logical Operators"/>
+        <section ref="language-5-2-5.html" title="Comparison Operators"/>
+        <section ref="language-5-2-6.html" title="Bit-wise operators"/>
+        <section ref="language-5-2-7.html" title="Special Operators"/>
+        <section ref="language-5-3.html" title="Declarations"/>
+        <section ref="language-5-3-1.html" title="class"/>
+        <section ref="language-5-3-2.html" title="const"/>
+        <section ref="language-5-3-3.html" title="function"/>
+        <section ref="language-5-3-4.html" title="var"/>
+        <section ref="language-6.html" title="Control Statements"/>
+        <section ref="language-6-1.html" title="break"/>
+        <section ref="language-6-2.html" title="case"/>
+        <section ref="language-6-3.html" title="catch"/>
+        <section ref="language-6-4.html" title="continue"/>
+        <section ref="language-6-5.html" title="default"/>
+        <section ref="language-6-6.html" title="do"/>
+        <section ref="language-6-7.html" title="else"/>
+        <section ref="language-6-8.html" title="for"/>
+        <section ref="language-6-9.html" title="if"/>
+        <section ref="language-6-10.html" title="finally"/>
+        <section ref="language-6-11.html" title="label"/>
+        <section ref="language-6-12.html" title="return"/>
+        <section ref="language-6-13.html" title="switch"/>
+        <section ref="language-6-14.html" title="throw"/>
+        <section ref="language-6-15.html" title="try"/>
+        <section ref="language-6-16.html" title="while"/>
+        <section ref="language-6-17.html" title="with"/>
+    </section>
+</section>
+</DCF>

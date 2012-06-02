@@ -1,0 +1,81 @@
+/*!
+
+\page index.html
+
+\title Qt Script for Applications
+
+Qt Script for Applications is a cross-platform toolkit for making C++
+applications scriptable using an interpreted scripting language, Qt
+Script.
+
+You can have a look at \link articles.html Articles about Qt Script
+for Applications\endlink, if you are interested in use cases of QSA or
+want to submit your own QSA related articles to this forum.
+
+Below are links to the Qt Script for Applications documentation.
+
+\table
+\row \i <b>\link qsa.book Getting Started with QSA \endlink</b>
+     \i About QSA, how to make an application scriptable, how to write
+     scripts and how to deploy these applications.
+\row \i <b>\link classes.html QSA Classes\endlink</b>
+     \i Class reference for QSA-specific classes.
+\row \i <b>\link functions.html QSA Functions\endlink</b>
+     \i Function reference for QSA-specific functions.
+\row \i <b>\link examples.html QSA Examples \endlink</b>
+     \i Model working examples.
+\row \i <b>\link headers.html QSA Header files\endlink</b>
+     \i Header files for QSA-specific classes.
+\row \i <b>\link language.book Qt Script Language Reference\endlink</b>
+     \i Qt Script's types, objects, functions and control statements. 
+\row \i <b>\link extensions.book QSA Extension Frameworks \endlink</b>
+     \i Additional scripting API's available with QSA
+\row \i <b>\link qtscripter.book QSA Workbench Reference\endlink</b>
+     \i The QSA Workbench manual.
+\row \i <b>\link credits.html Credits \endlink</b>
+     \i Bug reporters, patch contributors, beta testers.
+\row \i <b>\link http://doc.trolltech.com/qt/ Qt API\endlink</b>
+     \i The Qt API reference documentation.
+\endtable
+
+
+*/
+
+
+/*!
+
+\page classes.html
+
+\title QSA - Library Classes
+
+\annotatedclasslist
+
+*/
+
+/*!
+
+\page headers.html
+
+\title QSA - Header Files
+
+\headerfilelist
+
+*/
+
+/*!
+
+\page functions.html
+
+\title QSA - All Functions
+
+\functionindex
+
+*/
+
+/*!
+
+\defgroup examples
+
+\title QSA Examples
+
+*/

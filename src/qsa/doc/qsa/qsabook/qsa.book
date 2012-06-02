@@ -1,0 +1,14 @@
+\title Qt Script for Applications
+
+\granularity chapter
+
+\input chap-preface.leaf
+\input chap-whatsqsa.leaf
+\input chap-creating-scriptable-applications.leaf
+\input chap-application-objects.leaf
+\input chap-creating-scripts2.leaf
+
+\omit
+\input chap-debugging-qsa.leaf
+\input chap-deploying-apps.leaf
+\endomit

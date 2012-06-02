@@ -1,0 +1,45 @@
+\chapter Reference: Windows
+
+\section1 Introduction
+
+By default \QSAD starts up with two windows: the Project Scripts
+window and the Output window. This chapter explains each window in
+detail.
+
+\section1 Project Scripts Window
+
+\img qsad_projectwindow.png
+\caption Project Scripts Window
+
+This window lists all the script files associated with the project. To open a
+form or file single click it in the Files list. 
+
+Double-click a file to open its corresponding tab on Editor window if
+the tab has been previously closed.
+
+Right-click a file to get a context menu of options.
+
+The scripts that are executed within the context of an object are have a small red box in the script icon.
+
+\img qsad_objectscript.png
+\caption Script running inside the context of an applicationobject.
+
+The scripts that are executed in the global context are displayed as plain scripts.
+
+\img qsad_nonobjectscript.png
+\caption Script running in the global context.
+
+\section1 Output Window
+
+\img qsad_outputwindow.png
+\caption Ouput Window
+
+This window displays errors that occur when running the script. 
+
+\omit
+add more info
+\endomit
+
+
+
+

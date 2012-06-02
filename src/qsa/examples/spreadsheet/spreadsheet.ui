@@ -1,0 +1,301 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>SpreadSheet</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>SpreadSheet</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>718</width>
+            <height>543</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Spread Sheet</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QTabWidget">
+            <property name="name">
+                <cstring>TabWidget2</cstring>
+            </property>
+            <property name="tabPosition">
+                <enum>Bottom</enum>
+            </property>
+            <property name="tabShape">
+                <enum>Triangular</enum>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tabSheet1</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Sheet1</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QTable">
+                        <property name="name">
+                            <cstring>sheet1</cstring>
+                        </property>
+                        <property name="numRows">
+                            <number>200</number>
+                        </property>
+                        <property name="numCols">
+                            <number>200</number>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tabSheet2</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Sheet2</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QTable">
+                        <property name="name">
+                            <cstring>sheet2</cstring>
+                        </property>
+                        <property name="numRows">
+                            <number>200</number>
+                        </property>
+                        <property name="numCols">
+                            <number>200</number>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
+        </widget>
+    </vbox>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>menubar</cstring>
+    </property>
+    <item text="&amp;File" name="fileMenu">
+        <action name="fileExitAction"/>
+    </item>
+    <item text="&amp;Scripts" name="scriptsMenu">
+        <action name="scriptsNewAction"/>
+        <action name="scriptsQSA"/>
+        <separator/>
+    </item>
+</menubar>
+<toolbars>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="horizontallyStretchable">
+            <bool>true</bool>
+        </property>
+        <property name="label">
+            <string>Calculation Toolbar</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>currentCell</cstring>
+            </property>
+            <property name="text">
+                <string>A1</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>formulaEdit</cstring>
+            </property>
+        </widget>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>scriptsToolbar</cstring>
+        </property>
+        <property name="newLine">
+            <bool>true</bool>
+        </property>
+        <property name="label">
+            <string>Scripts Toolbar</string>
+        </property>
+        <action name="scriptsNewAction"/>
+        <action name="scriptsQSA"/>
+        <separator/>
+    </toolbar>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>fileExitAction</cstring>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+        <property name="menuText">
+            <string>E&amp;xit</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>scriptsNewAction</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>hi22-action-run.png</iconset>
+        </property>
+        <property name="text">
+            <string>New...</string>
+        </property>
+        <property name="menuText">
+            <string>New...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>scriptsQSA</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>hi22-action-project_open.png</iconset>
+        </property>
+        <property name="text">
+            <string>Open QSA Workbench</string>
+        </property>
+        <property name="menuText">
+            <string>Open QSA Workbench...</string>
+        </property>
+    </action>
+    <actiongroup>
+        <property name="name">
+            <cstring>scriptsGroup</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+    </actiongroup>
+</actions>
+<connections>
+    <connection>
+        <sender>fileExitAction</sender>
+        <signal>activated()</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>fileExit()</slot>
+    </connection>
+    <connection>
+        <sender>sheet2</sender>
+        <signal>currentChanged(int,int)</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>currentCellChanged(int,int)</slot>
+    </connection>
+    <connection>
+        <sender>TabWidget2</sender>
+        <signal>currentChanged(QWidget*)</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>sheetChanged(QWidget*)</slot>
+    </connection>
+    <connection>
+        <sender>sheet2</sender>
+        <signal>valueChanged(int,int)</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>currentValueChanged(int,int)</slot>
+    </connection>
+    <connection>
+        <sender>sheet1</sender>
+        <signal>currentChanged(int,int)</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>currentCellChanged(int,int)</slot>
+    </connection>
+    <connection>
+        <sender>sheet1</sender>
+        <signal>valueChanged(int,int)</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>currentValueChanged(int,int)</slot>
+    </connection>
+    <connection>
+        <sender>formulaEdit</sender>
+        <signal>returnPressed()</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>formulaEdited()</slot>
+    </connection>
+    <connection>
+        <sender>scriptsQSA</sender>
+        <signal>activated()</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>openIDE()</slot>
+    </connection>
+    <connection>
+        <sender>scriptsNewAction</sender>
+        <signal>activated()</signal>
+        <receiver>SpreadSheet</receiver>
+        <slot>addScript()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="global" impldecl="in declaration">qpair.h</include>
+    <include location="global" impldecl="in declaration">qmap.h</include>
+    <include location="global" impldecl="in declaration">qsinterpreter.h</include>
+    <include location="local" impldecl="in implementation">spreadsheet.ui.h</include>
+</includes>
+<forwards>
+    <forward>class QTableItem;</forward>
+</forwards>
+<variables>
+    <variable>QMap&lt;QAction *, QString&gt; scripts;</variable>
+    <variable>QMap&lt;QPair&lt;int, int&gt;, QString&gt; sheet2Map;</variable>
+    <variable>QTable *currentSheet;</variable>
+    <variable>QMap&lt;QPair&lt;int, int&gt;, QString&gt; sheet1Map;</variable>
+    <variable access="public">QSInterpreter *interpreter;</variable>
+    <variable access="public">QSProject *project;</variable>
+</variables>
+<slots>
+    <slot>init()</slot>
+    <slot>setupSheet( QTable * t )</slot>
+    <slot>fileExit()</slot>
+    <slot>currentCellChanged( int row, int col )</slot>
+    <slot>sheetChanged( QWidget * page )</slot>
+    <slot>currentValueChanged( int row, int col )</slot>
+    <slot returnType="QString">cellName( int row, int col )</slot>
+    <slot>evaluate()</slot>
+    <slot>evaluateCell( QTableItem * item, const QString &amp; f, const QString &amp; vars )</slot>
+    <slot>formulaEdited()</slot>
+    <slot>openIDE()</slot>
+    <slot>addScript()</slot>
+    <slot>addScript( const QString &amp; function, const QString &amp; name, const QPixmap &amp; pixmap )</slot>
+    <slot>runScript()</slot>
+    <slot>showFunction( QSScript *script, const QString &amp;functionName )</slot>
+</slots>
+<pixmapinproject/>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

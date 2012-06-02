@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../examples/filter/filter.doc:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Filters example, Using QSA as software component glue</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>Filters example, Using QSA as software component glue</h1>
+
+
+<p> 
+<p> 
+<p> It is a common approach in software development to separate
+functionallity into different software components. In this article we
+try to describe how a scripting language combined with good C++
+bindings can increase the flexibitly and reuse value of individual
+software components.
+<p> The application used in this article contains a set of processing
+components used for image filtering. For simplicity we will refer to
+these components as modules. In this example we provide a module for
+loading an image from disk and another for displaying the image on
+screen. In addition we provide some modules to do the processing in
+between.
+<p> What we wish to show with this application is how QSA can be used to
+script enable software components in such a way that it increases the
+overall flexibility with a minimum amount of programming effort. This
+gain comes from using already existing code and simply glue it
+together using QSA.
+<p> <h2> The Modules
+</h2>
+<a name="1"></a><p> First we will now go through how the modules in the application work
+and how they can be used from QSA. For the sake of reference, lets
+start with a simple example:
+<p> <pre>
+var loader = new ImageSource;
+connect( loader, "output(Data)", Renderer, "input(Data)" );
+loader.file = "myimage.png";
+loader.load(); 
+</pre>
+ 
+<p> What happens in this script is that we create one module, the
+ImageSource, used to load an image from disk. In addition we use the
+global module Renderer, used to display an image on the screen. We set
+up the chain of processing by connecting the output of the ImageSource
+to the input of the Renderer. We then set the filename for the
+ImageSource start processing by calling the function load() in the
+ImageSource. The ImageSource will then load the image and give the
+image to the Renderer which displays will it.
+<p> The ImageSource class in example above is really a C++ class that has
+been made available from script using functionallity in QSA. For this
+to work, the C++ class has be derived from QObject. When this
+requirement is met all the class' slots and properties are
+automatically accessible from the scripting language. Also, to be able
+to instantiate the class from script we also need to implement a
+subclass of <a href="qsobjectfactory.html">QSObjectFactory</a> that
+will, on demand from QSA, create an instnace of the module. The
+implementation of the module factory can be found in the sourcefiles:
+modulefactory.h and modulefactory.cpp.
+<p> When a module receives input via its input slot, it will process that
+input and send the result to all modules connected to its output
+signal. It is important to realise that only the setting up of
+processing chains and configuration of modules are done in the
+script. The real number crunching is done in C++ which means that the
+execution speed is limited only by the efficiency of the C++
+implementation, while still obtaining the flexibility that a scripting
+language offers.
+<p> An image has been represented using a simple class called Data, as can
+be seen from the connect statement above. Objects of this class are
+not used from within the script so we do not provide any bindings for
+it. It is only visible in the connect statements and within the C++ 
+modules.
+<p> A list of the modules implemented in the example and a short
+description of them follows below. The implementation of the modules
+can be viewed in modules.h and modules.cpp.
+<p> <ul>
+<li> <b>BumpMapper</b> <br>
+This module is used to create a bumpmap from the input
+data. Bumpmapping is a simple light rendering technique where one
+specifies a surface map and a light source. The output is then
+generated by calculating the intensity of light for each pixel. 
+<ul>
+<li> slot input( Data ); The surface to do bumpmapping on. White in
+the image represents high and black represents low.
+<li> signal output( Data ); The result, connect to this signal to send
+the result to other modules.
+<li> light : Point; The position of the light.
+<li> smoothness : Number; A factor describing the smoothness of the
+image, small numbers mean a steep surface, and large numbers
+mean a smooth surface.
+<li> radius : Number; The radius describes the radius of the
+light source in number of pixels.
+</ul>
+<p> <li> <b>ImageSource</b> <br>
+This module is used to load an image from disk and put it into
+the databuffer that is for processing in this example.
+<ul>
+<li> signal output( Data ); The image that is loaded
+<li> file : String; 
+The filename of the image that should be loaded. The 
+image is converted to grayscale automatically so 
+any image type supported by Qt can be specified.
+</ul>
+<p> <li> <b>Renderer</b> <br>
+This module is used to display an image on screen. This is done
+by converting the databuffer to grayscale image and paint it
+on a widget. The Renderer module is a global object reachable
+using <tt>Application.Renderer</tt> or <tt>Renderer</tt>, and can not 
+be instantiated using <tt>new</tt> as the other modules. This done
+to ensure that renderering always happens to the same window 
+and that the renderer is not memory managed and deleted by 
+the engine as other user defined script objects are.
+<ul>
+<li> slot input( Data ); The image to display
+</ul>
+<p> <li> <b>Threshold</b> <br>
+This module is used to strengthen the contrasts in the image by
+reducing the number of shades used so that the contrast between them
+becomes more visible.
+<ul>
+<li> slot input( Data ); The image to process on.
+<li> signal output( Data ); The processed image.
+<li> steps : Number; 
+The steps factor describes the number of shades that should
+be used in the output image.
+</ul>
+<p> <li> <b>Smudger</b> <br> 
+This module is a simple blurring algorithm. It calculates the average
+value for each pixel based on the surrounding pixels.
+<ul>
+<li> slot input( Data ); The image to blur.
+<li> signal output( Data ); The blurred image.
+<li> steps : Number; 
+This value specifies the number iterations that are taken.
+For each iteration the avarege of every pixel is calculated
+once.
+</ul>
+</ul>
+<p> <h2> The Application
+</h2>
+<a name="2"></a><p> The application that has been written in this example is very simple
+if we assume that the modules exists (this is after all the idea, to
+script enable existing code to gain more flexibility). For user
+interface we use the QSA Workbench which gives us the possibility to
+edit and run scripts. In addition we implemented the module factory
+which exposes the modules. 
+<p> Below is one of the sample scripts available in the example file <tt>main.qs</tt>. It uses all the available modules.  Below is shown the two
+images of how the filtering works. Unprocessed (left) and processed
+(right).  The example sets up the processing to first load the
+image. The image is then sent into the Threshold module which creates
+the steps in the resulting image. The thresholded image is then sent
+to the Smudger module where the edges are smoothed out a bit, causing
+a more gliding transition between the steps in the image.  The next
+step is the BumpMapper module where the light source is positioned in
+the upper left region of the image causing this area to be illuminated
+while shadows are cast on the other side. Finally the image reaches
+the renderer which opens up a window displaying the resulting image.
+<p> <center><table cellpadding="4" cellspacing="2" border="0">
+<tr bgcolor="#f0f0f0"> <td valign="top"><center><img src="filter_1.png" width="254" height="214"></center> <td valign="top"><center><img src="filter_2.png" width="254" height="214"></center> </table></center>
+<p> <pre>
+function doAll() 
+{
+    var src = new ImageSource();
+    var bump = new BumpMapper();
+    var thres = new Threshold();
+    var blur = new Smudger();
+
+    connect( src,   'output(Data)', thres.input );
+    connect( thres, 'output(Data)', blur.input );
+    connect( blur,  'output(Data)', bump.input );
+    connect( bump,  'output(Data)', Renderer.input );
+
+    src.file = 'bump.jpg';
+    thres.steps = 10;
+    bump.smoothness = 4;
+    bump.light = new Point( 150, 150 );
+    bump.radius = 250;
+    blur.iterations = 4;
+    src.load();    
+}</pre>
+ 
+<p> As a simple exercise, try to change some of the module properties or
+reconnect them in a different order to see what happens when you run
+the function again.
+<p> <h2> Why not use a specialized GUI for this?
+</h2>
+<a name="3"></a><p> At this point one might be thinking that this is no different than the
+same code written in C++ using the components directly. This is true
+if one want to recompile for every small change one does, that is, if
+you have access to source code and a compiler at all.
+<p> It would also be possible to provide the same level of functionallity
+in a graphical application. One could write a configuration dialog for
+each module and write a widget for doing the connections
+graphically. Such a GUI takes time to write, and will most likely be
+task specific. Scripting the same functionallity can be done directly
+with only a minimal amount of programming, if any at all. There are
+also some features that are more difficult to reflect in a GUI, such
+as iterations and conditional execution. These are easily available in
+a scripting language, but are not trivial to represent in a graphical
+application.
+<p> Another common usage area of application scripting is the on-the-fly
+customization of existing functionallity, in which case one does not
+wish to spend time programming user interfaces, but rather hook
+together the pieces you want with a few scripting statements and let
+it run. For this purpose scripting is ideal.
+<p> <h2> Famous last words
+</h2>
+<a name="4"></a><p> We have now shown how wrapping C++ functionallity in QSA increases the
+flexibility and usability of existing code. We make use of the
+<a href="qsobjectfactory.html">QSObjectFactory</a> to enable use of C++ classes from script and we use
+the QSA Workbench to easily get the possility to edit and run
+scripts. All in all it shows how QSA can improve the functionallity
+of existsing application code.
+<p> <p>See also <a href="examples.html">QSA Examples</a>.
+
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

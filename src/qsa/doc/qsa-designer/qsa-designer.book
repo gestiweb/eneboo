@@ -1,0 +1,11 @@
+\title QSA Workbench Manual
+
+\granularity chapter
+
+\input chap-qsad-preface.leaf
+\input chap-creating-scriptable-applications.leaf
+\input chap-qsad-key-bindings.leaf
+\input chap-qsad-menus.leaf
+\input chap-qsad-toolbuttons.leaf
+\input chap-qsad-dialogs.leaf
+\input chap-qsad-windows.leaf

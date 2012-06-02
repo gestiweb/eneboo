@@ -1,0 +1,896 @@
+\chapter Built-in Functions and Operators
+
+\Q provides many useful built-in functions and operators.
+
+The built-in functions include 
+\l isNaN(),
+\l killTimer(),
+\l killTimers(), 
+\l connect(), 
+\l debug(), 
+\l eval(), 
+\l isFinite(),
+\l parseFloat(), 
+\l parseInt(),
+\l print(),
+\l escape(),
+\l unescape()
+ and \l startTimer()
+
+\omit
+The built-in operators include \l{+ operator}, \l{++ operator}, \l{-
+operator}, \l{-- operator}, \l{* operator}, \l{/ operator}, \l{%
+operator}, \l{+ string operator}, \l{+= string operator}, \l{+=
+operator}, \l{&& operator}, \l{|| operator}, \l{! operator}, \l{&
+operator}, \l{^ operator}, \l{| operator}, \l{~ operator}, \l{<<
+operator}, \l{>> operator}, \l{>>> operator}, \l{= operator}, \l{-=
+operator}, \l{*= operator}, \l{/= operator}, \l{%= operator}, \l{&=
+operator}, \l{^= operator}, \l{|= operator}, \l{<<= operator}, \l{>>=
+operator}, \l{>>>= operator}, \l{== operator}, \l{!= operator}, \l{===
+operator}, \l{!== operator}, \l{> operator}, \l{>= operator}, \l{?:
+operator}, \l{, operator}, \l{function operator}, \l{in operator},
+\l{instanceof operator}, \l{new operator}, \l{this operator} and
+\l{typeof operator}.
+\endomit
+
+Classes, functions, variables and constants are declared with \l
+class, \l function, \l var and \l const respectively.
+
+\ECMA reserves the following words for future use:\BR
+\e boolean, \e byte, \e char, \e debugger, \e double, \e enum,
+\e export, \e float, \e goto, \e implements, \e import,
+\e int, \e interface, \e long, \e native, \e short,
+\e synchronized, \e throws, \e transient and \e volatile.\BR
+It is unadvisable to use any of these words as identifiers.
+
+\section1 Built-in Functions
+
+\omit
+The built-in functions include: \l connect(), \l debug(),
+\l eval(), \l isFinite(), \l isNaN(), \l killTimer(), \l killTimers(),
+\l parseFloat(), \l parseInt() and \l startTimer().
+\endomit
+
+\section2 connect()
+
+\c{connect( signallingObject, signal, receivingObject, slot )}
+
+This function is used to create signals and slots connections between
+objects.
+
+See the simplescript example program's example-script for an example.
+
+\c{connect( sender, signal, functionRef )}
+
+This function is used to create signals and slots connections between
+objects. \Func functionRef can be a global function or a mamber of the
+class. 
+
+\section2 debug()
+
+\c{debug( expression )}
+
+Prints the \e expression (applying \Func toString() if necessary) to
+the output (\c stderr), followed by a newline.
+
+\section2 eval()
+
+\c{eval( string )}
+
+\code
+    var x = 57;
+    var y = eval( "40 + x" ); // y == 97
+\endcode
+
+This function parses and executes the contents of the \e string,
+taking the text to be valid \QS.
+
+\section2 isFinite()
+
+\c{isFinite( expression )}
+
+Returns \c true if the \e expression's value is a number that is
+within range; otherwise returns \c false.
+
+\section2 isNaN()
+
+\c{isNaN( expression )}
+
+Returns \c true if the \e expression's value is not a number;
+otherwise returns \c false.
+
+Example:
+\code
+    var x = parseFloat( "3.142" );
+    var y = parseFloat( "haystack" );
+    if ( isNaN( x ) ) debug( "x is not a number" );
+    if ( isNaN( y ) ) debug( "y is not a number" );
+    // Prints: "y is not a number"
+\endcode
+
+\section2 killTimer()
+
+\c{killTimer( timerId )}
+
+Stops and deletes the timer with the given \e timerId. Any events that
+are triggered by the timer with \e timerId will no longer be
+triggered.
+
+See \l killTimers() and \l startTimer().
+
+\section2 killTimers()
+
+\c{killTimers()}
+
+Stops and deletes all timers that have been created with \l
+startTimer(). Any events that are triggered by any of these timers
+will no longer be triggered.
+
+See \l killTimer() and \l startTimer().
+
+\section2 parseFloat()
+
+\c{parseFloat( string )}
+
+Parses the \e string and returns the floating point number that the \e
+string represents or \l NaN if the parse fails. Leading and trailing
+whitespace are ignored. If the string contains a number followed by
+non-numeric characters, the value of the number is returned and the
+trailing characters ignored.
+
+See also \l parseInt().
+
+\section2 parseInt()
+
+\c{parseInt( string, optBase )}
+
+Parses the \e string and returns the integer that the \e string
+represents in the given base \e optBase, or \l NaN if the parse fails.
+If the base isn't specified, the base is determined as follows:
+\list
+\i base 16 (hexadecimal) if the first non-whitespace characters are
+"0x" or "0X";
+\i base 8 (octal) if the first non-whitespace character is "0";
+\i base 10 otherwise.
+\endlist
+Leading and trailing whitespace are ignored. If the string contains a
+number followed by non-numeric characters, the value of the number is
+returned and the trailing characters ignored.
+
+Example:
+\code
+    var i = parseInt( "24" );       // i == 24
+    var h = parseInt( "0xFF" );     // h == 255
+    var x = parseInt( " 459xyz " ); // x == 459
+\endcode
+
+See also \l parseFloat().
+
+\section2 startTimer()
+
+\c{var timerId = startTimer( interval, timeoutFunction )}
+
+Creates a new timer. The timer's id is returned, although it isn't
+needed if you use \l killTimers(). The timer calls the
+\e timeoutFunction every \e interval milliseconds.
+
+\section2 print() 
+
+\c {print(string)}
+
+Prints the string to standard err.
+
+\section2 escape()
+
+\c {escape(string)}
+
+Escapes the input string, converting any non-latin1 characters to 
+
+\section1 Built-in Operators
+
+The built-in operators include: \l{+ operator}, \l{++ operator}, \l{-
+operator}, \l{-- operator}, \l{* operator}, \l{/ operator}, \l{%
+operator}, \l{+ string operator}, \l{+= string operator}, \l{+=
+operator}, \l{&& operator}, \l{|| operator}, \l{! operator}, \l{&
+operator}, \l{^ operator}, \l{| operator}, \l{~ operator}, \l{<<
+operator}, \l{>> operator}, \l{>>> operator}, \l{= operator}, \l{-=
+operator}, \l{*= operator}, \l{/= operator}, \l{%= operator}, \l{&=
+operator}, \l{^= operator}, \l{|= operator}, \l{<<= operator}, \l{>>=
+operator}, \l{>>>= operator}, \l{== operator}, \l{!= operator}, \l{===
+operator}, \l{!== operator}, \l{> operator}, \l{>= operator}, \l{?:
+operator}, \l{, operator}, \l{function operator}, \l{in operator},
+\l{instanceof operator}, \l{new operator}, \l{this operator} and
+\l{typeof operator}.
+
+\section2 Assignment Operators
+
+These operators are used to assign the value of expressions to
+variables.
+
+\section3 = operator
+
+\c{var variable = expression;}
+
+The assignment operator is used to assign the value of an \e
+expression to the \e variable.
+
+It is an error to attempt to assign to a \l{const}ant.
+
+\section3 += operator
+
+\c{variable += expression;}
+
+This operator adds the value of the \e expression to the \e variable.
+It is the same as:
+\code
+    variable = variable + expression;
+\endcode
+but is shorter to write, and less error-prone.
+
+See also \l{+= string operator}.
+
+\section3 -= operator
+
+\c{variable -= expression;}
+
+This operator subtracts the value of the \e expression from the \e
+variable.
+
+\section3 *= operator
+
+\c{variable *= expression;}
+
+This operator multiplies the value of the \e expression by the value
+of the \e variable.
+
+\section3 /= operator
+
+\c{variable /= expression;}
+
+This operator divides the value of the \e variable by the value
+of the \e expression.
+
+\section3 %= operator
+
+\c{variable %= expression;}
+
+This operator divides the \e variable by the \e expression, and
+assigns the remainder of the division (which may be 0), to the \e
+variable.
+
+\section3 \&= operator
+
+\c{variable &= expression;}
+
+This operator performs a bit-wise AND on the value of the \e
+expression and the value of the \e variable, and assigns the result to
+the \e variable.
+
+\section3 ^= operator
+
+\c{variable ^= expression;}
+
+This operator performs a bit-wise OR on the value of the \e
+expression and the value of the \e variable, and assigns the result to
+the \e variable.
+
+\section3 |= operator
+
+\c{variable |= expression;}
+
+This operator performs a bit-wise OR on the value of the \e
+expression and the value of the \e variable, and assigns the result to
+the \e variable.
+
+\section3 \<\<= operator
+
+\c{variable <<= expression;}
+
+This operator performs a bit-wise left shift on the \e variable by an
+\e expression number of bits. Zeros are shifted in from the right.
+
+\section3 \>\>= operator
+
+\c{variable >>= expression;}
+
+This operator performs a bit-wise (sign-preserving) right shift on the
+\e variable by an \e expression number of bits.
+
+\section3 \>\>\>= operator
+
+\c{variable >>>= expression;}
+
+This operator performs a bit-wise (zero-padding) right shift on the \e
+variable by an \e expression number of bits.
+
+\section2 Arithmetic Operators
+
+These operators are used to perform arithmetic computations on their
+operands.
+
+\section3 + operator
+
+\c{operand1 + operand2}
+
+This operator returns the result of adding the two operands (\e
+operand1 and \e operand2).
+
+See also \l{+ string operator}.
+
+\section3 ++ operator
+
+\code
+++operand; // pre-increment
+operand++; // post-increment
+\endcode
+
+The pre-increment version of this operator increments the \e operand,
+and returns the value of the (now incremented) \e operand.
+
+The post-incremented version of this operator returns the value of
+the \e operand, and \e then increments the \e operand.
+
+\section3 - operator
+
+\code
+var result = operand1 - operand2; // subtraction
+operand = -operand;               // unary negation
+\endcode
+
+The subtraction version of this operator returns the result of
+subtracting its second operand (\e operand2) from its first operand
+(\e operand1).
+
+The unary negation version of this operator returns the result of
+negating (changing the sign) of its \e operand.
+
+\section3 -- operator
+
+\code
+--operand; // pre-decrement
+operand--; // post-decrement
+\endcode
+
+The pre-decrement version of this operator decrements the \e operand,
+and returns the value of the (now decremented) \e operand.
+
+The post-decremented version of this operator returns the value of
+the \e operand, and \e then decrements the \e operand.
+
+\section3 * operator
+
+\c{operand1 * operand2}
+
+This operator returns the result of multiplying the two operands (\e
+operand1 and \e operand2).
+
+\section3 / operator
+
+\c{operand1 / operand2}
+
+This operator returns the result of dividing the first operand (\e
+operand1) by the second operand (\e operand2).
+
+Note that division by zero is \e not an error. The result of division
+by zero is \l Infinity.
+
+\section3 % operator
+
+\c{operand1 % operand2}
+
+This operator returns the integer remainder (which may be 0) from the
+division of \e operand1 by \e operand2.
+
+\section2 String Operators
+
+These operators provide string functions using operators. Many other
+string functions are available, see \l String.
+
+\section3 + string operator
+
+\c{str1 + str2}
+
+This operator returns a string that is the concatenation of its
+operands, (\e str1 and \e str2).
+
+See also \l{+ operator}.
+
+\section3 += string operator
+
+\c{str1 += str2}
+
+This operator appends its second operand (\e str2) onto the end of the
+first operand (\e str1).
+
+See also \l{+= operator}.
+
+\section2 Logical Operators
+
+These operators are used to evaluate whether their operands are \c
+true or \c false in terms of the operator (for unary operators) and in
+terms of each other (for binary operators).
+
+The binary operators use short-circuit logic, i.e. they do not
+evaluate their second operand if the logical value of the expression
+can be determined by evaluating the first operand alone.
+
+\section3 \&\& operator
+
+\c{operand1 && operand2}
+
+This operator returns an object whose value is \c true if both its
+operands are \c true; otherwise it returns an object whose value is \e
+false.
+
+Specifically, if the value of \e operand1 is \c false, the operator
+returns \e operand1 as its result. If \e operand1 is \c true, the
+operator returns \e operand2.
+
+\section3 || operator
+
+\c{operand1 || operand2}
+
+This operator returns an object whose value is \c true if either of
+its operands are \c true; otherwise it returns an object whose value
+is \e false.
+
+Specifically, if the value of \e operand1 is \c true, the operator
+returns \e operand1 as its result. If \e operand1 is \c false, the
+operator returns \e operand2.
+
+\section3 ! operator
+
+\c{! operand}
+
+If the \e operand's value is \c true, this operator returns \c false;
+otherwise it returns \c true.
+
+\section2 Comparison Operators
+
+These operators are used to compare objects and their values.
+
+\section3 == operator
+
+\c{operand1 == operand2}
+
+Returns \c true if the operands are equal; otherwise returns \c false.
+
+\section3 != operator
+
+\c{operand1 != operand2}
+
+Returns \c true if the operands are not equal; otherwise returns \c
+false.
+
+\section3 === operator
+
+\c{operand1 === operand2}
+
+Returns \c true if the operands are equal \e and of the same type;
+otherwise returns \c false.
+
+\section3 !== operator
+
+\c{operand1 !== operand2}
+
+Returns \c true if the operands are not equal or if the operands are
+of different types; otherwise returns \c false.
+
+\section3 \> operator
+
+\c{operand1 > operand2}
+
+Returns \c true if \e operand1 is greater than \e operand2; otherwise
+returns \c false.
+
+\section3 \>= operator
+
+\c{operand1 >= operand2}
+
+Returns \c true if \e operand1 is greater than or equal to \e
+operand2; otherwise returns \c false.
+
+\section3 \< operator
+
+\c{operand1 < operand2}
+
+Returns \c true if \e operand1 is less than \e operand2; otherwise
+returns \c false.
+
+\section3 \<= operator
+
+\c{operand1 <= operand2}
+
+Returns \c true if \e operand1 is less than or equal to \e
+operand2; otherwise returns \c false.
+
+\section2 Bit-wise operators
+
+\section3 \& operator
+
+\c{operand1 & operand2}
+
+Returns the result of a bit-wise AND on the operands (\e operand1 and
+\e operand2).
+
+\section3 ^ operator
+
+\c{operand1 ^ operand2}
+
+Returns the result of a bit-wise XOR on the operands (\e operand1 and
+\e operand2).
+
+\section3 | operator
+
+\c{operand1 | operand2}
+
+Returns the result of a bit-wise OR on the operands (\e operand1 and
+\e operand2).
+
+\section3 ~ operator
+
+\c{~ operand}
+
+Returns the bit-wise NOT of the \e operand.
+
+\section3 \<\< operator
+
+\c{operand1 << operand2}
+
+Returns the result of a bit-wise left shift of \e operand1 by the
+number of bits specified by \e operand2. Zeros are shifted in from the
+right.
+
+\section3 \>\> operator
+
+\c{operand1 >> operand2}
+
+Returns the result of a bit-wise (sign propagating) right shift of \e operand1 by the
+number of bits specified by \e operand2.
+
+\section3 \>\>\> operator
+
+\c{operand1 >>> operand2}
+
+Returns the result of a bit-wise (zero filling) right shift of \e
+operand1 by the number of bits specified by \e operand2. Zeros are
+shifted in from the left.
+
+\section2 Special Operators
+
+\section3 ?: operator
+
+\c{expression ? resultIfTrue : resultIfFalse}
+
+This operator evaluates its first operand, the \e expression.
+If the \e expression is \c true, the value of the second operand (\e
+resultIfTrue) is returned; otherwise the value of the third operand
+(\e resultIfFalse) is returned.
+
+\section3 , operator
+
+\c{expression1, expression2}
+
+This operator evaluates its first and second operand (\e expression1
+and \e expression2), and returns the value of the second operand (\e
+expression2).
+
+The comma operator can be subtle, and is best reserved only for use in
+argument lists.
+
+\section3 function operator
+
+\code var variable = function( optArguments ) { Statements }\endcode
+
+This operator is used to create anonymous functions. Once assigned,
+the \e variable is used like any other function name, e.g.
+\c{variable(1, 2, 3)}. Specify the argument names (in \e optArguments)
+if named arguments are required. If no \e optArguments are specified,
+arguments may still be passed and will be available using the \l
+arguments list.
+
+The \QS \Func function operator supports closures, for example:
+\code
+    function make_counter( initialValue )
+    {
+	var current = initialValue;
+	return function( increment ) { current += increment; return current; }
+    }
+    // ...
+    var counterA = make_counter( 3 );  // Start at 3.
+    var counterB = make_counter( 12 ); // Start at 12.
+    debug( counterA( 2 ) );  // Adds 2, so prints 5
+    debug( counterB( 2 ) );  // Adds 2, so prints 14
+    debug( counterA( 7 ) );  // Adds 7, so prints 12
+    debug( counterB( 30 ) ); // Adds 30, so prints 44
+\endcode
+Note that for each call to \e make_counter(), the anonymous function
+that is returned has its own copy of \e current (initialized to the \e
+initialValue), which is incremented independently of any other
+anonymous function's \e current. It is this capturing of context that
+makes the function that is returned a closure.
+
+See also \l function and \l{Function type}.
+
+\section3 in operator
+
+\c{property in Object}
+
+Returns \c true if the given \e Object has the given \e property;
+otherwise returns \c false.
+
+\section3 instanceof operator
+
+\c{object instanceof type}
+
+Returns \c true if the given \e object is an instance of the given \e
+type, (or of one of its base classes); otherwise returns \c false.
+
+\section3 new operator
+
+\c{var instance = new Type( optArguments );}
+
+This function calls the constructor for the given \e Type, passing it
+the optional arguments (\e optArguments) if any, and returns an
+\e instance of the given \e Type. The \e Type may be one of the
+built-in types, one of the library types, or a user-defined type.
+
+Example:
+\code
+    var circle = new Circle( x, y );
+    var file = new File();
+\endcode
+
+\section3 this operator
+
+\c{this.property}
+
+The \e this operator may only be used within a \l function that is
+defined within a \l class or form, i.e. a member function. Within the
+scope of the function \e this is a reference to the particular
+instance (object) of the \l class's type.
+
+Example:
+\code
+    class MinMax {
+	var _min;
+	var _max;
+	function MinMax( min, max ) { this._min = min; this._max = max; }
+	function max() { return this._max; }
+	function min() { return this._min; }
+	function setMax( value ) { this._max = value; }
+	function setMin( value ) { this._min = value; }
+    }
+\endcode
+
+\section3 typeof operator
+
+\c{typeof item}
+
+This operator returns a type of the object as a string.
+
+Example:
+\code
+    var f = new Function("arguments[0]*2"); // "object"
+    var str = "text"; // "string"
+    var pi = Math.PI; // "number"
+\endcode
+
+\section1 Declarations
+
+Classes, functions, variables and constants are declared with \l
+class, \l function, \l var and \l const respectively.
+
+\section2 class
+
+\code
+class ClassName {
+    static var ClassVariable;
+    var MemberVariable;
+    static function ClassFunction { Statements; }
+    function ClassName() { Statements; } // constructor
+    function MemberFunction() { Statements; }
+}
+\endcode
+
+This keyword is used to define new classes. After the keyword \c class
+comes the \e ClassName, then optionally, the keyword \c extends
+followed by a class name from which this class derives, then an
+opening brace. Class variables are declared with \c static \l var (\e
+ClassVariable). Only one instance of these variables exists per class.
+Member variables (\e MemberVariable), are declared with \l var; each
+instance (object) of the class has its own copy of each member
+variable. Functions declared with the keywords \c static \l function
+are class functions (\e ClassFunction); these functions are called
+using the name of the class rather than from an object. In the
+standard library, the \l Math functions are all static, for example
+\Func Math.sin(). Member functions (methods) are called by objects and
+are declared with \l function. The constructor is the member function
+with the same name as the class; constructors must not contain an
+explicit \l return statement, or have an explicit return type, since
+\Q handles these automatically.
+
+A class that only contains \c static \l const, \l var and \l function
+definitions does not need a constructor.
+
+Example:
+\code
+    class Area {
+	static var count = 0;
+	var _name;
+	function Area( name ) { this._name = name; this.count++ }
+	function destroy() { this.count--; }
+	static function count() { return this.count; }
+	function name() { return this._name; }
+	function setName( name ) { this._name = name; }
+    }
+\endcode
+In this example we define the "Area" class. When an instance of the
+class is constructed:
+\code
+    var area = new Area( "Berkshire" );
+\endcode
+the given name is assigned to the object's \c _name variable, and the
+class's \c static \c count is incremented. The \Func destroy()
+function is \e not called automatically; it must be called explicitly
+if there is any clean-up to do.
+
+All the class's variables and functions must be defined within the
+class definition. \ECMA does not have destructors. But for \Q forms,
+\Q will call a class's \Func destroy() function, if it has one, before
+deleting the form. This occurs because \Q automatically connects the
+form's \Func destroyed() signal to the \Func destroy() function. If
+you want a destructor you must create your own and call it explicitly.
+
+Classes are all derived from \l Object. It is possible to derive a
+class from another class using the \c extends keyword, for example:
+\code
+    class City extends Area {
+	var _population;
+	function City( name, population )
+	{
+	    Area( name );
+	    _population = population;
+	}
+	function population() { return _population; }
+	function setPopulation( population ) { _population = population; }
+    }
+\endcode
+
+See also \l function.
+
+\section2 const
+
+\c{const identifier = Value;}
+
+This keyword is used to define constant values. The \e identifier is
+created as a constant with the given \e Value. The constant is global
+unless defined within the scope of a \l class or \l function.
+
+Example:
+\code
+    const PI2 = Math.PI * 2;
+    const COPYRIGHT = "Copyright (c) 2001";
+\endcode
+
+\omit
+    Constants can also be declared within classes, for example:
+    \code
+	// Path and filename: %HOME%\qtscriptlib\Constants.qs
+	class Sizes {
+	    const WIDTH = 57;
+	}
+    \endcode
+
+    \PRELIMINARY
+
+    This constant can be accessed like this:
+    \code
+	import Constants;
+
+	var w = Constants.Sizes.WIDTH;
+    \endcode
+    or by aliasing:
+    \code
+	import Constants;
+	var WIDTH = Constants.Sizes.WIDTH;
+
+	var width = WIDTH;
+    \endcode
+\endomit
+
+Attempts to assign to a constant cause the interpreter to issue an
+error message and stop.
+
+\section2 function
+
+\code
+function functionName( arguments )
+{
+    Statements;
+}
+\endcode
+
+\omit
+    If a function is declared in a \File .qs file that does not contain
+    the \File main() function, it must be declared within a \l class. If
+    no object is required, the function can be declared as \c static.
+    \code
+	// Path and filename: %HOME%\qtscriptlib\MathExt.qs
+	class Math {
+	    static function sum()
+	    {
+		var total = 0;
+		for( i = 0; i < arguments.length; i++ )
+		    total += arguments[ i ];
+		return total;
+	    }
+	}
+    \endcode
+    To access the \Func sum() function from another \QS file, it must be
+    \link Importing imported\endlink and optionally aliased:
+    \code
+	import MathExt;
+
+	var x = MathExt.Math.sum( 1, 2, 3, 4, 5 );
+    // or
+	var sum = MathExt.Math.sum;
+	var y = sum( 2, 4, 6, 8 );
+    // or
+	var y;
+	with ( MathExt.Math ) {
+	    y = sum( 2, 4, 6, 8 );
+	}
+    \endcode
+    If the file was called \File Ext.qs and was in the \File Math
+    subdirectory, the code would look like this:
+    \code
+	import Math.Ext;
+
+	var x = Math.Ext.Math.sum( 1, 2, 3, 4, 5 );
+    // or
+	var sum = Math.Ext.Math.sum;
+	var y = sum( 2, 4, 6, 8 );
+    // or
+	var y;
+	with ( Math.Ext.Math ) {
+	    y = sum( 2, 4, 6, 8 );
+	}
+    \endcode
+
+    Every non-GUI \Q application must have one function in one of the
+    files listed in the \File .pro file's \c DESIGNER_SOURCES section,
+    called \Func main(). This function will be called automatically by \Q
+    when you run the application. In GUI applications, \Q will create an
+    instance of the \e{main form} and run that instance.
+\endomit
+
+Functions may also be declared within the scope of a \l class
+definition. In this situation, the functions become member functions
+(methods) of the class that contains them. See \l class.
+
+\omit See also \l Importing.\endomit
+
+\section2 var
+
+\code
+var variableName;
+var anotherVariableName = InitialValue;
+\endcode
+
+This keyword is used to declare and optionally initialize variables.
+If just the \e variableName is given, the variable is created, but it
+has no value, i.e. its value is \l undefined. If an \e InitialValue is
+given, the variable is created and assigned this \e InitialValue.
+Variables declared within functions are local to the function in which
+they are declared. Variables declared outside of functions and classes
+are global.
+
+Example:
+\code
+    var i;
+    var count = 22;
+    var str = "string";
+\endcode
+
+

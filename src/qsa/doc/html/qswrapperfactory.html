@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qswrapperfactory.cpp:42 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSWrapperFactory Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSWrapperFactory Class Reference</h1>
+
+<p>The QSWrapperFactory class provides a method for Qt Script to
+extend QObject C++ types and to automatically wrap non-QObject C++
+types.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qswrapperfactory-h.html">qswrapperfactory.h</a>&gt;</tt>
+<p><a href="qswrapperfactory-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn><a href="#QSWrapperFactory"><b>QSWrapperFactory</b></a> ()</li>
+<li class=fn>virtual QObject * <a href="#create"><b>create</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;className, void&nbsp;*&nbsp;ptr ) = 0</li>
+<li class=fn>void <a href="#registerWrapper"><b>registerWrapper</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;QString&nbsp;&amp;&nbsp;cppClassName = QString::null )</li>
+<li class=fn>void <a href="#throwError"><b>throwError</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;message )</li>
+</ul>
+<h2>Protected Members</h2>
+<ul>
+<li class=fn>QSInterpreter * <a href="#interpreter"><b>interpreter</b></a> () const</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+The QSWrapperFactory class provides a method for Qt Script to
+extend QObject C++ types and to automatically wrap non-QObject C++
+types.
+<p> If a C++ object which is available to Qt Script returns a pointer
+of a non-QObject type, by default Qt Script can't wrap it
+dynamically. It can store the pointer and pass it on, but no
+functions can be called on the object. The QSWrapperFactory class
+provides a means of making non-QObject types properly accessible
+from Qt Script.
+<p> The way QSWrapperFactory achieves this is that when a non-QObject pointer
+is returned, the Qt Script interpreter tries to find a wrapper for
+that type. A wrapper is a QObject which can wrap the non-QObject
+type and which makes the non-QObject type's slots, properties,
+etc. available to Qt Script.
+<p> In some cases even a QObject might need to be wrapped. For
+example, we might want to use a QObject subclass's functions which
+are not declared as slots in Qt Script. Qt Script only makes the
+slots, signals and properties of QObjects available. With
+QSWrapperFactory it is possible to define a QObject which extends another
+QObject with additional slots, properties, and signals.
+<p> To make use of this method, wrap the classes you want to
+make available or want to extend (see the example below). You then
+create a QSWrapperFactory (wrapper factory) subclass. You
+register your wrapper factory (or factories) with the Qt Script
+interpreter. When the interpreter needs an instance of a class, it
+checks the registered wrapper factories to see if the class has a
+suitable wrapper.
+<p> Call <a href="#registerWrapper">registerWrapper</a>() for each class that this instance of
+QSWrapperFactory can wrap. Reimplement <a href="#create">create</a>() to create a
+wrapper for a certain type. Finally, create an instance of the
+QSWrapperFactory and add it to an interpreter.
+<p> The following code is an example of how to make a non-QObject C++ type known to
+Qt Script. We create a wrapper for a class called Process that
+provides a function called exec(). We then create a wrapper
+factory which we'll register with the interpreter. You can wrap as
+many classes as you like and make them all available through a
+single wrapper factory (although you can use as many wrapper
+factories as you like).
+<p> The created wrapper is deleted by the interpreter as at some point
+after that the interpreter determines that there are no more
+references to the wrapped type from script.
+<p> <pre>
+    class ProcessWrapper : public QObject
+    {
+        Q_OBJECT
+    public:
+        ProcessWrapper( Process *p ) : proc( p ) {}
+    public slots:
+        void exec( const QString &amp;args ) { proc-&gt;exec( args ); }
+    private:
+        Process *proc;
+    };
+
+    class WrapperFactory : public QSWrapperFactory
+    {
+    public:
+        WrapperFactory()
+        {
+            <a href="#registerWrapper">registerWrapper</a>( "Process", "ProcessWrapper" );
+        }
+
+        QObject *create( const QString &amp;className, void *ptr ) {
+            if ( className == "Process" )
+                return new ProcessWrapper( (Process*)ptr );
+            return 0;
+        }
+    };
+    </pre>
+ 
+<p> Somewhere in your code, before executing any QSA related
+functionality, you must instantiate an instance of our new
+wrapper.
+<p> <pre>
+    interpreter-&gt;addWrapperFactory( new WrapperFactory() );
+    </pre>
+ 
+<p> Now, whenever Qt Script comes across a Process pointer, it will
+look through its wrapper factories to find one that provides a
+wrapper for the Process class and wrap it (e.g. with
+ProcessWrapper). So the script writer will now be able to use all
+the slots, properties, and signals that ProcessWrapper provides.
+<p> To <em>extend</em> a QObject C++ type, you do exactly the same process: i.e.
+wrap the class in a class that exposes the required functionality,
+put the wrapper in a wrapper factory, and register the wrapper
+factory with the interpreter.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSWrapperFactory"></a>QSWrapperFactory::QSWrapperFactory ()
+</h3>
+This constructor creates a wrapper factory. To make the wrapper factory
+available to an interpreter, use <a href="qsinterpreter.html#addWrapperFactory">QSInterpreter::addWrapperFactory</a>()
+<p> <p>See also <a href="qsinterpreter.html#addWrapperFactory">QSInterpreter::addWrapperFactory</a>().
+
+<h3 class=fn>QObject * <a name="create"></a>QSWrapperFactory::create ( const&nbsp;QString&nbsp;&amp;&nbsp;className, void&nbsp;*&nbsp;ptr )<tt> [pure virtual]</tt>
+</h3>
+
+<p> This function is called by the Qt Script interpreter to request a
+wrapper for the type <em>className</em>. <em>ptr</em> is a pointer to the
+instance of the type <em>className</em>. The <em>ptr</em> will be passed to
+its related wrapper function and an instance of the wrapper will
+be returned.
+<p> Reimplement this function to make your wrappers available from
+your wrapper factory.
+<p> If <em>ptr</em> is invalid or any other invalid operation occurs, you
+can use <a href="#throwError">throwError</a>() to issue a Qt Script error.
+
+<h3 class=fn><a href="qsinterpreter.html">QSInterpreter</a>&nbsp;* <a name="interpreter"></a>QSWrapperFactory::interpreter () const<tt> [protected]</tt>
+</h3>
+Returns the interpreter that this wrapper factory is creating
+objects for.
+
+<h3 class=fn>void <a name="registerWrapper"></a>QSWrapperFactory::registerWrapper ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;QString&nbsp;&amp;&nbsp;cppClassName = QString::null )
+</h3>
+Registers that this factory provides a wrapper for the type <em>className</em>.
+The <em>cppClassName</em> variable tells the engine which C++ class is
+used to represent it. This is used for better completion. \cppClassName can
+be null (the default) in which case the engine assumes that the script class
+and C++ implementation both have the same name.
+
+<h3 class=fn>void <a name="throwError"></a>QSWrapperFactory::throwError ( const&nbsp;QString&nbsp;&amp;&nbsp;message )
+</h3>
+Informs the interpreter that an error has occurred. The error is
+treated like a normal Qt Script error. The error message is passed
+in <em>message</em>.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

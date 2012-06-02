@@ -1,0 +1,13 @@
+\title Qt Script: Language Reference
+
+\granularity section2 
+
+\input language-introduction.leaf
+\input language-concepts.leaf
+\input built-in-types-and-objects.leaf
+\input built-in-variables-and-constants.leaf
+\input built-in-functions.leaf
+\input control-statements.leaf
+\omit
+\input built-in-exceptions.leaf
+\endomit

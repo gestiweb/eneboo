@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:29 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Array</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1.html">Prev: Built-in Types</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-2.html">Next: Boolean</a>]</p>
+<h4 align="center">Array</h4>
+<p>An <font color=blue><tt>Array</tt></font> is a datatype which contains a named list of items. The items can be any <font color=darkmagenta>Qt Script</font> object. Multi-dimensional arrays are achieved by setting array items to be arrays themselves.</p>
+<p>Arrays can be extended dynamically simply by creating items at non-existent index positions. Items can also be added using <tt>push()</tt>, <tt>unshift()</tt> and <tt>splice()</tt>. Arrays can be concatenated together using <tt>concat()</tt>. Items can be extracted using <tt>pop()</tt>, <tt>shift()</tt> and <tt>slice()</tt>. Items can be deleted using <tt>splice()</tt>. Arrays can be turned into strings using <tt>join()</tt> or <tt>Array::toString()</tt>. Use <tt>reverse()</tt> to reverse the items in an array, and <tt>sort()</tt> to sort the items. The <tt>sort()</tt> function can be passed a comparison function for customized sort orders.</p>
+<p>In general, operations that copy array items perform a deep copy on items that are <tt>Number</tt> or <tt>String</tt> objects, and a shallow copy on other objects.</p>
+<h5><a name="1"></a>Array Construction</h5>
+<p>Arrays can be constructed from array literals or using the <a href="language-5-2-7.html#6">new operator</a>:</p>
+<pre>
+    var mammals = [ "human", "dolphin", "elephant", "monkey" ];
+    var plants = new Array( "flower", "tree", "shrub" );
+    var things = [];
+    for ( i = 0; i &lt; mammals.length; i++ ) {
+        things[i] = new Array( 2 );
+        things[i][0] = mammals[i];
+        things[i][1] = plants[i];       
+    }
+</pre>
+<p>Arrays can be initialized with a size, but with all items undefined:</p>
+<pre>
+    var a = new Array( 10 ); // 10 items
+</pre>
+<h5><a name="2"></a>Array Access</h5>
+<p><font color=blue><tt>Array</tt></font> items are accessed via their names. Names can be either integers or strings.</p>
+<p>Example:</p>
+<pre>
+    var m2 = mammals[2];
+    mammals[2] = "gorilla";
+    var thing = things[2][1]
+</pre>
+<p>The first statement retrieves the value of the third item of the <tt>mammals</tt> array and assigns it to <tt>m2</tt>, which now contains "monkey". The second statement replaces the third item of the <tt>mammals</tt> array with the value "gorilla". The third statement retrieves the second item of the third item's array from the <tt>things</tt> array and assigns it to <tt>thing</tt>, which now contains "shrub".</p>
+<p>As stated above, it is also possible to access the arrays using strings. These act as normal properties, and can be accessed either using the square bracked operator ([]) or by directly dereferencing the array object and specifying the property name (.name). These two accessor types can be mixed freely as seen below with the <tt>address</tt> and <tt>phoneNumber</tt> properties.</p>
+<pre>
+    var names = [];
+    names["first"] = "John";
+    names["last"] = "Doe";
+    var firstName = names["first"];
+    var lastName = names["last"];
+   
+    names["address"] = "Somewhere street 2";
+    names.phoneNumber = "+0123456789";
+    var address = names.address;
+    var phoneNumber = names["phoneNumber"];
+</pre>
+<h5><a name="3"></a>Array Properties</h5>
+<ul><li><p>length : Number; Holds the number of items in the array. Items with string keys are excluded from the length property.</p>
+</ul><h5><a name="4"></a>Array Functions</h5>
+<ul><li><p>concat( a1 : Array, a2 : Array ... aN : Array) : Array;</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    var y = x.concat( [ "d", "e" ], [ 90, 100 ] );
+    // y == [ "a", "b", "c", "d", "e", 90, 100 ]
+</pre>
+<p>Concatenates the array with one or more other arrays in the order given, and returns a single array.</p>
+<li><p>join( optSeparator : String ) : String;</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    var y = x.join();         // y == "a,b,c"
+    var z = x.join( " * " );  // y == "a * b * c"
+</pre>
+<p>Joins all the items of an array together, separated by commas, or by the specified <tt>optSeparator</tt>.</p>
+<li><p>pop() : Object;</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    var y = x.pop(); // y == "c"  x == [ "a", "b" ]
+</pre>
+<p>Pops (i.e. removes) the top-most (right-most) item off the array and returns it.</p>
+<li><p>push( item1, optItem2, ... optItemN );</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    x.push( 121 ); // x == [ "a", "b", "c", 121 ]
+</pre>
+<p>Pushes (i.e. inserts) the given items onto the top (right) end of the array. The function returns the new length of the array.</p>
+<li><p>reverse();</p>
+<pre>
+    var x = new Array( "a", "b", "c", "d" );
+    x.reverse(); // x == [ "d", "c", "b", "a" ]
+</pre>
+<p>Reverses the items in the array.</p>
+<li><p>shift() : Object;</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    var y = x.shift(); // y == "a"  x == [ "b", "c" ]
+</pre>
+<p>Shifts (i.e. removes) the bottom-most (left-most) item off the array and returns it.</p>
+<li><p>slice( startIndex : Number, optEndIndex : Number ) : Array;</p>
+<pre>
+    var x = new Array( "a", "b", "c", "d" );
+    var y = x.slice( 1, 3 ); // y == [ "b", "c" ]
+    var z = x.slice( 2 );    // z == [ "c", "d" ]
+</pre>
+<p>Copies a slice of the array from the item with the given starting index, <tt>startIndex</tt>, to the item <em>before</em> the item with the given ending index, <tt>optEndIndex</tt>. If no ending index is given, all items from the starting index onward are sliced.</p>
+<li><p>sort( optComparisonFunction : function );</p>
+<pre>
+    var x = new Array( "d", "x", "a", "c" );
+    x.sort(); // x == [ "a", "c", "d", "x" ]
+</pre>
+<p>Sorts the items in the array using string comparison. For customized sorting, pass the <tt>sort()</tt> function a comparison function, <tt>optComparisonFunction</tt>, that has the following signature and behavior:</p>
+<pre>
+    function comparisonFunction( a, b ) // signature
+</pre>
+<p>The function must return an integer as follows:</p>
+<ul><li><p>-1 if a &lt; b</p>
+<li><p>0 if a == b</p>
+<li><p>1 if a &gt; b</p>
+</ul><p>Example:</p>
+<pre>
+    function numerically( a, b ) { return a &lt; b ? -1 : a &gt; b ? 1 : 0; }
+    var x = new Array( 8, 90, 1, 4, 843, 221 );
+    x.sort( numerically ); // x == [ 1, 4, 8, 90, 221, 843 ]
+</pre>
+<li><p>splice( startIndex : Number, replacementCount : Number, optItem1, ... optItemN );</p>
+<pre>
+    var x = new Array( "a", "b", "c", "d" );
+
+    // 2nd argument 0, plus new items   ==&gt; insertion
+    x.splice( 1, 0, "X", "Y" );
+    // x == [ "a", "X", "Y", "b", "c", "d" ]
+
+    // 2nd argument &gt; 0, and no items   ==&gt; deletion
+    x.splice( 2, 1 );
+    // x == [ "a", "X", "b", "c", "d" ]
+
+    // 2nd argument &gt; 0, plus new items ==&gt; replacement
+    x.splice( 3, 2, "Z" );
+    // x == [ "a", "X", "b", "Z" ]
+</pre>
+<p>Splices items into the array and out of the array. The first argument, <tt>startIndex</tt>, is the start index. The second argument, <tt>replacementCount</tt>, is the number of items that are to be replaced. Make the second argument 0 if you are simply inserting items. The remaining arguments are the items to be inserted. If you are simply deleting items, the second argument must be &gt; 0 (i.e. the number of items to delete), and there must be no new items given.</p>
+<li><p>toString() : String;</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    var y = x.toString();  // y == "a,b,c"
+    var z = x.join();      // y == "a,b,c"
+</pre>
+<p>Joins all the items of an array together, separated by commas. This function is used when the array is used in the context of a string concatenation or is used as a text value, e.g. for printing. Use <tt>join()</tt> if you want to use your own separator.</p>
+<li><p>unshift( expression : String, optExpression1, ... opExpressionN )</p>
+<pre>
+    var x = new Array( "a", "b", "c" );
+    x.unshift( 121 ); // x == [ 121, "a", "b", "c" ]
+</pre>
+<p>Unshifts (i.e. inserts) the given items at the bottom (left) end of the array.</p>
+<!-- eof -->
+<p align="right">[<a href="language-3-1.html">Prev: Built-in Types</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-2.html">Next: Boolean</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

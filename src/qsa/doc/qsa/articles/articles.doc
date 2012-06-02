@@ -1,0 +1,31 @@
+/*!
+
+\page articles.html
+
+\title Qt Script for Applications Articles
+
+Click on an article below to read it. If you want to submit your own
+QSA related article, please contact \link mailto:qsa@trolltech.com
+qsa@trolltech.com\endlink.
+
+\table
+\row \i <b>\link plot.html The Plot Application\endlink</b>
+     \i This article describes how to use QSA in an application which
+     can visualize mathematical functions in a 1D plot widget. The
+     plotting functionality and application itself is implemented
+     using Qt/C++ and the functions which can be visualized are
+     written in Qt Script by the user of the application.
+\row \i <b>\link http://kcheckers.osdn.org.ua/qt/qsa.html
+     Fun, Fast and Flexible Qt Script in Russian\endlink</b>
+     \i A Russian translation of the \e{Qt Quarterly} article
+     \link http://doc.trolltech.com/qq/qq02-fun-fast-and-flexible-qt-script.html
+     Fun, Fast and Flexible Qt Script\endlink.
+     Contributed by Andi Peredri.
+\endtable
+
+\e {Trolltech is not responsible for the accuracy or content of
+external links.}
+
+*/
+
+

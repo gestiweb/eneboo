@@ -1,0 +1,635 @@
+\chapter Control Statements
+
+The flow--of--control in \QS programs is controlled by control
+statements, for example, \l if and \l switch, \l for and \l while. \QS
+also supports exceptions with \l try and \l catch.
+
+\section1 break
+
+\code
+label:
+for ( var i = 0; i < limit; i++ ) {
+    if ( condition ) {
+	break label;
+    }
+}
+
+switch ( expression ) {
+    case 1:
+	Statements1;
+	break;
+    default:
+	DefaultStatements;
+	break;
+}
+\endcode
+
+This keyword is used in \l for loops, \l do loops, \l while loops and
+\l{switch} statements. When a \c break statement is encountered in a
+loop, control is passed to the statement following the end of the
+inner-most loop that contains the \c break statement; unless the \c
+break statement is followed by the name of a \e label, in which case
+control passes to the statement governed by the label.
+
+A \c break statement is usually placed at the end of each \l{case} in
+a switch statement to prevent the interpreter "falling through" to the
+next case. When the interpreter encounters a \c break statement, it
+passes control to the statement that follows the inner-most enclosing
+\c switch statement. If every \c case has a corresponding \c break,
+then at most one \c case's statements will be executed. If the \c
+break statement is followed by a label name (\e label) then when the
+\c break is encountered, control will pass to the statement marked
+with that label; this is useful, for example, for breaking out of
+deeply nested loops.
+
+Example:
+\code
+    red:
+    for ( x = 0; x < object.width; x++ ) {
+	for ( y = 0; y < object.height; y++ ) {
+	    if ( color[x][y] == 0xFF0000 ) {
+		break red;
+	    }
+	}
+    }
+\endcode
+
+See \l{switch} for another example.
+See also \l do, \l while, \l for and \l break.
+
+\section1 case
+
+\code
+switch ( expression ) {
+    case Value:
+	Statements;
+	break;
+    default:
+	DefaultStatements;
+	break;
+}
+\endcode
+
+This keyword is used in \l{switch} statements. For each possible value
+that a \c switch statement's expression may evaluate to, one \c case
+may be written, (but see \l{default}.) If a case's literal value (\e
+Value) matches the value of the \c switch statement's \e expression,
+then that \c case's statements (\e Statements) are executed.
+
+Normally a \c case's statements are terminated by a \l{break}
+statement which causes execution to pass to the end of the \c switch
+statement.
+
+See \l{switch} for an example.
+
+\section1 catch
+
+\code
+try {
+    Statements;
+}
+catch( exception ) {
+    ExceptionStatements;
+}
+\endcode
+
+This keyword is used in \l{try} statements. If an \e exception occurs,
+then the \e ExceptionStatements in a matching \c catch block are
+executed.
+
+Catch blocks come in two varieties, unqualified and qualified. An
+unqualified \c catch block has the form:
+\code
+    catch ( e ) {
+	/* statements */
+    }
+\endcode
+and a qualified \c catch block has the form:
+\code
+    catch ( e if e instanceOf RangeError ) {
+	/* statements */
+    }
+\endcode
+
+The possible exception types are:
+\list
+\i EvalError -- the result of a failed \l{eval()} call.
+\i RangeError -- a result that is out of range, e.g. an array index to
+an element that isn't in the array.
+\i TypeError -- an attempt to perform an operation on an object of an
+inappropriate type.
+\i User defined exceptions -- exceptions that are objects of a
+user-defined type.
+\endlist
+
+See \l{try} for an example.
+
+\omit
+(See also \l{Built-in Exceptions}.)
+\endomit
+
+\section1 continue
+
+\code
+for ( var i = 0; i < limit; i++ ) {
+    if ( condition ) {
+	continue;
+    }
+    Statements;
+}
+\endcode
+
+This keyword is used within the context of a \l for, \l while or \l do
+loop.
+
+If a \c continue statement is encountered in a \l for loop, execution
+immediately passes to the third part of the \l for loop (normally
+where a counter is incremented or decremented), and then execution
+continues normally, i.e. the middle part of the \l for loop (the
+conditional) is tested, and if true, the body of the loop is executed.
+
+If a \c continue statement is encountered in a \l while or \l do loop,
+execution immediately passes to the conditional, which is retested;
+the body of the loop will be executed if the conditional is still
+true.
+
+See \l do for an example.
+See also \l do, \l while, \l for and \l break.
+
+\section1 default
+
+\code
+switch ( expression ) {
+    case 1 :
+	Statements1;
+	break;
+    default :
+	DefaultStatements;
+	break;
+}
+\endcode
+
+This keyword is used in \l{switch} statements. It is used instead of
+\l{case} to match \e anything that the \c switch statement's
+expression has evaluated to. If no \c default is used, and none of the
+cases match, then the \c switch statement will not execute anything
+and control will pass on to the following statement. If \c default is
+used, it \e must be the last case in the \c switch statement. This is
+because each \c case is evaluated in order, and since \c default
+matches any value, it will always be executed if the interpreter
+reaches it, and any following cases would always be ignored. When the
+\c default case is encountered its \e DefaultStatements are executed.
+It is customary to end a \c default statement with a \l break.
+
+See \l{switch} for an example.
+
+\section1 do
+
+\code
+do {
+    Statements;
+} while ( condition );
+\endcode
+
+This keyword is used in conjunction with \l while to form a loop which
+is guaranteed to execute at least once.
+
+The \e Statements in the braces following the \c do are executed once.
+If the \l while \e condition evaluates to \c true, execution passes
+back to the \c do, and the whole process repeats. If the \l while
+loop's conditional ever becomes \c false, execution continues from the
+statement following the \l while statement.
+
+Example:
+\code
+    var x = 0;
+    do {
+	x += 5;
+	if ( x == 50 )
+	    continue;
+	System.println( x );
+    } while ( x < 100 );
+\endcode
+The example prints 5, 10, 15, ..., 45, 55, 60, 65, ..., 95 on the
+console.
+
+See also \l while, \l for, \l continue and \l break.
+
+\section1 else
+
+\code
+if ( condition ) {
+    Statements;
+}
+else {
+    ElseStatements;
+}
+\endcode
+
+The \c else keyword is used in conjunction with \l if. See \l if for
+details.
+
+\section1 for
+
+\code
+for ( i = 0; i < limit; i++ ) {
+    Statements;
+}
+\endcode
+
+This keyword is used to create a loop that executes a fixed number of
+times.
+
+The \c for statement is broken into parts as follows: the keyword \c
+for, an opening parentheses, zero or more statements (the \e{first
+part}), a semi-colon, a conditional expression (the \e{second part}),
+a semi-colon, zero or more statements (the \e{third part}), a closing
+parentheses, and finally a statement or block that is governed by the
+\c for loop.
+
+The first part of the \c for statement is typically used to initialize
+(and possibly declare) the variable used in the conditional in the
+second part of the \c for loop statement. This part is executed once
+before the loop begins. This part may be empty.
+
+The second part contains a conditional expression. The expression is
+evaluated before each iteration of the loop (including before the
+first iteration). If this expression evaluates to \c false, the
+statement or block governed by the \c for loop is not executed and
+control passes to the statement that follows. If the condition is \e
+never \c true, the statement or block governed by the \c for loop will
+never be executed. If the condition expression is \c true, the
+statement or block governed by the \c for loop is executed, and then
+the third part of the \c for statement is executed, before control is
+passed back to the conditional expression with the whole process being
+repeated. This part should not be empty.
+
+The third part contains statements which must be executed at the end
+of every iteration of the loop. This part is typically used to
+increment a variable that was initialized in the first part, and whose
+value is tested in the second part. This part may be empty.
+
+Example:
+\code
+    var a = [ "a", "b", "c", "d", "e" ];
+    for( var i = 0; i < a.length; i++ ) {
+	System.println( a[ i ] );
+    }
+\endcode
+See also \l do, \l while, \l continue and \l break.
+
+\section1 if
+
+\code
+if ( expression1 ) {
+    // statements1
+else {
+    // elsestatements
+}
+
+if ( expression1 ) {
+    // statements1
+else if ( expression2 ) {
+    // statements2
+}
+// else if ...
+else {
+    // elsestatementsN
+}
+\endcode
+
+An \c if statement provides a two-way branch. A multi-way branch is
+achieved using \c{else if}s. (See also \l switch.)
+
+\list 1
+\i If the first expression, \e expression1, is \c true, then the
+statements governed by that expression (\e statements1) will be
+executed, after which control will pass to the statement following the
+\c if block.
+
+\i If \e expression1 is \c false, control passes to the \c else
+statement. If the \c else has no following \c if, the \c else
+statements (\e elsestatements) are executed, after which control will
+pass to the statement following the \c if block. If the \c else has a
+following \c if, then step 1 or step 2 (this step) is repeated for
+that \c if statement depending on whether its expression is \c true or
+\c false.
+\endlist
+
+\section1 finally
+
+\code
+try {
+    Statements;
+}
+finally {
+    finalStatements;
+}
+\endcode
+
+A \c finally block is a block of code that is executed after the
+governing \l try block. If no exceptions occur within the \l try
+block, control will pass to the \c finally block after the last
+statement in the \l try block has been executed. If an exception
+occurs within the \l try block, control is passed immediately to the
+\c finally block.
+
+See also \l try.
+
+\omit
+    \section1 import
+
+    \PRELIMINARY
+
+    \code
+    import Module;
+    import Relative.Path.To.Module;
+    \endcode
+
+    This keyword is used to import a module (a \QS \File .qs file).
+    Modules may class definitions.
+
+    If the module is not in one of the \c $QTSCRIPT_PACKAGES
+    directories, then it \e must be in a \c $QTSCRIPT_PACKAGES
+    subdirectory (at any depth), in which case the full (case-sensitive)
+    path must be given, using '.' as the path separator.
+
+    See \l Importing for full details.
+\endomit
+
+\section1 label
+
+\c{labelname: Statement;}
+
+Statements may be labelled; the syntax is \e labelname followed by a
+colon, followed by the \e Statement. The \e labelname is any valid
+(unique) identifier.
+
+See \l break for an example.
+
+\section1 return
+
+\c{return optExpression;}
+
+A \c return statement may occur anywhere within a function, including
+member functions, but not within constructors. When a \c return
+statement is encountered, control leaves the function immediately, and
+execution resumes at the statement following the call that invoked the
+function. If the \c return statement is followed by an expression (\e
+optExpression) the value of the expression is returned to the caller.
+
+Example:
+\code
+    function inRange( v, min, max )
+    {
+	if ( v >= min && v <= max ) {
+	    return true;
+	}
+	else {
+	    return false;
+	}
+    }
+\endcode
+
+\section1 switch
+
+\code
+switch( expression ) {
+    case Value :
+	Statements;
+	break;
+    default :
+	DefaultStatements;
+	break;
+}
+\endcode
+
+A \c switch statement provides a multi-way branch. The \e expression
+is evaluated once, then each \l case is checked in order to find one
+with a \e Value that matches the value of the \e expression. If a
+match is made, the \e Statements of the matching case are executed,
+after which control passes to the statement following the \c switch
+block. If no matching \l case is found, and there is a \l default
+case, the \e DefaultStatements are executed, after which control
+passes to the statement following the \c switch block. If there is no
+matching case and no \l default, no statements within the \c switch
+block are executed, and control passes to the statement following the
+\c switch block.
+
+Note that if a \l default is used it \Bold must be come after all the
+\l{case}s; this is because once \l default is encountered it is
+treated as a matching \l case regardless of what follows.
+
+Every \l case, and the \l default (if used) should have a \l break as
+their last statement. If \l break is not present, control will "drop
+through" to the following statements, which is not usually the desired
+behavior.
+
+The \e expression may be any arbitrary \Q expression that evaluates to
+an object that can be strictly compared. For example, an expression
+that evaluates to a \l{Boolean}, \l{Date}, \l{Number} or \l{String}
+value.
+
+Example:
+\quotefile langtest.qs
+\skipto QUOTE SWITCH
+\skipline
+\printto QUOTE SWITCH
+In the example, if \c expr has the value 1, the \e doActionOne()
+function will be called. But if \c expr has the value 3, both \e
+doActionThree() and \e doActionFour() will be called, because case 3
+doesn't have a \c break statement, and execution "falls through" to
+case 4. If \c expr is not 1, "two", 3 or 4 then the \l{default} case
+will be matched and \e doDefaultAction() will be executed.
+
+See also \l break.
+
+\section1 throw
+
+\code
+try {
+    Statements;
+    throw "an exception";
+}
+catch ( e ) {
+    if ( e == "an exception" ) {
+	ExceptionStatements;
+    }
+    else {
+	OtherExceptionStatements
+    }
+}
+\endcode
+
+The \c throw keyword is used to raise user-defined exceptions.
+
+Example:
+\code
+    function monthToName( i )
+    {
+	var IndexToMonth = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+	
+	if ( i < 0 || i > 11 ) {
+	    throw "month number out of range";
+	}
+	else {
+	    return IndexToMonth[ i ];
+	}
+    }
+\endcode
+
+It is also possible to define a user-defined exception class and throw
+an object of that type, e.g.
+\code
+    throw new AUserDefinedException( "month number out of range" );
+\endcode
+
+See also \l try.
+
+\section1 try
+
+\code
+try {
+    Statements;
+}
+catch ( e ) {
+}
+
+try {
+    Statements;
+}
+finally {
+}
+\endcode
+
+The \c try keyword is used to identify a statement block for which
+exceptions will be caught. There are two kinds of \c try block,
+\c{try...catch} and \c{try...finally}.
+
+\Bold{try...catch}
+
+If an exception occurs within a \c{try...catch} block, control is
+passed to the first \l{catch} block. If that \c catch block does not
+accept the exception, control is passed on to the next \c catch block
+(if any), and so on, until there are no more \c catch blocks, in which
+case the exception is passed up the call chain until an enclosing \c
+catch block is found to accept it, or if none accept it, the program
+will terminate.
+
+A \c catch block has the form:
+\code
+    catch ( e ) { /* statements */ }
+\endcode
+
+\Bold{try...finally}
+
+If an exception occurs within a \c{try...catch} block, control is
+passed to the \l finally block. This is useful if you want to ensure
+that something happens at the end of the block, no matter what.
+
+Examples:
+
+\code
+    try {
+	file = new File;
+	file.open( filename );
+	process( file );
+    }
+    finally {
+	file.close();	
+    }
+\endcode
+In this example, the file is always closed, even if an exception
+occurred.
+
+\code
+    try {
+	var a = monthToName( 11 );
+	var b = monthToName( 2 );
+    }
+    catch ( e ) {
+	if ( e == "month number out of range" ) {
+	    debug( "Code error: " + e );
+	}
+	else {
+	    throw e;
+	}
+    }
+\endcode
+In this example, the \Func monthToName() function is called to set two
+variables. If the function fails, it throws an exception rather than
+returns an error value, so no explicit check for an error value is
+necessary. If one of the function calls failed \l debug() is called;
+otherwise the exception is re-thrown so that it can be handled at a
+higher level. (See \l throw for the definition of \Func
+monthToName().)
+
+\section1 while
+
+\code
+while ( condition ) {
+    Statements;
+}
+\endcode
+
+This keyword is used to repeat a block of code zero or more times.
+When the \c while statement is encountered the \e condition is
+evaluated. If the \e condition is \c true, the \e Statements in the
+\c while block are executed; otherwise control passes to the statement
+following the \c while block. If the \e condition is \c true, after
+the \e Statements have been executed, the \e condition is again
+evaluated, and the whole process repeats.
+
+Example:
+\code
+    var i = 10;
+    while ( i > 0 ) {
+	debug( i );
+	i--;
+    }
+\endcode
+
+See also \l do, \l for, \l continue and \l break.
+
+\section1 with
+
+\code
+with ( QualifyingName ) {
+    Statements;
+}
+\endcode
+
+This keyword is used to indicate that any unqualified names in the \e
+Statements should be qualified by \e QualifyingName. QSA does not support
+declaring variables using the 'var' statement inside a with() block.
+
+Example:
+\code
+// Without with
+    System.print "one ";
+    System.print "two ";
+    System.println "three";
+// With with
+    with ( System ) {
+	print "one ";
+	print "two ";
+	println "three";
+    }
+\endcode
+
+If multiple qualifying names are required, with statements can be
+nested, e.g.
+\code
+    with ( System ) {
+	with ( Math ) {
+	    print abs( -4 );
+	    print pow( 2, 3 );
+	    print random();
+	}
+    }
+\endcode
+
+Forcing the interpreter to do the lookup may be slower than using the
+fully qualified names.
+

@@ -1,0 +1,81 @@
+\chapter Reference: Toolbar Buttons
+
+\section1 Introduction
+
+\QSAD's toolbar buttons provide fast access to common functionality.
+Toolbar buttons are grouped in several toolbars. Toolbars have a
+handle at the left hand side which can be clicked to minimize the
+toolbar. Toolbars that have been minimized have their handle appear
+just under the menu bar; click the handle to restore the toolbar to
+the last position it occupied. You can drag a toolbar's handle to move
+the toolbar to a different position in the toolbar area. Toolbars can
+be dragged out of the toolbar area entirely and made into stand-alone
+tool dock windows. To hide a tool dock window click its close button.
+To restore a hidden tool dock window, right click the tool area, then
+click the name of the tool dock window you wish to restore.
+
+\section1 The File Toolbar Buttons
+
+\img qsad_filetoolbar.png
+\caption File Toolbuttons
+
+\list
+\i \Toolbutton {New Script}\BR Click this toolbar button (or press \Key Ctrl+N)
+to create a new dialog or source file. Clicking File invokes the
+\l{New Script Dialog}dialog.
+
+\i \Toolbutton {Import Script}\BR Click this menu option (or press \Key Ctrl+O) to
+invoke the \l{Import Script Dialog} dialog.
+
+\i \Toolbutton {Export Script}\BR Click this menu option (or press \Key Ctrl+S) to
+invoke the \l{Export Script Dialog} dialog.
+
+\i \Toolbutton {Remove Script}\BR Click this menu option (or press \Key Ctrl+D) to remove the script from the project.
+
+\endlist
+
+\section1 The Edit Toolbar Buttons
+
+\img qsad_edittoolbar.png 
+\caption Edit Toolbuttons
+
+\list
+
+\i \Toolbutton Undo\BR Click this toolbar button (or press \Key Ctrl+Z) to
+undo an action. The name of the last action that was performed appears
+after the word 'Undo' in this toolbar button's tooltip. 
+
+\i \Toolbutton Redo\BR Click this toolbar button (or press \Key Ctrl+Y) to
+redo an action. The name of the last action that was performed appears
+after the word 'Redo' in this toolbar button's tooltip.
+
+\i \Toolbutton Cut\BR Click this toolbar button (or press \Key
+Ctrl+X) to delete the selected item from the current form or file and
+copy it to the clipboard.
+
+\i \Toolbutton Copy\BR Click this toolbar button (or press \Key Ctrl+C) to
+copy the selected item from the current form or file to the clipboard.
+
+\i \Toolbutton {Paste}\BR Click this toolbar button (or press \Key
+Ctrl+V) to paste the selected item (if any) from the clipboard into
+the current form or file.
+
+\endlist
+
+\section1 The Project Toolbar Buttons
+
+\img qsad_projecttoolbar.png 
+\caption Project Toolbuttons
+
+This menu is invoked with \Key Alt+O, provides the following options:
+
+\list
+
+\i \Menu{Project|Call Function}\BR Click this
+menu option (or press \Key F5) to invoke the \Dialog{Call function} dialog.
+
+\i \Menu{Project|Call Function}\BR Click this
+menu option (or press \Key F6) to call the last function specified in the \Dialog{Call Function} dialog.
+
+\endlist
+

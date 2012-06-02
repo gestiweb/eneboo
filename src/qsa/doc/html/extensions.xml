@@ -1,0 +1,5 @@
+<!DOCTYPE DCF>
+<DCF ref="extensions.html" icon="extensions.png" imagedir="../../gif" title="QSA Extensions Framework">
+<section ref="extensions-1.html" title="QSA Input Dialog Framework"/>
+<section ref="extensions-2.html" title="QSA Utility Framework"/>
+</DCF>

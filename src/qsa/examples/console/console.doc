@@ -1,0 +1,128 @@
+/*! 
+
+\page console.html
+
+\ingroup examples
+
+\title Console
+
+The console example demonstrates how QSA can be used as an interactive scripting
+console where each command you type is automatically run in the interpreter.
+
+The console example consists of three different widgets. The Input
+widget is used for writing script code and it is the largest and most
+important one of these is the input widget. This widget lies in the
+center of the dialog. The output window widget is found in the
+uppermost text area it displays output from print commands. It also
+displays syntax and logic errors. The third widget is the history
+window, situated in the lowermost text area of the dialog.History
+displays all of the commands that the user has typed.
+
+The following sections will show an example and description of the console application.
+
+\section1 A Line by Line Example
+
+We will start by stepping thought line by line of a simple example
+where we create a dialog that reads and displays the first and last
+name that is typed into a line edit. Altough some lines are grouped
+together, you should try to type them in one by one and press enter
+between each line. The example below relies strongly on the 
+\link qsa-6.book Input Dialog Framework \endlink.
+
+\code var dialog = new Dialog; \endcode
+
+We start by creating a dialog.
+
+\code dialog.exec(); \endcode
+
+To verify that the dialog actually changes, we will display the dialog before
+any changes have been made to it. The dialog pops up with only an \c Ok
+and \c Cancel button on it. The function \c exec() is in the \c Dialog class.
+Close the dialog and continue with the steps below.
+
+\code
+dialog.title = "Name reading dialog";
+dialog.okButtonText = "Done"
+dialog.cancelButtonText = "Abort";
+dialog.exec();
+\endcode
+
+The preceding code configures the dialog to fit our needs. We set the
+title and modify the text on the \c OK and \c Cancel buttons. When you
+type \c dialog.exec() at the end of the code, the dialog pops up with your
+changes. When you have confirmed that the changes have taken
+place, close the dialog.
+
+\code
+var first = new LineEdit;
+first.label = "First name: ";
+dialog.add( first );
+dialog.exec(); 
+\endcode
+
+This code creates a line edit which we will use to read the
+first name.  We change the label to "First name: " and add it to the
+dialog. When we call \c exec(), the dialog will now contain your new
+line edit. Close the dialog again.
+
+\code
+var last = new LineEdit;
+last.label = "Last name: ";
+dialog.add( last );
+dialog.exec();
+\endcode
+
+We need to add another line edit for typing the last name. Change
+the label to "Last name: ", and add the line edit to the dialog.
+Type in \c dialog.exec() to run the dialog. Type in your first and
+last name in the respective input fields and press \Button Done.
+
+Finally, we need to add the following code to get the result from the
+dialog and print it out.
+
+\code
+var fullName = last.text + ", " + first.text;
+print( "Full name is: " + fullName );
+\endcode
+
+\section1 Console in Detail
+
+The console example uses an instance of \link qsinterpreter.html
+QSInterpreter \endlink and the function \link
+qsinterpreter.html#evaluate() QSInterpreter::evaluate() \endlink to
+give line by line commands that are interpreted. To have some classes
+to play with, we make the \link qsinputdialogfactory.html Input Dialog
+Framework \endlink available to the scripting engine using the
+function \link qsinterpreter.html#addObjectFactory
+QSInterpreter::addObjectFactory \endlink.
+
+The input widget is a \link qseditor.html QSEditor \endlink, which
+means that all script code is written with syntax highlighting and
+completion. To get completion on all the classes that an interpreter
+knows about, we have to tell the editor which interpreter we are
+using. (In the most common case of using QSEditor, it is handled using
+\link qsproject.html QSProject \endlink, but in this example we have
+no project and therefore have to make the binding ourselves). This is
+done by calling the function \link qseditor.html#setInterpreter
+QSEditor::setInterpreter() \endlink. Without making this binding, the
+syntax completion would, for example, not be able to tell that the
+input dialog framework was available in the interpreter.
+
+We have installed an event filter on the QSEditor so that we can
+provide the line by line interpretation of the script code that we
+want. If the user presses enter, we perform a syntax check on the
+source code in the editor using \link qsinterpreter.html#checkSyntax
+QSInterpreter::checkSyntax() \endlink. If it passes, the code is
+evaluated. The return value from the interpreter (typically the value
+of the last statement executed) is always displayed in the output
+window. If you want to write multi-line commands, use \Key Control+Enter
+to go to the next line without evaluating the code.
+
+\section1 Conclusion
+
+The console example shows how QSA can be used as an input form for
+giving interactive commands. It also sho how QSEditor can be embedded
+in an arbitrary user interface without the use of QSA Workbench or the project.
+
+
+*/

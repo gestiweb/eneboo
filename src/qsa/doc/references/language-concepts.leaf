@@ -1,0 +1,470 @@
+\chapter Qt Script Language Concepts
+
+This chapter describes the concepts behind \QS, \Q's implementation of
+\ECMA.
+
+\omit
+    \section1 Qt Script's Files
+
+    \QS can be used to write stand-alone GUI applications (desktop
+    applications), client-server GUI applications, CGI (web server)
+    applications and console applications.
+
+    A \QS application consists of a set of files as described in the
+    following sections.
+
+    Although it is customary to write \Q applications using \QD which
+    creates and maintains the files in \Q applications, it is also
+    possible to write the \QS code in \File .qs files, using any plain
+    text editor.
+
+    \section2 Project Files (.pro)
+
+    \QS applications usually have a single \File .pro file. This file is
+    used to store information about the application, for example which
+    forms (\File .ui files) and \QS (\File .qs) files it contains.
+
+    \QD automatically creates and maintains the project file for a \QS
+    application; hand editing is not recommended.
+
+    \sidebar Console Applications
+
+    Console applications can be created and run from inside \QD, and they
+    can also be created with any plain text editor and run from a console.
+
+    To run a console application from the console, simply invoke the \Q
+    interpreter with the name of the application's main file, e.g.
+    \code
+    qtscript myapp.qs
+    \endcode
+
+    A function called \Func main() must exist in the file (in this
+    example, in \File myapp.qs), although the application can import any
+    number of other \File .qs files (see \l Importing).
+
+    Console applications that are created with \QD will also have a \File
+    .pro project file, and can be run in the usual way, i.e.
+    \code
+    qtscript myapp.pro
+    \endcode
+    \endsidebar
+
+    \section2 Qt Script Files (.qs)
+
+    \QS \File .qs files contain \QS code, i.e, class definitions. \QS
+    files can be added to a project using \QD, or imported using an \link
+    Importing import\endlink statement.
+
+    \section2 User Interface Files (.ui)
+
+    Most \QS applications have GUIs (Graphical User Interfaces). GUIs use
+    forms to present options, feedback and interactions to the user. Using
+    \QD, programmers can create the forms their applications need. Each
+    form is stored in a \File .ui file created and maintained by \QD.
+
+    Each \File .ui file contains the information that describes the design
+    of a single form. The signals and slots connections, and the
+    implementations of the slots, are stored in \File .ui.qs files.
+
+    \section2 User Interface Qt Script Files (.ui.qs)
+
+    The functionality of a form is implemented by implementing \QS
+    functions. These functions are \e slots which various events (called
+    \e signals) may be connected to. For example, buttons have a \Func
+    clicked() signal. To execute some code when a particular button is
+    clicked, you would connect the button's \Func clicked() signal to a
+    slot of your own choosing, e.g. \Func Button1_clicked(), and implement
+    the desired behavior in the \Func Button1_clicked() slot. The signal
+    and slot connections, the form's class variables and its slots, are
+    stored in a \File .ui.qs file that corresponds to the user interface
+    design in the related \File .ui file. The \File .ui.qs files are
+    created and maintained by \QD; programmers write their code using
+    \QD's code editor.
+
+    See the \link getting-started.book Getting Started Guide\endlink for
+    examples and more information.
+
+    \section1 Qt Script's Execution Model
+
+    A \Q application is run by invoking the \c qtscript interpreter, and
+    passing it a file name. In the case of a GUI application, the file name
+    must be the name of a project \File .pro file. In the case of a
+    console application, either the name of the project file, or the name
+    of a \File .qs file that contains a function called \Func main(), may
+    be given.
+
+    \Q starts by reading all the files and forms required by the
+    application, reading in \link Importing imported\endlink files as
+    necessary.
+
+    For console applications, \Q looks for a function called \Func main()
+    and executes it.
+
+    For GUI applications, \Q looks for a function called \Func main(). If
+    this function exists, \Q executes it. Next, \Q looks for the
+    application's main form, creates an instance of that form, and enters
+    the GUI event loop, waiting for user interaction, e.g. mouse clicks,
+    key presses, etc.
+
+\endomit
+
+\section1 Identifiers, Variables and Constants
+
+\QS identifiers match the regex pattern \Bold{[_A-Za-z][_A-Za-z0-9]*}.
+Identifiers are used for variables, constants, class names, function
+names and labels.
+
+\ECMA reserves some words which are valid identifiers for its own use.
+See the \l{Built-in Functions and Operators} chapter for the complete
+list.
+
+Variables are declared using the \l var keyword:
+\code
+    var a;               // undefined
+    var c = "foliage";   // the string "foliage"
+    x = 1;               // global variable
+\endcode
+
+If a variable is assigned to without being declared, it is
+automatically declared as a global variable. Using global variables
+can make your code difficult to debug and maintain and is not
+recommended.
+
+Constants are declared using the \l const keyword:
+\code
+    const x = "Willow";
+    const y = 42;
+\endcode
+Constants must be defined at the point of declaration, because they
+cannot be changed later. If an attempt is made to assign to a
+constant, the \Q interpreter will issue an error message and stop.
+
+Constants are public globals if they are declared outside of any
+enclosing braces. When declared within the scope of some braces, e.g.
+within an \l if statment, their scope is local to the enclosing block.
+
+\section1 Classes and Methods
+
+\QS is a fully object oriented language. Classes can be defined as
+shown below in the source files of a project.
+
+Example:
+\code
+    class Circle {
+	var m_x;
+	var m_y;
+	var m_r;
+
+	function Circle( posx, posy, radius )
+	{
+	    m_x = posx;
+	    m_y = posy;
+	    m_r = radius;
+	}
+	function setX( posx ) { m_x = posy; }
+	function setY( posy ) { m_y = posy; }
+	function setR( radius ) { m_r = radius; }
+	function x() { return m_x; }
+	function y() { return m_y; }
+	function r() { return m_r; }
+    }
+
+    class ColorCircle extends Circle {
+	var m_rgb;
+
+	function ColorCircle( posx, posy, radius, rgbcolor)
+	{
+	    Circle( posx, posy, radius );
+	    m_rgb = rgbcolor;
+	}
+	function setRgb( rgbcolor ) { m_rgb = rgbcolor; }
+	function rgb() { return m_rgb; }
+    }
+\endcode
+
+A class's constructor is the function which has the same
+(case-sensitive) name as the class itself. The constructor should not
+contain an explicit return statement; it will return an object of its
+type automatically. \QS does not have a destructor function (a
+function that is called when the class is destroyed), for a class.
+
+The class's member variables are declared with \l var, and its member
+functions (methods) with \l function.
+
+The object instance itself is referred to using the \l{this
+operator}. Inside a member function of a class, member variables and
+member functions can be accessed with an explicit this
+(e.g. \c{this.x = posx;}). This is not required, but can sometimes help
+to increase visibility.
+
+\omit
+\PRELIMINARY
+\endomit
+
+\QS supports single inheritance, and if a class inherits from another
+class, the superclass's constructor can be called with \Func super().
+
+\omit 
+	Functions and variables may specify the types of their arguments and
+	return types if desired. For example:
+	\code
+	    class ColorCircle extends Circle {
+		var _rgb : Color;
+	
+		function ColorCircle(
+		    x : Integer, y : Integer, r : Integer,
+		    rgb : Color )
+		{
+		    super( x, y, r );
+		    this._rgb = rgb;
+		}
+		function setRgb( rgb : Color ) { this._rgb = rgb; }
+		function rgb() : Color { return this._rgb; }
+	    }
+	\endcode
+\endomit
+
+See also \l class, \l function, \l{Function type}, \l{function
+operator}.
+
+\sidebar Qualified Names
+
+When you declare an object of a particular type, the object itself
+becomes, in effect, a namespace. For example, in \Q there is a
+function called \c Math.sin(). If you wanted to have a \Func
+sin() function in your own class that wouldn't be a problem, because
+objects of your class would call the function using the
+\c{object.function()} syntax. The period is used to distinguish the
+namespace a particular identifier belongs to.
+
+For example, in a \Q GUI application, every application object belongs
+to the \c Application object. This can lead to some rather lengthy
+code, for example \c{Application.Dialog.ListBox.count}. Such long
+names can often be shortened, for example, within a signal handler,
+e.g.  \c{this.ListBox.count}. In practice, \Q is intelligent enough to
+work out the fully qualified name, so the code you would actually
+write is simply \c{ListBox.count}. The only time that you need to
+qualify your names is when an unqualified name is ambiguous.  \omit or
+when you're using an \link Importing imported\endlink name.\endomit
+
+\endsidebar
+
+\section2 Class Properties
+
+A property is an undeclared variable that can be written to and
+accessed if the class supports properties. The classes supporting
+properties are \l Object, the application objects and the classes
+provided by the object and wrapper factories.
+
+\code
+var obj = new Object
+object.myProperty = 100;
+\endcode
+
+The class Object does not define the variable \c myProperty, but since
+the class supports properties, we can define the variable with that
+name on the fly and use it later. Properties are associated with the
+object they are assigned to, so even though the object \c obj in the
+example above gets the property \c myProperty, it does not mean that
+other objects of type \c Object will have the \c myProperty property,
+unless explicitly stated.
+
+\omit
+\section2 Class Inheritance
+
+###
+
+\section2 Class Scopes
+
+###
+\endomit
+
+\section1 Comments
+
+\QS supports the same commenting syntax as C++. One line comments may
+appear on a line of their own, or after the statements on a line.
+Multi-line comments may appear anywhere.
+
+\code
+// A one line comment.
+
+/*
+    A multi-line
+    comment.
+*/
+\endcode
+
+
+\omit
+    \section1 Importing
+
+    \PRELIMINARY
+
+    \Q has an enormous library of built-in functionality thanks to its use
+    of \QT. \QS makes it easy to extend this functionality with compiled
+    C++ modules, and with \QS modules, using the import mechanism described
+    in the following sections.
+
+    \section2 Adding Modules to a Project
+\endomit
+
+\omit
+\section1 Adding Modules to a Project
+
+A \QS file can be added to a project using \QD. 
+    this will cause the \File .qs file to be added to the list of
+    \c{DESIGNER_SOURCES} files in the application's \File .pro (project)
+    file. 
+
+For example, if the \Class Brick class is defined in \File Brick.qs,
+and \File Brick.qs is added to a project with \QD, brick objects can
+be created like this: 
+\code
+    var b = new Brick();
+\endcode
+Note that since \File Brick.qs has been added to the project, there is
+no need to qualify the class name.
+
+\endomit
+
+\omit
+    \section2 Importing Modules into a Project
+
+    Modules can also be imported directly in code. To import a module,
+    instead of adding it to a project using \QD, put an \l import statement
+    in one of the project's existing \File .qs files:
+    \code
+	import Brick;
+    \endcode
+    The classes in the imported module are available by using their fully
+    qualified names, for example:
+    \code
+	var b = new Brick.Brick();
+    \endcode
+    Programmers are free to create their own aliases if they wish, e.g.
+    \code
+	var BrickType = Brick.Brick;
+	var b = new BrickType();
+    \endcode
+
+    An alternative to aliasing is to use the \l with statement. This is
+    useful if several classes are to be accessed from an imported module,
+    for example:
+    \code
+	var b1, b2;
+	with ( Brick ) {
+	    b1 = new Brick;
+	    b2 = new Brick;
+	}
+    \endcode
+
+    \section2 Module Import Paths
+
+    When the \Q interpreter encounters an \l import statement, it searches
+    for a module of that name, and loads the module. \Q modules
+    may be implemented in \QS or as C++ libraries (\File .DLL files on
+    Windows, \File .so files on Unix).
+
+    The following example illustrates the mechanism.
+
+    Suppose there is a module for working with roman numerals, and a
+    programmer writes the following \l import statement to access its
+    functionality:
+    \code
+	import Math.Roman;
+    \endcode
+
+    As soon as \Q finds a matching module it will load that module and
+    stop searching further. The process by which \Q looks for the module
+    is described below.
+
+    Any periods '.' that appear in the module name are converted into path
+    separators appropriate for the underlying platform. The paths listed
+    below use the Windows convention, but on a Unix machine, for example,
+    \c / would be used as the path separator.
+
+    Some platforms support case-sensitive filenames, and some platforms do
+    not. \Q looks for files using the case specified in the \l import
+    statement. If that fails, \Q lowercases the filename part and tries
+    again. If that fails, \Q lowercases the entire path and tries again.
+
+    If no matching \File .qs file is found then \Q will look for a shared
+    library file \File .DLL on Windows, \File .so on Unix.
+
+    Assuming that \c $QTSCRIPT_PACKAGES path is
+    \c{~/qtscriptlib:/usr/local/lib/qtscript/1.0.0} (i.e. \c
+    %QTSCRIPT_PACKAGES% is \c{%HOME%\qtscriptlib;C:\Program
+    Files\Trolltech\Qt Script\1.0.0\Lib} on Windows), \Q would next search
+    as follows:
+    \list
+    \i \File{%HOME%\\Math\\Roman.qs}
+    \i \File{%HOME%\\Math\\Roman.dll}
+    \i \File{C:\\Program Files\\Trolltech\\Qt Script\\1.0.0\\Lib\\Math\\Roman.qs}
+    \i \File{C:\\Program Files\\Trolltech\\Qt Script\\1.0.0\\Lib\\Math\\Roman.dll}
+    \endlist
+
+    For \QSA users, additional paths can be set in the \QSAD project. At
+    runtime, paths can be retrieved with \c{System.getenv(
+    'QTSCRIPT_PACKAGES' )} and set using \c{System.setenv(
+    'QTSCRIPT_PACKAGES', newPaths )}. 
+
+    \Q stops searching as soon as it finds a matching file, and attempts
+    to load the file.
+
+    \Q defines two exceptions for import errors:
+    \Func ImportNotFoundException, and \Func ImportFailedException. (See
+    \l{Built-in Exceptions}.)
+
+    \section2 Packages and Modules
+
+    \Q only permits global functions, variables and constants to be
+    defined in the \File .qs file that contains the \Func main() function.
+    Other \File .qs files may only contain \l class definitions. Class
+    definitions can include functions, variables and constants, and if no
+    object is required, such functions, variables and constants can be
+    made static so that they are available in the same way as \Func
+    Math.sin(), etc.
+
+    Example:
+    \code
+	// File: %QTSCRIPT_PACKAGES%\Math\Stats.qs
+	class Statistics {
+	    static function average( x )
+	    {
+		var total = 0;
+		for ( var i = 0; i < x.length; i++ ) {
+		    total += x[ i ]
+		}
+		return total / x.length;
+	    }
+	}
+	class Constants {
+	    static const MAX_HEIGHT = 1024;
+	}
+    \endcode
+    In this example, the \File Stats.qs file contains two class
+    definitions. The first provides the static function \Func average(),
+    which is used as follows:
+    \code
+	import Stats;
+	var x = Stats.Statistics.average( [ 1, 3, 5, 7, 9 ] );
+    \endcode
+    The second provides a static constant:
+    \code
+	import Stats;
+	var z = Stats.Constants.MAX_HEIGHT * 2;
+    \endcode
+    If several functions and constants in the \File Stats.qs file were
+    being used, nested \l with statements an shorten the code:
+    \code
+	var x, y, z;
+	with ( Stats.Statistics ) {
+	    with ( Stats.Constants ) {
+		x = average( [ 1, 3, 5, 7, 9 ] );
+		y = average( [ 2, 4, 8, 16, 32 ] );
+		z = MAX_HEIGHT * 2;
+	    }
+	}
+    \endcode
+
+\endomit

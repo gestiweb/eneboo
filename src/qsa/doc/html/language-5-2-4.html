@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:409 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Logical Operators</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-2-3.html">Prev: String Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-5.html">Next: Comparison Operators</a>]</p>
+<h4 align="center">Logical Operators</h4>
+<p>These operators are used to evaluate whether their operands are <tt>true</tt> or <tt>false</tt> in terms of the operator (for unary operators) and in terms of each other (for binary operators).</p>
+<p>The binary operators use short-circuit logic, i.e. they do not evaluate their second operand if the logical value of the expression can be determined by evaluating the first operand alone.</p>
+<h5><a name="1"></a>&amp;&amp; operator</h5>
+<p><tt>operand1 &amp;&amp; operand2</tt></p>
+<p>This operator returns an object whose value is <tt>true</tt> if both its operands are <tt>true</tt>; otherwise it returns an object whose value is <em>false</em>.</p>
+<p>Specifically, if the value of <em>operand1</em> is <tt>false</tt>, the operator returns <em>operand1</em> as its result. If <em>operand1</em> is <tt>true</tt>, the operator returns <em>operand2</em>.</p>
+<h5><a name="2"></a>|| operator</h5>
+<p><tt>operand1 || operand2</tt></p>
+<p>This operator returns an object whose value is <tt>true</tt> if either of its operands are <tt>true</tt>; otherwise it returns an object whose value is <em>false</em>.</p>
+<p>Specifically, if the value of <em>operand1</em> is <tt>true</tt>, the operator returns <em>operand1</em> as its result. If <em>operand1</em> is <tt>false</tt>, the operator returns <em>operand2</em>.</p>
+<h5><a name="3"></a>! operator</h5>
+<p><tt>! operand</tt></p>
+<p>If the <em>operand</em>'s value is <tt>true</tt>, this operator returns <tt>false</tt>; otherwise it returns <tt>true</tt>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-5-2-3.html">Prev: String Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-5.html">Next: Comparison Operators</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

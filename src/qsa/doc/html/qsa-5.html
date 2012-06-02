@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- qsabook/chap-creating-scripts2.leaf:3 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Creating Qt Scripts</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="qsa-4.html">Prev: How to Design and Implement Application Objects</a>] [<a href="qsa.html">Home</a>]</p>
+<h2 align="center">Creating Qt Scripts</h2>
+<p>In this chapter we'll demonstrate how to create scripts for a scriptable application using <font color=darkmagenta>QSA Workbench</font>, a scripting environment for managing, creating, and running scripts. <font color=darkmagenta>QSA Workbench</font> provides a code completion feature that makes writing scripts easier. We will explain how to create a dialog using <font color=darkmagenta>Qt Script</font> and then create and implement a convertToEuro() function. We will write the scripts using the <tt>spreadsheet</tt> application that we created in the previous chapter.</p>
+<p align="center"><img align="middle" src="dialog1.png" width="344" height="214">
+</p>
+<blockquote><p align="center"><em>Settings for Euro Converter Finished Dialog</em></p></blockquote>
+<h3><a name="1"></a>Creating a New Macro</h3>
+<p>A 'Macro' is simply a global <font color=darkmagenta>Qt Script</font> function.</p>
+<p>Run the <tt>spreadsheet</tt> application if it isn't already running. Click the <font color=darkmagenta>New</font> button located on the Scripts toolbar to invoke the <i>New Macro</i> dialog. Once we create a new macro, a toolbar button will appear on the Scripts toolbar as a shortcut to execute the macro.</p>
+<p align="center"><img align="middle" src="newscript.png" width="90" height="31">
+</p>
+<blockquote><p align="center"><em>New Macro Toolbar Button</em></p></blockquote>
+<p>Follow the steps below to create the new macro:</p>
+<ul><li><p>The combobox is labelled 'Call Function'. Enter the name of the new global function. Functions that already exist can be viewed by clicking the arrow on the combobox, or by typing the name of the function in the combobox.</p>
+<li><p>In addition to the function name, the macro can have a 'display name' that appears, for example, in the application's <b>Scripts</b> menu. Enter 'Euro Conversion' in the 'Name' line edit.</p>
+<li><p>If you want to associate an icon with the macro, click the ellipsis button (<font color=darkblue>...</font>) to invoke the <i>Open File</i> dialog and select an icon to represent the macro. The icon will appear on the application's toolbar as a shortcut to the script you create.</p>
+</ul><p>Click <b>OK</b> when you have entered the information in the <i>New Script</i> dialog. The <i>Add Function</i> message box will pop up, saying "The function doesn't exist. Do you want to add it?". Click <font color=darkblue>Yes</font>.</p>
+<p align="center"><img align="middle" src="addfunction.png" width="359" height="175">
+</p>
+<blockquote><p align="center"><em>Adding the New Function</em></p></blockquote>
+<p><font color=darkmagenta>QSA Workbench</font> opens with the new empty function added to it. We will implement the scripting function in the following section.</p>
+<h3><a name="2"></a>Implementing the Macro and Creating a Dialog</h3>
+<p>In this section, we will implement the functionality of the convert-to-euro macro. We want to present the user with a dialog in which they can: 1) enter a range of rows and columns which are read from the spreadsheet, 2) specify where in the spreadsheet the results should be written, and 3) select a currency type to convert into Euros.</p>
+<p>In the <font color=darkmagenta>QSA Workbench</font> editor, we write the code to calculate the input values which are the input column, start row, end row, and ouput column. We initialize these variables to 1, but if the user selects a range in the spreadsheet, we then use the selection for the initial values.</p>
+<pre>        var inputCol = 1;
+        var startRow = 1;
+        var endRow = 1;
+        var outputCol = 1;
+        if ( Application.sheet1.numSelections &gt; 0 ) {
+            var sel = Application.sheet1.selection( 0 );
+            inputCol = sel.x + 1;
+            outputCol = inputCol + 1;
+            startRow = sel.y + 1;
+            endRow = sel.bottom + 1;
+        }
+</pre>
+ <p>In <font color=darkmagenta>Qt Script</font>, we have some global objects. The most important one for our example is called <tt>Application</tt>. This object contains application objects. Application objects are the objects that the C++ application makes available to our script. In the <tt>spreadsheet</tt> example, the sheets are available this way, e.g., Application.sheet1.</p>
+<p>To create a new dialog, write the following code. An explanation of the code will follow.</p>
+<pre>        d = new Dialog;
+        d.caption = "Settings for Euro Converter";
+        d.okButtonText = "Calculate";
+        d.cancelButtonText = "Cancel";
+</pre>
+ <p>Every dialog includes an Ok and Cancel button by default. After creating the new dialog, simply change the caption property to "Settings for Euro Convertor. Change the <em>text</em> of the OK Button to 'Calculate'. Change the <em>text</em> property of the Cancel button to 'Cancel'.</p>
+<h3><a name="3"></a>Adding Widgets to the Dialog</h3>
+<p>The Settings for Euro dialog consists of three spinboxes for selecting the columns and rows on the spreadsheet, a spinbox to output the result of the conversion, a group box to lay out the spinboxes, three radiobuttons in a group box to select the currency to convert from, and text labels for each of the widgets. If you run the dialog application and resize it, all the widgets scale properly. The layout of the widgets is determined by the order in which you add them to the dialog or the group box.</p>
+<h4><a name="3-1"></a>Add A Group Box and Spin boxes</h4>
+<p>We'll start with the first group box and its widgets. Write the following code in the editor to create the group box:</p>
+<pre>        var g = new GroupBox;
+        g.title = "Conversion Range:";
+        d.add( g );
+</pre>
+ <p>This code creates the new group box. Set its <em>title</em> to "Conversion Range:". Then add the group box to the dialog. Note that every time a widget is created, it must be added its parent.</p>
+<p>Write the following code to add multiple spin boxes and text labels to the group box:</p>
+<pre>        var spinColumn = new SpinBox;
+        spinColumn.label = "Column:";
+        spinColumn.minimum = 1;
+        spinColumn.maximum = 100;
+        spinColumn.value = inputCol;
+        g.add( spinColumn );
+
+        var spinStartRow = new SpinBox;
+        spinStartRow.label = "Start at Row:";
+        spinStartRow.minimum = 1;
+        spinStartRow.maximum = 100;
+        spinStartRow.value = startRow;
+        g.add( spinStartRow );
+
+        var spinEndRow = new SpinBox;
+        spinEndRow.label = "End at Row:";
+        spinEndRow.minimum = 1;
+        spinEndRow.maximum = 100;
+        spinEndRow.value = endRow;
+        g.add( spinEndRow );
+
+        var spinOutput = new SpinBox;
+        spinOutput.label = "Output Column:";
+        spinOutput.minimum = 1;
+        spinOutput.maximum = 100;
+        spinOutput.value = outputCol;
+        g.add( spinOutput );
+</pre>
+ <p>With this code, we create the first spin box in the group box and and name it spinColumn. This spin box corresponds to the column in the spreadsheet from which the numbers will be read. Set the <em>label</em> property to "Column:". Set the <em>minimum</em> property to 1 and the <em>maximum</em> property to 100. Set the <em>number</em> property to the calculated input column. Add the spin box to the group box.</p>
+<p>Create the second spin box and name it spinStartRow. This spin box corresponds to first row in the spreadsheet from which the numbers will be read. Set the <em>label</em> property to "Start at Row:". Set the <em>minimum</em> property to 1 and the <em>maximum</em> property to 100. Set the <em>number</em> property to the calculated start row. Add the spin box to the group box.</p>
+<p>Create the third spin box and and name it spinEndRow. This spin box corresponds to the last row in the spreadsheet from which the numbers will be read. Set the <em>label</em> property to "Start at Row:". Set the <em>minimum</em> property to 1 and the <em>maximum</em> property to 100. Set the <em>number</em> property to the calculated end row. Add the spin box to the group box.</p>
+<p>Create the fourth spin box and and name it spinOutput. This spin box corresponds to the column in the spreadsheet to which the converted values will be returned. Set the <em>label</em> property to "Start at Row:". Set the <em>minimum</em> property to 1 and the <em>maximum</em> property to 100. Set the <em>number</em> property to the calculated output column. Add the spin box to the group box.</p>
+<h4><a name="3-2"></a>Widget Lay Out</h4>
+<p>We'll add a column to the dialog to set layout so that the new group box will be added beside the current group box.:</p>
+<pre>        d.newColumn();
+</pre>
+<h4><a name="3-3"></a> Add a Group Box and Radio Buttons</h4>
+<p>Now we'll add the second group box and its widgets. Write the following code to create the second group box:</p>
+<pre>        var g = new GroupBox;
+        g.title = "Conversion Range:";
+        d.add( g );
+</pre>
+ <p>This code creates the new group box similar to the first group box we created earlier in the chapter. Change the <em>title</em> property to "Convert From:". Add the group box to the dialog.</p>
+<p>Write the following code to add multiple radio buttons to the group box:</p>
+<pre>        var radioUSD = new RadioButton;
+        radioUSD.text = "USD";
+        radioUSD.checked = true;
+        g.add(radioUSD);
+        var radioYEN = new RadioButton;
+        radioYEN.text = "YEN";
+        g.add(radioYEN);
+        var radioNOK = new RadioButton;
+        radioNOK.text = "NOK";
+        g.add(radioNOK);
+</pre>
+ <p>We create the first radio button and name it radioUSD. Set its <em>text</em> property to "USD". Set the <em>checked</em> property to true to make this radio button checked. Add the radio button to the group box.</p>
+<p>Create the second radio button and name it radioYEN. Set its <em>text</em> property to "YEN". Add the radio button to the group box.</p>
+<p>Create the third radio button and name it radioNOK. Set its <em>text</em> property to "NOK". Add the radio button to the group box.</p>
+<h3><a name="4"></a>Running the Dialog</h3>
+<p>To run the dialog, click the <font color=darkblue>Call Function</font> button in <font color=darkmagenta>QSA Workbench</font>. The Call Function dialog pops up with a drop down list of functions you created. Select convertToEuro and click <b>OK</b>. The Output Window displays errors found in the code.</p>
+<p>The first block of code reads what currency the user chose and then initializes the divisor accordingly.</p>
+<pre>        var divisor;
+
+        if( radioUSD.checked )
+            divisor = 0.930492;
+        else if( radioYEN.checked )
+            divisor = 0.007677;
+        else if ( radioNOK.checked )
+            divisor = 0.133828;
+</pre>
+ <p>The second block of code reads the range that the user has entered in the dialog.</p>
+<pre>        inputCol = spinColumn.value - 1;
+        outputCol = spinOutput.value - 1;
+        startRow = spinStartRow.value - 1;
+        endRow = spinEndRow.value - 1;
+</pre>
+ <p>The third block of code checks that the entered range is valid. If it is not valid, a warning is issued and the operation is canceled.</p>
+<pre>        if ( endRow &lt; startRow ) {
+            MessageBox.critical( "Cannot calculate!", "Error" );
+            return;
+        }
+</pre>
+ <p>The fourth block of code reads the value from the spreadsheet, calculates the results and then writes the results to the spreadsheet.</p>
+<pre>        for ( var i = startRow; i &lt;= endRow; ++i ) {
+            var input = Application.sheet1.text( i, inputCol );
+            Application.sheet1.setText( i, outputCol,
+                                        Math.round( input / divisor * 100 ) / 100 );
+        }
+</pre>
+<h3><a name="5"></a> Running the EuroConvertor Macro</h3>
+<p>We are now ready to run the macro and invoke the dialog we just created.</p>
+<ul><li><p>In the spreadsheet, type a few numbers in column A, rows 1-3.</p>
+<li><p>Select the cells you entered the numbers into so that they are highlighted.</p>
+<li><p>Click the <font color=darkmagenta>Euro Conversion</font> toolbar button. The <i>Settings for Euro Converter</i> dialog pops up.</p>
+<li><p>The 'Column', 'Start at Row', 'End at Row' and 'Output Column' spinboxes are defaulted to the selection you made on the spreadsheet.</p>
+<li><p>Select a currency to convert the numbers you entered on the spreadsheet to euro.</p>
+<li><p>Click <font color=darkblue>Calculate</font>.</p>
+<li><p>The results of the conversion are output starting at the 'Output Column' indicated in the dialog.</p>
+</ul><p>We've now coded a dialog and written the code to provide its functionality, all purely using <font color=darkmagenta>Qt Script</font>. This should provide a taste of the power and flexibility that <font color=darkmagenta>Qt Script for Applications</font> can provide for your <a href= http://doc.trolltech.com >Qt</a> C++ applications.</p>
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

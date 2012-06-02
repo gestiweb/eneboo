@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsinterpreter.cpp:91 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSStackFrame Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSStackFrame Class Reference</h1>
+
+<p>The QSStackFrame class provides information about a function call
+in the stack trace.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsinterpreter-h.html">qsinterpreter.h</a>&gt;</tt>
+<p><a href="qsstackframe-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn>QString <a href="#scriptName"><b>scriptName</b></a> () const</li>
+<li class=fn>QString <a href="#function"><b>function</b></a> () const</li>
+<li class=fn>int <a href="#line"><b>line</b></a> () const</li>
+<li class=fn>QObject * <a href="#context"><b>context</b></a> () const</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSStackFrame class provides information about a function call
+in the stack trace.
+<p> A QSStackFrame object only makes sense when grouped together in a
+<a href="qsstacktrace.html">QSStackTrace</a> to provide a trace of the execution up to where an
+error occurred.
+<p> The QSStackFrame contains four values: file name, line number,
+function name, and context.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn>QObject * <a name="context"></a>QSStackFrame::context () const
+</h3>
+
+<p> Returns the context of the function if it was evaluated in the
+context of a QObject; otherwise returns 0.
+
+<h3 class=fn>QString <a name="function"></a>QSStackFrame::function () const
+</h3>
+
+<p> Returns the name of the function that this stack frame describes.
+
+<h3 class=fn>int <a name="line"></a>QSStackFrame::line () const
+</h3>
+
+<p> Returns the line number within the script.
+
+<h3 class=fn>QString <a name="scriptName"></a>QSStackFrame::scriptName () const
+</h3>
+
+<p> Returns the name of the script in which the function is located if
+the script name was specified when the function was evaluated;
+otherwise returns QString::null.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

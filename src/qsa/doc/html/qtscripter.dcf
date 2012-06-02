@@ -1,0 +1,9 @@
+<!DOCTYPE DCF>
+<DCF ref="qtscripter.html" icon="qtscripter.png" imagedir="../../gif" title="QSA Workbench Manual">
+<section ref="qtscripter-1.html" title="Preface"/>
+<section ref="qtscripter-2.html" title="Reference: Key Bindings"/>
+<section ref="qtscripter-3.html" title="Reference: Menu Options"/>
+<section ref="qtscripter-4.html" title="Reference: Toolbar Buttons"/>
+<section ref="qtscripter-5.html" title="Reference: Dialogs"/>
+<section ref="qtscripter-6.html" title="Reference: Windows"/>
+</DCF>

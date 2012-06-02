@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/language-concepts.leaf:254 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Class Properties</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-2-2.html">Prev: Classes and Methods</a>] [<a href="language.html">Home</a>] [<a href="language-2-3.html">Next: Comments</a>]</p>
+<h4 align="center">Class Properties</h4>
+<p>A property is an undeclared variable that can be written to and accessed if the class supports properties. The classes supporting properties are <a href="language-3-1-6.html">Object</a>, the application objects and the classes provided by the object and wrapper factories.</p>
+<pre>
+var obj = new Object
+object.myProperty = 100;
+</pre>
+<p>The class Object does not define the variable <tt>myProperty</tt>, but since the class supports properties, we can define the variable with that name on the fly and use it later. Properties are associated with the object they are assigned to, so even though the object <tt>obj</tt> in the example above gets the property <tt>myProperty</tt>, it does not mean that other objects of type <tt>Object</tt> will have the <tt>myProperty</tt> property, unless explicitly stated.</p>
+<!-- eof -->
+<p align="right">[<a href="language-2-2.html">Prev: Classes and Methods</a>] [<a href="language.html">Home</a>] [<a href="language-2-3.html">Next: Comments</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

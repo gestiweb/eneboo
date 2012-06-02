@@ -1,0 +1,427 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsproject.cpp:87 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSProject Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSProject Class Reference</h1>
+
+<p>The QSProject class provides project management over scripts
+written in Qt Script for Applications.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsproject-h.html">qsproject.h</a>&gt;</tt>
+<p><a href="qsproject-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn>enum <a href="#StorageMode-enum"><b>StorageMode</b></a> { Bundle, TextFiles }</li>
+<li class=fn><a href="#QSProject"><b>QSProject</b></a> ( QObject&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )</li>
+<li class=fn>bool <a href="#editorsModified"><b>editorsModified</b></a> () const</li>
+<li class=fn>bool <a href="#scriptsModified"><b>scriptsModified</b></a> () const</li>
+<li class=fn>QSInterpreter * <a href="#interpreter"><b>interpreter</b></a> () const</li>
+<li class=fn>QStringList <a href="#scriptNames"><b>scriptNames</b></a> () const</li>
+<li class=fn>QPtrList&lt;QSScript&gt; <a href="#scripts"><b>scripts</b></a> () const</li>
+<li class=fn>QSScript * <a href="#script"><b>script</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;name ) const</li>
+<li class=fn>QSScript * <a href="#script-2"><b>script</b></a> ( QObject&nbsp;*&nbsp;context ) const</li>
+<li class=fn>QObject * <a href="#object"><b>object</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;name ) const</li>
+<li class=fn>QObjectList <a href="#objects"><b>objects</b></a> () const</li>
+<li class=fn>QSScript * <a href="#createScript"><b>createScript</b></a> ( QObject&nbsp;*&nbsp;context, const&nbsp;QString&nbsp;&amp;&nbsp;code = QString::null )</li>
+<li class=fn>QSScript * <a href="#createScript-2"><b>createScript</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;name, const&nbsp;QString&nbsp;&amp;&nbsp;code = QString::null )</li>
+<li class=fn>void <a href="#addSignalHandler"><b>addSignalHandler</b></a> ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, QObject&nbsp;*&nbsp;receiver, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )</li>
+<li class=fn>void <a href="#addSignalHandler-2"><b>addSignalHandler</b></a> ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )</li>
+<li class=fn>void <a href="#removeSignalHandler"><b>removeSignalHandler</b></a> ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, QObject&nbsp;*&nbsp;receiver, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )</li>
+<li class=fn>void <a href="#removeSignalHandler-2"><b>removeSignalHandler</b></a> ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )</li>
+<li class=fn>QSEditor * <a href="#activeEditor"><b>activeEditor</b></a> () const</li>
+<li class=fn>QPtrList&lt;QSEditor&gt; <a href="#editors"><b>editors</b></a> () const</li>
+<li class=fn>QSEditor * <a href="#editor"><b>editor</b></a> ( QSScript&nbsp;*&nbsp;script ) const</li>
+<li class=fn>QSEditor * <a href="#createEditor"><b>createEditor</b></a> ( QSScript&nbsp;*&nbsp;script, QWidget&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )</li>
+<li class=fn>void <a href="#setStorageMode"><b>setStorageMode</b></a> ( StorageMode&nbsp;mode )</li>
+<li class=fn>StorageMode <a href="#storageMode"><b>storageMode</b></a> () const</li>
+</ul>
+<h2>Public Slots</h2>
+<ul>
+<li class=fn>bool <a href="#load"><b>load</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;projectFile )</li>
+<li class=fn>bool <a href="#save"><b>save</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;projectFile = QString::null )</li>
+<li class=fn>bool <a href="#loadFromData"><b>loadFromData</b></a> ( QByteArray&nbsp;projectData )</li>
+<li class=fn>bool <a href="#saveToData"><b>saveToData</b></a> ( QByteArray&nbsp;data )</li>
+<li class=fn>void <a href="#clearObjects"><b>clearObjects</b></a> ()</li>
+<li class=fn>void <a href="#addObject"><b>addObject</b></a> ( QObject&nbsp;*&nbsp;object )</li>
+<li class=fn>void <a href="#removeObject"><b>removeObject</b></a> ( const&nbsp;QObject&nbsp;*&nbsp;object )</li>
+<li class=fn>void <a href="#commitEditorContents"><b>commitEditorContents</b></a> ()</li>
+<li class=fn>void <a href="#revertEditorContents"><b>revertEditorContents</b></a> ()</li>
+</ul>
+<h2>Signals</h2>
+<ul>
+<li class=fn>void <a href="#editorTextChanged"><b>editorTextChanged</b></a> ()</li>
+<li class=fn>void <a href="#projectChanged"><b>projectChanged</b></a> ()</li>
+<li class=fn>void <a href="#projectEvaluated"><b>projectEvaluated</b></a> ()</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSProject class provides project management over scripts
+written in Qt Script for Applications.
+<p> The project's interpreter can be accessed through the function
+<a href="#interpreter">interpreter</a>().
+<p> Scripts are encapsulated as instances of the class <a href="qsscript.html">QSScript</a>. QSScript
+objects are created by using the <a href="#createScript">createScript</a>() functions. It is
+possible to query the project for scripts using the functions <a href="#scripts">scripts</a>(),
+<a href="#scriptNames">scriptNames</a>(), and <a href="#script">script</a>().
+<p> It is possible to associate a QSScript with a context object,
+meaning that the script will be evaluated in the context of that
+object. If a script and an object have the same name, they are
+grouped together.
+<p> Objects are added to the project with <a href="#addObject">addObject</a>() and removed from
+the project with <a href="#removeObject">removeObject</a>(). To query the project's objects, use
+the <a href="#object">object</a>() and <a href="#objects">objects</a>() functions. Note that objects added to the
+project become persistant, meaning that when the interpreter is
+cleared, they will still be scriptable. This is in contrast to
+objects added to the interpreter using the
+<a href="qsinterpreter.html#addTransientObject">QSInterpreter::addTransientObject</a>() function, which will not be
+available after the interpreter is cleared.
+<p> A project can be stored on disk and loaded again using the <a href="#load">load</a>()
+and <a href="#save">save</a>() functions. It is also possible to write the project to a
+data buffer that can be used in conjunction with other applications
+by using the <a href="#loadFromData">loadFromData</a>() and <a href="#saveToData">saveToData</a>() functions.
+<p> The project also manages editors for the scripts it holds. Editors
+can be created using <a href="#createEditor">createEditor</a>(), and can be queried using the
+<a href="#editors">editors</a>(), <a href="#editor">editor</a>(), and <a href="#activeEditor">activeEditor</a>() functions. When text changes
+in the interpreter, the <a href="#editorsModified">editorsModified</a>() signal is emitted. Before
+the changes are reflected in the script, the <a href="#commitEditorContents">commitEditorContents</a>()
+function must be called. To revert the editors to the code in the
+scripts use <a href="#revertEditorContents">revertEditorContents</a>().
+<p> When the editors are committed, the scripts will be out of sync with
+the state of the interpreter. The <a href="#scriptsModified">scriptsModified</a>() signal is
+emitted to indicate this situation.
+<p> Several actions in the interpreter will trigger re-evaluation of the
+project; consequently, the interpreter will be cleared and the
+scripts re-evaluated. Such actions include modifying scripts and
+removing objects. For this reason it is unwise to have executing
+script code (such as calling application functionality) outside of
+functions when using a QSProject. Non-executing script code (such as
+declaration of global variables) is safe.
+<p> The <a href="#addSignalHandler">addSignalHandler</a>() and <a href="#removeSignalHandler">removeSignalHandler</a>() functions can
+be used to connect and disconnect signals and slots from C++ to
+Qt Script.
+<p> Note on threading; The QSProject class cannot be used outside
+the GUI thread.
+<p> See the <a href="qsa.html">Manual</a> for more explanations and
+examples.
+<p> <p>See also <a href="qsscript.html">QSScript</a>, <a href="qseditor.html">QSEditor</a>, and <a href="qsinterpreter.html">QSInterpreter</a>.
+
+<hr><h2>Member Type Documentation</h2>
+<h3 class=fn><a name="StorageMode-enum"></a>QSProject::StorageMode</h3> 
+<p> The StorageMode enum describes the format of the project files when
+they are stored with <a href="#save">QSProject::save</a>()
+<ul>
+<li><tt>QSProject::Bundle</tt> - The project file is saved as one binary bundle. This
+format is easily portable, but the scripts cannot be edited in an
+external editor (This was the default for QSA 1.0).
+<li><tt>QSProject::TextFiles</tt> - The project file stores only the script file name,
+and saves the script file as a separate file. This allows editing of
+script files with an external editor. This is the default for QSA
+1.1 and later.
+</ul>
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSProject"></a>QSProject::QSProject ( QObject&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )
+</h3>
+Constructs a QSProject with parent <em>parent</em> and <em>name</em> being
+passed to the QObject constructor.
+
+<h3 class=fn><a href="qseditor.html">QSEditor</a>&nbsp;* <a name="activeEditor"></a>QSProject::activeEditor () const
+</h3> 
+Returns the editor which is currently editing the project; if no
+editor is active returns 0.
+
+<h3 class=fn>void <a name="addObject"></a>QSProject::addObject ( QObject&nbsp;*&nbsp;object )<tt> [slot]</tt>
+</h3>
+Makes the QObject <em>object</em> available to the scripting engine. All child
+objects of <em>object</em> are also made available, recursivly.
+<p> If no object in the parent hierarchy of <em>object</em> has been added via
+<a href="#addObject">addObject</a>(), <em>object</em> will be made available as a toplevel object to
+the programmer and will be accessible via <tt>Application.object_name</tt>
+(where <tt>object_name</tt> is the value of <em>object</em>'s QObject::name()
+property).
+<p> If an object in the parent hierarchy of <em>object</em> has been made available
+via addObject(), <em>object</em> will not be made available as a
+toplevel object. It is then accessible through <tt>parent1.parent2.object_name</tt> in the scripting language, assuming that <tt>parent1</tt> has previously been made available via addObject(). The
+reason to make an object available this way even though it is not
+made available as a toplevel object, is so that code can be added in
+the context of that object.
+<p> Objects added with this function are persistent. This means that
+when the interpreter is cleared, either by calling <a href="qsinterpreter.html#clear">QSInterpreter::clear</a>()
+or by modifying the scripts, these objects will remain available
+to the scripting engine.
+<p> If a script exists in the project that has the same name as <em>object</em>,
+the script will be evaluated with <em>object</em> as context.
+<p> Note on threading; If the interpreter is running in the non-GUI thread,
+<em>object</em> cannot be a QWidget subclass.
+<p> <b>Warning:</b> Every object passed to this function must have a unique
+name.
+<p> <p>See also <a href="qsinterpreter.html#addTransientObject">QSInterpreter::addTransientObject</a>(), <a href="#removeObject">removeObject</a>(), <a href="#clearObjects">clearObjects</a>(), and <a href="#object">object</a>().
+
+<h3 class=fn>void <a name="addSignalHandler"></a>QSProject::addSignalHandler ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, QObject&nbsp;*&nbsp;receiver, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )
+</h3>
+Adds the Qt Script function <em>qtscriptFunction</em> in the context of
+<em>receiver</em> as a signal handler for the C++ signal <em>signal</em> of the
+object <em>sender</em>.
+<p> Example:
+<pre>
+  project-&gt;addSignalHandler(myButton, SIGNAL(clicked()), document, "startCalculation");
+  </pre>
+ 
+<p> <p>See also <a href="#removeSignalHandler">removeSignalHandler</a>().
+
+<h3 class=fn>void <a name="addSignalHandler-2"></a>QSProject::addSignalHandler ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )
+</h3>
+Adds the Qt Script function <em>qtscriptFunction</em> (fully qualified)
+as a signal handler for the C++ signal <em>signal</em> of the object <em>sender</em>.
+<p> Example:
+<pre>
+  project-&gt;addSignalHandler(myButton, SIGNAL(clicked()), "a.b.startCalculation");
+  </pre>
+ 
+<p> <p>See also <a href="#removeSignalHandler">removeSignalHandler</a>().
+
+<h3 class=fn>void <a name="clearObjects"></a>QSProject::clearObjects ()<tt> [slot]</tt>
+</h3>
+Removes all application objects from the list of available
+objects.
+<p> QSProject does not take ownership of the objects, so the objects
+are not deleted.
+<p> <p>See also <a href="#addObject">addObject</a>(), <a href="#removeObject">removeObject</a>(), <a href="#object">object</a>(), and <a href="qsinterpreter.html#addTransientObject">QSInterpreter::addTransientObject</a>().
+
+<h3 class=fn>void <a name="commitEditorContents"></a>QSProject::commitEditorContents ()<tt> [slot]</tt>
+</h3>
+Updates the scripts with the content of the editors.
+<p> For each editor that is changed, commit() is called, propagating
+the changes in the editor into the script it is currently editing.
+<p> After a call to commitEditorContents, the project will no longer be
+modified.
+<p> <p>See also <a href="#editorsModified">editorsModified</a>() and <a href="#revertEditorContents">revertEditorContents</a>().
+
+<h3 class=fn><a href="qseditor.html">QSEditor</a>&nbsp;* <a name="createEditor"></a>QSProject::createEditor ( <a href="qsscript.html">QSScript</a>&nbsp;*&nbsp;script, QWidget&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )
+</h3>
+Creates a new editor for the script <em>script</em> with the parent
+<em>parent</em> and name <em>name</em>.
+<p> If <em>script</em> does not belong to the current project, 0 is returned.
+<p> If an editor already exists for the given script, the existing editor
+is returned.
+
+<h3 class=fn><a href="qsscript.html">QSScript</a>&nbsp;* <a name="createScript"></a>QSProject::createScript ( QObject&nbsp;*&nbsp;context, const&nbsp;QString&nbsp;&amp;&nbsp;code = QString::null )
+</h3>
+Creates a script with context <em>context</em> and source code <em>code</em>.
+<p> The context is added to this project's list of objects.
+<p> If a script already exists for this context, 0 is returned.
+
+<h3 class=fn><a href="qsscript.html">QSScript</a>&nbsp;* <a name="createScript-2"></a>QSProject::createScript ( const&nbsp;QString&nbsp;&amp;&nbsp;name, const&nbsp;QString&nbsp;&amp;&nbsp;code = QString::null )
+</h3>
+Creates a script called <em>name</em> and source code <em>code</em> without
+a context.
+<p> If an object exists in the project with the same name as <em>name</em>,
+the object is associated with the created script and the script will
+be evaluated in the context of that object.
+<p> If a script already exists with this name, 0 is returned.
+
+<h3 class=fn><a href="qseditor.html">QSEditor</a>&nbsp;* <a name="editor"></a>QSProject::editor ( <a href="qsscript.html">QSScript</a>&nbsp;*&nbsp;script ) const
+</h3>
+Returns the editor for the script <em>script</em> if the editor
+exists; otherwise returns 0.
+
+<h3 class=fn>void <a name="editorTextChanged"></a>QSProject::editorTextChanged ()<tt> [signal]</tt>
+</h3>
+
+<p> This signal is emitted whenever text changes in one of the editors
+that the project currently manages.
+
+<h3 class=fn>QPtrList&lt;QSEditor&gt; <a name="editors"></a>QSProject::editors () const
+</h3>
+Returns a list of all the editors for the scripts in this
+project.
+
+<h3 class=fn>bool <a name="editorsModified"></a>QSProject::editorsModified () const
+</h3>
+Returns TRUE if the project is modified; otherwise returns FALSE.
+<p> A project enters the modified state when the editors and scripts
+become out of sync. This will occur, for example, when a user edits
+a script in an editor. Before the interpreter is used, this value
+should be checked and the application should decide to either commit
+or revert the changes in the editor before the project is evaluated.
+<p> <p>See also <a href="#commitEditorContents">commitEditorContents</a>() and <a href="#revertEditorContents">revertEditorContents</a>().
+
+<h3 class=fn><a href="qsinterpreter.html">QSInterpreter</a>&nbsp;* <a name="interpreter"></a>QSProject::interpreter () const
+</h3>
+Returns the interpreter which is used to evaluate code
+for this project.
+
+<h3 class=fn>bool <a name="load"></a>QSProject::load ( const&nbsp;QString&nbsp;&amp;&nbsp;projectFile )<tt> [slot]</tt>
+</h3>
+Reads and parses the Qt Script for Applications project contained in
+the file, <em>projectFile</em>.
+<p> If an error occurs while running or parsing the script, actions
+according to the errorMode() are taken and the error() signal is
+emitted.
+<p> After <a href="#load">load</a>() is called, functions and classes defined in this
+project can be called and used through the evaluate() and call()
+functions.
+<p> If the project has signal/slot connections, for example, a form that
+connects widget signals to Qt Script slots, then the connections
+are established as part of the open() process, if the objects are
+already known to the interpreter via <a href="#addObject">QSProject::addObject</a>() or
+<a href="qsinterpreter.html#addTransientObject">QSInterpreter::addTransientObject</a>().
+
+<h3 class=fn>bool <a name="loadFromData"></a>QSProject::loadFromData ( QByteArray&nbsp;projectData )<tt> [slot]</tt>
+</h3>
+Reads and parses the Qt Script for Applications project from <em>projectData</em>.
+<p> If an error occurs while running or parsing the script, actions
+according to the errorMode() are taken and the error() signal is
+emitted.
+<p> After <a href="#loadFromData">loadFromData</a>() is called, functions and classes defined in this
+project can be called and used through the evaluate() and call()
+functions.
+<p> If the project has signal/slot connections, for example, a form that
+connects widget signals to Qt Script slots, then the connections
+are established as part of the process.
+
+<h3 class=fn>QObject * <a name="object"></a>QSProject::object ( const&nbsp;QString&nbsp;&amp;&nbsp;name ) const
+</h3>
+Returns the persistent object in the project called <em>name</em>.
+
+<h3 class=fn>QObjectList <a name="objects"></a>QSProject::objects () const
+</h3>
+Returns the list of persistent objects in the project.
+
+<h3 class=fn>void <a name="projectChanged"></a>QSProject::projectChanged ()<tt> [signal]</tt>
+</h3>
+
+<p> This signal is emitted whenever the project has changed in such a
+way that it is out of sync with the interpreter and needs to be
+re-evaluated before the interpreter is used.
+
+<h3 class=fn>void <a name="projectEvaluated"></a>QSProject::projectEvaluated ()<tt> [signal]</tt>
+</h3>
+
+<p> This signal is emitted whenever the project has been evaluated and
+the interpreter back in sync with the scripts in the project.
+
+<h3 class=fn>void <a name="removeObject"></a>QSProject::removeObject ( const&nbsp;QObject&nbsp;*&nbsp;object )<tt> [slot]</tt>
+</h3>
+Removes the persistent QObject <em>object</em> from the list of
+available objects for scripting.
+<p> Note that only persistent objects can be removed with
+this function. Objects added to the interpreter using
+QSInterpreter::addTransientObject can not be removed with this
+function.
+<p> If <em>object</em> is the context of a script, the script will
+also be removed from the project.
+<p> <p>See also <a href="#addObject">addObject</a>(), <a href="#clearObjects">clearObjects</a>(), and <a href="#object">object</a>().
+
+<h3 class=fn>void <a name="removeSignalHandler"></a>QSProject::removeSignalHandler ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, QObject&nbsp;*&nbsp;receiver, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )
+</h3>
+Removes the connection between the signal <em>signal</em> of the object
+<em>sender</em> and the signal handler <em>qtscriptFunction</em> in the
+context <em>receiver</em>.
+<p> <p>See also <a href="#addSignalHandler">addSignalHandler</a>().
+
+<h3 class=fn>void <a name="removeSignalHandler-2"></a>QSProject::removeSignalHandler ( QObject&nbsp;*&nbsp;sender, const&nbsp;char&nbsp;*&nbsp;signal, const&nbsp;char&nbsp;*&nbsp;qtscriptFunction )
+</h3>
+Removes the connection between the signal <em>signal</em> of the object
+<em>sender</em> and the fully qualified signal handler <em>qtscriptFunction</em>.
+<p> <p>See also <a href="#addSignalHandler">addSignalHandler</a>().
+
+<h3 class=fn>void <a name="revertEditorContents"></a>QSProject::revertEditorContents ()<tt> [slot]</tt>
+</h3>
+Reverts the text in the editors to the state of the scripts.
+<p> After a call to revertEditorContents, the project will no longer
+be modified.
+<p> <p>See also <a href="#editorsModified">editorsModified</a>() and <a href="#commitEditorContents">commitEditorContents</a>().
+
+<h3 class=fn>bool <a name="save"></a>QSProject::save ( const&nbsp;QString&nbsp;&amp;&nbsp;projectFile = QString::null )<tt> [slot]</tt>
+</h3>
+Saves the scripts project to the file <em>projectFile</em>
+<p> The default for <em>projectFile</em> is QString::null, in which
+case the filename used during load will be used.
+<p> <p>See also <a href="#load">load</a>().
+
+<h3 class=fn>bool <a name="saveToData"></a>QSProject::saveToData ( QByteArray&nbsp;data )<tt> [slot]</tt>
+</h3>
+Writes the the whole project to the data block <em>data</em>.
+<p> This is useful for keeping the project data with a document. For
+example, you can take the data returned by this function and store
+it in a document's file. Later, when the document is opened, you can
+extract the data from the document and pass it to the overload of
+openFromData() that takes a QByteArray to reconstruct the project.
+<p> <p>See also <a href="#loadFromData">loadFromData</a>().
+
+<h3 class=fn><a href="qsscript.html">QSScript</a>&nbsp;* <a name="script"></a>QSProject::script ( const&nbsp;QString&nbsp;&amp;&nbsp;name ) const
+</h3>
+Returns the script called <em>name</em> if it exists in the
+project; otherwise returns 0.
+
+<h3 class=fn><a href="qsscript.html">QSScript</a>&nbsp;* <a name="script-2"></a>QSProject::script ( QObject&nbsp;*&nbsp;context ) const
+</h3>
+Returns the script that has <em>context</em> as context if it
+exists in the project; otherwise returns 0.
+
+<h3 class=fn>QStringList <a name="scriptNames"></a>QSProject::scriptNames () const
+</h3>
+Returns the names of all the scripts in this project.
+
+<h3 class=fn>QPtrList&lt;QSScript&gt; <a name="scripts"></a>QSProject::scripts () const
+</h3>
+Returns a list of all the scripts in this project.
+
+<h3 class=fn>bool <a name="scriptsModified"></a>QSProject::scriptsModified () const
+</h3>
+Returns TRUE if the script has been modified and is out of sync
+with the state in the interpreter; otherwise returns FALSE.
+
+<h3 class=fn>void <a name="setStorageMode"></a>QSProject::setStorageMode ( <a href="qsproject.html#StorageMode-enum">StorageMode</a>&nbsp;mode )
+</h3>
+Sets the mode for storing projects to <em>mode</em>.
+<p> <p>See also <a href="#StorageMode-enum">StorageMode</a>.
+
+<h3 class=fn><a href="qsproject.html#StorageMode-enum">StorageMode</a> <a name="storageMode"></a>QSProject::storageMode () const
+</h3>
+Returns the storage mode used for this project.
+<p> <p>See also <a href="#StorageMode-enum">StorageMode</a>.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

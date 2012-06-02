@@ -1,0 +1,181 @@
+\chapter Debugging Qt Script Applications
+
+\section1 Introduction
+
+\QSAD includes an integrated debugger. The debugger helps you locate and
+correct programming errors. You can set breakpoints which allow you to
+run to specific points in the code from where you can single step and
+watch variables as they change. The debugger provides views of the
+call stack and variables. This chapter demonstrates how to debug \QSA
+scripts, using the Convert to Euro script as an example.
+
+
+\section1 Setting Breakpoints
+
+Script execution stops at breakpoints. Once the interpreter stops
+executing, it is possible to view the values of the variables that are
+within scope. The following steps show you how to set a breakpoint.
+
+\list 
+
+\i
+Open the Convert to Euro dialog you created in the previous
+chapter. In the File Overview window, click \c {EuroSettings [Source]}
+to open the main form and its code.
+
+\i 
+In the source code editor, find the \Func buttonCalculate_clicked()
+function. Go to the first line of code in the function, in this case,
+\c {var divisor}. Click to the left of the vertical line to set a
+breakpoint. The breakpoint is shown as a red stop sign. You can also
+move the cursor to the line where you want to set the breakpoint and
+then click the \Button Breakpoint toolbar button (\Key F9).
+
+\img dbug-setbreakpoint1.png 
+\caption Setting a Breakpoint
+
+\i
+Click the \Button {Run Function} toolbar button to invoke the \Widget
+{Choose a function to run} dialog.
+
+\img dbug-choosefunc.png
+\caption Choose a function to run dialog
+
+Choose the \Func {convertToEuro} function from the combobox and click
+\OK to run it. \Widget{The Settings for Euro Converter} dialog will appear.
+Click \Button{Calculate}. Notice that the line of code at which the
+breakpoint is set, is now highlighted. The script has stopped
+executing and the debugger is ready to step through the code. The
+\l{Call Stack window} and the \l{Watch Variables window} appear
+automatically when you click \Button {Run Function}. We will discuss
+the functionality of these windows later on in the chapter as we step
+through the code.
+
+\endlist
+
+\img dbug-stopbreakpoint1.png 
+\caption Execution Stops at Breakpoints
+
+\section1 Stepping Through Code
+
+When the code execution reaches a breakpoint, the script stops
+running. The line containing the breakpoint is highlighted. The
+debugger is now ready for you to step through the code. When stepping
+through a line of code, that line is executed and you can see the
+effects of this by viewing the \l{Call Stack window} and \l{Watch
+Variables window}s. When stepping through code, you can either step
+over, or step into the code. 
+
+\section2 Stepping Over	
+
+\img quick-debug-stepover.png
+\caption Stepping Over Toolbar Button
+
+When you step over a line of code, that line is executed and the step
+arrow (blue arrow) moves to point to the next statement in the code.
+If the statement that is executed is a function call, the call will be
+executed but the debugger will not step into the called function. 
+
+We will use the Convert to Euro example to demonstrate stepping over. At
+this point, you should have set and run to the breakpoint, so that the
+line of code at the breakpoint is highlighted. Click the \Button {Step
+Over} toolbar button (or press \Key F10). The highlighted statement is
+executed and then the step arrow appears to the left of the line.
+Continue to click \Button {Step over} to move to the next statement in
+the code.
+
+\img dbug-stepover1.png
+\caption Stepping Over Each Line of Code
+
+\section2 Stepping Into
+
+\img quick-debug-stepinto.png
+\caption Stepping Into Toolbar Button
+
+The Convert to Euro script example contains only one function so we cannot
+demonstrate stepping into another function. However, stepping into is
+a concept that is important to know when debugging.
+
+When the step arrow is pointing to a function call, the function will
+be executed and the debugger will move to the following statement. If
+you click the \Button {Step Into} toolbar button, the function will be
+called and the step arrow will be positioned at the first executable
+line of the function that was called. 
+
+\section1 Call Stack Window
+
+The Call Stack window lists functions that are currently loaded from
+the breakpoint which you have set. Call stacks are useful in debugging
+since they show which function a particular function is called
+from. The call stack window has two columns, the Function column and
+the Line column. The function name is listed in the function column
+and the line of code in the file where the function was called is listed
+in the line column. For all functions except the last one in the
+call stack, the line column shows the line number at which the 
+function call was made. For the last function listed in the stack, the
+number represents the line where execution stopped. 
+
+For our example, look at the call stack window and you will see a
+stack of two functions. If you click on one of the functions, the
+cursor will point to the line in the code where the function call was
+made.
+
+\img dbug-callstack.png
+\caption Using the Call Stack Window
+
+\section1 Watch Variables Window
+
+The Watch Variables window is used to view and change the values of
+variables as you debug the program. The window consists of the
+Variable column, the Value column and the Type column. The Variable
+column is separated into Global Variables and Local Variables. The
+variable names are listed below the appropriate variable column. The
+Value column shows the current value of each variable. The Type
+column shows what each variable's type is.
+
+\sidebar Shortcuts for Watching Variables
+
+A quick shortcut for finding out a variable's value and type is to view
+the tooltips that appear when you hover over a variable name in the
+editor window.
+
+The debugger also has a shortcut for automatically adding variable
+names to the Variables column in the Watch Variables window. To add a
+variable name, set your breakpoint and start the debugger. Press
+\Key Ctrl and move your mouse over the code. Notice that any code that
+the mouse moves over is highlighted. Highlight a variable name you
+want to select, click on it and it will appear in the variables
+column.
+
+\endsidebar 
+
+\section2 Local Variables
+
+We will use the Convert to Euro example to watch a local variable, in
+this case, divisor. Follow the steps above to set the breakpoint and
+stop at the breakpoint. Step over one time and notice that the divisor
+variable is listed as 'undefined' in the Values column of the Watch
+Variables window. Step over two more times and you will see that the
+value is now set to the value written in the source code editor.
+
+\img dbug-watchvar1.png
+\caption Watch Variables Window
+
+\img dbug-watchvar2.png
+\caption Watching the 'divisor' Local Variable
+
+\section1 Conclusion
+
+The first couple of chapters explained how to create a \QSA script,
+and this chapter has demonstrated the essentials of using \QSAD's
+debugger. You now have enough information and practical experience to
+create your own \QSA scripts. The \link language.book Language
+Reference\endlink provides more information on the \QSA scripting
+language, and the \link library.book Library Reference\endlink covers
+all the classes and functions that are available to you. We recommend
+that you read the \link language.book Language Reference\endlink, and
+skim the \link library.book Library Reference\endlink to get a feel of
+what \QSA has to offer (and to avoid reinventing the wheel).
+
+We hope that you enjoy using \QSA, and produce great scripts with it!
+

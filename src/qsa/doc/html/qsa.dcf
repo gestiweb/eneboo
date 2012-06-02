@@ -1,0 +1,8 @@
+<!DOCTYPE DCF>
+<DCF ref="qsa.html" icon="qsa.png" imagedir="../../gif" title="Qt Script for Applications">
+<section ref="qsa-1.html" title="Preface"/>
+<section ref="qsa-2.html" title="What is Qt Script for Applications"/>
+<section ref="qsa-3.html" title="How to Make Qt Applications Scriptable"/>
+<section ref="qsa-4.html" title="How to Design and Implement Application Objects"/>
+<section ref="qsa-5.html" title="Creating Qt Scripts"/>
+</DCF>

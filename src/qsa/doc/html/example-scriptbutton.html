@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../examples/scriptbutton/scriptbutton.doc:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scriptbutton</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>Scriptbutton</h1>
+
+ 
+<p> 
+<p> The Scriptbutton example demonstrates how to implement a GUI control with a
+customizable action on activation. ScriptButton is a specialized
+<tt>QPushButton</tt> class that can have a snippet of script code attached to
+it. The script will be executed whenever the user clicks on the
+button. To modify the behavior of the buttons, the user can right-click
+a button and choose to either rename the button label or edit the
+script code in a simple editor. 
+<p> The Scriptbutton example also shows how to extend the scripting API of
+an existing C++ <tt>QObject</tt> class, which in this case is <tt>QWidget</tt>.
+Here we extend every QWidget class by two scripting functions: <tt>sendMousePressEvent()</tt> and <tt>sendMouseReleaseEvent()</tt>. These functions
+will show up in the API of every <tt>QWidget</tt> subclass and will then allow
+the scriptwriter to send mouse press and release events to any
+<tt>QWidget</tt>.   
+<p> For demonstration purposes, the example widget contains both a
+<tt>QLCDNumber</tt> and <tt>QLineEdit</tt> widget with properties that can be changed by
+the buttons located on the right side of the dialog.
+<p> <h2> Implementing Scriptbutton
+</h2>
+<a name="1"></a><p> The scriptbutton is a <tt>QPushButton</tt> subclass and contains an extra
+property which stores the code that will be executed when clicking the
+button. To edit the code, a subclass of <a href="qseditor.html">QSEditor</a> is used. The
+scriptbutton's code is passed into a call to <a href="qsinterpreter.html#evaluate">QSInterpreter::evaluate</a>()
+in the scriptbutton's <tt>executeScript()</tt> slot, which is connected to
+its <tt>clicked()</tt> signal.
+<p> <h2> Implementation of the QWidget Extension
+</h2>
+<a name="2"></a><p> To extend the <tt>QWidget</tt> API for the script writer, we implement a class
+<tt>WidgetWrapper</tt> which inherits <tt>QObject</tt> and takes the widget it wraps in
+its constructor. <tt>WidgetWrapper</tt> then implements the two slots
+<tt>sendMousePressEvent()</tt> and <tt>sendMouseReleaseEvent()</tt> which send a mouse
+event to the wrapped widget.
+<p> To make this wrapper known to the Qt Script Interpreter, we implement
+a <tt>WidgetWrapperFactory</tt> which inherits <a href="qswrapperfactory.html">QSWrapperFactory</a>. This
+enables the Qt Script Interpreter to create a WidgetWrapper for every
+<tt>QWidget</tt> it exposes to Qt Script. 
+<p> <p>See also <a href="examples.html">QSA Examples</a>.
+
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

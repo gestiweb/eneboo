@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsinputdialogfactory.cpp:61 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSInputDialogFactory Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSInputDialogFactory Class Reference</h1>
+
+<p>The QSInputDialogFactory class extends QSA with a basic and
+easy-to-use input dialog framework.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsinputdialogfactory-h.html">qsinputdialogfactory.h</a>&gt;</tt>
+<p>Inherits <a href="qsobjectfactory.html">QSObjectFactory</a>.
+<p><a href="qsinputdialogfactory-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn><a href="#QSInputDialogFactory"><b>QSInputDialogFactory</b></a> ()</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSInputDialogFactory class extends QSA with a basic and
+easy-to-use input dialog framework.
+<p> To extend the interpreter with the Input Dialog Framework you need
+to create an instance of the QSInputDialogFactory and add it to the
+interpreter using the function
+<a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>(). For example:
+<p> <pre>
+  <a href="qsproject.html">QSProject</a> proj;
+  <a href="qsinterpreter.html">QSInterpreter</a> *ip = proj-&gt;<a href="qsproject.html#interpreter">interpreter</a>();
+  ip-&gt;<a href="qsinterpreter.html#addObjectFactory">addObjectFactory</a>( new QSInputDialogFactory );
+  </pre>
+ 
+<p> The script extensions provided by the QSInputDialogFramework are
+described in detail in <a href="qsa-6.html">Input Dialog Framework</a>
+<p> Note on threading; If the Input Dialog Factory is used with an
+interpreter running in the non GUI thread, all functionallity is
+disabled.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSInputDialogFactory"></a>QSInputDialogFactory::QSInputDialogFactory ()
+</h3>
+
+<p> Creates the input dialog factory. Use the function
+QSInterpreter::addObjectFactory to make the objects this factory
+represents to an interpreter.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

@@ -1,0 +1,27 @@
+\chapter Reference: \QSAD Editor
+
+\section1 Introduction
+
+By default \QSAD starts up with an open source code editor to be able to start scripting
+straight away.This chapter explains the editor in detail.
+
+\section1 \QSAD Source Code Editor
+
+\img
+\caption \QSAD Souce Code editor
+
+The editor displays two tabs by default to be able to switch between
+scripts. Every time a new script file is created, a corresponding tab
+is displayed in the source code editor. To close tabs, click \Menu
+{File|Close Tab} or press \Key{Ctrl+Q}.
+
+To write script code, just start typing text directly into the editor.
+To make changes to the editor's properties, click \Menu
+{Edit|Preferences}.
+
+Right-click the editor to get a context menu of options,
+for example, 'Comment Code' or 'Uncomment Code' to add or remove
+comments from the script code.
+
+
+

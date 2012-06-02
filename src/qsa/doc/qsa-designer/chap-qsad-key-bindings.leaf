@@ -1,0 +1,129 @@
+\chapter Reference: Key Bindings
+
+\index Keypresses (QSA Workbench)
+\list
+\i
+
+Ctrl+A -- Selects all GUI elements in the active form.
+\i
+
+Ctrl+B -- Breaks the selected layout so that you can add or delete GUI elements.
+\i
+
+Ctrl+C -- Copies the selected GUI elements from the active form into the clipboard.
+\i
+
+Alt+E -- Pulls down the \Menu Edit menu.
+\i
+
+Alt+F -- Pulls down the \Menu File menu.
+\i
+
+Ctrl+F -- Invokes the \Dialog{Find Text} dialog.
+\i
+
+Alt+G -- Invokes the \Dialog{Goto Line} dialog.
+\i
+
+Ctrl+G -- Applies a grid layout to the selected container, or creates a new container containing the selected GUI elements and applies a grid layout to this container.
+\i
+
+Ctrl+H -- Applies a horizontal box layout to the selected container, or creates a new container containing the selected GUI elements and applies a horizontal box layout to this container.
+\i
+
+Alt+H -- Pulls down the \Menu Help menu.
+\i
+
+Alt+I -- Places the cursor on the Find Incremental line edit. 
+\i
+
+Ctrl+J Adjusts the size of the selected GUI element (or elements) so that it has the minimal size needed for displaying itself properly.
+\i
+
+Ctrl+L -- Applies a vertical box layout to the selected container, or creates a new container containing the selected GUI elements and applies a vertical box layout to this container.
+\i
+
+Alt+L -- Pulls down the \Menu Layout menu.
+\i
+
+Ctrl+M -- Opens an online version of this manual in Qt Assistant.
+\i
+
+Ctrl+N -- Invokes a new dialog.
+\i
+
+Alt+N -- Invokes the \Dialog {Name of File} dialog.
+\i
+
+Ctrl+O -- Invokes the \Dialog {Open File} dialog.
+\i
+
+Alt+P -- Pulls down the \Menu Preview menu.
+\i
+
+Alt+R -- Checks the accelerators in the active form for duplicates.
+\i
+
+Ctrl+R -- Invokes the \Dialog{Replace Text} dialog.
+\i
+
+Ctrl+S -- Saves the active form.
+\i
+
+Ctrl+T -- Previews the active form in the default GUI style of the platform.
+\i
+
+Alt+T -- Pulls down the \Menu Tools menu.
+\i
+
+Ctrl+V -- Pastes the GUI element (or elements) in the clipboard into the active form at the position it had in its original form plus a little offset. Does nothing if the clipboard does not contain a GUI element.
+\i
+
+Alt+W -- Pulls down the \Menu Window menu.
+\i
+
+Ctrl+X -- Cuts the selected GUI element (or elements) from the active form and puts it into the clipboard.
+\i
+
+Ctrl+Y -- Redoes the last undo action.
+\i
+
+Ctrl+Z -- Undoes the last action.
+\i
+
+Del -- Deletes the selected GUI elements from the active form.
+\i
+
+F1 -- Opens the introductory page of the Qt Designer manual in Qt Assistant.
+\i
+
+Shift+F1 -- Turns on What's This mode, which lets you click on a GUI element in Qt Designer to get a small description window for this element.
+\i
+
+F2 -- Activates the pointer tool that lets you select GUI elements.
+\i
+
+F4 -- Activates the tab order tool that lets you change the tab order of the GUI elements on the active form.
+\i
+
+F5 -- Invokes the \Dialog{Choose a function to run} dialog.
+\i
+
+
+F9 -- Activates the toggle breakpoint tool.
+\i
+
+F10 -- Activates the step over tool for debugging scripts.
+\i
+
+F11 -- Activates the step into tool for debugging scripts.
+\i
+
+Ctrl+F4 -- Closes the active window.
+\i
+
+Ctrl+F6 -- Activates the next window in the order of window creation.
+\i
+
+Ctrl+Shift-F6 -- Activates the previous window in the order of window creation.
+\endlist

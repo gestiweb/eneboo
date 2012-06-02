@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:719 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Rect</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1-7.html">Prev: Point</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-9.html">Next: Size</a>]</p>
+<h4 align="center">Rect</h4>
+<p>A <font color=blue><tt>Rect</tt></font> object represents a rectangle.</p>
+<p>The rectangle class provides three constructors.</p>
+<pre>
+    var rect = new Rect( 10, 20, 30, 40 ); // x=10, y=20, width=30, height=40
+    var duplicate = new Rect( rect );      // x=10, y=20, width=30, height=40
+    var empty = new Rect();                // x=0, y=0, width=0, height=0
+</pre>
+<h5><a name="1"></a>Rect Properties</h5>
+<ul><li><p>x : Number; The left position of the rectangle.</p>
+<li><p>y : Number; The right position of the rectangle.</p>
+<li><p>width : Number; The width of the rectangle.</p>
+<li><p>height : Number; The height of the rectangle.</p>
+<li><p>top : Number; The position of the top of the rectangle. This is defined as <tt>top = y</tt>.</p>
+<li><p>bottom : Number; The position of the bottom of the rectangle. This is defined as <tt>bottom = y + height + 1</tt>.</p>
+<li><p>left : Number; The position of the rectangle's left side. This is defined as <tt>left = x</tt></p>
+<li><p>right : Number; The position of the rectangle's right side. This is defined as <tt>right = x + width + 1</tt>.</p>
+<li><p>center : Point; The center of the rectangle.</p>
+</ul><h5><a name="2"></a>Rect Functions</h5>
+<ul><li><p>isNull() : Boolean;</p>
+<pre>
+    var empty = new Rect();
+    empty.isNull(); // true;
+
+    var square = new Rect( 10, 10, 10, 10 );
+    square.isNull(); // false;
+</pre>
+<p>Returns true if the rectangle has a width and height of 0.</p>
+<li><p>isEmpty() : Boolean;</p>
+<pre>
+    var rect = new Rect( 10, 10, -10, -10 );
+    rect.isEmpty(); // true
+    
+    var rect = new Rect( 10, 10, 10, 10 );
+    rect.isEmpty(); // false
+</pre>
+<p>Returns true if the rectangle is empty, meaning that it has width and/or height that is negative.</p>
+<li><p>contains( otherRect : Rect ) : Boolean;</p>
+<pre>
+    new Rect( 0, 0, 100, 100 ).contains( new Rect( 10, 10, 10, 10 ) ); // true
+    new rect( 10, 10, 10, 10 ).contains( new Rect( 0, 0, 100, 100 ) ); // false
+</pre>
+<p>Returns true if the rectangle contains the other rectangle.</p>
+<li><p>intersection( otherRect : Rect ) : Rect; Returns the intersection between this rectangle and another rectangle. The intersection of two rectangles is the part of the rectangles that overlap. If they do not overlap, an empty rectangle is returned.</p>
+<li><p>union( otherRect : Rect ) : Rect; Returns the union of two rectangles. The union is a rectangle large enough to encompass both rectangles.</p>
+<li><p>intersects( otherRect : Rect ) : Boolean; Returns true if this rectangle intersects the other rectangle.</p>
+<li><p>normalize(); Normalizes this rectangle. This means changing the prefix of the width and/or height if they are negative. After being normalized, a rectangle will no longer be empty.</p>
+<li><p>moveLeft( pos : Number ); Moves the rectangle so that its <tt>left</tt> property is equal to <tt>pos</tt>.</p>
+<li><p>moveRight( pos : Number ); Moves the rectangle so that its <tt>right</tt> property is equal to <tt>pos</tt>.</p>
+<li><p>moveTop( pos : Number ); Moves the rectangle so that its <tt>top</tt> property is equal to <tt>pos</tt>.</p>
+<li><p>moveBottom( pos : Number ); Moves the rectangle so that its <tt>bottom</tt> property is equal to <tt>pos</tt>.</p>
+<li><p>moveBy( dx : Number, dy : Number ); Translates the rectangle by <tt>dx</tt> and <tt>dy</tt>. <tt>dx</tt> and <tt>dy</tt> will be added to <tt>x</tt> and <tt>y</tt>, and <tt>width</tt> and <tt>height</tt> will be left unchanged.</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-1-7.html">Prev: Point</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-9.html">Next: Size</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

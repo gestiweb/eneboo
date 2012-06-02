@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:234 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>for</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-7.html">Prev: else</a>] [<a href="language.html">Home</a>] [<a href="language-6-9.html">Next: if</a>]</p>
+<h3 align="center">for</h3>
+<pre>
+for ( i = 0; i &lt; limit; i++ ) {
+    Statements;
+}
+</pre>
+<p>This keyword is used to create a loop that executes a fixed number of times.</p>
+<p>The <tt>for</tt> statement is broken into parts as follows: the keyword <tt>for</tt>, an opening parentheses, zero or more statements (the <em>first part</em>), a semi-colon, a conditional expression (the <em>second part</em>), a semi-colon, zero or more statements (the <em>third part</em>), a closing parentheses, and finally a statement or block that is governed by the <tt>for</tt> loop.</p>
+<p>The first part of the <tt>for</tt> statement is typically used to initialize (and possibly declare) the variable used in the conditional in the second part of the <tt>for</tt> loop statement. This part is executed once before the loop begins. This part may be empty.</p>
+<p>The second part contains a conditional expression. The expression is evaluated before each iteration of the loop (including before the first iteration). If this expression evaluates to <tt>false</tt>, the statement or block governed by the <tt>for</tt> loop is not executed and control passes to the statement that follows. If the condition is <em>never</em> <tt>true</tt>, the statement or block governed by the <tt>for</tt> loop will never be executed. If the condition expression is <tt>true</tt>, the statement or block governed by the <tt>for</tt> loop is executed, and then the third part of the <tt>for</tt> statement is executed, before control is passed back to the conditional expression with the whole process being repeated. This part should not be empty.</p>
+<p>The third part contains statements which must be executed at the end of every iteration of the loop. This part is typically used to increment a variable that was initialized in the first part, and whose value is tested in the second part. This part may be empty.</p>
+<p>Example:</p>
+<pre>
+    var a = [ "a", "b", "c", "d", "e" ];
+    for( var i = 0; i &lt; a.length; i++ ) {
+        System.println( a[ i ] );
+    }
+</pre>
+<p>See also <a href="language-6-6.html">do</a>, <a href="language-6-16.html">while</a>, <a href="language-6-4.html">continue</a> and <a href="language-6-1.html">break</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-7.html">Prev: else</a>] [<a href="language.html">Home</a>] [<a href="language-6-9.html">Next: if</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

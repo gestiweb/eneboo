@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:1445 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Math</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-2.html">Prev: Built-in Objects</a>] [<a href="language.html">Home</a>] [<a href="language-3-2-2.html">Next: System</a>]</p>
+<h4 align="center">Math</h4>
+<p>The <font color=blue><tt>Math</tt></font> object always exists in a <font color=darkmagenta>Qt Script</font> program. Use the <font color=blue><tt>Math</tt></font> object to access mathematical constants and functions, e.g.</p>
+<pre>
+    var x, angle, y;
+    with ( Math ) {
+        x = PI * 2;
+        angle = 1.3;
+        y = x * sin( angle );
+    }
+</pre>
+<p>The <font color=blue><tt>Math</tt></font> object supports all the common mathematical functions, for example: <tt>abs()</tt>, <tt>acos()</tt> and <tt>cos()</tt>, <tt>asin()</tt> and <tt>sin()</tt>, <tt>atan()</tt>, <tt>atan2()</tt> and <tt>tan()</tt>, <tt>ceil()</tt>, <tt>floor()</tt> and <tt>round()</tt>, <tt>exp()</tt> and <tt>log()</tt>, <tt>max()</tt> and <tt>min()</tt>, <tt>pow()</tt> and <tt>sqrt()</tt>, <tt>random()</tt>, and <tt>round()</tt>.</p>
+<p>See also, <a href="language-5-2-2.html#1">+ operator</a>, <a href="language-5-2-2.html#2">++ operator</a>, <a href="language-5-2-2.html#3">- operator</a>, <a href="language-5-2-2.html#4">-- operator</a>, <a href="language-5-2-2.html#5">* operator</a>, <a href="language-5-2-2.html#6">/ operator</a>, <a href="language-5-2-2.html#7">% operator</a>, <a href="language-5-2-1.html#3">-= operator</a>, <a href="language-5-2-1.html#2">+= operator</a>, <a href="language-5-2-1.html#4">*= operator</a>, <a href="language-5-2-1.html#5">/= operator</a> and <a href="language-5-2-1.html#6">%= operator</a>.</p>
+<h5><a name="1"></a>Math Properties</h5>
+<p>All the <font color=blue><tt>Math</tt></font> properties are read-only constants.</p>
+<ul><li><p>E -- Euler's constant. The base for natural logarithms.</p>
+<li><p>LN2 -- Natural logarithm of 2.</p>
+<li><p>LN10 -- Natural logarithm of 10.</p>
+<li><p>LOG2E -- Base 2 logarithm of E.</p>
+<li><p>LOG10E -- Base 10 logarithm of E.</p>
+<li><p>PI -- Pi.</p>
+<li><p>SQRT1_2 -- Square root of 1/2.</p>
+<li><p>SQRT2 -- Square root of 2.</p>
+</ul><h5><a name="2"></a>Math Functions</h5>
+<ul><li><p>abs( number : Number ) : Number;</p>
+<p>Returns the absolute value of the given <tt>number</tt>. The equivalent of</p>
+<pre>
+    x = x &lt; 0 ? -x : x;
+</pre>
+<pre>
+    var x = -99;
+    var y = 99;
+    with ( Math ) {
+        x = abs( x );
+        y = abs( y );
+    }
+    if ( x == y ) System.println( "equal" );
+</pre>
+<li><p>acos( number : Number ) : Number; Returns the arccosine of the given <tt>number</tt> in radians between 0 and <tt>Math.PI</tt>. If the number is out of range, returns <a href="language-4-2-2.html">NaN</a>.</p>
+<li><p>asin( number : Number ) : Number; Returns the arcsine of the given <tt>number</tt> in radians between <tt>-Math.PI/2</tt> and <tt>Math.PI/2</tt>. If the number is out of range, returns <a href="language-4-2-2.html">NaN</a>.</p>
+<li><p>atan( number : Number ) : Number; Returns the arctangent of the given <tt>number</tt> in radians between <tt>-Math.PI/2</tt> and <tt>Math.PI/2</tt>. If the number is out of range, returns <a href="language-4-2-2.html">NaN</a>.</p>
+<li><p>atan2( yCoord : Number, xCoord : Number ) : Number; Returns the counter-clockwise angle in radians between the positive x-axis and the point at (<tt>xCoord</tt>, <tt>yCoord</tt>). The value returned is always between <tt>-Math.PI</tt> and <tt>Math.PI</tt>.</p>
+<p>Example:</p>
+<pre>
+    function polar( x, y )
+    {
+        return Math.atan2( y, x );
+    }
+</pre>
+<li><p>ceil( number : Number ) : Number; If the <tt>number</tt> is an integer, it returns the <tt>number</tt>. If the <tt>number</tt> is a floating point value, it returns the smallest integer greater than the <tt>number</tt>.</p>
+<p>Example:</p>
+<pre>
+    var x = 913.41;
+    x = Math.ceil( x ); // x == 914
+    var y = -33.97;
+    y = Math.ceil( y ); // y == -33
+</pre>
+<li><p>cos( number : Number ) : Number; Returns the cosine of the given <tt>number</tt>. The value will be in the range -1..1.</p>
+<li><p>exp( number : Number ) : Number; Returns <tt>Math.E</tt> raised to the power of the given <tt>number</tt>.</p>
+<li><p>floor( number : Number ) : Number; If the <tt>number</tt> is an integer, it returns the <tt>number</tt>. If the <tt>number</tt> is a floating point value, it returns the greatest integer less than the <tt>number</tt>.</p>
+<li><p>log( number : Number ) : Number; If the <tt>number</tt> is &gt; 0, it returns the natural logarithm of the given <tt>number</tt>. If the <tt>number</tt> is 0, it returns <tt>Infinity</tt>. If the <tt>number</tt> is &lt; 0, it returns <a href="language-4-2-2.html">NaN</a>.</p>
+<li><p>max( number1 : Number, number2 : Number ) : Number; Returns the largest of <tt>number1</tt> and <tt>number2</tt>.</p>
+<li><p>min( number1 : Number, number2 : Number ) : Number; Returns the smallest of <tt>number1</tt> and <tt>number2</tt>.</p>
+<li><p>pow( number : Number, power : Number ) : Number; Returns the value of the <tt>number</tt> raised to the <tt>power</tt>.</p>
+<li><p>random() : Number; Returns a pseudo-random floating point number between 0 and 1. Pseudo random numbers are not truly random, but may be adequate for some applications, for example, games and simple simulations.</p>
+<li><p>round( number : Number ) : Number; Returns the <tt>number</tt> rounded to the nearest integer. If the fractional part of the <tt>number</tt> is &gt;= 0.5, the <tt>number</tt> is rounded up; otherwise it is rounded down.</p>
+<li><p>sin( number : Number ) : Number; Returns the sine of the given <tt>number</tt>. The value will be in the range -1..1.</p>
+<li><p>sqrt( number : Number ) : Number; If the <tt>number</tt> is &gt;= 0, it returns the square root. If the <tt>number</tt> is &lt; 0, it returns <a href="language-4-2-2.html">NaN</a>.</p>
+<li><p>tan( number : Number ) : Number; Returns the tangent of the given <tt>number</tt>.</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-2.html">Prev: Built-in Objects</a>] [<a href="language.html">Home</a>] [<a href="language-3-2-2.html">Next: System</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

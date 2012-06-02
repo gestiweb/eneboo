@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsobjectfactory.cpp:44 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSObjectFactory Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSObjectFactory Class Reference</h1>
+
+<p>The QSObjectFactory class provides a method for Qt Script
+programs to create C++ QObjects.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsobjectfactory-h.html">qsobjectfactory.h</a>&gt;</tt>
+<p>Inherited by <a href="qsinputdialogfactory.html">QSInputDialogFactory</a> and <a href="qsutilfactory.html">QSUtilFactory</a>.
+<p><a href="qsobjectfactory-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn><a href="#QSObjectFactory"><b>QSObjectFactory</b></a> ()</li>
+<li class=fn>virtual QObject * <a href="#create"><b>create</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;QSArgumentList&nbsp;&amp;&nbsp;arguments, QObject&nbsp;*&nbsp;context )</li>
+<li class=fn>void <a href="#registerClass-2"><b>registerClass</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;className, QObject&nbsp;*&nbsp;staticDescriptor = 0 )</li>
+<li class=fn>void <a href="#registerClass"><b>registerClass</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;QString&nbsp;&amp;&nbsp;cppClassName, QObject&nbsp;*&nbsp;staticDescriptor = 0 )</li>
+<li class=fn>void <a href="#throwError"><b>throwError</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;message )</li>
+</ul>
+<h2>Protected Members</h2>
+<ul>
+<li class=fn>QSInterpreter * <a href="#interpreter"><b>interpreter</b></a> () const</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSObjectFactory class provides a method for Qt Script
+programs to create C++ QObjects.
+<p> To enable script programmers to create their own C++ QObjects,
+application programmers can provide a QObject subclass that has a
+slot which is a factory function that returns QObjects.
+Alternatively, the application programmer can subclass
+QSObjectFactory and reimplement the <a href="#create">create</a>() and classes()
+functions.
+<p> The <a href="#registerClass">registerClass</a>() function is called to register to the scripting
+engine each of the classes that this object factory can instantiate.
+In addition, the create() function is called by the scripting engine
+to create the instance, i.e. when the user writes something like
+<p> <pre>
+  var x = new SomeCppObject( arg1, arg2 ); // Qt Script
+  </pre>
+ 
+<p> The function create() is reimplemented in each QSObjectFactory
+to provide the an instance of the QObject subclass that describes
+what the scripter should experience as an object of the type
+SomeCppObject.
+<p> A single QSObjectFactory subclass may be used to provide any number
+of creatable QObject classes. A QSObjectFactory becomes active when
+it is added to a <a href="qsinterpreter.html">QSInterpreter</a> using the function
+<a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>(). An object factory can only be
+added to one QSInterpreter at a time.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSObjectFactory"></a>QSObjectFactory::QSObjectFactory ()
+</h3> Constructor.
+Creates the object factory. To make the object factory available to
+an interpreter, use the function: <a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>().
+
+<h3 class=fn>QObject * <a name="create"></a>QSObjectFactory::create ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;<a href="qsargumentlist.html">QSArgumentList</a>&nbsp;&amp;&nbsp;arguments, QObject&nbsp;*&nbsp;context )<tt> [virtual]</tt>
+</h3>
+This virtual function should be reimplemented in your
+QSObjectFactory subclass when you want to instantiate objects from
+script. The subclass can be used to create any number of different
+classes. The name of the required class is passed in the <em>className</em> argument, and the arguments to be passed to that class's
+constructor are passed in the <em>arguments</em> list. See <a href="qsargument.html">QSArgument</a> for
+further information about the arguments. <em>context</em> is the script
+QObject context in which the class has been instantiated, or 0 if
+the class has not been instantiated in a QObject context.
+<p> Only QObject subclasses may be created in this way. This
+function returns an instance of the requested class.
+<p> This function is called by the scripting engine, e.g. when it
+encounters code similar to the following:
+<pre>
+    var x = new ACppObject( arg1, arg2 ); // Qt Script
+  </pre>
+ 
+<p> The classes that a particular QSObjectFactory instance is capable of
+instantiating is returned by classes().
+<p> If the arguments are invalid or any other invalid operation happens,
+you can use <a href="#throwError">throwError</a>() to issue a Qt Script error.
+<p> All objects created from this function are deleted by the engine when
+the engine registers it as not being referenced anymore, unless the
+object at this time has a parent, which will then be responsible for
+ownership.
+
+<h3 class=fn><a href="qsinterpreter.html">QSInterpreter</a>&nbsp;* <a name="interpreter"></a>QSObjectFactory::interpreter () const<tt> [protected]</tt>
+</h3>
+Returns the interpreter that this object factory is creating
+objects for.
+
+<h3 class=fn>void <a name="registerClass"></a>QSObjectFactory::registerClass ( const&nbsp;QString&nbsp;&amp;&nbsp;className, const&nbsp;QString&nbsp;&amp;&nbsp;cppClassName, QObject&nbsp;*&nbsp;staticDescriptor = 0 )
+</h3>
+Registers that this object factory provides the class <em>className</em>.
+<p> This function is called once for each of the script classes that a
+subclass of QSObjectFactory wishes to expose to the scripting
+engine.
+<p> The name <em>className</em> is the name that the class has within
+the scripting engine. <em>cppClassName</em> is the name of the
+C++ class that is actually instantiated when <em>className</em> is
+passed to the <a href="#create">create</a>() function. For instance:
+<p> <pre>
+  // in script
+  var x = new MyObject();
+
+  // in C++
+  QObject *create( const QString &amp;name, ... ) {
+      if( name == "MyObject" )
+          return new MyScriptObject()
+  }
+  </pre>
+ 
+<p> Here we would call registerClass as follows:
+<pre>
+  <a href="#registerClass">registerClass</a>( "MyObject", "MyScriptObject" );
+  </pre>
+ 
+<p> Providing QString::null in <em>cppClassName</em> will tell the interpreter
+that the class is not instantiable.
+<p> The <em>staticDescriptor</em> is used to describe the static part of a class.
+The properties, signals and slots of the <em>staticDescriptor</em> object
+will be accessible as <em>className</em> 's static part.
+
+<h3 class=fn>void <a name="registerClass-2"></a>QSObjectFactory::registerClass ( const&nbsp;QString&nbsp;&amp;&nbsp;className, QObject&nbsp;*&nbsp;staticDescriptor = 0 )
+</h3>
+This is an overloaded member function, provided for convenience. It behaves essentially like the above function.
+<p> 
+<h3 class=fn>void <a name="throwError"></a>QSObjectFactory::throwError ( const&nbsp;QString&nbsp;&amp;&nbsp;message )
+</h3>
+Informs the interpreter that an error has occurred. The error is
+treated like a normal Qt Script error. The error message is passed
+in <em>message</em>.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

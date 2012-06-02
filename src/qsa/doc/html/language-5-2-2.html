@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:308 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Arithmetic Operators</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-2-1.html">Prev: Assignment Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-3.html">Next: String Operators</a>]</p>
+<h4 align="center">Arithmetic Operators</h4>
+<p>These operators are used to perform arithmetic computations on their operands.</p>
+<h5><a name="1"></a>+ operator</h5>
+<p><tt>operand1 + operand2</tt></p>
+<p>This operator returns the result of adding the two operands (<em>operand1</em> and <em>operand2</em>).</p>
+<p>See also <a href="language-5-2-3.html#1">+ string operator</a>.</p>
+<h5><a name="2"></a>++ operator</h5>
+<pre>
+++operand; // pre-increment
+operand++; // post-increment
+</pre>
+<p>The pre-increment version of this operator increments the <em>operand</em>, and returns the value of the (now incremented) <em>operand</em>.</p>
+<p>The post-incremented version of this operator returns the value of the <em>operand</em>, and <em>then</em> increments the <em>operand</em>.</p>
+<h5><a name="3"></a>- operator</h5>
+<pre>
+var result = operand1 - operand2; // subtraction
+operand = -operand;               // unary negation
+</pre>
+<p>The subtraction version of this operator returns the result of subtracting its second operand (<em>operand2</em>) from its first operand (<em>operand1</em>).</p>
+<p>The unary negation version of this operator returns the result of negating (changing the sign) of its <em>operand</em>.</p>
+<h5><a name="4"></a>-- operator</h5>
+<pre>
+--operand; // pre-decrement
+operand--; // post-decrement
+</pre>
+<p>The pre-decrement version of this operator decrements the <em>operand</em>, and returns the value of the (now decremented) <em>operand</em>.</p>
+<p>The post-decremented version of this operator returns the value of the <em>operand</em>, and <em>then</em> decrements the <em>operand</em>.</p>
+<h5><a name="5"></a>* operator</h5>
+<p><tt>operand1 * operand2</tt></p>
+<p>This operator returns the result of multiplying the two operands (<em>operand1</em> and <em>operand2</em>).</p>
+<h5><a name="6"></a>/ operator</h5>
+<p><tt>operand1 / operand2</tt></p>
+<p>This operator returns the result of dividing the first operand (<em>operand1</em>) by the second operand (<em>operand2</em>).</p>
+<p>Note that division by zero is <em>not</em> an error. The result of division by zero is <a href="language-4-2-1.html">Infinity</a>.</p>
+<h5><a name="7"></a>% operator</h5>
+<p><tt>operand1 % operand2</tt></p>
+<p>This operator returns the integer remainder (which may be 0) from the division of <em>operand1</em> by <em>operand2</em>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-5-2-1.html">Prev: Assignment Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-3.html">Next: String Operators</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

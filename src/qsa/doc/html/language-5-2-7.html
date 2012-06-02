@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:561 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Special Operators</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-2-6.html">Prev: Bit-wise operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-3.html">Next: Declarations</a>]</p>
+<h4 align="center">Special Operators</h4>
+<h5><a name="1"></a>?: operator</h5>
+<p><tt>expression ? resultIfTrue : resultIfFalse</tt></p>
+<p>This operator evaluates its first operand, the <em>expression</em>. If the <em>expression</em> is <tt>true</tt>, the value of the second operand (<em>resultIfTrue</em>) is returned; otherwise the value of the third operand (<em>resultIfFalse</em>) is returned.</p>
+<h5><a name="2"></a>, operator</h5>
+<p><tt>expression1, expression2</tt></p>
+<p>This operator evaluates its first and second operand (<em>expression1</em> and <em>expression2</em>), and returns the value of the second operand (<em>expression2</em>).</p>
+<p>The comma operator can be subtle, and is best reserved only for use in argument lists.</p>
+<h5><a name="3"></a>function operator</h5>
+<pre> var variable = function( optArguments ) { Statements }</pre>
+<p>This operator is used to create anonymous functions. Once assigned, the <em>variable</em> is used like any other function name, e.g. <tt>variable(1, 2, 3)</tt>. Specify the argument names (in <em>optArguments</em>) if named arguments are required. If no <em>optArguments</em> are specified, arguments may still be passed and will be available using the <a href="language-4-1-1.html">arguments</a> list.</p>
+<p>The <font color=darkmagenta>Qt Script</font> <tt>function</tt> operator supports closures, for example:</p>
+<pre>
+    function make_counter( initialValue )
+    {
+        var current = initialValue;
+        return function( increment ) { current += increment; return current; }
+    }
+    // ...
+    var counterA = make_counter( 3 );  // Start at 3.
+    var counterB = make_counter( 12 ); // Start at 12.
+    debug( counterA( 2 ) );  // Adds 2, so prints 5
+    debug( counterB( 2 ) );  // Adds 2, so prints 14
+    debug( counterA( 7 ) );  // Adds 7, so prints 12
+    debug( counterB( 30 ) ); // Adds 30, so prints 44
+</pre>
+<p>Note that for each call to <em>make_counter()</em>, the anonymous function that is returned has its own copy of <em>current</em> (initialized to the <em>initialValue</em>), which is incremented independently of any other anonymous function's <em>current</em>. It is this capturing of context that makes the function that is returned a closure.</p>
+<p>See also <a href="language-5-3-3.html">function</a> and <a href="language-3-1-4.html">Function Type</a>.</p>
+<h5><a name="4"></a>in operator</h5>
+<p><tt>property in Object</tt></p>
+<p>Returns <tt>true</tt> if the given <em>Object</em> has the given <em>property</em>; otherwise returns <tt>false</tt>.</p>
+<h5><a name="5"></a>instanceof operator</h5>
+<p><tt>object instanceof type</tt></p>
+<p>Returns <tt>true</tt> if the given <em>object</em> is an instance of the given <em>type</em>, (or of one of its base classes); otherwise returns <tt>false</tt>.</p>
+<h5><a name="6"></a>new operator</h5>
+<p><tt>var instance = new Type( optArguments );</tt></p>
+<p>This function calls the constructor for the given <em>Type</em>, passing it the optional arguments (<em>optArguments</em>) if any, and returns an <em>instance</em> of the given <em>Type</em>. The <em>Type</em> may be one of the built-in types, one of the library types, or a user-defined type.</p>
+<p>Example:</p>
+<pre>
+    var circle = new Circle( x, y );
+    var file = new File();
+</pre>
+<h5><a name="7"></a>this operator</h5>
+<p><tt>this.property</tt></p>
+<p>The <em>this</em> operator may only be used within a <a href="language-5-3-3.html">function</a> that is defined within a <a href="language-5-3-1.html">class</a> or form, i.e. a member function. Within the scope of the function <em>this</em> is a reference to the particular instance (object) of the <a href="language-5-3-1.html">class</a>'s type.</p>
+<p>Example:</p>
+<pre>
+    class MinMax {
+        var _min;
+        var _max;
+        function MinMax( min, max ) { this._min = min; this._max = max; }
+        function max() { return this._max; }
+        function min() { return this._min; }
+        function setMax( value ) { this._max = value; }
+        function setMin( value ) { this._min = value; }
+    }
+</pre>
+<h5><a name="8"></a>typeof operator</h5>
+<p><tt>typeof item</tt></p>
+<p>This operator returns a type of the object as a string.</p>
+<p>Example:</p>
+<pre>
+    var f = new Function("arguments[0]*2"); // "object"
+    var str = "text"; // "string"
+    var pi = Math.PI; // "number"
+</pre>
+<!-- eof -->
+<p align="right">[<a href="language-5-2-6.html">Prev: Bit-wise operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-3.html">Next: Declarations</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

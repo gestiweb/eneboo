@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:9 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>break</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6.html">Prev: Control Statements</a>] [<a href="language.html">Home</a>] [<a href="language-6-2.html">Next: case</a>]</p>
+<h3 align="center">break</h3>
+<pre>
+label:
+for ( var i = 0; i &lt; limit; i++ ) {
+    if ( condition ) {
+        break label;
+    }
+}
+
+switch ( expression ) {
+    case 1:
+        Statements1;
+        break;
+    default:
+        DefaultStatements;
+        break;
+}
+</pre>
+<p>This keyword is used in <a href="language-6-8.html">for</a> loops, <a href="language-6-6.html">do</a> loops, <a href="language-6-16.html">while</a> loops and <a href="language-6-13.html">switch</a> statements. When a <tt>break</tt> statement is encountered in a loop, control is passed to the statement following the end of the inner-most loop that contains the <tt>break</tt> statement; unless the <tt>break</tt> statement is followed by the name of a <em>label</em>, in which case control passes to the statement governed by the label.</p>
+<p>A <tt>break</tt> statement is usually placed at the end of each <a href="language-6-2.html">case</a> in a switch statement to prevent the interpreter "falling through" to the next case. When the interpreter encounters a <tt>break</tt> statement, it passes control to the statement that follows the inner-most enclosing <tt>switch</tt> statement. If every <tt>case</tt> has a corresponding <tt>break</tt>, then at most one <tt>case</tt>'s statements will be executed. If the <tt>break</tt> statement is followed by a label name (<em>label</em>) then when the <tt>break</tt> is encountered, control will pass to the statement marked with that label; this is useful, for example, for breaking out of deeply nested loops.</p>
+<p>Example:</p>
+<pre>
+    red:
+    for ( x = 0; x &lt; object.width; x++ ) {
+        for ( y = 0; y &lt; object.height; y++ ) {
+            if ( color[x][y] == 0xFF0000 ) {
+                break red;
+            }
+        }
+    }
+</pre>
+<p>See <a href="language-6-13.html">switch</a> for another example. See also <a href="language-6-6.html">do</a>, <a href="language-6-16.html">while</a>, <a href="language-6-8.html">for</a> and <a href="language-6-1.html">break</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6.html">Prev: Control Statements</a>] [<a href="language.html">Home</a>] [<a href="language-6-2.html">Next: case</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

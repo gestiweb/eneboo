@@ -1,0 +1,37 @@
+\chapter Preface
+
+This manual presents \QSAD, an IDE for creating, editing, running and
+debugging \QS dialogs and code. The IDE features a complete code editor
+which includes syntax highlighting and completion. In addition, \QSAD
+provides a class browser and a signal viewer. \QSAD also
+provides functionality for the user interface designer to create dialogs
+with layout tools. \QSAD allows users to interactively connect C++
+signals to C++ slots and Qt Script functions.
+
+Those familiar with \e{Qt Designer} will immediately feel at home
+because \QSAD takes the same approach to dialog design and provides
+much of the same functionality.
+
+\img qsa-preface.png
+\caption QSA Workbench
+
+This manual introduces you to \QSAD in the first chapter, by leading
+you through the development of a short and simple script. The
+remaining chapters provide reference material that explain \QSAD's
+menu options, toolbars, key bindings, windows and dialogs in detail.
+
+The following are links to the chapters in this manual:
+
+Chapter One: \l{
+
+
+
+\section1 Feedback
+
+If you have any comments, suggestions, criticisms or even praise
+regarding this manual, please let us know at \c {doc@trolltech.com}.
+Bug reports on Qt or \QD should be sent to \c ###{qt-bugs@trolltech.com}.
+You might also like to join the \e qt-interest mailing list, which
+\QD's developers read and contribute to; see \link
+http://lists.trolltech.com http://lists.trolltech.com \endlink for
+further details.

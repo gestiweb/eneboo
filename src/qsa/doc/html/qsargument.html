@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsargument.cpp:32 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSArgument Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSArgument Class Reference</h1>
+
+<p>The QSArgument class provides storage for various datatypes
+used in QSObjectFactory::create() calls.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsargument-h.html">qsargument.h</a>&gt;</tt>
+<p><a href="qsargument-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn>enum <a href="#Type-enum"><b>Type</b></a> { Invalid, Variant, QObjectPtr, VoidPointer }</li>
+<li class=fn><a href="#QSArgument"><b>QSArgument</b></a> ()</li>
+<li class=fn><a href="#QSArgument-2"><b>QSArgument</b></a> ( const&nbsp;QVariant&nbsp;&amp;&nbsp;v )</li>
+<li class=fn><a href="#QSArgument-3"><b>QSArgument</b></a> ( QObject&nbsp;*&nbsp;o )</li>
+<li class=fn><a href="#QSArgument-4"><b>QSArgument</b></a> ( void&nbsp;*&nbsp;p )</li>
+<li class=fn>QVariant <a href="#variant"><b>variant</b></a> () const</li>
+<li class=fn>QObject * <a href="#qobject"><b>qobject</b></a> () const</li>
+<li class=fn>void * <a href="#ptr"><b>ptr</b></a> () const</li>
+<li class=fn>Type <a href="#type"><b>type</b></a> () const</li>
+<li class=fn>QString <a href="#typeName"><b>typeName</b></a> () const</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSArgument class provides storage for various datatypes
+used in <a href="qsobjectfactory.html#create">QSObjectFactory::create</a>() calls.
+<p> When the user writes Qt Script code like this:
+<pre>
+    var x = new AnotherCppObject( arg1, arg2 ); // Qt Script
+  </pre>
+ 
+the arguments are passed to the QSObjectFactory::create() call as a
+QValueList of QSArguments. A QSArgument can hold a QVariant, a
+QObject pointer or a void pointer. The type held by a QSArgument is
+returned by <a href="#type">type</a>() and the value is returned by <a href="#variant">variant</a>(), <a href="#qobject">qobject</a>(), or <a href="#ptr">ptr</a>(), depending on the QSArgument type.
+<p> 
+<hr><h2>Member Type Documentation</h2>
+<h3 class=fn><a name="Type-enum"></a>QSArgument::Type</h3> 
+<p> This enum describes which datatype is held by this QSArgument.
+<ul>
+<li><tt>QSArgument::Invalid</tt> - Invalid datatype
+<li><tt>QSArgument::Variant</tt> - Holds a QVariant
+<li><tt>QSArgument::QObjectPtr</tt> - Holds a QObject pointer
+<li><tt>QSArgument::VoidPointer</tt> - Holds an untyped pointer (void*)
+</ul>
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSArgument"></a>QSArgument::QSArgument ()
+</h3> Creates an invalid QSArgument 
+<h3 class=fn><a name="QSArgument-2"></a>QSArgument::QSArgument ( const&nbsp;QVariant&nbsp;&amp;&nbsp;v )
+</h3>
+Creates a QSArgument which holds the variant <em>v</em> as its value and
+is of type Variant.
+
+<h3 class=fn><a name="QSArgument-3"></a>QSArgument::QSArgument ( QObject&nbsp;*&nbsp;o )
+</h3>
+Creates a QSArgument which holds the QObject pointer <em>o</em> as its value
+and is of type QObjectPtr.
+
+<h3 class=fn><a name="QSArgument-4"></a>QSArgument::QSArgument ( void&nbsp;*&nbsp;p )
+</h3>
+Creates a QSArgument which holds the pointer <em>p</em> as its value and
+is of type VoidPointer.
+
+<h3 class=fn>void * <a name="ptr"></a>QSArgument::ptr () const
+</h3>
+If this QSArgument's <a href="#type">type</a>() is VoidPointer, it returns the void pointer;
+otherwise returns 0.
+
+<h3 class=fn>QObject * <a name="qobject"></a>QSArgument::qobject () const
+</h3>
+If this QSArgument's <a href="#type">type</a>() is QObjectPtr, it returns the object
+pointer; otherwise returns 0.
+
+<h3 class=fn><a href="qsargument.html#Type-enum">Type</a> <a name="type"></a>QSArgument::type () const
+</h3>
+Returns the type of this QSArgument. This can be <a href="#Type-enum">Invalid</a>, <a href="#Type-enum">Variant</a>, <a href="#Type-enum">QObjectPtr</a>, or <a href="#Type-enum">VoidPointer</a>
+<p> <p>See also <a href="#typeName">typeName</a>().
+
+<h3 class=fn>QString <a name="typeName"></a>QSArgument::typeName () const
+</h3> Returns the type name of this argument. 
+<h3 class=fn>QVariant <a name="variant"></a>QSArgument::variant () const
+</h3>
+If this QSArgument's <a href="#type">type</a>() is Variant, it returns the variant value;
+otherwise returns an invalid variant.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

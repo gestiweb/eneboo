@@ -1,0 +1,40 @@
+\chapter Preface
+
+This manual presents \QSAD, a scripting environment for creating, editing, and running
+scripts. The scripting environment features a code editor
+which includes syntax highlighting and completion. In addition, \QSAD
+provides an output window for viewing errors. 
+
+\img qsaworkbench.png
+\caption QSA Workbench
+
+This manual introduces you to \QSAD in the first chapter, by leading
+you through the development of a short and simple script. The
+remaining chapters provide reference material that explain \QSAD's
+menu options, toolbars, key bindings, windows and dialogs in detail.
+
+The following links take you directly to each chapter:
+
+Chapter One: Using QSA Workbench (more to come).
+
+Chapter Two: \l{Reference: Key Bindings}
+
+Chapter Three: \l{Reference: Menu Options}
+
+Chapter Four: \l{Reference: Toolbar Buttons}
+
+Chapter Five: \l{Reference: Dialogs}
+
+Chapter Six: \l{Reference: Windows}
+
+
+\section1 Feedback
+
+If you have any comments, suggestions or criticisms regarding this
+manual, please let us know at \c {doc@trolltech.com}. Bug reports on
+Qt or \QD should be sent to \c ###{qt-bugs@trolltech.com}. You might
+also like to join the \e qt-interest mailing list, which \QD's
+developers read and contribute to; see \link
+http://lists.trolltech.com http://lists.trolltech.com \endlink for
+further details.
+

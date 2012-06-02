@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:1592 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>System</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-2-1.html">Prev: Math</a>] [<a href="language.html">Home</a>] [<a href="language-4.html">Next: Built-in Variables and Constants</a>]</p>
+<h4 align="center">System</h4>
+<p>The <font color=blue><tt>System</tt></font> object always exists in a <font color=darkmagenta>Qt Script</font> program. Use the <font color=blue><tt>System</tt></font> object to access and manipulate environment variables, e.g. with <tt>getenv()</tt> and <tt>setenv()</tt>, and to print text to the console with <tt>print()</tt> and <tt>println()</tt>.</p>
+<h5><a name="1"></a>System Functions</h5>
+<ul><li><p>getenv( environmentVariable : String ) : String; Returns the string stored in the given <tt>environmentVariable</tt>.</p>
+<p>Example:</p>
+<pre>
+    var q = System.getenv( "QTDIR" ); // q == "/usr/local/qt"
+</pre>
+<li><p>print( expression : String ); Prints the <tt>expression</tt> (applying <tt>toString()</tt> if necessary) to the console (<tt>stdout</tt>).</p>
+<li><p>println( expression : String ); Prints the <tt>expression</tt> (applying <tt>toString()</tt> if necessary) to the console (<tt>stdout</tt>), followed by a newline.</p>
+<li><p>setenv( environmentVariable : String, value : String ); Sets the <tt>environmentVariable</tt> to the <tt>value</tt>. If the <tt>environmentVariable</tt> does not exist it is created. The environment is only changed within the context of the <font color=darkmagenta>Qt Script</font> process for the duration of the process.</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-2-1.html">Prev: Math</a>] [<a href="language.html">Home</a>] [<a href="language-4.html">Next: Built-in Variables and Constants</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

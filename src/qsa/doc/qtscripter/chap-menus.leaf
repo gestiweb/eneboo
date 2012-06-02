@@ -1,0 +1,189 @@
+\chapter Reference: Menu Options 
+
+\section1 Introduction
+
+\QSAD provides menu options that invoke the actions necessary to create
+applications. Many menu options lead to dialog boxes that provide
+additional options and functionality. The most commonly used menu
+options also have corresponding toolbar buttons. This chapter explains
+each menu option and its use. For menu options that invoke a dialog
+box or which have a corresponding toolbar button, there is a
+cross-reference to the detailed explanation that appears in the
+relevant chapter.
+
+\section1 The File Menu
+
+\img filemenu.png
+\caption The File Menu
+
+This menu is invoked with \Key Alt+F, and provides the following
+options:
+
+\list
+
+\i \Menu {File|New Script}\BR Click this menu option (or press \Key Ctrl+N) to
+invoke the \l{New Script Dialog} dialog.
+
+\i \Menu {File|Import Script}\BR Click this menu option (or press \Key
+Ctrl+I) to invoke the \l{Import Script Dialog} dialog.
+
+\i \Menu {File|Export Script}\BR Click this menu option (or press \Key
+Ctrl+E) to invoke the \l{Export Script Dialog} dialog.
+
+\i \Menu {File|Rename Script}\BR Click this menu option (or press \Key
+Ctrl+R) to rename script in the active editor. Object scripts cannot 
+be renamed.
+
+\i \Menu {File|Remove Script}\BR Click this menu option (or press \Key
+Ctrl+D) to remove the script from the project.
+
+\i \Menu {File|Close Tab}\BR Click this menu option (or press \Key
+Ctrl+F4) to close the tab in the editor.
+
+\i \Menu {File|Print}\BR Click this menu option  (or press \Key
+Ctrl+P) to print the contents of the current editor.
+
+\i \Menu {File|Exit}\BR Click this menu option to exit \QSAD.
+
+\endlist
+
+\section1 The Edit Menu
+
+\img editmenu.png
+\caption The Edit Menu
+
+This menu is invoked with \Key Alt+E, and provides the following
+options:
+\list
+
+\i \Menu Edit|Undo\BR Click this menu option (or press \Key Ctrl+Z) to
+undo an action. The name of the last action that was performed appears
+after the word 'Undo'.  
+
+\i \Menu Edit|Redo\BR Click this menu option (or press \Key Ctrl+Y) to
+redo an action. The name of the last action that was performed appears
+after the word 'Redo'. 
+
+\i \Menu Edit|Cut\BR Click this menu option (or press \Key Ctrl+X) to
+delete the selected item from the current form or file and copy it to
+the clipboard. 
+
+\i \Menu Edit|Copy\BR Click this menu option (or press \Key Ctrl+C) to
+copy the selected item from the current form or file to the clipboard.
+
+\i \Menu Edit|Paste\BR Click this menu option (or press \Key Ctrl+V) to
+paste the clipboard item (if any) into the current form or file. 
+
+\i \Menu {Edit|Select All}\BR Click this menu option (or press \Key
+Ctrl+A) to highlight all the text in the current editor.
+
+\i \Menu Edit|Preferences\BR Click this menu option to invoke the
+\l{Preferences Dialog} dialog.
+
+\endlist
+
+\section1 The Search Menu
+
+\img searchmenu.png
+\caption The Search Menu
+
+This menu is invoked with \Key Alt+S, and provides the following options:
+
+\list
+
+\i \Menu Search|Find\BR Click this menu option (or press \Key Ctrl+F) to
+invoke the \l{Find Text Dialog}. 
+
+\i \Menu Search|Find Next\BR Click this menu option (or press \Key F3) to
+find the next occurance of the last key word searched for. The \l{Find
+Text Dialog} is shown if this is the first search.
+
+\i \Menu Search|Find Previous\BR Click this menu option (or press \Key
+Shift+F3) to find the next occurance of the last key word searched for. The
+\l{Find Text Dialog} is shown if this is the first search.
+
+\i \Menu Search|Replace\BR Click this menu option (or press \Key
+Ctrl+R) to invoke the \l{Replace Text Dialog} to replace specific
+words or characters.
+
+\i \Menu{Search|Goto line}\BR Click this menu option (or press \Key
+Alt+G) to invoke the \l{Goto Line Dialog} to go to a specific line in
+the file.
+
+\endlist
+
+\section1 Project
+
+\img projectmenu.png
+\caption Project Menu
+
+This menu is invoked with \Key Alt+P, provides the following options:
+
+\list
+
+\i \Menu{Project|Call Function}\BR Click this
+menu option (or press \Key F5) to invoke the \Dialog{Call function} dialog.
+
+\i \Menu{Project|Call Function}\BR Click this
+menu option (or press \Key F6) to call the last function specified in the \Dialog{Call Function} dialog.
+
+\i \Menu{Project|Evaluate}\BR Press this function to force evaluation of the files
+in the project.
+
+\endlist
+
+\section1 Window
+
+\img windowmenu1.png
+\caption Window Menu, first submenu.
+
+\img windowmenu2.png
+\caption Window Menu, second submenu.
+
+This menu is invoked with \Key Alt+W, provides the following options:
+
+\list
+
+\i \Menu{Window|Views|Output}\BR Click this menu option to enable/disable the
+output window.
+
+\i \Menu{Window|Views|Project Scripts}\BR Click this menu option to enable/disable the
+project scripts window.
+
+\i \Menu{Window|Views|Line up}\BR Click this menu option to line up the dockable windows
+in the user interface.
+
+\i \Menu{Window|Toolbars|File}\BR Click this menu option to enable/disable the file toolbar.
+
+\i \Menu{Window|Toolbars|Edit}\BR Click this menu option to enable/disable the
+edit toolbar.
+
+\i \Menu{Window|Toolbars|Project}\BR Click this menu option to enable/disable the project toolbar.
+
+\i \Menu{Window|Toolbars|Line up}\BR Click this menu option to line up the dockable windows
+in the user interface.
+
+\endlist
+
+
+\section1 The Help Menu
+
+\img helpmenu.png
+\caption The Help Menu
+
+This menu is invoked with \Key Alt+H, and provides the following
+option:
+
+\list 
+
+\i \Menu{Help|About}\BR Click this menu option to invoke the About
+\QSAD dialog which gives the version number and some licensing
+information.
+
+\endlist
+
+
+
+
+
+

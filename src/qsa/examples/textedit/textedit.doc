@@ -1,0 +1,36 @@
+/*!   \page example-textedit.html
+
+\ingroup examples
+\title Text Edit Example
+
+This Text Edit example displays a text editor with the user interface written
+in pure C++.
+
+The example adds the mainwindow of the application as an application
+object. This makes all the signals, slots and properties of the
+application's mainwindow and its children scriptable. Please note that
+this is \e{bad practise} for more complex applications, because it
+makes too much of the application's internal functionality available
+to script programmers. However, it is a simple solution that may be
+suitable for some applications.
+
+Text edit also shows how to make a non \c QObject class available to
+Qt Script. Consequently, it should be possible for the script writer
+to implement a syntax highlighter which works on the current editor.
+Qt already provides a class called \c QSyntaxHighlighter. To make this
+class available, we implement a class called \c SyntaxHighlighter
+which inherits \c QObject and \c QSyntaxHighlighter. We implement an
+interface (public slots and signals) which makes the class scriptable
+in the \c SyntaxHighlighter class. 
+
+To allow the script writer to instantiate a syntax highlighter, the
+class is made available to Qt Script where the class \c
+ConstructorFactory inherits QSObjectFactory.
+
+The text edit example already comes with one syntax highlighter
+implemented in Qt Script. It is called DiffHighlighter and it
+highlights uniformed diffs. 
+
+*/
+
+

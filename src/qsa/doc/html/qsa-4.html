@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- qsabook/chap-application-objects.leaf:3 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>How to Design and Implement Application Objects</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="qsa-3.html">Prev: How to Make Qt Applications Scriptable</a>] [<a href="qsa.html">Home</a>] [<a href="qsa-5.html">Next: Creating Qt Scripts</a>]</p>
+<h2 align="center">How to Design and Implement Application Objects</h2>
+<h3><a name="1"></a>Overview</h3>
+<p>This chapter explains how to implement application objects and provides the necessary technical background material.</p>
+<h3><a name="2"></a>Making a C++ object available to Scripts Written in Qt Script</h3>
+<p>Making C++ classes and objects available to a scripting language is not trivial since scripting languages are more dynamic than C++ and it must be possible to introspect objects (query information such as functions names, function signatures, properties, etc., at runtime). Standard C++ doesn't provide for this.</p>
+<p>We can achieve the functionality we want by extending C++, using C++'s own facilities so our code is still standard C++. The Qt meta object system provides the necessary additional functionality. It allows us to write using an extended C++ syntax, but converts this into standard C++ using a small utility program called <a href="http://doc.trolltech.com/moc.html">moc</a> (Meta Object Compiler). Classes that wish to take advantage of the meta object facilities are either subclasses of QObject, or use the <tt>Q_OBJECT</tt> macro. Qt has used this approach for many years and it has proven to be solid and reliable. <font color=darkmagenta>Qt Script for Applications</font> uses this meta object technology to provide scripters with dynamic access to C++ classes and objects.</p>
+<p>To completely understand how to make C++ objects available to Qt Script, some basic knowledge of the Qt meta object system is very helpful. We recommend that you read the <a href="http://doc.trolltech.com/3.0/object.html">Qt Object Model</a>. The information in this document and the documents it links to are very useful for understanding how to implement application objects, however this knowledge is not essential.</p>
+<p>To make an object available in Qt Script, it must derive from QObject. All classes which derive from QObject are introspective and can provide the information needed by the scripting engine, e.g. classname, functions, signatures, etc., at runtime. Because we obtain the information we need about classes dynamically at run time, there is no need to write wrappers for QObject derived classes.</p>
+<h4><a name="2-1"></a>Making C++ Class Member Functions Available in Qt Script</h4>
+<p>The meta object system makes information about slots dynamically available at runtime. This means that for QObject derived classes, only the slots are automatically made available to scripts. This is very convenient, because in practice we normally only want to make specially chosen functions available to scripters.</p>
+<p>When you create a QObject subclass, make sure that the functions you want to be available to scripters are public slots:</p>
+<pre>
+class MyObject : public QObject
+{
+    Q_OBJECT
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in Qt Script
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+private:
+   ....
+
+};
+</pre>
+<p>In the example above, aNonScriptableFunction() is not declared as a slot, so it will not be available in <font color=darkmagenta>Qt Script</font>. The other three functions will automatically be made available in <font color=darkmagenta>Qt Script</font>.</p>
+<h4><a name="2-2"></a>Making C++ Class Properties Available in Qt Script</h4>
+<p>In the previous example, if we wanted to get or set a property using <font color=darkmagenta>Qt Script</font> we would have to write code like the following:</p>
+<pre>
+var obj = new MyObject;
+obj.setEnabled( true );
+debug( "obj is enabled: " + obj.isEnabled() );
+</pre>
+<p>Scripting languages often provide a property syntax to modify and retrieve properties (in our case the enabled state) of an object. Many script programmers would want to write the above code like this:</p>
+<pre>
+var obj = new MyObject;
+obj.enabled = true;
+debug( "obj is enabled: " + obj.enabled );
+</pre>
+<p>To make this possible, you must define properties in the C++ QObject subclass. The class declaration of <tt>MyObject</tt> must look like the following to declare a property <tt>enabled</tt> of the type <tt>bool</tt>, which should use the function <tt>setEnabled(bool)</tt> as its setter function and the function <tt>isEnabled()</tt> as its getter function:</p>
+<pre>
+class MyObject : public QObject
+{
+    Q_OBJECT
+    // define the enabled property
+    Q_PROPERTY( bool enabled WRITE setEnabled READ isEnabled )
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in Qt Script
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+private:
+   ....
+
+};
+</pre>
+<p>The only difference from the original code is the use of the macro <tt>Q_PROPERTY</tt>, which takes the type and name of the property, and the names of the setter and getter functions as arguments.</p>
+<h4><a name="2-3"></a>Reacting to C++ Objects Signals in Scripts</h4>
+<p>In the Qt object model, signals are used as a notification mechanism between QObjects. This means one object can connect a signal to another object's slot and every time the signal is fired (emitted) the slot is called. This connection is established using the <tt>QObject::connect()</tt> function. This mechanism is also available to <font color=darkmagenta>Qt Script</font> programmers. The C++ code for declaring a signal is no different for a C++ class that is to be used by <font color=darkmagenta>Qt Script</font> than a C++ class used with <a href= http://doc.trolltech.com >Qt</a>.</p>
+<pre>
+class MyObject : public QObject
+{
+    Q_OBJECT
+    // define the enabled property
+    Q_PROPERTY( bool enabled WRITE setEnabled READ isEnabled )
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in Qt Script
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+signals: // the signals
+    void enabledChanged( bool newState );
+
+private:
+   ....
+
+};
+</pre>
+<p>The only change this time is to declare a <tt>signals</tt> section, and declare the relevant signal in it.</p>
+<p>Now the script writer can write a function and connect to the object like this:</p>
+<pre>
+function enabledChangedHandler( b )
+{
+    debug( "state changed to: " + b );
+}
+
+function init()
+{
+    var obj = new MyObject;
+    // connect a script function to the signal
+    connect( obj, "enabledChanged(bool)", this, "enabledChangedHandler" );
+    obj.enabled = true;
+    debug( "obj is enabled: " + obj.enabled );
+}
+
+</pre>
+<h3><a name="3"></a>Design of Application Objects</h3>
+<p>The previous section described how to implement C++ objects which can be used in <font color=darkmagenta>Qt Script</font>. Application objects are the same kind of objects, and they make your application's functionality available to <font color=darkmagenta>Qt Script</font> scripters.</p>
+<p>Since the C++ application is already written in Qt, many objects are already QObjects. The easiest approach would be to simply add all these QObjects as application objects to the scripting engine. For small applications this might be sufficient, but for larger applications this is probably not the right approach. The problem is that this method reveals too much of the internal API and gives script programmers access to application internals which should not be exposed.</p>
+<p>Generally, the best way of making application functionality available to scripters is to code some QObjects which define the application's public API using signals, slots, and properties. This gives you complete control of the functionality you make available. The implementation of these objects simply calls the functions in the application which do the real work. So instead of making all your QObjects available to the scripting engine, just add the "wrapper QObjects". For an example of this technique, see the implementation of an application object in the <tt>SheetInterface</tt> (<tt>examples/spreadsheet/sheetinterface.{cpp|h}</tt>).</p>
+<!-- eof -->
+<p align="right">[<a href="qsa-3.html">Prev: How to Make Qt Applications Scriptable</a>] [<a href="qsa.html">Home</a>] [<a href="qsa-5.html">Next: Creating Qt Scripts</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

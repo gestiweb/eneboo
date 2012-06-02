@@ -1,0 +1,608 @@
+\chapter Reference: Menu Options 
+
+\section1 Introduction
+
+\QSAD provides menu options that invoke the actions necessary to create
+applications. Many menu options lead to dialog boxes that provide
+additional options and functionality. The most commonly used menu
+options also have corresponding toolbar buttons. This chapter explains
+each menu option and its use. For menu options that invoke a dialog
+box or which have a corresponding toolbar button, there is a
+cross-reference to the detailed explanation that appears in the
+relevant chapter.
+
+\section1 The File Menu
+
+\img rm-file.png 
+\caption The File Menu
+
+This menu is invoked with \Key Alt+F, and provides the following
+options:
+
+\list
+
+\i \Menu File|New\BR Click this menu option (or press \Key Ctrl+N) to
+display two submenus.
+
+\list
+\i Click Dialog (\Key Ctrl+N) from the submenu to create a new dialog.
+
+\i Click File (\Key Alt+N) from the submenu to invoke the \Message{Name
+of File} message box.
+\endlist
+
+\i \Menu File|Save\BR Click this menu option (or press \Key Ctrl+S) to
+save the script along with its forms and files. 
+
+\i \Menu File|Close\BR Click this menu option to close \QSAD. 
+
+\endlist 
+
+See also \l{The File Toolbar Buttons}.
+
+
+\section1 The Edit Menu
+
+\img rm-edit.png
+\caption The Edit Menu
+
+This menu is invoked with \Key Alt+E, and provides the following
+options:
+\list
+
+\i \Menu Edit|Undo\BR Click this menu option (or press \Key Ctrl+Z) to
+undo an action. The name of the last action that was performed appears
+after the word 'Undo'.  
+
+\i \Menu Edit|Redo\BR Click this menu option (or press \Key Ctrl+Y) to
+redo an action. The name of the last action that was performed appears
+after the word 'Redo'. 
+
+\i \Menu Edit|Cut\BR Click this menu option (or press \Key Ctrl+X) to
+delete the selected item from the current form or file and copy it to
+the clipboard. 
+
+\i \Menu Edit|Copy\BR Click this menu option (or press \Key Ctrl+C) to
+copy the selected item from the current form or file to the clipboard.
+
+\i \Menu Edit|Paste\BR Click this menu option (or press \Key Ctrl+V) to
+paste the clipboard item (if any) into the current form or file. 
+
+\i \Menu Edit|Delete\BR Click this menu option (or press \Key Del) to
+delete the selected item from the current form or file.
+
+\i \Menu {Edit|Select All}\BR Click this menu option (or press \Key
+Ctrl+A) to highlight all the widgets on the current form or all the
+text in the current file. 
+
+\i \Menu {Edit|Check Accelerators}\BR Click this menu option (or press
+\Key Alt+R) to verify that all the accelerators are used only
+once. If an accelerator is used more than once, a message box
+appears with the statement 'The accelerator 'x' is used 'y' times'.
+Click \Button Select to highlight the widgets with the same
+accelerator, or click \CANCEL to exit the message box without taking
+any action. 
+
+\i \Menu {Edit|Form Settings}\BR Click this menu option to invoke the \l{Form
+Settings Dialog}.
+
+\i \Menu Edit|Preferences\BR Click this menu option to invoke the
+\l{Preferences Dialog}.
+
+\endlist
+
+See also \l{The Edit Toolbar buttons}.
+
+\section1 The Project Menu
+
+\img rm-project.png
+\caption The Project Menu
+
+This menu is invoked with \Key Alt+O, and provides the following
+options:
+
+\list 
+
+\i \Menu {Project|Image Collection}\BR Click this menu option to invoke
+the \l{Manage Image Collection Dialog}.
+
+\i \Menu {Project|Project Settings}\BR Click this menu option to invoke
+the \l{Project Settings Dialog}.
+
+\endlist
+
+\section1 The Search Menu
+
+\img rm-search.png
+\caption The Search Menu
+
+This menu is invoked with \Key Alt+S, and provides the following options:
+
+\list
+
+\i \Menu Search|Find\BR Click this menu option (or press \Key Ctrl+F) to
+invoke the \l{Find Text Dialog}. 
+
+\i \Menu {Search|Find Incremental}\BR Click this menu option (or press
+\Key Alt+I) to place the cursor in the text box located next to the
+\Toolbutton Find toolbar button. Type characters into the text box; as
+you type, \QSAD will highlight the first occurrence of the text that it
+finds in the file. Press the \Key Enter key to go to the next
+occurrence of the text. Press the \Key Esc key once you have found the
+word you are looking for to place the cursor in the editor.
+
+\i \Menu Search|Replace\BR Click this menu option (or press \Key
+Ctrl+R) to invoke the \l{Replace Text Dialog} to replace specific
+words or characters.
+
+\i \Menu{Search|Goto line}\BR Click this menu option (or press \Key
+Alt+G) to invoke the \l{Goto Line Dialog} to go to a specific line in
+the file.
+
+\endlist
+
+See also \l{The Search Toolbar Buttons}.
+
+\section1 The Tools Menu
+
+\img rm-tools.png
+\caption The Tools Menu
+
+This menu is invoked with \Key Alt+T, and provides the following
+options:
+
+\list 
+
+\i \Menu Tools|Pointer\BR Click this menu option (or press \Key F2) to
+de-select any selected widget toolbar button. The pointer is also used
+to stop inserting new widgets on the form if you double clicked a
+widget toolbar button. Press the \Key Esc key to return to the
+pointer at any time.
+
+\i \Menu {Tools|Tab Order}\BR Click this menu option (or press \Key
+F4) to set the tab order for all the widgets on the form that can
+accept keyboard focus. Choose this option and blue circles with
+numbers on them appear next to the widgets. Click the widget that you
+want to be first in the tab order, then click the widget that should
+be next in the tab order, and continue until all the widgets have the
+tab order numbers you want. If you make a mistake, double click the
+first widget and start again. Press \Key Esc to leave tab order mode.
+If you want to revert your changes, leave tab order mode, then undo.
+
+\i \Menu{Tools|Set Buddy}\BR Click this toolbar button to set a buddy
+to a label. Then click on a label and drag the line to the widget that
+you want to be the buddy. Release the mouse button and the buddy is
+set. 
+
+\i \Menu {Tools|Buttons|PushButton}\BR Click this menu option and then
+click the form to place a PushButton on the form. 
+
+\i \Menu {Tools|Buttons|ToolButton}\BR Click this menu option and then
+click the form to place a ToolButton on the form.
+
+\i \Menu {Tools|Buttons|RadioButton}\BR Click this menu option and
+then click the form to place a RadioButton on the form. It is
+recommended that you place RadioButtons inside ButtonGroups so that Qt
+will automatically ensure that only one RadioButton in the group is
+active at any one time.
+
+\i \Menu {Tools|Buttons|CheckBox}\BR Click this menu option and then
+click the form to place a CheckBox on the form.
+
+\i \Menu {Tools|Buttons|ColorButton}\BR Click this menu option and
+then click the form to place a ColorButton on the form.
+
+\i \Menu {Tools|Containers|GroupBox}\BR Click this menu option and
+then click the form to place a GroupBox on the form.
+
+\i \Menu {Tools|Containers|ButtonGroup}\BR Click this menu option and
+then click the form to place a ButtonGroup on the form.
+
+\i \Menu {Tools|Containers|Frame}\BR Click this menu option and then
+click the form to place a Frame on the form.
+
+\i \Menu {Tools|Containers|TabWidget}\BR Click this menu option and
+then click the form to place a TabWidget on the form. To add or remove
+tabs, right click the tab widget and choose 'Add Page' or 'Remove
+Page'. 
+
+\i \Menu {Tools|Views|ListBox}\BR Click this menu option and then
+click the form to place a ListBox on the form.
+
+\i \Menu {Tools|Views|ListView}\BR Click this menu option and then
+click the form to place a ListView on the form.
+
+\i \Menu {Tools|Views|Icon View}\BR Click this menu option and then
+click the form to place an IconView on the form.
+
+\i \Menu {Tools|Views|Table}\BR Click this menu option and then click
+the form to place a Table on the form.
+
+\i \Menu {Tools|Database|DataTable}\BR Click this menu option and then
+click the form to place a DataTable on the form.
+
+\i \Menu {Tools|Database|DataBrowser}\BR Click this menu option and
+then click the form to place a DataBrowser on the form.
+
+\i \Menu {Tools|Database|DataView}\BR Click this menu option and then
+click the form to place a DataView on the form.
+
+\i \Menu {Tools|Input|LineEdit}\BR Click this menu option and then
+click the form to place a LineEdit on the form.
+
+\i \Menu {Tools|Input|SpinBox}\BR Click this menu option and then
+click the form to place a SpinBox on the form.
+
+\i \Menu {Tools|Input|DateEdit}\BR Click this menu option and then 
+click the form to place a DateEdit on the form.
+
+\i \Menu {Tools|Input|TimeEdit}\BR Click this menu option and then
+click the form to place a TimeEdit on the form.
+
+\i \Menu {Tools|Input|DateTimeEdit}\BR Click this menu option and then
+click the form to place a DateTimeEdit on the form.
+
+\i \Menu {Tools|Input|TextEdit}\BR Click this menu option and then
+click the form to place a TextEdit on the form.
+
+\i \Menu {Tools|Input|ComboBox}\BR Click this menu option and then
+click the form to place a ComboBox on the form.
+
+\i \Menu {Tools|Input|Slider}\BR Click this menu option and then click
+the form to place a Slider on the form.
+
+\i \Menu {Tools|Input|ScrollBar}\BR Click this menu option and then
+click the form to place a Scrollbar on the form.
+
+\i \Menu {Tools|Input|Dial}\BR Click this menu option and then click
+the form to place a Dial on the form.
+
+\i \Menu {Tools|Display|TextLabel}\BR Click this menu option  and then
+click the form to place a TextLabel on the form.
+
+\i \Menu {Tools|Display|PixmapLabel}\BR Click this menu option and
+then click the form to place a PixmapLabel on the form.
+
+\i \Menu {Tools|Display|LCDNumber}\BR Click this menu option and then
+click the form to place a LCDNumber on the form.
+
+\i \Menu {Tools|Display|Line}\BR Click this menu option and then 
+click the form to place a Line on the form.
+
+\i \Menu {Tools|Display|ProgressBar}\BR Click this menu option and
+then click the form to place a ProgressBar on the form.
+
+\i \Menu {Tools|Display|TextBrowser}\BR Click this menu option and
+then click the form to place a TextBrowser on the form.
+
+\i \Menu {Tools|Custom|Edit Custom Widgets}\BR Click this menu option
+to invoke the \l{Edit Custom Widgets Dialog}. 
+
+\i \Menu {Tools|Custom|<My Custom Widget>}\BR Click this menu option and
+then click the form to place the Custom Widget on the form. Note that
+this menu option only appears if you have created a widget using
+\Menu{Tools|Custom|Edit Custom Widgets}.
+
+\i \Menu {Tools|Configure Toolbox}\BR Click this menu option to invoke
+the \l{Configure Toolbox Dialog}.
+
+\endlist
+
+See also \l{The Tools Toolbar Buttons}.
+
+\section1 The Layout Menu 
+
+\img rmo-layoutmenu.png
+\caption The Layout Menu
+
+This menu is invoked with \Key Alt+L, and provides the following
+options:
+\list 
+
+\i \Menu {Layout|Adjust Size}\BR Click this menu option (or press \Key
+Ctrl+J) to adjust the size of the widget to it's recommended size. 
+
+\i \Menu {Layout|Lay Out Horizontally}\BR Click this menu option (or
+press \Key Ctrl+H) to lay out the selected widgets or layouts side by
+side. Use \Key Shift+Click to select each widget or layout, and then
+choose this menu option to group them horizontally. Note that for
+complex widgets it is sometimes easiest to select widgets and layouts
+by clicking them in the Widgets tab of the \l{Object Explorer Window}.
+If only one widget is selected, its child widgets will be laid out
+horizontally.
+
+\i \Menu {Layout|Lay Out Vertically}\BR Click this menu option (or press
+\Key Ctrl+L) to lay out the selected widgets one above the other. Use
+\Key Shift+Click to select each widget or layout, and then choose this
+menu option to group them vertically. Note that for complex widgets it
+is sometimes easiest to select widgets and layouts by clicking them in
+the Widgets tab of the \l{Object Explorer Window}. If only one widget
+is selected, its child widgets will be laid out vertically.
+
+\i \Menu {Layout|Lay Out in a Grid}\BR Click this menu option (or press
+\Key Ctrl+G) to lay out the selected widgets in a grid. If only one
+widget is selected, its child widgets will be laid out in a grid.
+
+\i \Menu {Layout|Lay Out Horizontally (in Splitter)}\BR Click this menu
+option to lay out the selected widgets or layouts side by side with a
+splitter between each. Use \Key Shift+Click to select each
+widget or layout, and then choose this menu option to group them
+horizontally. Note that for complex widgets it is sometimes easiest to
+select widgets and layouts by clicking them in the Widgets tab of the
+\l{Object Explorer Window}.
+
+\i \Menu {Layout|Lay Out Vertically (in Splitter)}\BR Click this menu
+option to lay out the selected widgets or layouts one above the other
+with a splitter between each. Use \Key{Shift+Click} to select each
+widget or layout, and then choose this menu option to group them
+vertically. Note that for complex widgets it is sometimes easiest to
+select widgets and layouts by clicking them in the Widgets tab of the
+\l{Object Explorer Window}.
+
+\i \Menu {Layout|Break Layout}\BR Click this menu option (or press \Key
+Ctrl+B) to break a layout. Click on the layout, then select this option;
+the layout is deleted. 
+
+\i \Menu {Layout|Add Spacer}\BR Click this menu option to add a vertical
+or horizontal spacer to widgets that take up too much space on the
+form. The spacer consumes extra space in the layout.
+
+\endlist
+
+See also \l{The Layout Toolbar Buttons}.
+
+\section1 The Preview Menu 
+
+\img rmo-previewmenu.png
+\caption The Preview Menu
+
+This menu is invoked with \Key Alt+P, and provides the following
+options: 
+\list 
+
+\i \Menu{Preview|Preview Form}\BR Click this menu option (or press
+\Key Ctrl+T) to preview the form within \QD.
+
+\i \Menu{Preview|...in Windows Style}\BR Click this menu option to
+preview the form in the Windows style. 
+
+\i \Menu{Preview|...in Motif Style}\BR Click this menu option to preview
+the form in the Motif style.
+
+\i \Menu{Preview|...in CDE Style}\BR Click this menu option to preview
+the form in the CDE style.
+
+\i \Menu{Preview|...in MotifPlus Style}\BR Click this menu option to
+preview the form in the MotifPlus style. 
+
+\i \Menu{Preview|...in Platinum Style}\BR Click this menu option to
+preview the form in the Platinum style. 
+
+\i \Menu{Preview|...in SGI Style}\BR Click this menu option to preview the
+form in the SGI style.
+
+\endlist
+
+\section1 Qt Script Editor
+
+\img rm-editor.png
+\caption Qt Script Editor Menu
+
+\list
+\i Click this menu option (or press \Key F9) to toggle (set or unset) a breakpoint at the current line in the currently opened editor.
+\endlist
+
+\section1 Qt Script Project
+
+\img rm-project.png
+\caption Qt Script Project Menu
+
+This menu provides the following options:
+
+\list
+\i \Menu{Qt Script Project|Step Into}\BR Click this menu option (or
+press \Key F11) to step into the next function when a debugging session is active.
+  
+\i \Menu{Qt Script Project|Step Over}\BR Click this menu option (or
+press \Key F10) to step over a function, execute it, then go to the
+next statement in the code when a debugging session is active.  
+
+\i \Menu{Run} \BR Click this menu option to display the following
+options when a debugging session is active:
+
+\list
+\i \Menu{Qt Script Project|Run Function|Run Function}\BR Click this
+menu option (or press \Key F5) to invoke the \Dialog {Choose a function to run} dialog.
+
+\i \Menu{Qt Script Project|Run Function|Run}\BR Click this menu option
+to run a global Qt Script function as choses in the settings dialog or
+to continue execution if a debugging session is active.
+\endlist
+
+\i \Menu{Qt Script Project|Stop Execution/Debugger}\BR Click this menu
+option to stop the debugger when a debugging session is active.
+
+\endlist
+
+\section1 The Window Menu
+
+\img rmo-windowmenu.png
+\caption The Window Menu
+
+This menu is invoked with \Key Alt+W, and provides the following
+options:
+\list 
+
+\i \Menu{Window|Close}\BR Click this menu option (or press \Key
+Ctrl+F4) to close the window that is currently active.
+
+\i \Menu{Window|Close All}\BR Click this menu option to close all the
+windows that are currently open.
+
+\i \Menu{Window|Next}\BR Click this menu option (or press \Key
+Ctrl+F6) to make the next window active. The order is the order in
+which the windows were opened. 
+
+\i \Menu{Window|Previous}\BR Click this menu option (or press \Key
+Ctrl+Shift+F6) to make the previous window active. The order is the
+order in which the windows were opened. 
+
+\i \Menu{Window|Tile}\BR Click this menu option to arrange all the open
+files and forms side by side so that each window is visible. 
+
+\i \Menu{Window|Cascade}\BR Click this menu option to stack all the
+open file and forms, one on top of the other, but with an overlap so
+that each window's title bar is visible. 
+
+\i \Menu{Window|Views|Output Window}\BR Click this menu option to invoke
+the \l{Output Window}, which displays debugging messages. 
+
+\i \Menu{Window|Views|Toolbox}\BR 
+
+\i \Menu{Window|Views|Project Overview}\BR 
+
+\i \Menu{Window|Views|Object Explorer}\BR Click this menu option to make
+the \l{Object Explorer Window} visible, or to hide it if it is already
+visible. If the window is currently visible, a check mark
+will appear next to the name in the menu.
+
+\i \Menu{Window|Views|Property Editor/Signal Handlers}\BR Click this
+menu option to make the \l{Property Editor/Signal Handlers Window}
+visible, or to hide it if it is already visible. If the window is
+currently visible, a check mark will appear next to the name in the
+menu.
+
+\i \Menu{Window|Views|Line Up}\BR Click this menu option to eliminate
+any extra space between toolbars and line them up next to each other
+all at once, rather than moving each individual toolbar into place.
+
+\i \Menu{Window|Toolbars|File}\BR Click this menu option to make the File
+toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Edit}\BR Click this menu option to make the Edit
+toolbar buttons visible, or to hide them if they are already visible.
+If the toolbar buttons are currently visible, a check mark will appear
+next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Search}\BR Click this menu option to make the
+Search toolbar buttons visible, or to hide them if they are already
+visible. if the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Layout}\BR Click this menu option to make the
+Layout toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Tools}\BR Click this menu option to make the
+Tools toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Buttons}\BR Click this menu option to make the
+Buttons toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Containers}\BR Click this menu option to make the
+Containers toolbar buttons visible, or to hide them if they are
+already visible. If the toolbar buttons are currently visible, a check
+mark will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Views}\BR Click this menu option to make the
+Views toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Database}\BR Click this menu option to make the
+Database toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Input}\BR Click this menu option to make the
+Input toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Display}\BR Click this menu option to make the
+Display toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Custom}\BR Click this menu option to make the
+Custom toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Qt Script Editor\BR}Click this menu option to make the
+Qt Script Editor toolbar button visible, or to hide it if is is already
+visible. If the toolbar button is currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Qt Script Project}\BRClick this menu option to make the
+Qt Sript Project toolbar buttons visible, or to hide them if they are already
+visible. If the toolbar buttons are currently visible, a check mark
+will appear next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Help}\BR Click this menu option to make the Help
+toolbar buttons visible, or to hide them if they are already visible.
+If the toolbar buttons are currently visible, a check mark will appear
+next to the name in the menu. 
+
+\i \Menu{Window|Toolbars|Line Up}\BR Click this menu option to eliminate
+extra space between toolbars and line them up next to each other all
+at once, rather than moving each individual toolbar into place.
+
+\i \Menu{Window|n}\BR Click one of the numbered menu options that list
+the currently open files and forms to switch to the named file or
+form.
+
+\endlist
+
+\section1 The Help Menu
+
+\img rmo-helpmenu.png
+\caption The Help Menu
+
+This menu is invoked with \Key Alt+H, and provides the following
+options:
+\list 
+
+\i \Menu{Help|Contents}\BR Click this menu option (or press \Key F1)
+to invoke the \link assistant.book Qt Assistant\endlink application
+which provides on-line help. The on-line help is context sensitive, so
+you can type the item you want more information about in the line edit
+and Qt Assistant will automatically find it if it is available.
+
+\i \Menu{Help|Manual}\BR Click this menu option (or press \Key Ctrl+M) to
+invoke the \link assistant.book Qt Assistant\endlink application which
+opens showing this manual.
+
+\i \Menu{Help|About}\BR Click this menu option to invoke the About
+\QD dialog which gives the version number and some licensing
+information.
+
+\i \Menu{Help|About Qt}\BR Click this menu option to invoke a
+dialog which provides information about Qt.
+
+\i \Menu{Help|What's This?}\BR Click this menu option to invoke a small
+question mark that is attached to the mouse pointer. Click on a
+feature which you would like more information about. A popup box
+appears with information about the feature.
+
+\endlist 
+
+See also \l{The Help Toolbar Button}.
+
+
+
+
+
+
+
+
+
+
+

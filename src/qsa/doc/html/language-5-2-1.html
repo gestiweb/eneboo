@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:207 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Assignment Operators</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-2.html">Prev: Built-in Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-2.html">Next: Arithmetic Operators</a>]</p>
+<h4 align="center">Assignment Operators</h4>
+<p>These operators are used to assign the value of expressions to variables.</p>
+<h5><a name="1"></a>= operator</h5>
+<p><tt>var variable = expression;</tt></p>
+<p>The assignment operator is used to assign the value of an <em>expression</em> to the <em>variable</em>.</p>
+<p>It is an error to attempt to assign to a <a href="language-5-3-2.html">const</a>ant.</p>
+<h5><a name="2"></a>+= operator</h5>
+<p><tt>variable += expression;</tt></p>
+<p>This operator adds the value of the <em>expression</em> to the <em>variable</em>. It is the same as:</p>
+<pre>
+    variable = variable + expression;
+</pre>
+<p>but is shorter to write, and less error-prone.</p>
+<p>See also <a href="language-5-2-3.html#2">+= string operator</a>.</p>
+<h5><a name="3"></a>-= operator</h5>
+<p><tt>variable -= expression;</tt></p>
+<p>This operator subtracts the value of the <em>expression</em> from the <em>variable</em>.</p>
+<h5><a name="4"></a>*= operator</h5>
+<p><tt>variable *= expression;</tt></p>
+<p>This operator multiplies the value of the <em>expression</em> by the value of the <em>variable</em>.</p>
+<h5><a name="5"></a>/= operator</h5>
+<p><tt>variable /= expression;</tt></p>
+<p>This operator divides the value of the <em>variable</em> by the value of the <em>expression</em>.</p>
+<h5><a name="6"></a>%= operator</h5>
+<p><tt>variable %= expression;</tt></p>
+<p>This operator divides the <em>variable</em> by the <em>expression</em>, and assigns the remainder of the division (which may be 0), to the <em>variable</em>.</p>
+<h5><a name="7"></a>&amp;= operator</h5>
+<p><tt>variable &amp;= expression;</tt></p>
+<p>This operator performs a bit-wise AND on the value of the <em>expression</em> and the value of the <em>variable</em>, and assigns the result to the <em>variable</em>.</p>
+<h5><a name="8"></a>^= operator</h5>
+<p><tt>variable ^= expression;</tt></p>
+<p>This operator performs a bit-wise OR on the value of the <em>expression</em> and the value of the <em>variable</em>, and assigns the result to the <em>variable</em>.</p>
+<h5><a name="9"></a>|= operator</h5>
+<p><tt>variable |= expression;</tt></p>
+<p>This operator performs a bit-wise OR on the value of the <em>expression</em> and the value of the <em>variable</em>, and assigns the result to the <em>variable</em>.</p>
+<h5><a name="10"></a>&lt;&lt;= operator</h5>
+<p><tt>variable &lt;&lt;= expression;</tt></p>
+<p>This operator performs a bit-wise left shift on the <em>variable</em> by an <em>expression</em> number of bits. Zeros are shifted in from the right.</p>
+<h5><a name="11"></a>&gt;&gt;= operator</h5>
+<p><tt>variable &gt;&gt;= expression;</tt></p>
+<p>This operator performs a bit-wise (sign-preserving) right shift on the <em>variable</em> by an <em>expression</em> number of bits.</p>
+<h5><a name="12"></a>&gt;&gt;&gt;= operator</h5>
+<p><tt>variable &gt;&gt;&gt;= expression;</tt></p>
+<p>This operator performs a bit-wise (zero-padding) right shift on the <em>variable</em> by an <em>expression</em> number of bits.</p>
+<!-- eof -->
+<p align="right">[<a href="language-5-2.html">Prev: Built-in Operators</a>] [<a href="language.html">Home</a>] [<a href="language-5-2-2.html">Next: Arithmetic Operators</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>
