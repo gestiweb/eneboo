@@ -40,7 +40,10 @@
 #include "qapplication.h"
 #include "qt_windows.h"
 
-//#define DEBUG_QPAINTDEVICE
+#define DEBUG_QPAINTDEVICE
+#if defined(QT_CHECK_STATE)
+#define CHECK_STATE
+#endif
 
 // NOT REVISED
 /*!

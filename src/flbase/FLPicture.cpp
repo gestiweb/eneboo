@@ -60,15 +60,15 @@ FLPicturePrivate::FLPicturePrivate()
 
 FLPicturePrivate::~FLPicturePrivate()
 {
-  if (pic) {
-    end();
-    if (ownerPic)
-      delete pic;
-  }
   if (pte) {
     end();
     if (ownerPte)
       delete pte;
+  }
+  if (pic) {
+    end();
+    if (ownerPic)
+      delete pic;
   }
 }
 
