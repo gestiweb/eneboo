@@ -131,6 +131,7 @@ used. otherwise they look different under win and x11... no problem.
 #include "qtextlayout_p.h"
 
 #define DEBUG_QPAINTER
+// #define DEBUG_QPAINTER_2
 #define QT_CHECK_RANGE
 
 /* needed for dynamic loading ... */
@@ -332,7 +333,7 @@ inline double qcos( double a )
 
 void QPainter::initialize()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::initialize()" );
 #endif
     ( DWORD& ) qtAlphaBlend = ( DWORD ) QLibrary::resolve( "msimg32.dll", "AlphaBlend" );
@@ -344,7 +345,7 @@ void QPainter::initialize()
 
 void QPainter::cleanup()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::cleanup()" );
 #endif
     QPointArray::cleanBuffers();
@@ -358,7 +359,7 @@ void QPainter::cleanup()
 
 void QPainter::destroy()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::destroy()" );
 #endif
 
@@ -378,7 +379,7 @@ static QPaintDeviceDict *pdev_dict = 0;
 
 void QPainter::init()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::init()" );
 #endif
 
@@ -422,7 +423,7 @@ void QPainter::init()
 
 void QPainter::setFont( const QFont &font )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setFont( %s )", font.toString().latin1() );
 #endif
     if ( !isActive() )
@@ -437,7 +438,7 @@ void QPainter::setFont( const QFont &font )
 
 void QPainter::updateFont()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: updateFont " );
 #endif
 
@@ -458,7 +459,7 @@ void QPainter::updateFont()
 
 void QPainter::updatePen()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::updatePen() color: red0x%08x", QT_RGB_P );
 #endif
 
@@ -543,7 +544,7 @@ void QPainter::updateBrush()
 {
     // Holgi TODO the dense patterns do not support transparent drawing,
     // that is they also draw the background...
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: updateBrush " );
 #endif
 
@@ -892,7 +893,7 @@ void QPainter::updateBrush()
 
 bool QPainter::begin( const QPaintDevice *pd, bool /*unclipped*/ )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::begin( %p )", pd );
 #endif
 
@@ -1062,7 +1063,7 @@ bool QPainter::begin( const QPaintDevice *pd, bool /*unclipped*/ )
 
 bool QPainter::end()        // end painting
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::end() hdc: 0x%08p", hdc );
 #endif
 
@@ -1133,7 +1134,7 @@ void QPainter::flush( const QRegion &, CoordinateMode )
 */
 void QPainter::flush()
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::flush()" );
 #endif
     if ( isActive() )
@@ -1153,7 +1154,7 @@ void QPainter::flush()
 
 void QPainter::setBackgroundColor( const QColor &c )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setBackgroundColor( 0x%08x )", c.rgb() );
 #endif
 
@@ -1185,7 +1186,7 @@ void QPainter::setBackgroundColor( const QColor &c )
 */
 void QPainter::setBackgroundMode( BGMode m )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setBackgroundMode( %d )", m );
 #endif
 
@@ -1255,7 +1256,7 @@ static const int rop3Codes[] =
 
 void QPainter::setRasterOp( RasterOp r )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setRasterOp( RasterOp %d )", r );
 #endif
 
@@ -1289,7 +1290,7 @@ void QPainter::setRasterOp( RasterOp r )
 */
 void QPainter::setBrushOrigin( int x, int y )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setBrushOrigin(%d, %d)", x, y );
 #endif
 
@@ -1320,7 +1321,7 @@ void QPainter::setBrushOrigin( int x, int y )
 */
 void QPainter::setClipping( bool enable )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setClipping ( %d )", enable );
 #endif
 
@@ -1360,7 +1361,7 @@ void QPainter::setClipping( bool enable )
 */
 void QPainter::setClipRect( const QRect &r, CoordinateMode m )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setClipRect( %d/%d-%d/%d, %d) ", r.left(), r.top(), r.right(), r.bottom(), m );
 #endif
 
@@ -1378,7 +1379,7 @@ void QPainter::setClipRect( const QRect &r, CoordinateMode m )
 */
 void QPainter::setClipRegion( const QRegion &rgn, CoordinateMode m )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::setClipRegion( %p, %d)", rgn.handle(), m );
 #endif
     if ( !isActive() )
@@ -1406,7 +1407,7 @@ void QPainter::setClipRegion( const QRegion &rgn, CoordinateMode m )
 
 void QPainter::drawPolyInternal( const QPointArray &a, bool /*close*/ )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawPolyInternal()" );
 #endif
 
@@ -1444,7 +1445,7 @@ void QPainter::drawPolyInternal( const QPointArray &a, bool /*close*/ )
 */
 void QPainter::drawPoint( int x, int y )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawPoint( %d, %d)", x, y );
 #endif
 
@@ -1477,7 +1478,7 @@ void QPainter::drawPoint( int x, int y )
 */
 void QPainter::drawPoints( const QPointArray& a, int index, int npoints )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawPoints()" );
 #endif
 
@@ -1525,7 +1526,7 @@ void QPainter::drawPoints( const QPointArray& a, int index, int npoints )
 */
 void QPainter::moveTo( int x, int y )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::moveTo( %d, %d )", x, y );
 #endif
 
@@ -1554,7 +1555,7 @@ void QPainter::moveTo( int x, int y )
 
 void QPainter::lineTo( int x2, int y2 )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::lineTo( %d, %d )", x2, y2 );
 #endif
 
@@ -1578,7 +1579,7 @@ void QPainter::lineTo( int x2, int y2 )
     if ( cpen.style() != NoPen ) {
         LineTo( hdc, x2, y2 );
         qt_DrawLastPoint( hdc, x1, y1, x2, y2, QT_RGB_P );
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
 
         qDebug ( "hdc = %x", hdc );
         qDebug ( "x1=%d, y1=%d, x2=%d, y2=%d", x1, y1, x2, y2 );
@@ -1595,7 +1596,7 @@ void QPainter::lineTo( int x2, int y2 )
 */
 void QPainter::drawLine( int x1, int y1, int x2, int y2 )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawLine( %d, %d, %d, %d )", x1, y1, x2, y2 );
 #endif
 
@@ -1619,7 +1620,7 @@ void QPainter::drawLine( int x1, int y1, int x2, int y2 )
         MoveToEx( hdc, x1, y1, NULL );
         LineTo( hdc, x2, y2 );
         qt_DrawLastPoint( hdc, x1, y1, x2, y2, QT_RGB_P );
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
 
         qDebug ( "hdc = %x", hdc );
         qDebug ( "x1=%d, y1=%d, x2=%d, y2=%d", x1, y1, x2, y2 );
@@ -1637,7 +1638,7 @@ void QPainter::drawLine( int x1, int y1, int x2, int y2 )
 */
 void QPainter::drawRect( int x, int y, int w, int h )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qQPainter::drawRect( x: %d, y: %d, w: %d, h: %d )", x, y, w, h );
 #endif
 
@@ -1767,7 +1768,7 @@ void QPainter::drawWinFocusRect( int x, int y, int w, int h )
 void QPainter::drawWinFocusRect( int x, int y, int w, int h,
                                  const QColor &bgColor )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawWinFocusRect( %d, %d, %d, %d, rgb: %02x/%02x/%02x )",
             x, y, w, h, bgColor.red(), bgColor.green(), bgColor.blue() );
 #endif
@@ -1831,7 +1832,7 @@ void QPainter::drawWinFocusRect( int x, int y, int w, int h,
 
 void QPainter::drawRoundRect( int x, int y, int w, int h, int xRnd, int yRnd )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawRoundRect( %d,%d, %d,%d, %d, %d), x, y, w, h, xRnd, yRnd" );
 #endif
 
@@ -1910,7 +1911,7 @@ void QPainter::drawRoundRect( int x, int y, int w, int h, int xRnd, int yRnd )
 */
 void QPainter::drawEllipse( int x, int y, int w, int h )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawEllipse( %d, %d, %d, %d )", x, y, w, h );
 #endif
 
@@ -1974,7 +1975,7 @@ void QPainter::drawEllipse( int x, int y, int w, int h )
 */
 void QPainter::drawArc( int x, int y, int w, int h, int a, int alen )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawArc( %d,%d, %d,%d, %d, %d), x, y, w, h, a, aLen" );
 #endif
 
@@ -2047,7 +2048,7 @@ void QPainter::drawArc( int x, int y, int w, int h, int a, int alen )
 */
 void QPainter::drawPie( int x, int y, int w, int h, int a, int alen )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawPie " );
 #endif
     // Holgi TODO
@@ -2165,7 +2166,7 @@ void QPainter::drawPie( int x, int y, int w, int h, int a, int alen )
 
 void QPainter::drawChord( int x, int y, int w, int h, int a, int alen )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawChord " );
 #endif
     // Holgi TODO
@@ -2255,7 +2256,7 @@ void QPainter::drawChord( int x, int y, int w, int h, int a, int alen )
 
 void QPainter::drawLineSegments( const QPointArray &a, int index, int nlines )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawLineSegments( a, index: %d, nlines: %d ", index, nlines );
 #endif
 
@@ -2310,7 +2311,7 @@ void QPainter::drawLineSegments( const QPointArray &a, int index, int nlines )
 
 void QPainter::drawPolyline( const QPointArray &a, int index, int npoints )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawPolyline " );
 #endif
 
@@ -2350,7 +2351,7 @@ void QPainter::drawPolyline( const QPointArray &a, int index, int npoints )
     Check the definition for QPoint ...
     */
     if ( cpen.style() != NoPen ) {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
         qDebug ( "drawing polyLine with pen: rgb= 0x%08x", QT_RGB_P );
         qDebug ( "npoints = %d", npoints );
         for ( int j = 0; j < npoints; j++ ) {
@@ -2389,7 +2390,7 @@ void QPainter::drawPolyline( const QPointArray &a, int index, int npoints )
 void QPainter::drawPolygon( const QPointArray &a, bool winding,
                             int index, int npoints )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawPolygon " );
 #endif
     // Holgi TODO
@@ -2482,7 +2483,7 @@ void QPainter::drawPolygon( const QPointArray &a, bool winding,
 void QPainter::drawConvexPolygon( const QPointArray &pa,
                                   int index, int npoints )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawConvexPolygon" );
 #endif
     //    global_polygon_shape = Convex;
@@ -2502,7 +2503,7 @@ void QPainter::drawConvexPolygon( const QPointArray &pa,
 
 void QPainter::drawCubicBezier( const QPointArray &a, int index )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "QPainter::drawCubicBezier()" );
 #endif
 
@@ -2614,7 +2615,7 @@ void QPainter::drawCubicBezier( const QPointArray &a, int index )
 void QPainter::drawPixmap( int x, int y, const QPixmap &pixmap,
                            int sx, int sy, int sw, int sh )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawPixmap x: %d, y: %d, sx: %d, sy: %d, sw: %d, sh: %d.",
             x, y, sx, sy, sw, sh );
 #endif
@@ -2804,7 +2805,7 @@ void QPainter::drawPixmap( int x, int y, const QPixmap &pixmap,
 void QPainter::drawTiledPixmap( int x, int y, int w, int h,
                                 const QPixmap &pixmap, int sx, int sy )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: drawTiledPixmap(x=%d, y=%d, w=%d, h=%d):(sx=%d, sy=%d)", x, y, w, h, sx, sy );
 #endif
 
@@ -2925,7 +2926,7 @@ static QString gen_text_bitmap_key( const QWMatrix &m, const QFont &font,
 
 static QBitmap *get_text_bitmap( const QString &key )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: get_text_bitmap " );
 #endif
 
@@ -2934,7 +2935,7 @@ static QBitmap *get_text_bitmap( const QString &key )
 
 static void ins_text_bitmap( const QString &key, QBitmap *bm )
 {
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug( "qpainter_win.cpp: ins_text_bitmap " );
 #endif
 
@@ -2952,7 +2953,7 @@ static void ins_text_bitmap( const QString &key, QBitmap *bm )
 void QPainter::drawText( int x, int y, const QString &str, int len, TextDirection dir )
 {
 #ifdef DEBUG_QPAINTER
-    qDebug( "qpainter_win.cpp: drawText" );
+    qDebug( "qpainter_win.cpp: drawText 1 len: %d str: ascii: %s", len, str.ascii() );
 #endif
 
     if ( len < 0 )
@@ -2966,7 +2967,7 @@ void QPainter::drawText( int x, int y, const QString &str, int len, TextDirectio
 void QPainter::drawText( int x, int y, const QString &str, int pos, int len, QPainter::TextDirection dir )
 {
 #ifdef DEBUG_QPAINTER
-    qDebug( "qpainter_win.cpp: drawText len: %d str: ascii: %s", len, str.ascii() );
+    qDebug( "qpainter_win.cpp: drawText 2 len: %d str: ascii: %s", len, str.ascii() );
 #endif
 
     if ( !isActive() )
@@ -3132,7 +3133,7 @@ void qt_draw_transformed_rect( QPainter * p, int x, int y, int w, int h, bool fi
     rect.right = xp;
     rect.bottom = yp;
 
-#ifdef DEBUG_QPAINTER
+#ifdef DEBUG_QPAINTER_2
     qDebug ( "qt_draw_transformed_rect: %d,%d - %d,%d", rect.left, rect.top, rect.right, rect.bottom );
 #endif
 
