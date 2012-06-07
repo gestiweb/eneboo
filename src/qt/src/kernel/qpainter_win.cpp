@@ -130,7 +130,8 @@ used. otherwise they look different under win and x11... no problem.
 #include "qtextengine_p.h"
 #include "qtextlayout_p.h"
 
-//#define DEBUG_QPAINTER
+#define DEBUG_QPAINTER
+#define QT_CHECK_RANGE
 
 /* needed for dynamic loading ... */
 static BOOL ( WINAPI * qtAlphaBlend ) (
@@ -1414,7 +1415,8 @@ void QPainter::drawPolyInternal( const QPointArray &a, bool /*close*/ )
 
     int npoints;
     npoints = a.size();
-#if defined(Q_CC_MSVC) || defined(Q_CC_BOR)
+//#if defined(Q_CC_MSVC) || defined(Q_CC_BOR)
+#if 1
 
     POINT *mypoints = new POINT[ npoints ];
 #else
@@ -1428,7 +1430,7 @@ void QPainter::drawPolyInternal( const QPointArray &a, bool /*close*/ )
         mypoints[ i ].y = a.point( i ).y();
     }
     Polygon( hdc, mypoints, npoints );
-#if defined(Q_CC_MSVC) || defined(Q_CC_BOR)
+#if 1
 
     delete [] mypoints;
 #endif
@@ -2442,7 +2444,7 @@ void QPainter::drawPolygon( const QPointArray &a, bool winding,
     /* XDrawLines( dpy, hd, gc, (XPoint*)(pa.shortPoints( index, npoints )),
           npoints, CoordModeOrigin );
     */
-#if defined(Q_CC_MSVC) || defined(Q_CC_BOR)
+#if 1
     POINT *mypoints = new POINT[ npoints ];
 #else
 
@@ -2456,7 +2458,7 @@ void QPainter::drawPolygon( const QPointArray &a, bool winding,
     }
 
     Polygon( hdc, mypoints, npoints );
-#if defined(Q_CC_MSVC) || defined(Q_CC_BOR)
+#if 1
 
     delete [] mypoints;
 #endif

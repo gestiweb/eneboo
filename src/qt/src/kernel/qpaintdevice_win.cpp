@@ -41,6 +41,7 @@
 #include "qt_windows.h"
 
 #define DEBUG_QPAINTDEVICE
+// #define DEBUG_QPAINTDEVICE_2
 #define QT_CHECK_STATE
 #define CHECK_STATE
 
@@ -111,7 +112,7 @@ bool  QPaintDevice::x_appdefvisual;
 
 QPaintDevice::QPaintDevice( uint devflags )
 {
-#ifdef DEBUG_QPAINTDEVICE
+#ifdef DEBUG_QPAINTDEVICE_2
     qDebug( "QPaintDevice::QPaintDevice( %d )", devflags );
 #endif
 
@@ -134,7 +135,7 @@ QPaintDevice::QPaintDevice( uint devflags )
 
 QPaintDevice::~QPaintDevice()
 {
-#ifdef DEBUG_QPAINTDEVICE
+#ifdef DEBUG_QPAINTDEVICE_2
     qDebug( "QPaintDevice::~QPaintDevice()" );
 #endif
 #if defined(QT_CHECK_STATE)
@@ -171,7 +172,7 @@ QPaintDevice::~QPaintDevice()
 */
 HDC QPaintDevice::handle() const
 {
-#ifdef DEBUG_QPAINTDEVICE
+#ifdef DEBUG_QPAINTDEVICE_2
     qDebug( "QPaintDevice::handle(), DevType=%s", devType() == QInternal::Widget ? "QInternal::Widget" : "Other" );
 #endif
     return hdc;
@@ -761,7 +762,7 @@ void bitBlt( QPaintDevice *dst, int dx, int dy,
     //      Qt::RasterOp rop, bool ignoreMask )
 
     // BitBlt(dest, xd, yd, w, h, src, xs, ys, rop);
-#ifdef DEBUG_QPAINTDEVICE
+#ifdef DEBUG_QPAINTDEVICE_2
     qDebug( "  bitBlt: sw: %d, sh: %d, dx: %d, dy: %d, sx: %d, sy: %d,",
             sw, sh, dx, dy, sx, sy );
 
@@ -847,7 +848,7 @@ void bitBlt( QPaintDevice *dst, int dx, int dy,
 #endif
 
     }
-#ifdef DEBUG_QPAINTDEVICE
+#ifdef DEBUG_QPAINTDEVICE_2
 
     qDebug( "no stop" );
 #endif
