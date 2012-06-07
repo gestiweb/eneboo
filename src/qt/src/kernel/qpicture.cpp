@@ -50,7 +50,7 @@
 #include "private/qsvgdevice_p.h"
 #endif
 
-#define QT_CHECK_RANGE
+//#define QT_CHECK_RANGE
 
 /*!
     \class QPicture qpicture.h

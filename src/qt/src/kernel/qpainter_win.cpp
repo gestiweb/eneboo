@@ -130,9 +130,9 @@ used. otherwise they look different under win and x11... no problem.
 #include "qtextengine_p.h"
 #include "qtextlayout_p.h"
 
-#define DEBUG_QPAINTER
+//#define DEBUG_QPAINTER
 // #define DEBUG_QPAINTER_2
-#define QT_CHECK_RANGE
+//#define QT_CHECK_RANGE
 
 /* needed for dynamic loading ... */
 static BOOL ( WINAPI * qtAlphaBlend ) (
