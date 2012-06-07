@@ -7,7 +7,7 @@ else {
 }
 TEMPLATE = app 
 
-CONFIG += warn_off link_prl qt 
+CONFIG += warn_off link_prl qt console
 unix:CONFIG += x11
 CONFIG -= dll
 
