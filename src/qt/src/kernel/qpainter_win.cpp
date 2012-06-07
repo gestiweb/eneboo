@@ -423,7 +423,7 @@ void QPainter::init()
 void QPainter::setFont( const QFont &font )
 {
 #ifdef DEBUG_QPAINTER
-    qDebug( "QPainter::setFont( %s )" font.family.latin1(), font.toString().latin1() );
+    qDebug( "QPainter::setFont( %s )", font.toString().latin1() );
 #endif
     if ( !isActive() )
         qWarning( "QPainter::setFont: Will be reset by begin()" );
@@ -1911,7 +1911,7 @@ void QPainter::drawRoundRect( int x, int y, int w, int h, int xRnd, int yRnd )
 void QPainter::drawEllipse( int x, int y, int w, int h )
 {
 #ifdef DEBUG_QPAINTER
-    qDebug( "QPainter::drawEllipse( %d, %d, %d, %d )" x, y, w, h );
+    qDebug( "QPainter::drawEllipse( %d, %d, %d, %d )", x, y, w, h );
 #endif
 
     if ( !isActive() )
