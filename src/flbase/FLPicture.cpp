@@ -51,6 +51,7 @@ public:
 
 FLPicturePrivate::FLPicturePrivate()
 {
+  qWarning("FLPicturePrivate::FLPicturePrivate()");
   pic = new QPicture();
   pte = new QPainter();
   ownerPic = true;
@@ -60,15 +61,20 @@ FLPicturePrivate::FLPicturePrivate()
 
 FLPicturePrivate::~FLPicturePrivate()
 {
+  qWarning("FLPicturePrivate::~FLPicturePrivate()");
   if (pte) {
     end();
-    if (ownerPte)
+    if (ownerPte) {
+      qWarning("FLPicturePrivate:: delete pte");
       delete pte;
+    }
   }
   if (pic) {
     end();
-    if (ownerPic)
+    if (ownerPic) {
+      qWarning("FLPicturePrivate:: delete pic");
       delete pic;
+    }
   }
 }
 
@@ -76,6 +82,9 @@ bool FLPicturePrivate::begin()
 {
   if (!pte->isActive())
     return pte->begin(pic);
+  else 
+    qWarning("WARN: FLPicturePrivate::begin() -> pte->isActive() !!");
+  
   return false;
 }
 
@@ -85,11 +94,15 @@ bool FLPicturePrivate::end()
     return pte->end();
   else if (!ownerPte && pte->isActive() && endPte)
     return pte->end();
+  else
+    qWarning("WARN: FLPicturePrivate::end() -> not active or other error!!");
+    
   return false;
 }
 
 void FLPicturePrivate::setPainter(QPainter * pt)
 {
+  qWarning("FLPicturePrivate::setPainter(pt)");
   if (pic && pt) {
     if (pte) {
       end();
@@ -105,13 +118,17 @@ void FLPicturePrivate::setPainter(QPainter * pt)
 FLPicture::FLPicture(QObject * parent, const char * name) :
   QObject(parent, name), d(0)
 {
+  qWarning("FLPicture::FLPicture(QObject * parent, const char * name)");
 }
 
 FLPicture::FLPicture(FLPicture * other) :
   QObject(0), d(0)
 {
+  qWarning("FLPicture::FLPicture(FLPicture * other)");
   if (other && other != this && other->d && other->d->pic) {
     d = new FLPicturePrivate();
+    qWarning("WARN: FLPicture::FLPicture(FLPicture * other) -> replacing picture !!)");
+    
     *(d->pic) = *(other->d->pic);
   }
 }
@@ -119,36 +136,44 @@ FLPicture::FLPicture(FLPicture * other) :
 FLPicture::FLPicture(const QPicture & pic) :
   QObject(0), d(0)
 {
+  qWarning("FLPicture::FLPicture(const QPicture & pic)");
   setPicture(pic);
 }
 
 FLPicture::FLPicture(QPicture * pic, QObject * parent, const char * name) :
   QObject(parent, name), d(0)
 {
+  qWarning("FLPicture::FLPicture(QPicture * pic, QObject * parent, const char * name)");
   setPicture(pic);
 }
 
 FLPicture::FLPicture(QPicture * pic, QPainter * pte, QObject * parent, const char * name) :
   QObject(parent, name), d(0)
 {
+  qWarning("FLPicture::FLPicture(QPicture * pic, QPainter * pte, QObject * parent, const char * name)");
   setPicture(pic);
   d->setPainter(pte);
 }
 
 FLPicture::~FLPicture()
 {
+  qWarning("FLPicture::~FLPicture()");
+
   cleanup();
 }
 
 QPicture * FLPicture::picture() const
 {
-  if (!d)
+  if (!d) {
+    qWarning("WARN: QPicture * FLPicture::picture() const - no picture found, returning NULL");
     return 0;
+  }
   return d->pic;
 }
 
 void FLPicture::setPicture(const QPicture & pic)
 {
+  qWarning("WARN: FLPicture::setPicture(const QPicture & pic) - replacing picture");
   cleanup();
   PIC_NEW_D
   *(d->pic) = pic;
@@ -157,11 +182,14 @@ void FLPicture::setPicture(const QPicture & pic)
 void FLPicture::setPicture(QPicture * pic)
 {
   if (pic) {
+    qWarning("WARN: FLPicture::setPicture(QPicture * pic) - replacing picture - new picture not owned!");
     cleanup();
     PIC_NEW_D
     delete d->pic;
     d->pic = pic;
     d->ownerPic = false;
+  } else {
+    qWarning("WARN: FLPicture::setPicture(QPicture * pic) - pic == NULL - nothing changed.");
   }
 }
 
@@ -197,18 +225,21 @@ void FLPicture::setBoundingRect(const QRect & r)
 
 bool FLPicture::begin()
 {
+  qWarning("FLPicture::begin()");
   PIC_NEW_D
   return d->begin();
 }
 
 bool FLPicture::end() const
 {
+  qWarning("FLPicture::end()");
   PIC_CHK_D( false )
   return d->end();
 }
 
 void FLPicture::cleanup()
 {
+  qWarning("FLPicture::cleanup()");
   if (d)
     delete d;
   d = 0;
@@ -697,12 +728,14 @@ QPixmap * FLPicture::playOnPixmap(QPixmap * pix)
   if (!pix)
     return 0;
   end();
-  QPicture cpyPic;
-  cpyPic.setData(d->pic->data(), d->pic->size());
-  QPainter pa(pix);
-  pa.setClipRect(0, 0, pix->width(), pix->height());
-  cpyPic.play(&pa);
-  pa.end();
+  {
+      QPicture cpyPic;
+      QPainter pa(pix);
+      cpyPic.setData(d->pic->data(), d->pic->size());
+      pa.setClipRect(0, 0, pix->width(), pix->height());
+      cpyPic.play(&pa);
+      pa.end();
+  }
   begin();
   d->pte->drawPicture(0, 0, cpyPic);
   return pix;
