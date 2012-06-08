@@ -45,8 +45,7 @@ bool SqliteDriver::open(const QString &db, const QString &, const QString &, con
 
   if (!QFile::exists(db)) {
     QMessageBox msgBox(tr("AVISO IMPORTANTE") ,
-                       tr("AbanQ puede comportarse de forma inestable con la base de datos SQLite.\n"
-                          "AbanQ utilizando SQLite no tiene ningún tipo de soporte por parte de InfoSiAL S.L.,\n"
+                       tr("Eneboo puede comportarse de forma inestable con la base de datos SQLite.\n"
                           "esta opción sólo se ofrece para poder probar fácilmente la aplicación\n"
                           "sin necesidad de instalar un servidor de bases de datos.\n\n"
                           "Para asegurar la fiabilidad en entornos en producción utilice un sistema de gestión\n"
