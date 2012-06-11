@@ -116,6 +116,7 @@ FLPicture::FLPicture(QObject * parent, const char * name) :
   QObject(parent, name), d(0)
 {
   qWarning("FLPicture::FLPicture(QObject * parent, const char * name)");
+  PIC_NEW_D
 }
 
 FLPicture::FLPicture(FLPicture * other) :
