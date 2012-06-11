@@ -86,12 +86,13 @@ bool FLPicturePrivate::begin()
 
 bool FLPicturePrivate::end()
 {
-  if (ownerPte && pte->isActive())
+  if (!pte->isActive()) return false;
+  if (ownerPte)
     return pte->end();
-  else if (!ownerPte && pte->isActive() && endPte)
+  else if (!ownerPte && endPte)
     return pte->end();
   else
-    qWarning("WARN: FLPicturePrivate::end() -> not active or other error!!");
+    qWarning("WARN: FLPicturePrivate::end() -> not owner and endPte = False  error!!");
     
   return false;
 }
