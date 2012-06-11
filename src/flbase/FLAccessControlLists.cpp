@@ -86,8 +86,8 @@ void FLAccessControlLists::init(const QString &aclXml)
         accessControlList_->replace(ac->type() + QString::fromLatin1("::") +
                                     ac->name() + QString::fromLatin1("::") +
                                     ac->user(), ac);
-	qWarning("FLAccessControlLists::set: " +
-           ac->type() + " :: " + ac->name() + " :: " + ac->user() );
+//	qWarning("FLAccessControlLists::set: " +
+//           ac->type() + " :: " + ac->name() + " :: " + ac->user() );
         no = no.nextSibling();
         continue;
       }
@@ -108,10 +108,10 @@ void FLAccessControlLists::process(QObject *obj)
   QString name(obj->name());
   QString user(FLSqlConnections::database()->user());
 
-#ifdef FL_DEBUG
-  qWarning("FLAccessControlLists::process: " +
-           type + " :: " + name + " :: " + user);
-#endif
+//#ifdef FL_DEBUG
+//  qWarning("FLAccessControlLists::process: " +
+//           type + " :: " + name + " :: " + user);
+//#endif
 
   if (type.isEmpty() || name.isEmpty() || user.isEmpty())
     return;
