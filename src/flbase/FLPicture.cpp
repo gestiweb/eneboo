@@ -20,14 +20,10 @@
 
 #define PIC_NEW_D     if ( !d ) d = new FLPicturePrivate();
 
-#ifdef FL_DEBUG
 #define PIC_CHK_D(R)  if ( !d || ( d && !d->pte->isActive() ) ) { \
     qWarning( tr( "Picture no está activo, para activarlo llama a la función begin()" ) ); \
     return R; \
   }
-#else
-#define PIC_CHK_D(R)  if ( !d || ( d && !d->pte->isActive() ) ) return R;
-#endif
 
 class FLPicturePrivate
 {
@@ -728,14 +724,12 @@ QPixmap * FLPicture::playOnPixmap(QPixmap * pix)
   if (!pix)
     return 0;
   end();
-  {
-      QPicture cpyPic;
-      QPainter pa(pix);
-      cpyPic.setData(d->pic->data(), d->pic->size());
-      pa.setClipRect(0, 0, pix->width(), pix->height());
-      cpyPic.play(&pa);
-      pa.end();
-  }
+  QPicture cpyPic;
+  QPainter pa(pix);
+  cpyPic.setData(d->pic->data(), d->pic->size());
+  pa.setClipRect(0, 0, pix->width(), pix->height());
+  cpyPic.play(&pa);
+  pa.end();
   begin();
   d->pte->drawPicture(0, 0, cpyPic);
   return pix;
