@@ -193,7 +193,6 @@ QMYSQLResultPrivate::QMYSQLResultPrivate()
 QSqlError qMakeError(const QString &err, int type, const QMYSQLDriverPrivate *p)
 {
   QString msg = QString(mysql_error(p->mysql));
-  msg += "\n\n" + QApplication::tr("Obtenga ayuda y soporte en") + " http://www.infosial.com\n(c) InfoSiAL S.L.";
   printf("%s\n", msg.latin1());
   return QSqlError(QMYSQL_DRIVER_NAME ": " + err, msg, type, mysql_errno(p->mysql));
 }
