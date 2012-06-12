@@ -726,14 +726,15 @@ QPixmap * FLPicture::playOnPixmap(QPixmap * pix)
   if (!pix)
     return 0;
   end();
-  QPicture cpyPic;
+  //QPicture cpyPic;
   QPainter pa(pix);
-  cpyPic.setData(d->pic->data(), d->pic->size());
+  //cpyPic.setData(d->pic->data(), d->pic->size());
   pa.setClipRect(0, 0, pix->width(), pix->height());
-  cpyPic.play(&pa);
+  d->pic->play(&pa);
+  //cpyPic.play(&pa);
   pa.end();
   begin();
-  d->pte->drawPicture(0, 0, cpyPic);
+  //d->pte->drawPicture(0, 0, cpyPic);
   return pix;
 }
 
