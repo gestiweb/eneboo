@@ -239,7 +239,7 @@ QPixmap::QPixmap( const QImage& image )
 QPixmap::QPixmap( int w, int h, int depth, Optimization optimization )
     : QPaintDevice( QInternal::Pixmap )
 {
-    qDebug("QPixmap::QPixmap(w:%d,h:%d,depth:%d,optim:%d)", w,h,depth,optimization);
+    //qDebug("QPixmap::QPixmap(w:%d,h:%d,depth:%d,optim:%d)", w,h,depth,optimization);
     init( w, h, depth, FALSE, optimization );
 }
 
