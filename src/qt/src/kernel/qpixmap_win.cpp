@@ -47,7 +47,7 @@
 
 #undef MITSHM
 
-//#define DEBUG_QPIXMAP
+#define DEBUG_QPIXMAP
 
 /*****************************************************************************
   Internal functions
