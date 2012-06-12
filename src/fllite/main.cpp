@@ -102,7 +102,7 @@ void aq_main(int argc, char **argv)
   p.setColor(QPalette::Disabled, QColorGroup::ButtonText, QColor(100, 100, 100));
   p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(95, 150, 205));
 
- if (FLSettings::readEntry("style", "QtEneboo") == "QtEneboo")
+ if (FLSettings::readEntry("style", "QtCurve") == "QtEneboo")
     {
     p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(255, 226, 181));
     p.setColor(QPalette::Inactive, QColorGroup::Highlight, QColor(255, 110, 1));
@@ -185,7 +185,7 @@ void aq_main(int argc, char **argv)
   appFont.setStrikeOut(FLSettings::readBoolEntry("font/strikeOut", false));
 
   AbanQ->setFont(appFont);
-  AbanQ->setStyle(FLSettings::readEntry("style", "QtEneboo"));
+  AbanQ->setStyle(FLSettings::readEntry("style", "QtCurve"));
 
   AbanQ->installTranslator(AbanQ->createSysTranslator(QString(QTextCodec::locale()).left(2), true));
   AbanQ->installTranslator(AbanQ->createSysTranslator("multilang"));
