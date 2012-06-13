@@ -355,6 +355,7 @@ class MainWindow
     this.initTabWidget();
     this.initHelpMenu();
     this.initConfigMenu();
+    this.initTextLabel();
     this.initDocks();
     this.initEventFilter();
   }
@@ -715,6 +716,14 @@ class MainWindow
     font.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("font.png")));
     connect(font, "activated()", aqApp, "chooseFont()");
   }
+
+    function initTextLabel()
+    {
+    var w = this.w_;
+    var tL = w.child("tLabel");
+    var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='message'");
+    tL.text = texto;
+    }
 
   function initDocks()
   {
