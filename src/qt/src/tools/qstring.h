@@ -400,7 +400,7 @@ public:
     QString();                                  // make null string
     QString( QChar );                           // one-char string
     QString( const QString & );                 // impl-shared copy
-    QString( const QByteArray& );               // deep copy
+    QString( const QByteArray& , char mode = 't');   // deep copy
     QString( const QChar* unicode, uint length ); // deep copy
 #ifndef QT_NO_CAST_ASCII
     QString( const char *str );                 // deep copy
