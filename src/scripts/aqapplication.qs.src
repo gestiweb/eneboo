@@ -722,6 +722,7 @@ class MainWindow
     var w = this.w_;
     var tL = w.child("tLabel");
     var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='message'");
+    if (texto)
     tL.text = texto;
     }
 
