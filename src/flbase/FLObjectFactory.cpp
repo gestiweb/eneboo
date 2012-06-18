@@ -793,7 +793,7 @@ FLObjectFactory::FLObjectFactory() :
   registerClass("FLListViewItem", "FLListViewInterfaceItem");
   registerClass("FLScriptEditor", "FLScriptEditorInterface");
   //###
-  //registerClass("QTabWidget", "FLTabWidgetInterface");
+  registerClass("FLTabWidget", "FLTabWidgetInterface");
   registerClass("FLVar", "FLVarInterface");
   //###
   //registerClass("QDomNode", "FLDomNodeInterface");
@@ -911,7 +911,7 @@ QObject *FLObjectFactory::create(const QString &className, const QSArgumentList 
     }
   }
 
-  if (className == "QTabWidget") {
+  if (className == "FLTabWidget") {
     return new FLTabWidgetInterface();
   }
 
