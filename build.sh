@@ -69,6 +69,7 @@ for a in "$@"; do
     ;;
     -dbadmin)
       OPT_QUICK_CLIENT=no
+      OPT_DEBUGGER=yes
     ;;
     -single)
       OPT_MULTICORE=no
