@@ -607,7 +607,7 @@ void FLApplication::initToolBox()
         continue;
 #endif
         
-      if (*itM == "sys") {
+    if (*itM == "sys" && ap2->isDebuggerMode()) {
        
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
