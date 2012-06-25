@@ -2,11 +2,11 @@
 
 VERSION=$(git describe --tags)
 PROJECT="eneboo"
-PVERSION="${PROJECT}-${VERSION}"
-SRC="eneboo-build-win32"
-test -e "$SRC" || { echo "No existe compilacion para Windows 32 bits! (falta carpeta $SRC)"; exit 1; }
+PVERSION="${PROJECT}-${VERSION}-quick"
+SRC="eneboo-build-win32-quick"
+test -e "$SRC" || { echo "No existe compilacion Quick para Windows 32 bits! (falta carpeta $SRC)"; exit 1; }
 
-echo "Exportando compilacion Windows 32 bits para $PVERSION . . . "
+echo "Exportando compilacion Quick Windows 32 bits para $PVERSION . . . "
 
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-win32.tar" "$PVERSION"

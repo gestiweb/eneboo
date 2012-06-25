@@ -2,11 +2,11 @@
 
 VERSION=$(git describe --tags)
 PROJECT="eneboo"
-PVERSION="${PROJECT}-${VERSION}"
-SRC="eneboo-build-macx"
-test -e "$SRC" || { echo "No existe compilación para MacOSX ! (falta carpeta $SRC)"; exit 1; }
+PVERSION="${PROJECT}-${VERSION}-quick"
+SRC="eneboo-build-macx-quick"
+test -e "$SRC" || { echo "No existe compilación Quick para MacOSX ! (falta carpeta $SRC)"; exit 1; }
 
-echo "Exportando compilación MacOSX para $PVERSION . . . "
+echo "Exportando compilación Quick MacOSX para $PVERSION . . . "
 
 mv "$SRC" "$PVERSION"
 

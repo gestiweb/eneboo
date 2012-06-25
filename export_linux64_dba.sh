@@ -2,11 +2,11 @@
 
 VERSION=$(git describe --tags)
 PROJECT="eneboo"
-PVERSION="${PROJECT}-${VERSION}"
-SRC="eneboo-build-linux64"
-test -e "$SRC" || { echo "No existe compilacion para Linux 64 bits! (falta carpeta $SRC)"; exit 1; }
+PVERSION="${PROJECT}-${VERSION}-dba"
+SRC="eneboo-build-linux64-dba"
+test -e "$SRC" || { echo "No existe compilacion dbAdmin para Linux 64 bits! (falta carpeta $SRC)"; exit 1; }
 
-echo "Exportando compilacion Linux 64 bits para $PVERSION . . . "
+echo "Exportando compilacion dbAdmin Linux 64 bits para $PVERSION . . . "
 
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-linux64.tar" "$PVERSION"
