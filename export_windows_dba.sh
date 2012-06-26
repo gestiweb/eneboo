@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilacion dbAdmin para Windows 32 bits! (f
 
 echo "Exportando compilacion dbAdmin Windows 32 bits para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-win32.tar" "$PVERSION"
 bzip2 -9 "$PVERSION-win32.tar"

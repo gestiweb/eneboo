@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilacion quick para Linux 64 bits! (falta
 
 echo "Exportando compilacion quick Linux 64 bits para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-linux64.tar" "$PVERSION"
 bzip2 -9 "$PVERSION-linux64.tar"

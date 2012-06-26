@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilación dbAdmin para MacOSX ! (falta car
 
 echo "Exportando compilación dbAdmin MacOSX para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 
 rm -Rf "$PVERSION/lib/*.a"

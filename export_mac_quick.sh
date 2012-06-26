@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilación Quick para MacOSX ! (falta carpe
 
 echo "Exportando compilación Quick MacOSX para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 
 rm -Rf "$PVERSION/lib/*.a"

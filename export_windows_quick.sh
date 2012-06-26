@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilacion Quick para Windows 32 bits! (fal
 
 echo "Exportando compilacion Quick Windows 32 bits para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-win32.tar" "$PVERSION"
 bzip2 -9 "$PVERSION-win32.tar"
