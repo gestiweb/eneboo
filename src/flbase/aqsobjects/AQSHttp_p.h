@@ -63,7 +63,7 @@ public slots:
   int closeConnection();
   ulong bytesAvailable() const;
   long readBlock(char *, ulong);
-  QByteArray *readAll();
+  QByteArray readAll();
   int currentId() const;
   QIODevice *currentSourceDevice() const;
   QIODevice *currentDestinationDevice() const;
@@ -249,9 +249,9 @@ inline long AQSHttp::readBlock(char *arg0,  ulong arg1)
 {
   AQ_CALL_RET_V(readBlock(arg0, arg1), long);
 }
-inline QByteArray *AQSHttp::readAll()
+inline QByteArray AQSHttp::readAll()
 {
-  AQ_CALL_RET_PTR(readAll(), QByteArray);
+  AQ_CALL_RET_V(readAll(), QByteArray);
 }
 inline int AQSHttp::currentId() const
 {

@@ -1,0 +1,22 @@
+<!DOCTYPE PROP><PROP>
+<property>
+    <name>QSInterpreter::errorMode</name>
+    <doc href="qsinterpreter.html#errorMode-prop">
+&lt;p&gt;This property holds what happens when there is an error:.
+&lt;p&gt;
+&lt;p&gt;Set this property's value with &lt;a href="qsinterpreter.html#setErrorMode"&gt;setErrorMode&lt;/a&gt;() and get this property's value with &lt;a href="qsinterpreter.html#errorMode"&gt;errorMode&lt;/a&gt;().
+</doc>
+</property>
+<property>
+    <name>QSInterpreter::timeoutInterval</name>
+    <doc href="qsinterpreter.html#timeoutInterval-prop">
+&lt;p&gt;This property holds describes the number of milliseconds between each time the &lt;a href="qsinterpreter.html#timeout"&gt;timeout&lt;/a&gt;() signal will be emitted by the interpreter.
+&lt;p&gt;The timeout can be used to perform monitoring of the interpreter,
+such as forcing it to terminate if it has not terminated after 10
+seconds. A negative value, the default, will turn off the &lt;a href="qsinterpreter.html#timeout"&gt;timeout&lt;/a&gt;() signal.
+&lt;p&gt; &lt;p&gt;See also &lt;a href="qsinterpreter.html#timeout"&gt;timeout&lt;/a&gt;().
+
+&lt;p&gt;Set this property's value with &lt;a href="qsinterpreter.html#setTimeoutInterval"&gt;setTimeoutInterval&lt;/a&gt;() and get this property's value with &lt;a href="qsinterpreter.html#timeoutInterval"&gt;timeoutInterval&lt;/a&gt;().
+</doc>
+</property>
+</PROP>

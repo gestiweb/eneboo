@@ -61,6 +61,7 @@ public slots:
   void setShowAlias(const bool);
   bool showEditor() const;
   void setShowEditor(const bool);
+  void setPartDecimal(int);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -214,6 +215,10 @@ inline bool AQSFieldDB::showEditor() const
 inline void AQSFieldDB::setShowEditor(const bool arg0)
 {
   AQ_CALL_VOID(setShowEditor(arg0));
+}
+inline void AQSFieldDB::setPartDecimal(int arg0)
+{
+  AQ_CALL_VOID(setPartDecimal(arg0));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

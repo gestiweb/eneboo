@@ -26,18 +26,22 @@ AQS *globalAQS = &globalAQS_;
 QSInterpreter *globalAQSInterpreter = 0;
 AQSEvent *AQSObject::filterEvent_ = 0;
 QSArgumentList *AQSObject::filterArgs_ = 0;
+int AQSCanvasItemList::itCount_ = 0;
+QSObjectFactory *globalAQSFactory = 0;
 
 AQSObjectFactory::AQSObjectFactory()
 {
   d = new AQSObjectFactoryPrivate;
 
   globalAQSInterpreter = aqApp->project()->interpreter();
+  globalAQSFactory = this;
 
   AQ_GEN_REG_CLASS
 
   registerClass("AQS", "AQS", globalAQS);
   registerClass("aqApp", "AQSApplication", new AQSApplication(aqApp));
   registerClass("QSProject", "AQSSProject", new AQSSProject(aqApp->project()));
+  registerClass("QSInterpreter", "AQSSInterpreter", new AQSSInterpreter(globalAQSInterpreter));
   registerClass("AQSql", QString::null, new AQSql);
 }
 
@@ -109,3 +113,17 @@ bool AQS::ImageDrag_decode(QMimeSource *e, AQSPixmap *pm)
   return QImageDrag::decode(e, *pm);
 }
 
+bool AQS::UrlInfo_greaterThan(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy)
+{
+  return (i1 && i2) ? QUrlInfo::greaterThan(*i1, *i2, sortBy) : false;
+}
+
+bool AQS::UrlInfo_lessThan(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy)
+{
+  return (i1 && i2) ? QUrlInfo::lessThan(*i1, *i2, sortBy) : false;
+}
+
+bool AQS::UrlInfo_equal(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy)
+{
+  return (i1 && i2) ? QUrlInfo::equal(*i1, *i2, sortBy) : false;
+}

@@ -108,7 +108,7 @@ int CPUInfo::computeNumProcessors (void)
 {
   static int np = 0;
   if (!np) {
-#if defined(__linux) || defined(__APPLE__)
+#if defined(__linux) /*|| defined(__APPLE__)*/
     np = (int) sysconf(_SC_NPROCESSORS_ONLN);
 #elif defined(_WIN32)
     SYSTEM_INFO infoReturn[1];

@@ -431,6 +431,70 @@ QVariant FLUtil::nextCounter(const QString &name, FLSqlCursor *cursor_)
   return QVariant();
 }
 
+QVariant FLUtil::nextCounter( const QString & serie, const QString & name, FLSqlCursor * cursor_ ) {
+	if ( !cursor_ )
+		return QVariant();
+
+	FLTableMetaData *tMD = cursor_->metadata();
+
+	if ( !tMD )
+		return QVariant();
+
+	FLFieldMetaData *field = tMD->field( name );
+
+	if ( !field )
+		return QVariant();
+
+	int type = field->type();
+
+	if ( type != QVariant::String && type != QVariant::Double )
+		return QVariant();
+
+	unsigned int len = field->length() - serie.length();
+	QString cadena;
+
+	QString where = "LENGTH(" + name + ")=" + QString::number( field->length() );
+	where += QString(" AND substring(%1 FROM 1 for %2) = '%3'").arg(name).
+			arg(serie.length()).arg(serie);
+	QString select = QString("substring(%1 FROM %2) as %3").arg(name).
+			arg(serie.length()+1).arg(name);
+	FLSqlQuery q( 0, cursor_->db()->connectionName() );
+	q.setForwardOnly( true );
+	q.setTablesList( tMD->name() );
+	q.setSelect( select );
+	q.setFrom( tMD->name() );
+	q.setWhere( where );
+	q.setOrderBy( name + " DESC" );
+
+	if ( !q.exec() )
+		return QVariant();
+
+	double maxRange = pow( 10, len );
+	double numero = maxRange;
+
+	while ( numero >= maxRange ) {
+		if ( !q.next() ) {
+			numero = 1;
+			break;
+		}
+		numero = q.value( 0 ).toDouble();
+		numero++;
+	}
+
+	if ( type == QVariant::String || type == QVariant::Double ) {
+		cadena = QString::number( numero, 'f', 0 );
+		if ( cadena.length() < len ) {
+			QString str;
+			str.fill( '0', ( len - cadena.length() ) );
+			cadena = str + cadena;
+		}
+		QString res = QString("%1%2").arg(serie).arg(cadena);
+		return QVariant( cadena );
+	}
+
+	return QVariant();
+}
+
 QString FLUtil::nextSequence(int nivel, const QString &secuencia, const QString &ultimo)
 {
   QString cadena;

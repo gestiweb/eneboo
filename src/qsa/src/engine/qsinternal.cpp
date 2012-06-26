@@ -47,7 +47,9 @@
 
 #include <qapplication.h>
 #include <qregexp.h>
+#if defined (QT_THREAD_SUPPORT)
 #include <private/qmutexpool_p.h>
+#endif
 #include <stdio.h>
 
 extern int qsyyparse();

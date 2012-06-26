@@ -1,0 +1,13 @@
+Describes a stack trace after an error has occurred in the interpreter. | QSStackTrace
+Encapsulation of a script written in Qt Script. | QSScript
+Enhanced editor for editing Qt Script source code. | QSEditor
+Extends QSA with a basic and easy-to-use input dialog framework. | QSInputDialogFactory
+Extends QSA with classes to allow file access, directory traversal and executing external processes. | QSUtilFactory
+Information about a function call in the stack trace. | QSStackFrame
+Interface to QSA Workbench, the QSA simple scripting environment. | QSWorkbench
+Method for Qt Script programs to create C++ QObjects. | QSObjectFactory
+Method for Qt Script to extend QObject C++ types and to automatically wrap non-QObject C++ types. | QSWrapperFactory
+Project management over scripts written in Qt Script for Applications. | QSProject
+QValueList of QSArguments with some convenience constructors. | QSArgumentList
+Storage for various datatypes used in QSObjectFactory::create() calls. | QSArgument
+The public API for the Qt Script for Applications script engine. | QSInterpreter

@@ -37,9 +37,14 @@ protected:
       delete o_;
   }
 
+public slots:
+  QIODevice *ioDevice() const {
+    return static_cast<QIODevice *>(o_);
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
-  QByteArray *buffer() const;
+  QByteArray buffer() const;
   bool setBuffer(QByteArray *);
   bool setBuffer(AQSByteArray *);
 
@@ -67,9 +72,9 @@ public:
 };
 
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline QByteArray *AQSBuffer::buffer() const
+inline QByteArray AQSBuffer::buffer() const
 {
-  AQ_CALL_RET_PTR(buffer(), QByteArray);
+  AQ_CALL_RET_V(buffer(), QByteArray);
 }
 inline bool AQSBuffer::setBuffer(QByteArray *arg0)
 {

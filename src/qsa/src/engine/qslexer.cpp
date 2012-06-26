@@ -33,18 +33,161 @@
 #include "qslexer.h"
 #include "qsengine.h"
 #include "qsnodes.h"
-#include "qslookup.h"
 #include "qsinternal.h"
 #include "grammar.h"
-#include "qslexer.lut.h"
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define shiftWindowsLineBreak() if( current == '\r' && next1 == '\n' ) shift( 1 );
+#define record8(C) { \
+    if (pos8 >= size8 - 1) { \
+      char *tmp = new char[2 * size8]; \
+      memcpy(tmp, buffer8, size8 * sizeof(char)); \
+      delete [] buffer8; \
+      buffer8 = tmp; \
+      size8 *= 2; \
+    } \
+    buffer8[pos8++] = (char) C; \
+  }
 
+#define record16(C) { \
+    if (pos16 >= size16 - 1) { \
+      QChar *tmp = new QChar[2 * size16]; \
+      memcpy(tmp, buffer16, size16 * sizeof(QChar)); \
+      delete [] buffer16; \
+      buffer16 = tmp; \
+      size16 *= 2; \
+    } \
+    buffer16[pos16++] = C; \
+  }
+
+#define shift(P) { \
+    ushort p = P; \
+    while (p--) { \
+      ++pos; \
+      current = next1; \
+      next1 = next2; \
+      next2 = next3; \
+      next3 = (length > 0) ? code[pos + 3].unicode() : 0; --length;\
+    } \
+  }
+
+#define shiftWindowsLineBreak() \
+  if (((current == '\r') && (next1 == '\n')) \
+      || ((current == '\n') && (next1 == '\r'))) \
+    shift(1);
+
+#define quickMatchPunctuator(c1,c2,c3,c4) do { \
+    if (c1 == '>' && c2 == '>' && c3 == '>' && c4 == '=') { \
+      token = URSHIFTEQUAL; \
+      shift(4); break; \
+    } else if (c1 == '=' && c2 == '=' && c3 == '=') { \
+      token = STREQ; \
+      shift(3); break; \
+    } else if (c1 == '!' && c2 == '=' && c3 == '=') { \
+      token = STRNEQ; \
+      shift(3); break; \
+    } else if (c1 == '>' && c2 == '>' && c3 == '>') { \
+      token = URSHIFT; \
+      shift(3); break; \
+    } else if (c1 == '<' && c2 == '<' && c3 == '=') { \
+      token = LSHIFTEQUAL; \
+      shift(3); break; \
+    } else if (c1 == '>' && c2 == '>' && c3 == '=') { \
+      token = RSHIFTEQUAL; \
+      shift(3); break; \
+    } else if (c1 == '<' && c2 == '=') { \
+      token = LE; \
+      shift(2); break; \
+    } else if (c1 == '>' && c2 == '=') { \
+      token = GE; \
+      shift(2); break; \
+    } else if (c1 == '!' && c2 == '=') { \
+      token = NE; \
+      shift(2); break; \
+    } else if (c1 == '+' && c2 == '+') { \
+      token = PLUSPLUS; \
+      shift(2); break; \
+    } else if (c1 == '-' && c2 == '-') { \
+      token = MINUSMINUS; \
+      shift(2); break; \
+    } else if (c1 == '=' && c2 == '=') { \
+      token = EQEQ; \
+      shift(2); break; \
+    } else if (c1 == '+' && c2 == '=') { \
+      token = PLUSEQUAL; \
+      shift(2); break; \
+    } else if (c1 == '-' && c2 == '=') { \
+      token = MINUSEQUAL; \
+      shift(2); break; \
+    } else if (c1 == '*' && c2 == '=') { \
+      token = MULTEQUAL; \
+      shift(2); break; \
+    } else if (c1 == '/' && c2 == '=') { \
+      token = DIVEQUAL; \
+      shift(2); break; \
+    } else if (c1 == '&' && c2 == '=') { \
+      shift(2); break; \
+      token = ANDEQUAL; \
+    } else if (c1 == '^' && c2 == '=') { \
+      token = XOREQUAL; \
+      shift(2); break; \
+    } else if (c1 == '%' && c2 == '=') { \
+      token = MODEQUAL; \
+      shift(2); break; \
+    } else if (c1 == '|' && c2 == '=') { \
+      token = OREQUAL; \
+      shift(2); break; \
+    } else if (c1 == '<' && c2 == '<') { \
+      token = LSHIFT; \
+      shift(2); break; \
+    } else if (c1 == '>' && c2 == '>') { \
+      token = RSHIFT; \
+      shift(2); break; \
+    } else if (c1 == '&' && c2 == '&') { \
+      token = AND; \
+      shift(2); break; \
+    } else if (c1 == '|' && c2 == '|') { \
+      token = OR; \
+      shift(2); break; \
+    } \
+    switch (c1) { \
+      case '=': \
+      case '>': \
+      case '<': \
+      case ',': \
+      case '!': \
+      case '~': \
+      case '?': \
+      case ':': \
+      case '.': \
+      case '+': \
+      case '-': \
+      case '*': \
+      case '/': \
+      case '&': \
+      case '|': \
+      case '^': \
+      case '%': \
+      case '(': \
+      case ')': \
+      case '{': \
+      case '}': \
+      case '[': \
+      case ']': \
+      case ';': { \
+        token = static_cast<int>(c1); \
+        shift(1); \
+      } \
+      break; \
+      default: \
+        token = -1; \
+    } \
+  } while(0)
+
+extern double aqIntegerFromString(const char *buf, int size, int radix);
 
 #ifdef QSDEBUGGER
 extern YYLTYPE qsyylloc;  // global bison variable holding token info
@@ -59,14 +202,340 @@ int qsyylex()
   return QSLexer::lexer()->lex();
 }
 
+//#define AQ_CHECK_RESERVED
+
+static inline int findReservedWord(const QChar *c, int size)
+{
+#ifdef AQ_CHECK_RESERVED
+  bool check_reserved = true;
+#endif
+
+  if (size < 2 || size > 12)
+    return -1;
+  if (!c[0].isLetter())
+    return -1;
+
+  switch (size) {
+    case 2: {
+      if (c[0] == 'd' && c[1] == 'o')
+        return DO;
+      else if (c[0] == 'i' && c[1] == 'f')
+        return IF;
+      else if (c[0] == 'i' && c[1] == 'n')
+        return QS_IN;
+    }
+    break;
+
+    case 3: {
+      if (c[0] == 'f' && c[1] == 'o' && c[2] == 'r')
+        return FOR;
+      else if (c[0] == 'n' && c[1] == 'e' && c[2] == 'w')
+        return NEW;
+      else if (c[0] == 't' && c[1] == 'r' && c[2] == 'y')
+        return TRY;
+      else if (c[0] == 'v' && c[1] == 'a' && c[2] == 'r')
+        return VAR;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'i' && c[1] == 'n' && c[2] == 't')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 4: {
+      if (c[0] == 'c' && c[1] == 'a'
+          && c[2] == 's' && c[3] == 'e')
+        return CASE;
+      else if (c[0] == 'e' && c[1] == 'l'
+               && c[2] == 's' && c[3] == 'e')
+        return ELSE;
+      else if (c[0] == 't' && c[1] == 'h'
+               && c[2] == 'i' && c[3] == 's')
+        return THIS;
+      else if (c[0] == 'v' && c[1] == 'o'
+               && c[2] == 'i' && c[3] == 'd')
+        return QS_VOID;
+      else if (c[0] == 'w' && c[1] == 'i'
+               && c[2] == 't' && c[3] == 'h')
+        return WITH;
+      else if (c[0] == 't' && c[1] == 'r'
+               && c[2] == 'u' && c[3] == 'e')
+        return TRUETOKEN;
+      else if (c[0] == 'n' && c[1] == 'u'
+               && c[2] == 'l' && c[3] == 'l')
+        return NULLTOKEN;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'e' && c[1] == 'n'
+            && c[2] == 'u' && c[3] == 'm')
+          return RESERVED;
+        else if (c[0] == 'b' && c[1] == 'y'
+                 && c[2] == 't' && c[3] == 'e')
+          return RESERVED;
+        else if (c[0] == 'l' && c[1] == 'o'
+                 && c[2] == 'n' && c[3] == 'g')
+          return RESERVED;
+        else if (c[0] == 'c' && c[1] == 'h'
+                 && c[2] == 'a' && c[3] == 'r')
+          return RESERVED;
+        else if (c[0] == 'g' && c[1] == 'o'
+                 && c[2] == 't' && c[3] == 'o')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 5: {
+      if (c[0] == 'b' && c[1] == 'r'
+          && c[2] == 'e' && c[3] == 'a'
+          && c[4] == 'k')
+        return BREAK;
+      else if (c[0] == 'c' && c[1] == 'a'
+               && c[2] == 't' && c[3] == 'c'
+               && c[4] == 'h')
+        return CATCH;
+      else if (c[0] == 't' && c[1] == 'h'
+               && c[2] == 'r' && c[3] == 'o'
+               && c[4] == 'w')
+        return THROW;
+      else if (c[0] == 'w' && c[1] == 'h'
+               && c[2] == 'i' && c[3] == 'l'
+               && c[4] == 'e')
+        return WHILE;
+      else if (c[0] == 'c' && c[1] == 'o'
+               && c[2] == 'n' && c[3] == 's'
+               && c[4] == 't')
+        return QS_CONST;
+      else if (c[0] == 'f' && c[1] == 'a'
+               && c[2] == 'l' && c[3] == 's'
+               && c[4] == 'e')
+        return FALSETOKEN;
+      else if (c[0] == 'c' && c[1] == 'l'
+               && c[2] == 'a' && c[3] == 's'
+               && c[4] == 's')
+        return CLASS;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 's' && c[1] == 'h'
+            && c[2] == 'o' && c[3] == 'r'
+            && c[4] == 't')
+          return RESERVED;
+        else if (c[0] == 's' && c[1] == 'u'
+                 && c[2] == 'p' && c[3] == 'e'
+                 && c[4] == 'r')
+          return RESERVED;
+        else if (c[0] == 'f' && c[1] == 'i'
+                 && c[2] == 'n' && c[3] == 'a'
+                 && c[4] == 'l')
+          return FINAL;
+      }
+#endif
+    }
+    break;
+
+    case 6: {
+      if (c[0] == 'd' && c[1] == 'e'
+          && c[2] == 'l' && c[3] == 'e'
+          && c[4] == 't' && c[5] == 'e')
+        return QS_DELETE;
+      else if (c[0] == 'r' && c[1] == 'e'
+               && c[2] == 't' && c[3] == 'u'
+               && c[4] == 'r' && c[5] == 'n')
+        return RETURN;
+      else if (c[0] == 's' && c[1] == 'w'
+               && c[2] == 'i' && c[3] == 't'
+               && c[4] == 'c' && c[5] == 'h')
+        return SWITCH;
+      else if (c[0] == 't' && c[1] == 'y'
+               && c[2] == 'p' && c[3] == 'e'
+               && c[4] == 'o' && c[5] == 'f')
+        return TYPEOF;
+      else if (c[0] == 's' && c[1] == 't'
+               && c[2] == 'a' && c[3] == 't'
+               && c[4] == 'i' && c[5] == 'c')
+        return STATIC;
+      else if (c[0] == 'p' && c[1] == 'u'
+               && c[2] == 'b' && c[3] == 'l'
+               && c[4] == 'i' && c[5] == 'c')
+        return PUBLIC;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'e' && c[1] == 'x'
+            && c[2] == 'p' && c[3] == 'o'
+            && c[4] == 'r' && c[5] == 't')
+          return RESERVED;
+        else if (c[0] == 'd' && c[1] == 'o'
+                 && c[2] == 'u' && c[3] == 'b'
+                 && c[4] == 'l' && c[5] == 'e')
+          return RESERVED;
+        else if (c[0] == 'i' && c[1] == 'm'
+                 && c[2] == 'p' && c[3] == 'o'
+                 && c[4] == 'r' && c[5] == 't')
+          return IMPORT;
+        else if (c[0] == 'n' && c[1] == 'a'
+                 && c[2] == 't' && c[3] == 'i'
+                 && c[4] == 'v' && c[5] == 'e')
+          return RESERVED;
+        else if (c[0] == 't' && c[1] == 'h'
+                 && c[2] == 'r' && c[3] == 'o'
+                 && c[4] == 'w' && c[5] == 's')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 7: {
+      if (c[0] == 'd' && c[1] == 'e'
+          && c[2] == 'f' && c[3] == 'a'
+          && c[4] == 'u' && c[5] == 'l'
+          && c[6] == 't')
+        return DEFAULT;
+      else if (c[0] == 'f' && c[1] == 'i'
+               && c[2] == 'n' && c[3] == 'a'
+               && c[4] == 'l' && c[5] == 'l'
+               && c[6] == 'y')
+        return FINALLY;
+      else if (c[0] == 'e' && c[1] == 'x'
+               && c[2] == 't' && c[3] == 'e'
+               && c[4] == 'n' && c[5] == 'd'
+               && c[6] == 's')
+        return EXTENDS;
+      else if (c[0] == 'p' && c[1] == 'r'
+               && c[2] == 'i' && c[3] == 'v'
+               && c[4] == 'a' && c[5] == 't'
+               && c[6] == 'e')
+        return PRIVATE;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'b' && c[1] == 'o'
+            && c[2] == 'o' && c[3] == 'l'
+            && c[4] == 'e' && c[5] == 'a'
+            && c[6] == 'n')
+          return RESERVED;
+        else if (c[0] == 'p' && c[1] == 'a'
+                 && c[2] == 'c' && c[3] == 'k'
+                 && c[4] == 'a' && c[5] == 'g'
+                 && c[6] == 'e')
+          return PACKAGE;
+      }
+#endif
+    }
+    break;
+
+    case 8: {
+      if (c[0] == 'c' && c[1] == 'o'
+          && c[2] == 'n' && c[3] == 't'
+          && c[4] == 'i' && c[5] == 'n'
+          && c[6] == 'u' && c[7] == 'e')
+        return CONTINUE;
+      else if (c[0] == 'f' && c[1] == 'u'
+               && c[2] == 'n' && c[3] == 'c'
+               && c[4] == 't' && c[5] == 'i'
+               && c[6] == 'o' && c[7] == 'n')
+        return FUNCTION;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'd' && c[1] == 'e'
+            && c[2] == 'b' && c[3] == 'u'
+            && c[4] == 'g' && c[5] == 'g'
+            && c[6] == 'e' && c[7] == 'r')
+          return RESERVED;
+        else if (c[0] == 'a' && c[1] == 'b'
+                 && c[2] == 's' && c[3] == 't'
+                 && c[4] == 'r' && c[5] == 'a'
+                 && c[6] == 'c' && c[7] == 't')
+          return ABSTRACT;
+        else if (c[0] == 'v' && c[1] == 'o'
+                 && c[2] == 'l' && c[3] == 'a'
+                 && c[4] == 't' && c[5] == 'i'
+                 && c[6] == 'l' && c[7] == 'e')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 9: {
+#ifdef AQ_CHECK_RESERVED
+      if (check_reserved) {
+        if (c[0] == 'i' && c[1] == 'n'
+            && c[2] == 't' && c[3] == 'e'
+            && c[4] == 'r' && c[5] == 'f'
+            && c[6] == 'a' && c[7] == 'c'
+            && c[8] == 'e')
+          return RESERVED;
+        else if (c[0] == 't' && c[1] == 'r'
+                 && c[2] == 'a' && c[3] == 'n'
+                 && c[4] == 's' && c[5] == 'i'
+                 && c[6] == 'e' && c[7] == 'n'
+                 && c[8] == 't')
+          return RESERVED;
+        else if (c[0] == 'p' && c[1] == 'r'
+                 && c[2] == 'o' && c[3] == 't'
+                 && c[4] == 'e' && c[5] == 'c'
+                 && c[6] == 't' && c[7] == 'e'
+                 && c[8] == 'd')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 10: {
+      if (c[0] == 'i' && c[1] == 'n'
+          && c[2] == 's' && c[3] == 't'
+          && c[4] == 'a' && c[5] == 'n'
+          && c[6] == 'c' && c[7] == 'e'
+          && c[8] == 'o' && c[9] == 'f')
+        return INSTANCEOF;
+#ifdef AQ_CHECK_RESERVED
+      else if (check_reserved) {
+        if (c[0] == 'i' && c[1] == 'm'
+            && c[2] == 'p' && c[3] == 'l'
+            && c[4] == 'e' && c[5] == 'm'
+            && c[6] == 'e' && c[7] == 'n'
+            && c[8] == 't' && c[9] == 's')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+    case 12: {
+#ifdef AQ_CHECK_RESERVED
+      if (check_reserved) {
+        if (c[0] == 's' && c[1] == 'y'
+            && c[2] == 'n' && c[3] == 'c'
+            && c[4] == 'h' && c[5] == 'r'
+            && c[6] == 'o' && c[7] == 'n'
+            && c[8] == 'i' && c[9] == 'z'
+            && c[10] == 'e' && c[11] == 'd')
+          return RESERVED;
+      }
+#endif
+    }
+    break;
+
+  }
+
+  return -1;
+}
+
 QSLexer::QSLexer()
   : yylineno(1),
-    size8(128), size16(128), restrKeyword(false),
+    size8(32), size16(32768), restrKeyword(false),
     stackToken(-1), pos(0),
     code(0), length(0),
     bol(true),
     current(0), next1(0), next2(0), next3(0),
-    localeC(QLocale::C)
+    localeC(QLocale::C),
+    parenthesesState(IgnoreParentheses),
+    parenthesesCount(0),
+    prohibitAutomaticSemicolon(false)
 {
 #if YYDEBUG == 1
   extern int qsyydebug;
@@ -80,14 +549,17 @@ QSLexer::QSLexer()
   buffer8 = new char[size8];
   buffer16 = new QChar[size16];
 
-  ustrHash.resize(199);
+  ustrHash.resize(401);
   ustrHash.setAutoDelete(true);
+  ustrList.setAutoDelete(true);
 }
 
 QSLexer::~QSLexer()
 {
   delete [] buffer8;
   delete [] buffer16;
+
+  clearUstr();
 
   if (lx == this)
     lx = 0;
@@ -110,15 +582,17 @@ void QSLexer::setCode(const QString &c, int id, int lineno)
   pos = 0;
   code = c.unicode();
   length = c.length();
-#ifndef QTSCRIPT_PURE_ECMA
   bol = true;
-#endif
 
   // read first characters
   current = (length > 0) ? code[0].unicode() : 0;
-  next1 = (length > 1) ? code[1].unicode() : 0;
-  next2 = (length > 2) ? code[2].unicode() : 0;
-  next3 = (length > 3) ? code[3].unicode() : 0;
+  --length;
+  next1 = (length > 0) ? code[1].unicode() : 0;
+  --length;
+  next2 = (length > 0) ? code[2].unicode() : 0;
+  --length;
+  next3 = (length > 0) ? code[3].unicode() : 0;
+  --length;
 }
 
 int QSLexer::lex()
@@ -150,18 +624,21 @@ int QSLexer::lex()
           shift(1);
           state = InMultiLineComment;
         } else if (current == 0) {
-          if (!terminator && !delimited) {
+          syncProhibitAutomaticSemicolon();
+          if (!terminator && !delimited && !prohibitAutomaticSemicolon) {
             // automatic semicolon insertion if program incomplete
             token = ';';
             stackToken = 0;
             setDone(Other);
-          } else
+          } else {
             setDone(Eof);
+          }
         } else if (isLineTerminator()) {
           shiftWindowsLineBreak();
           yylineno++;
           bol = true;
           terminator = true;
+          syncProhibitAutomaticSemicolon();
           if (restrKeyword) {
             token = ';';
             setDone(Other);
@@ -182,10 +659,10 @@ int QSLexer::lex()
           record8(current);
           state = InDecimal;
         } else {
-          token = matchPunctuator(current, next1, next2, next3);
-          if (token != -1)
+          quickMatchPunctuator(current, next1, next2, next3);
+          if (token != -1) {
             setDone(Other);
-          else {
+          } else {
             setDone(Bad);
             errmsg = "Illegal character";
           }
@@ -268,9 +745,8 @@ int QSLexer::lex()
           shiftWindowsLineBreak();
           yylineno++;
           terminator = true;
-#ifndef QTSCRIPT_PURE_ECMA
           bol = true;
-#endif
+
           if (restrKeyword) {
             token = ';';
             setDone(Other);
@@ -321,9 +797,9 @@ int QSLexer::lex()
         break;
       case InHex:
         if (isHexDigit(current))
-          record8(current);
-        else
-          setDone(Hex);
+          record8(current)
+          else
+            setDone(Hex);
         break;
       case InOctal:
         if (isOctalDigit(current)) {
@@ -403,25 +879,33 @@ int QSLexer::lex()
   double dval = 0;
   if (state == Number) {
     dval = localeC.toDouble(buffer8);
-  } else if (state == Hex) {   // scan hex numbers
-    // TODO: support long uint
-    uint i;
-    sscanf(buffer8, "%x", &i);
-    dval = i;
+  } else if (state == Hex) { // scan hex numbers
+    dval = aqIntegerFromString(buffer8, pos8, 16);
     state = Number;
-  } else if (state == Octal) {     // scan octal number
-    uint ui;
-    sscanf(buffer8, "%o", &ui);
-    dval = ui;
+  } else if (state == Octal) { // scan octal number
+    dval = aqIntegerFromString(buffer8, pos8, 8);
     state = Number;
   }
 
   restrKeyword = false;
   delimited = false;
-#ifdef QSDEBUGGER
-  qsyylloc.first_line = yylineno; // ???
-  qsyylloc.last_line = yylineno;
-#endif
+
+  switch (parenthesesState) {
+    case IgnoreParentheses:
+      break;
+    case CountParentheses:
+      if (token == ')') {
+        --parenthesesCount;
+        if (parenthesesCount == 0)
+          parenthesesState = BalancedParentheses;
+      } else if (token == '(') {
+        ++parenthesesCount;
+      }
+      break;
+    case BalancedParentheses:
+      parenthesesState = IgnoreParentheses;
+      break;
+  }
 
   switch (state) {
     case Eof:
@@ -431,20 +915,36 @@ int QSLexer::lex()
         delimited = true;
       return token;
     case Identifier:
-      if ((token = QSLookup::find(&mainTable, buffer16, pos16)) < 0) {
+      if ((token = findReservedWord(buffer16, pos16)) < 0) {
         /* TODO: close leak on parse error. same holds true for String */
         qsyylval.ustr = newUstr(buffer16, pos16);
         return IDENT;
       }
       if (token == CONTINUE || token == BREAK ||
-          token == RETURN || token == THROW)
+          token == RETURN || token == THROW) {
         restrKeyword = true;
+      } else if (token == IF || token == FOR
+                 || token == WHILE || token == WITH) {
+        parenthesesState = CountParentheses;
+        parenthesesCount = 0;
+      } else if (token == DO) {
+        parenthesesState = BalancedParentheses;
+      }
       return token;
     case KeywordNumber:
-      token = localeC.toInt(buffer8);
+      token = 0;
+      for (int i = 0; i < pos8; ++i)
+        token = (token * 10) + (buffer8[i] - '0');
       if (token == CONTINUE || token == BREAK ||
-          token == RETURN || token == THROW)
+          token == RETURN || token == THROW) {
         restrKeyword = true;
+      } else if (token == IF || token == FOR
+                 || token == WHILE || token == WITH) {
+        parenthesesState = CountParentheses;
+        parenthesesCount = 0;
+      } else if (token == DO) {
+        parenthesesState = BalancedParentheses;
+      }
       return token;
     case String:
       qsyylval.ustr = newUstr(buffer16, pos16);
@@ -453,118 +953,40 @@ int QSLexer::lex()
       qsyylval.dval = dval;
       return NUMBER;
     case Bad:
+      clearUstr();
       return -1;
     default:
+      clearUstr();
       Q_ASSERT(!"unhandled numeration value in switch");
       return -1;
   }
 }
 
-int QSLexer::matchPunctuator(ushort c1, ushort c2,
-                             ushort c3, ushort c4)
+bool QSLexer::scanRegExp()
 {
-  if (c1 == '>' && c2 == '>' && c3 == '>' && c4 == '=') {
-    shift(4);
-    return URSHIFTEQUAL;
-  } else if (c1 == '=' && c2 == '=' && c3 == '=') {
-    shift(3);
-    return STREQ;
-  } else if (c1 == '!' && c2 == '=' && c3 == '=') {
-    shift(3);
-    return STRNEQ;
-  } else if (c1 == '>' && c2 == '>' && c3 == '>') {
-    shift(3);
-    return URSHIFT;
-  } else if (c1 == '<' && c2 == '<' && c3 == '=') {
-    shift(3);
-    return LSHIFTEQUAL;
-  } else if (c1 == '>' && c2 == '>' && c3 == '=') {
-    shift(3);
-    return RSHIFTEQUAL;
-  } else if (c1 == '<' && c2 == '=') {
-    shift(2);
-    return LE;
-  } else if (c1 == '>' && c2 == '=') {
-    shift(2);
-    return GE;
-  } else if (c1 == '!' && c2 == '=') {
-    shift(2);
-    return NE;
-  } else if (c1 == '+' && c2 == '+') {
-    shift(2);
-    return PLUSPLUS;
-  } else if (c1 == '-' && c2 == '-') {
-    shift(2);
-    return MINUSMINUS;
-  } else if (c1 == '=' && c2 == '=') {
-    shift(2);
-    return EQEQ;
-  } else if (c1 == '+' && c2 == '=') {
-    shift(2);
-    return PLUSEQUAL;
-  } else if (c1 == '-' && c2 == '=') {
-    shift(2);
-    return MINUSEQUAL;
-  } else if (c1 == '*' && c2 == '=') {
-    shift(2);
-    return MULTEQUAL;
-  } else if (c1 == '/' && c2 == '=') {
-    shift(2);
-    return DIVEQUAL;
-  } else if (c1 == '&' && c2 == '=') {
-    shift(2);
-    return ANDEQUAL;
-  } else if (c1 == '^' && c2 == '=') {
-    shift(2);
-    return XOREQUAL;
-  } else if (c1 == '%' && c2 == '=') {
-    shift(2);
-    return MODEQUAL;
-  } else if (c1 == '|' && c2 == '=') {
-    shift(2);
-    return OREQUAL;
-  } else if (c1 == '<' && c2 == '<') {
-    shift(2);
-    return LSHIFT;
-  } else if (c1 == '>' && c2 == '>') {
-    shift(2);
-    return RSHIFT;
-  } else if (c1 == '&' && c2 == '&') {
-    shift(2);
-    return AND;
-  } else if (c1 == '|' && c2 == '|') {
-    shift(2);
-    return OR;
+  pos16 = 0;
+  bool lastWasEscape = FALSE;
+
+  while (1) {
+    if (isLineTerminator() || current == 0)
+      return FALSE;
+    else if (current != '/' || lastWasEscape == TRUE) {
+      record16(current);
+      lastWasEscape = !lastWasEscape && (current == '\\');
+    } else {
+      pattern = QString(buffer16, pos16);
+      pos16 = 0;
+      shift(1);
+      break;
+    }
+    shift(1);
   }
 
-  switch (c1) {
-    case '=':
-    case '>':
-    case '<':
-    case ',':
-    case '!':
-    case '~':
-    case '?':
-    case ':':
-    case '.':
-    case '+':
-    case '-':
-    case '*':
-    case '/':
-    case '&':
-    case '|':
-    case '^':
-    case '%':
-    case '(':
-    case ')':
-    case '{':
-    case '}':
-    case '[':
-    case ']':
-    case ';':
-      shift(1);
-      return static_cast<int>(c1);
-    default:
-      return -1;
+  while (isIdentLetter(current)) {
+    record16(current);
+    shift(1);
   }
+  flags = QString(buffer16, pos16);
+
+  return TRUE;
 }

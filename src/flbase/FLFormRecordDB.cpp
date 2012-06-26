@@ -67,8 +67,8 @@ void FLFormRecordDB::initForm()
 
     if (iface)
       iface->finish();
-    setName("formRecord" + action_->name());
-    QSProject *p = aqApp ->project();
+    setName("formRecord" + idMDI_);
+    QSProject *p = aqApp->project();
     iface = static_cast<FLFormRecordDBInterface *>(p->object(name()));
     if (iface) {
       iface->setObj(this);
@@ -77,8 +77,8 @@ void FLFormRecordDB::initForm()
       cursor_->setContext(iface);
     }
 
-    QString caption = cursor_->metadata() ->alias() + " [ "
-                      + aqApp ->lastTextCaption() + " ]";
+    QString caption = cursor_->metadata()->alias() + " [ "
+                      + aqApp->lastTextCaption() + " ]";
     switch (cursor_->modeAccess()) {
       case FLSqlCursor::INSERT:
         cursor_->transaction();
@@ -360,7 +360,7 @@ void FLFormRecordDB::setMainWidget(QWidget *w)
 void FLFormRecordDB::initScript()
 {
   if (iface && cursor_)
-    aqApp ->call("init", QSArgumentList(), iface);
+    aqApp->call("init", QSArgumentList(), iface);
 }
 
 void FLFormRecordDB::setMainWidget()
@@ -386,37 +386,87 @@ void FLFormRecordDB::setCursor(FLSqlCursor *c)
 void FLFormRecordDB::afterCommitBuffer()
 {
   if (iface)
-    aqApp ->call("afterCommitBuffer", QSArgumentList(), iface);
+    aqApp->call("afterCommitBuffer", QSArgumentList(), iface);
 }
 
 void FLFormRecordDB::afterCommitTransaction()
 {
   if (iface)
-    aqApp ->call("afterCommitTransaction", QSArgumentList(), iface);
+    aqApp->call("afterCommitTransaction", QSArgumentList(), iface);
 }
 
 void FLFormRecordDB::acceptedForm()
 {
   if (iface)
-    aqApp ->call("acceptedForm", QSArgumentList(), iface);
+    aqApp->call("acceptedForm", QSArgumentList(), iface);
 }
 
 void FLFormRecordDB::canceledForm()
 {
   if (iface)
-    aqApp ->call("canceledForm", QSArgumentList(), iface);
+    aqApp->call("canceledForm", QSArgumentList(), iface);
 }
 
 bool FLFormRecordDB::validateForm()
 {
-  if (iface && (cursor_->modeAccess() == FLSqlCursor::INSERT || cursor_->modeAccess()
-                == FLSqlCursor::EDIT)) {
-    QVariant
-    v =
-      aqApp ->call("validateForm", QSArgumentList(), iface).variant();
+  FLTableMetaData *mtd = cursor_->metadata();
+  if (!cursor_ || !mtd)
+    return true;
+
+  if (cursor_->modeAccess() == FLSqlCursor::EDIT && mtd->concurWarn()) {
+    QStringList colFields(cursor_->concurrencyFields());
+
+    if (!colFields.isEmpty()) {
+      QString pKN(mtd->primaryKey());
+      QString pKWhere(
+        cursor_->db()->manager()->formatAssignValue(
+          mtd->field(pKN), cursor_->valueBuffer(pKN)
+        )
+      );
+
+      FLSqlQuery q(0, cursor_->db()->connectionName());
+      q.setTablesList(mtd->name());
+      q.setSelect(colFields.join(","));
+      q.setFrom(mtd->name());
+      q.setWhere(pKWhere);
+      q.setForwardOnly(true);
+
+      if (q.exec() && q.next()) {
+        for (QStringList::const_iterator it = colFields.begin(); it != colFields.end(); ++it) {
+          QString msg(
+            tr("El campo '%1' con valor '%2' ha sido modificado\npor otro usuario con el valor '%3'")
+            .arg(mtd->fieldNameToAlias(*it))
+            .arg(cursor_->valueBuffer(*it).toString().left(50))
+            .arg(q.value(*it).toString().left(50))
+          );
+
+          int res =
+            QMessageBox::warning(
+              qApp->focusWidget(),
+              tr("Aviso de concurrencia"),
+              msg + "\n\n" +
+              tr("¿ Desea realmente modificar este campo ?") + "\n\n" +
+              tr("Sí : Ignora el cambio del otro usuario y utiliza el valor que acaba de introducir\n") +
+              tr("No : Respeta el cambio del otro usuario e ignora el valor que ha introducido\n") +
+              tr("Cancelar : Cancela el guardado del registro y vuelve a la edición del registro\n\n"),
+              QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape
+            );
+          if (res == QMessageBox::Cancel)
+            return false;
+          if (res == QMessageBox::No)
+            cursor_->setValueBuffer(*it, q.value(*it));
+        }
+      }
+    }
+  }
+
+  if (iface && (cursor_->modeAccess() == FLSqlCursor::INSERT ||
+                cursor_->modeAccess() == FLSqlCursor::EDIT)) {
+    QVariant v(aqApp->call("validateForm", QSArgumentList(), iface).variant());
     if (v.isValid() && !v.toBool())
       return false;
   }
+
   return true;
 }
 
@@ -482,8 +532,8 @@ void FLFormRecordDB::acceptContinue()
       cursor_->commit();
       cursor_->setModeAccess(FLSqlCursor::INSERT);
       accepted = false;
-      QString caption = cursor_->metadata() ->alias() + " [ "
-                        + aqApp ->lastTextCaption() + " ]";
+      QString caption = cursor_->metadata()->alias() + " [ "
+                        + aqApp->lastTextCaption() + " ]";
       cursor_->transaction();
       setCaption(tr("Insertar ") + caption);
       if (initFocusWidget_)
@@ -553,8 +603,8 @@ void FLFormRecordDB::firstRecord()
         cursor_->commit();
         cursor_->setModeAccess(initialModeAccess);
         accepted = false;
-        QString caption = cursor_->metadata() ->alias() + " [ "
-                          + aqApp ->lastTextCaption() + " ]";
+        QString caption = cursor_->metadata()->alias() + " [ "
+                          + aqApp->lastTextCaption() + " ]";
         cursor_->transaction();
         cursor_->first();
         initScript();
@@ -580,8 +630,8 @@ void FLFormRecordDB::nextRecord()
         cursor_->commit();
         cursor_->setModeAccess(initialModeAccess);
         accepted = false;
-        QString caption = cursor_->metadata() ->alias() + " [ "
-                          + aqApp ->lastTextCaption() + " ]";
+        QString caption = cursor_->metadata()->alias() + " [ "
+                          + aqApp->lastTextCaption() + " ]";
         cursor_->transaction();
         cursor_->next();
         initScript();
@@ -607,8 +657,8 @@ void FLFormRecordDB::previousRecord()
         cursor_->commit();
         cursor_->setModeAccess(initialModeAccess);
         accepted = false;
-        QString caption = cursor_->metadata() ->alias() + " [ "
-                          + aqApp ->lastTextCaption() + " ]";
+        QString caption = cursor_->metadata()->alias() + " [ "
+                          + aqApp->lastTextCaption() + " ]";
         cursor_->transaction();
         cursor_->prev();
         initScript();
@@ -630,8 +680,8 @@ void FLFormRecordDB::lastRecord()
         cursor_->commit();
         cursor_->setModeAccess(initialModeAccess);
         accepted = false;
-        QString caption = cursor_->metadata() ->alias() + " [ "
-                          + aqApp ->lastTextCaption() + " ]";
+        QString caption = cursor_->metadata()->alias() + " [ "
+                          + aqApp->lastTextCaption() + " ]";
         cursor_->transaction();
         cursor_->last();
         initScript();

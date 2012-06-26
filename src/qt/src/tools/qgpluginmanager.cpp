@@ -498,15 +498,19 @@ bool QGPluginManager::addLibrary( QLibrary* lib )
 		if ( !takeFirst ) {
 		    useful = TRUE;
 		    plugDict.replace( *f, plugin );
+#if defined(QT_DEBUG)
 		    qWarning("%s: Discarding feature %s in %s!",
 			     (const char*) QFile::encodeName( plugin->library()),
 			     (*f).latin1(),
 			     (const char*) QFile::encodeName( old->library() ) );
+#endif
 		} else {
+#if defined(QT_DEBUG)
 		    qWarning("%s: Feature %s already defined in %s!",
 			     (const char*) QFile::encodeName( old->library() ),
 			     (*f).latin1(),
 			     (const char*) QFile::encodeName( plugin->library() ) );
+#endif
 		}
 	    }
 	}

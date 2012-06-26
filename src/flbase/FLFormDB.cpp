@@ -101,21 +101,20 @@ void FLFormDB::initForm()
     if (action_) {
       cursor_->setAction(action_);
       if (action_->caption() != QString::null) {
+        captionIsSet = true;
         QString action_caption = action_->caption(); 
         if (action_caption.contains("TRANSLATE", false) != 0) {
             action_caption = FLUtil::translate("MetaData", action_caption.mid(30, action_caption.length() - 32));
         }
-        if (action_caption.length() < 64) {
-            captionIsSet = true;
-            setCaption(action_caption + caption); 
-        }
+
+        setCaption(action_caption + caption); 
       }
       idMDI_ = action_->name();
     }
     if (!captionIsSet) {
         setCaption(cursor_->metadata()->alias() + caption);
     }
-    setName("form" + action_->name());
+    setName("form" + idMDI_);
     QSProject *p = aqApp->project();
     iface = static_cast<FLFormDBInterface *>(p->object(name()));
     if (iface) {
@@ -221,10 +220,8 @@ void FLFormDB::closeEvent(QCloseEvent *e)
 void FLFormDB::hideEvent(QHideEvent *h)
 {
   QWidget *pW = this->parentWidget();
-
   if (pW && pW->isA("QWorkspaceChild")) {
     QRect geo(pW->x(), pW->y(), pW->width(), pW->height());
-
     if (this->isMinimized()) {
       //geo.setWidth(1);
       //aqApp->saveGeometryForm(QObject::name(), geo);
@@ -241,20 +238,18 @@ void FLFormDB::hideEvent(QHideEvent *h)
 
 void FLFormDB::showEvent(QShowEvent *e)
 {
-  QWidget::showEvent(e);
-  this->showForm();
-  if (!isClosing_ and !this->aqWasDeleted() and !aqApp->project()->interpreter()->hadError()) {
-    QTimer::singleShot(0, this, SLOT(emitFormReady()));
-  }
-}
-
-void FLFormDB::showForm()
-{
   if (!showed && mainWidget_) {
     showed = true;
     initMainWidget();
-    this->initScript();
+    callInitScript();
   }
+}
+
+void FLFormDB::callInitScript()
+{
+  this->initScript();
+  if (!isClosing_ && !aqApp->project()->interpreter()->hadError())
+    QTimer::singleShot(0, this, SLOT(emitFormReady()));
 }
 
 void FLFormDB::initMainWidget(QWidget *w)
@@ -290,36 +285,25 @@ void FLFormDB::initMainWidget(QWidget *w)
 
     QWidget *pW = this->parentWidget();
     QRect desk;
-    bool parentIsDesktop = true;
-    
     if (!(pW && pW->isA("QWorkspaceChild"))) {
         desk = QApplication::desktop()->availableGeometry(this);
         pW = this;
     } else {
         desk = pW->parentWidget()->rect();
-        parentIsDesktop = false;
     }
 
     QRect geo(aqApp->geometryForm(QObject::name()));
     pW->show();
     mWidget->updateGeometry();
-    QSize bSz = mWidget->baseSize();
-    QSize SzH = mWidget->sizeHint();
+    // QSize minSz = mWidget->baseSize();
     int border = 5, border_b = 48;
-    
-    if (geo.width() < 100 || geo.width()>9000) {
-        geo.setWidth(bSz.width());
-        geo.setHeight(bSz.height());
-        geo.moveCenter(desk.center());
-        if (!parentIsDesktop) {
-            geo.moveTop(desk.top() + border - geo.top()+1);
-        }
-    }
+    QSize SzH = mWidget->sizeHint();
 
-    if (geo.width() < SzH.width()) {
+    if (geo.width() < SzH.width() || geo.width()>9000) {
         geo.setWidth(SzH.width());
+        geo.moveTop(desk.top() + border - geo.top()+1);
     }
-    if (geo.height() < SzH.height()) {
+    if (geo.height() < SzH.height() || geo.width()>9000) {
         geo.setHeight(SzH.height());
     }
     // Exceeds available horizontal area:

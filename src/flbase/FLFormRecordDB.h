@@ -102,16 +102,21 @@ protected:
   /**
   Validación de formulario.
 
-  Invoca a la función "validateForm" del script "process" asociado al formulario, cuando
-  se acepta el formulario y sólo continua con el commit del registro cuando la función del
-  script devuelve TRUE.
+  Invoca a la función "validateForm" del script asociado cuando se acepta el
+  formulario y sólo continua con el commit del registro cuando esa función
+  de script devuelve TRUE.
+
+  Si FLTableMetaData::concurWarn() es true y dos o mas sesiones/usuarios están
+  modificando los mismos campos mostrará un aviso de advertencia.
+
+  @return TRUE si el formulario ha sido validado correctamente
   */
   bool validateForm();
 
   /**
   Aceptación de formulario.
 
-  Invoca a la función "acceptedForm" del script "process" asociado al formulario, cuando
+  Invoca a la función "acceptedForm" del script asociado al formulario, cuando
   se acepta el formulario y justo antes de hace el commit del registro.
   */
   void acceptedForm();
@@ -135,7 +140,7 @@ protected:
   /**
   Cancelación de formulario.
 
-  Invoca a la función "canceledForm" del script "process" asociado al formulario, cuando se
+  Invoca a la función "canceledForm" del script asociado al formulario, cuando se
   cancela el formulario.
   */
   void canceledForm();
@@ -173,7 +178,7 @@ protected:
 public slots:
 
   /**
-  Invoca a la función "init()" del script "process" asociado al formulario
+  Invoca a la función "init()" del script asociado al formulario
   */
   void initScript();
 

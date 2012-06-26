@@ -710,6 +710,9 @@ void QSClass::replaceMember(const QString &name, QSMember *member,
 
   // Delete old function implementation.
   if (old.type() == QSMember::ScriptFunction) {
+
+    //### AbanQ
+#if 0
     Q_ASSERT(old.scriptFunction);
     if (old.scriptFunction->deref()) { // will delete
       delete old.scriptFunction;
@@ -719,6 +722,9 @@ void QSClass::replaceMember(const QString &name, QSMember *member,
         old.scriptFunction->setScopeDefinition(0);
       old.scriptFunction->setScopeDefinition(0);
     }
+#endif
+    m.setSuper(new QSMember(old));
+    //### AbanQ
   }
   // Ref new one...
   if (m.type() == QSMember::ScriptFunction) {

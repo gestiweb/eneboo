@@ -122,7 +122,7 @@ typedef union YYSTYPE
 
   int                   ival;
   double                dval;
-  const QString               *ustr;
+  const QString         *ustr;
   QSNode                *node;
   QSStatementNode       *stat;
   QSParameterNode       *param;

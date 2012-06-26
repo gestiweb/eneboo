@@ -35,8 +35,8 @@
 class QSWrapperFactoryPrivate
 {
 public:
-    QSInterpreter *ip;
-    QMap<QString,QString> descriptors;
+  QSInterpreter *ip;
+  QMap<QString, QString> descriptors;
 };
 
 /*!
@@ -93,28 +93,28 @@ public:
     \code
     class ProcessWrapper : public QObject
     {
-	Q_OBJECT
+  Q_OBJECT
     public:
-	ProcessWrapper( Process *p ) : proc( p ) {}
+  ProcessWrapper( Process *p ) : proc( p ) {}
     public slots:
-	void exec( const QString &args ) { proc->exec( args ); }
+  void exec( const QString &args ) { proc->exec( args ); }
     private:
-	Process *proc;
+  Process *proc;
     };
 
     class WrapperFactory : public QSWrapperFactory
     {
     public:
-	WrapperFactory()
-	{
-	    registerWrapper( "Process", "ProcessWrapper" );
-	}
+  WrapperFactory()
+  {
+      registerWrapper( "Process", "ProcessWrapper" );
+  }
 
-	QObject *create( const QString &className, void *ptr ) {
-	    if ( className == "Process" )
-		return new ProcessWrapper( (Process*)ptr );
-	    return 0;
-	}
+  QObject *create( const QString &className, void *ptr ) {
+      if ( className == "Process" )
+    return new ProcessWrapper( (Process*)ptr );
+      return 0;
+  }
     };
     \endcode
 
@@ -163,9 +163,9 @@ public:
     \sa QSInterpreter::addWrapperFactory()
 */
 QSWrapperFactory::QSWrapperFactory()
-    : d( new QSWrapperFactoryPrivate() )
+  : d(new QSWrapperFactoryPrivate())
 {
-    d->ip = 0;
+  d->ip = 0;
 }
 
 
@@ -174,9 +174,9 @@ QSWrapperFactory::QSWrapperFactory()
 */
 QSWrapperFactory::~QSWrapperFactory()
 {
-    if( interpreter() )
-	interpreter()->removeWrapperFactory( this );
-    delete d;
+  if (interpreter())
+    interpreter()->removeWrapperFactory(this);
+  delete d;
 }
 
 
@@ -185,13 +185,13 @@ QSWrapperFactory::~QSWrapperFactory()
     treated like a normal Qt Script error. The error message is passed
     in \a message.
 */
-void QSWrapperFactory::throwError( const QString &message )
+void QSWrapperFactory::throwError(const QString &message)
 {
-    if( d->ip )
-	d->ip->throwError( message );
+  if (d->ip)
+    d->ip->throwError(message);
 #if defined( QT_CHECK_STATE )
-    else
-	qWarning( "QSWrapperFactory::throwError(), factory does not have interpreter" );
+  else
+    qWarning("QSWrapperFactory::throwError(), factory does not have interpreter");
 #endif
 }
 
@@ -203,22 +203,22 @@ void QSWrapperFactory::throwError( const QString &message )
 
 QSInterpreter *QSWrapperFactory::interpreter() const
 {
-    return d->ip;
+  return d->ip;
 }
 
 
 /*!
   \internal
 */
-void QSWrapperFactory::setInterpreter( QSInterpreter *inter )
+void QSWrapperFactory::setInterpreter(QSInterpreter *inter)
 {
-    if( inter && d->ip ) {
+  if (inter && d->ip) {
 #if defined( QT_CHECK_STATE )
-	qWarning( "QSWrapperFactory::setInterpreter(), already has an interpreter" );
+    qWarning("QSWrapperFactory::setInterpreter(), already has an interpreter");
 #endif
-	return;
-    }
-    d->ip = inter;
+    return;
+  }
+  d->ip = inter;
 }
 
 
@@ -229,23 +229,23 @@ void QSWrapperFactory::setInterpreter( QSInterpreter *inter )
   be null (the default) in which case the engine assumes that the script class
   and C++ implementation both have the same name.
 */
-void QSWrapperFactory::registerWrapper( const QString &className,
-					const QString &cppClassName )
+void QSWrapperFactory::registerWrapper(const QString &className,
+                                       const QString &cppClassName)
 {
-    if( className.isEmpty() ) {
+  if (className.isEmpty()) {
 #if defined( QT_CHECK_STATE )
-	qWarning( "QSWrapperFactory::registerWrapper(), className is empty" );
+    qWarning("QSWrapperFactory::registerWrapper(), className is empty");
 #endif
-	return;
-    }
-    d->descriptors[className] = cppClassName;
+    return;
+  }
+  d->descriptors[className] = cppClassName;
 }
 
 
 /*!
   \internal
 */
-QMap<QString,QString> QSWrapperFactory::wrapperDescriptors() const
+QMap<QString, QString> QSWrapperFactory::wrapperDescriptors() const
 {
-    return d->descriptors;
+  return d->descriptors;
 }

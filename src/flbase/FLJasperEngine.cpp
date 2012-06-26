@@ -67,9 +67,19 @@ FLDomNodeInterface *FLJasperEngine::reportData() const
   return FLDomNodeInterface::nodeInterface(d->xmlData_);
 }
 
+QDomDocument FLJasperEngine::rptXmlData() const
+{
+  return d->xmlData_;
+}
+
 FLDomNodeInterface *FLJasperEngine::reportTemplate() const
 {
   return FLDomNodeInterface::nodeInterface(d->xmlTemplate_);
+}
+
+QDomDocument FLJasperEngine::rptXmlTemplate() const
+{
+  return d->xmlTemplate_;
 }
 
 void FLJasperEngine::setDataSourceParameters(const QString &selectExpression,

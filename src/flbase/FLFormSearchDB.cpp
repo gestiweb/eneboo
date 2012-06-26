@@ -93,7 +93,7 @@ void FLFormSearchDB::initForm()
     if (iface)
       iface->finish();
     setCaption(cursor_->metadata() ->alias() + caption);
-    setName("formSearch" + action_->name());
+    setName("formSearch" + idMDI_);
     QSProject *p = aqApp ->project();
     iface = static_cast<FLFormSearchDBInterface *>(p->object(name()));
     if (iface) {

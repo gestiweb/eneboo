@@ -1,0 +1,110 @@
+/*!  \page game.html
+
+\ingroup examples
+
+\title Game Example
+
+The Game example demonstrates how to combine a
+simple customizable widget with non trivial script code to
+significantly increase the functionality of the widget.
+
+The Game example consists of two main parts: the Playfield and a
+script file.  The C++ class \c{PlayField} contains a few properties and
+functions that can be accessed by the script file and that offer some
+basic game related functionality to the developer. The game script
+file describes how the game works.
+
+\section1 The PlayField Class
+
+The PlayField class is a simple game engine for playing sprite based
+games. It contains functionality that makes it easy for game
+developers to create game objects and to receive input from the
+keyboard.
+
+Programming a game for the game engine is done by implementing three
+stages. The first stage is initialization; this is where the script
+loads the images that will be used in the game and adds them to the
+PlayField for later use. This is done by calling the script function
+\c{init()}.  The second stage is the game loop where the PlayField
+runs a timer based loop that triggers every few milliseconds. Each
+time the loop triggers the script, function \c{next()} is called. This
+continues until the player either wins or looses and then the game calls
+the function \c{gameOver()}. This will tell the game loop to stop. 
+
+The PlayField class has the following properties: 
+\list 
+\i up- True if the user presses the \Key up arrow key.
+\i down-True if the user presses the \Key down arrow key.
+\i left- True if the user presses the \Key left arrow key.
+\i right- True if the user presses the \Key right arrow key.
+\i space- True if the user presses the space button.
+\endlist
+
+The PlayField class has the following script enabled functions:
+\list
+\i int addItem( const QPixmap &m )- Adds a pixmap to the playfield and
+returns its id.
+\i void moveItem( int id, int x, int y )- Moves the item with the
+given id.
+\i void enableItem( int id, bool enable )- Sets if the item should
+be painted or not.
+\i void gameOver( bool success )- Stops the game loop and displays a
+win or loose "game over" message.
+\i void clear()- Clears all the pixmaps in the Playfield.
+\endlist
+
+\section1 The Shooter Game Script
+
+The shooter game is the epic tale of the heroic space commander battling the
+alien armies in outer space. 
+
+The game is implemented using a Qt Script file that contains the game
+logics. This includes moving the participants of the game around or
+determining if a bullet shot hits or misses.
+
+As described above, the game is divided into three
+stages. Initialization is implemented in the script function
+\c{init()}. This function is called once before the game starts running,
+and is used to load the images and move them to their desired
+location on the screen. The second stage is the function \c{next()} which
+is called for every step in the game loop. In this function the script
+determines the actions of the player through the PlayFields
+properties, then moves the player, enemies and bullets around and
+checks for collisions. If an enemy is hit, it is disabled. If all
+enemies are disabled the script calls the gameOver function with true,
+indicating that the user won. If the player is hit, or the enemies get
+past the player the script calls the function gameOver with the
+argument false, meaning that the player lost.
+
+\section1 The Bouncer Game Script
+
+In the Bouncer game script, the player takes on a gang of evil bricks
+that just sit there. Your weapon is a ball that bounces around the
+screen and deals damage to the bricks when it collides into them.
+Smash all the bricks to win!
+
+The Bouncer game script is written in a more object-oriented way than the
+shooter script; consequently it shows how to use classes and inheritance in
+Qt Script. The base class is the \c GameItem, which contains a pixmap
+and some encapsulation of the pixmap id etc. The player is implemented
+in the \c Player class, which basically provides a specialized
+constructor. The ball is implemented using the \c Ball class which
+extends the GameItem with a speed vector, describing the direction and
+speed of the ball. The enemies are implemented in the \c Brick class.
+Each brick has three damage levels, each described by its own pixmap
+and id. This is encapsulated in the \c Brick class.
+
+The initialization stage of the game \c init() creates the player,
+ball and bricks. The bricks are then moved into place. While the
+game loop is running \c next(), the game moves the player and the
+ball. The player registers \c left and \c right buttons only, since 
+the player can only move horizontally. When the ball is moved, we
+check for collision with the player, which will bounce the ball back
+up to the bricks, or collision with one of the bricks. If the ball
+collides with a brick, it will damage the brick, which will 
+change the pixmap of the brick as can be seen in the function
+\c Brick.damage(). The game is over when the player either fails to 
+bounce the ball, or manages to destroy all the bricks.
+ 
+
+*/

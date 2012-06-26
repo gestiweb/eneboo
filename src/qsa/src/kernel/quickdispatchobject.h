@@ -42,73 +42,79 @@ class QSWrapperFactory;
 class QuickDispatchObjectFactory
 {
 public:
-    QuickDispatchObjectFactory( QuickInterpreter *i );
-    ~QuickDispatchObjectFactory();
+  QuickDispatchObjectFactory(QuickInterpreter *i);
+  ~QuickDispatchObjectFactory();
 
-    bool constructInterface( const QCString &className,
-			     void *ptr,
-			     QPtrVector<QObject> &result );
+  bool constructInterface(const QCString &className,
+                          void *ptr,
+                          QPtrVector<QObject> &result);
 
-    bool constructInstance( const QString &className,
-			    const QValueList<QVariant> &args,
-			    QPtrVector<QObject> &result );
+  bool constructInstance(const QString &className,
+                         const QValueList<QVariant> &args,
+                         QPtrVector<QObject> &result);
 
-    QMap<QString,QObject*> staticDescriptors() const;
-    QMap<QString,QString> instanceDescriptors() const;
+  QMap<QString, QObject *> staticDescriptors() const;
+  QMap<QString, QString> instanceDescriptors() const;
 
-    QStringList classes() const;
+  QStringList classes() const;
 
-    void throwError( const QString &message ) const;
+  void throwError(const QString &message) const;
 
-    QuickInterpreter *interpreter() const { return ip; }
+  QuickInterpreter *interpreter() const {
+    return ip;
+  }
 
-    void addObjectFactory( QSObjectFactory *factory );
-    void addWrapperFactory( QSWrapperFactory *factory );
+  void addObjectFactory(QSObjectFactory *factory);
+  void addWrapperFactory(QSWrapperFactory *factory);
 
-    void removeObjectFactory( QSObjectFactory *factory );
-    void removeWrapperFactory( QSWrapperFactory *factory );
-
-private:
-    bool createInterface( const QCString &className, void *ptr, QPtrVector<QObject> *);
-    bool createInstance( const QString &className,
-			 const QValueList<QVariant> &args,
-                         QPtrVector<QObject> *);
-
-    void addInterface( QObject *iface, QPtrVector<QObject> *);
-    void addObject( QObject *obj, QPtrVector<QObject> *);
+  void removeObjectFactory(QSObjectFactory *factory);
+  void removeWrapperFactory(QSWrapperFactory *factory);
 
 private:
-    QuickDispatchObjectFactoryPrivate *d;
-    QuickInterpreter *ip;
-    bool recurseBlock;
+  bool createInterface(const QCString &className, void *ptr, QPtrVector<QObject> *);
+  bool createInstance(const QString &className,
+                      const QValueList<QVariant> &args,
+                      QPtrVector<QObject> *);
+
+  void addInterface(QObject *iface, QPtrVector<QObject> *);
+  void addObject(QObject *obj, QPtrVector<QObject> *);
+
+private:
+  QuickDispatchObjectFactoryPrivate *d;
+  QuickInterpreter *ip;
+  bool recurseBlock;
 };
 
 
 class QuickUnnamedObject : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    QuickUnnamedObject( QObject *p = 0, const char *n = 0 ) : QObject( p, n ) {}
-    QuickInterpreter* interpreter() const;
-    void throwError( const QString &message ) const;
+  QuickUnnamedObject(QObject *p = 0, const char *n = 0) : QObject(p, n) {}
+  QuickInterpreter *interpreter() const;
+  void throwError(const QString &message) const;
 };
 
 
 class QuickPtrDispatchObject : public QuickUnnamedObject
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    QuickPtrDispatchObject( const char *n, void *p );
-    ~QuickPtrDispatchObject();
+  QuickPtrDispatchObject(const char *n, void *p);
+  ~QuickPtrDispatchObject();
 
-    void* pointer() const { return ptr; }
-    void setPointer( void *p );
+  void *pointer() const {
+    return ptr;
+  }
+  void setPointer(void *p);
 
 public slots:
-    bool isValid() const { return !!ptr; }
+  bool isValid() const {
+    return !!ptr;
+  }
 
 private:
-    void *ptr;
+  void *ptr;
 };
 
 #endif

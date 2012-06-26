@@ -60,27 +60,31 @@ public:
             };
 
   QSMember(Type t = Undefined, int a = AttributeNone)
-    : typ(t), attrs(a), own(0) { }
+    : typ(t), attrs(a), own(0), super_(0) { }
 
   QSMember(Type t, int i, int a)
-    : typ(t), attrs(a), own(0), idx(i) { }
+    : typ(t), attrs(a), own(0), idx(i), super_(0) { }
 
   QSMember(QSFunctionPointer fptr,
            int a = AttributeNonWritable)
     : typ(NativeFunction), attrs(a | AttributeExecutable), own(0),
-      nativeFunction(fptr) { }
+      nativeFunction(fptr), super_(0) { }
 
   QSMember(QSMemberFunctionPointer fptr, int a = AttributeNonWritable)
     : typ(NativeMemberFunction), attrs(a | AttributeExecutable),
-      own(0), nativeMemberFunction(fptr) { }
+      own(0), nativeMemberFunction(fptr), super_(0) { }
 
   QSMember(QSVoidFunctionPointer fptr, int a = AttributeNonWritable)
     : typ(NativeVoidFunction), attrs(a | AttributeExecutable),
-      own(0), nativeVoidFunction(fptr) { }
+      own(0), nativeVoidFunction(fptr), super_(0) { }
 
   QSMember(QSFunctionBodyNode *f, int a = AttributeNonWritable)
     : typ(ScriptFunction), attrs(a | AttributeExecutable), own(0),
-      scriptFunction(f) { }
+      scriptFunction(f), super_(0) { }
+
+  // ### AbanQ
+  ~QSMember();
+  // ### AbanQ
 
   Type type() const {
     return typ;
@@ -165,11 +169,46 @@ public:
     own = cl;
   }
 
+  // ### AbanQ
+  void setSuper(QSMember *super);
+  QSMember *super() const {
+    return super_;
+  }
+
+  QSMember(const QSMember &other)
+    : super_(0) {
+    copy(other);
+  }
+
+  QSMember &operator=(const QSMember &other) {
+    copy(other);
+    return *this;
+  }
+  // ### AbanQ
+
 private:
   Type typ;
   int attrs;
   const QSClass *own;
   QString str;
+
+  // ### AbanQ
+  QSMember *super_;
+
+  void copy(const QSMember &other) {
+    typ = other.typ;
+    attrs = other.attrs;
+    own = other.own;
+    str = other.str;
+    setSuper(other.super_);
+    idx = other.idx;
+    scriptFunction = other.scriptFunction;
+    nativeFunction = other.nativeFunction;
+    nativeMemberFunction = other.nativeMemberFunction;
+    nativeVoidFunction = other.nativeVoidFunction;
+    obj = other.obj;
+  }
+  // ### AbanQ
 
 public:
   // ### make private

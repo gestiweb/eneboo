@@ -32,43 +32,46 @@
 #include "qsclass.h"
 #include <qstringlist.h>
 
-class QSRegExpClass : public QSWritableClass {
+class QSRegExpClass : public QSWritableClass
+{
 public:
-    QSRegExpClass( QSClass *b );
-    QString name() const { return QString::fromLatin1("RegExp"); }
+  QSRegExpClass(QSClass *b);
+  QString name() const {
+    return QString::fromLatin1("RegExp");
+  }
 
-    virtual QSObject fetchValue( const QSObject *objPtr,
-				 const QSMember &mem ) const;
-    virtual void write( QSObject *objPtr, const QSMember &mem,
-			const QSObject &val ) const;
+  virtual QSObject fetchValue(const QSObject *objPtr,
+                              const QSMember &mem) const;
+  virtual void write(QSObject *objPtr, const QSMember &mem,
+                     const QSObject &val) const;
 
 
-    QString toString( const QSObject *obj ) const;
+  QString toString(const QSObject *obj) const;
 
-    QSObject construct( const QSList &args ) const;
-    QSObject cast( const QSList &args ) const;
+  QSObject construct(const QSList &args) const;
+  QSObject cast(const QSList &args) const;
 
-    static QRegExp *regExp( const QSObject *obj );
+  static QRegExp *regExp(const QSObject *obj);
 
-    // ECMA API
-    static QSObject exec( QSEnv *env );
-    static QSObject test( QSEnv *env );
-    static QSObject toStringScript( QSEnv *env );
-    // QRegExp API
-    static QSObject search( QSEnv *env );
-    static QSObject searchRev( QSEnv *env );
-    static QSObject exactMatch( QSEnv *env );
-    static QSObject pos( QSEnv *env );
-    static QSObject cap( QSEnv *env );
+  // ECMA API
+  static QSObject exec(QSEnv *env);
+  static QSObject test(QSEnv *env);
+  static QSObject toStringScript(QSEnv *env);
+  // QRegExp API
+  static QSObject search(QSEnv *env);
+  static QSObject searchRev(QSEnv *env);
+  static QSObject exactMatch(QSEnv *env);
+  static QSObject pos(QSEnv *env);
+  static QSObject cap(QSEnv *env);
 
-    QStringList lastCaptures;
+  QStringList lastCaptures;
 
-    static QString source(const QSObject *re);
-    static bool isGlobal(const QSObject *re);
-    static bool isIgnoreCase(const QSObject *re);
+  static QString source(const QSObject *re);
+  static bool isGlobal(const QSObject *re);
+  static bool isIgnoreCase(const QSObject *re);
 
 private:
-    static QRegExp* regExp( QSEnv *e );
+  static QRegExp *regExp(QSEnv *e);
 };
 
 #endif

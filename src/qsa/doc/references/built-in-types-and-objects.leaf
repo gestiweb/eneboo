@@ -1,0 +1,1621 @@
+\chapter Built-in Types and Objects
+
+\QS provides a variety of types and built-in objects. The types
+covered in the following sections are built into the \QS interpreter.
+
+\omit
+\QS also provides every \Class QObject subclass in the \QT library,
+which includes, for example, every \QT GUI widget.
+\endomit
+
+The built-in types include \l Array, \l Boolean, \l Date, \l{Function
+type} \l Number, \l Object, \l Point, \l Rect, \l RegExp, \l Size, \l
+String, \l Color, \l Palette, \l ColorGroup, \l ByteArray, \l Font and
+\l Pixmap.
+
+The built-in objects include \l Math and \l System. 
+
+\section1 Built-in Types
+
+These are in some sense, \QS's 'native' datatypes. 
+
+\omit
+********************************************************************************
+				class Array
+********************************************************************************
+\endomit
+\section2 Array
+
+An \Class Array is a datatype which contains a named list of
+items. The items can be any \QS object. Multi-dimensional arrays
+are achieved by setting array items to be arrays themselves.
+
+Arrays can be extended dynamically simply by creating items at
+non-existent index positions. Items can also be added using \c
+push(), \c unshift() and \c splice(). Arrays can be concatenated
+together using \c concat(). Items can be extracted using \c pop(),
+\c shift() and \c slice(). Items can be deleted using \c splice().
+Arrays can be turned into strings using \c join() or
+\c{Array::toString()}. Use \c reverse() to reverse the items in an
+array, and \c sort() to sort the items. The \c sort() function can
+be passed a comparison function for customized sort orders.
+
+In general, operations that copy array items perform a deep copy on
+items that are \c Number or \c String objects, and a shallow copy
+on other objects.
+
+\section3 Array Construction
+
+Arrays can be constructed from array literals or using the \l{new
+operator}:
+\code
+    var mammals = [ "human", "dolphin", "elephant", "monkey" ];
+    var plants = new Array( "flower", "tree", "shrub" );
+    var things = [];
+    for ( i = 0; i < mammals.length; i++ ) {
+	things[i] = new Array( 2 );
+	things[i][0] = mammals[i];
+	things[i][1] = plants[i];	
+    }
+\endcode
+
+Arrays can be initialized with a size, but with all items
+undefined:
+\code
+    var a = new Array( 10 ); // 10 items
+\endcode
+
+\section3 Array Access
+
+\Class Array items are accessed via their names. Names can be either
+integers or strings. 
+
+Example:
+\code
+    var m2 = mammals[2];
+    mammals[2] = "gorilla";
+    var thing = things[2][1]
+\endcode
+The first statement retrieves the value of the third item of the \c
+mammals array and assigns it to \c m2, which now contains "monkey".
+The second statement replaces the third item of the \c mammals
+array with the value "gorilla". The third statement retrieves the
+second item of the third item's array from the \c things array
+and assigns it to \c thing, which now contains "shrub".
+
+As stated above, it is also possible to access the arrays using
+strings. These act as normal properties, and can be accessed either
+using the square bracked operator ([]) or by directly dereferencing
+the array object and specifying the property name (.name). These two
+accessor types can be mixed freely as seen below with the \c address
+and \c phoneNumber properties.
+
+\code
+    var names = [];
+    names["first"] = "John";
+    names["last"] = "Doe";
+    var firstName = names["first"];
+    var lastName = names["last"];
+   
+    names["address"] = "Somewhere street 2";
+    names.phoneNumber = "+0123456789";
+    var address = names.address;
+    var phoneNumber = names["phoneNumber"];
+\endcode
+
+\section3 Array Properties
+
+\list 
+
+\i length : Number; Holds the number of items in the array. Items with
+string keys are excluded from the length property.
+
+\endlist
+
+\section3 Array Functions
+
+\list
+
+\i concat( a1 : Array, a2 : Array ... aN : Array) : Array;
+\code
+    var x = new Array( "a", "b", "c" );
+    var y = x.concat( [ "d", "e" ], [ 90, 100 ] );
+    // y == [ "a", "b", "c", "d", "e", 90, 100 ]
+\endcode
+
+Concatenates the array with one or more other arrays in the order
+given, and returns a single array.
+
+\i join( optSeparator : String ) : String; 
+\code
+    var x = new Array( "a", "b", "c" );
+    var y = x.join();         // y == "a,b,c"
+    var z = x.join( " * " );  // y == "a * b * c"
+\endcode
+
+Joins all the items of an array together, separated by commas, or by
+the specified \c optSeparator.
+
+\i pop() : Object;
+\code
+    var x = new Array( "a", "b", "c" );
+    var y = x.pop(); // y == "c"  x == [ "a", "b" ]
+\endcode
+Pops (i.e. removes) the top-most (right-most) item off the array and
+returns it.
+
+\i push( item1, optItem2, ... optItemN );
+\code
+    var x = new Array( "a", "b", "c" );
+    x.push( 121 ); // x == [ "a", "b", "c", 121 ]
+\endcode
+Pushes (i.e. inserts) the given items onto the top (right) end of the
+array. The function returns the new length of the array.
+
+\i reverse();
+\code
+    var x = new Array( "a", "b", "c", "d" );
+    x.reverse(); // x == [ "d", "c", "b", "a" ]
+\endcode
+Reverses the items in the array.
+
+\i shift() : Object; 
+\code
+    var x = new Array( "a", "b", "c" );
+    var y = x.shift(); // y == "a"  x == [ "b", "c" ]
+\endcode
+Shifts (i.e. removes) the bottom-most (left-most) item off the array
+and returns it.
+
+\i slice( startIndex : Number, optEndIndex : Number ) : Array;
+\code
+    var x = new Array( "a", "b", "c", "d" );
+    var y = x.slice( 1, 3 ); // y == [ "b", "c" ]
+    var z = x.slice( 2 );    // z == [ "c", "d" ]
+\endcode
+Copies a slice of the array from the item with the given starting
+index, \c startIndex, to the item \e before the item with the given
+ending index, \c optEndIndex. If no ending index is given, all items
+from the starting index onward are sliced.
+
+\i sort( optComparisonFunction : function );
+\code
+    var x = new Array( "d", "x", "a", "c" );
+    x.sort(); // x == [ "a", "c", "d", "x" ]
+\endcode
+
+Sorts the items in the array using string comparison. For
+customized sorting, pass the \Func sort() function a comparison
+function, \c optComparisonFunction, that has the following signature
+and behavior:
+
+\code
+    function comparisonFunction( a, b ) // signature
+\endcode
+
+The function must return an integer as follows:
+\list
+\i -1 if a \< b
+\i  0 if a == b
+\i  1 if a \> b
+\endlist
+
+Example:
+\code
+    function numerically( a, b ) { return a < b ? -1 : a > b ? 1 : 0; }
+    var x = new Array( 8, 90, 1, 4, 843, 221 );
+    x.sort( numerically ); // x == [ 1, 4, 8, 90, 221, 843 ]
+\endcode
+
+\i splice( startIndex : Number, replacementCount : Number, optItem1, ... optItemN );
+\code
+    var x = new Array( "a", "b", "c", "d" );
+
+    // 2nd argument 0, plus new items   ==> insertion
+    x.splice( 1, 0, "X", "Y" );
+    // x == [ "a", "X", "Y", "b", "c", "d" ]
+
+    // 2nd argument > 0, and no items   ==> deletion
+    x.splice( 2, 1 );
+    // x == [ "a", "X", "b", "c", "d" ]
+
+    // 2nd argument > 0, plus new items ==> replacement
+    x.splice( 3, 2, "Z" );
+    // x == [ "a", "X", "b", "Z" ]
+\endcode
+Splices items into the array and out of the array. The first
+argument, \c startIndex, is the start index. The second argument, \c
+replacementCount, is the number of items that are to be replaced.
+Make the second argument 0 if you are simply inserting items. The
+remaining arguments are the items to be inserted. If you are simply
+deleting items, the second argument must be \> 0 (i.e. the number of
+items to delete), and there must be no new items given.
+
+\i toString() : String;
+\code
+    var x = new Array( "a", "b", "c" );
+    var y = x.toString();  // y == "a,b,c"
+    var z = x.join();      // y == "a,b,c"
+\endcode
+Joins all the items of an array together, separated by commas. This
+function is used when the array is used in the context of a string
+concatenation or is used as a text value, e.g. for printing. Use \c
+join() if you want to use your own separator.
+
+\i unshift( expression : String, optExpression1, ... opExpressionN )
+\code
+    var x = new Array( "a", "b", "c" );
+    x.unshift( 121 ); // x == [ 121, "a", "b", "c" ]
+\endcode
+Unshifts (i.e. inserts) the given items at the bottom (left) end of
+the array.
+
+\omit
+********************************************************************************
+				class Boolean
+********************************************************************************
+\endomit
+\section2 Boolean
+
+\ECMA provides a \Class Boolean data type. In general, creating objects
+of this type is not recommended since the behavior will probably not
+be what you would expect.
+
+Instead, use the boolean constants \c true and \c false as required.
+Any expression can be evaluated in a boolean context, e.g. in an \l if
+statement. If the expression's value is \c 0, \c null, \c false, \l
+NaN, \l undefined or the empty string \c "", the expression is \c
+false; otherwise the expression is \c true.
+
+\omit 
+	\section2 ByteArray
+	
+	A \Class ByteArray is an array optimized for storing raw bytes. See
+	the \link library.book Library Reference\endlink for details.
+
+	\QTDOC QByteArray.
+
+	\section2 Color
+
+	A \Class Color object represents a color. See the \link library.book
+	Library Reference\endlink for details.
+
+	\QTDOC QColor.
+\endomit
+
+\omit
+********************************************************************************
+				class Date
+********************************************************************************
+\endomit
+\section2 Date
+
+Instances of the \Class Date class are used to store and manipulate
+dates and times.
+
+A variety of get functions are provided to obtain the date, time or
+relevant parts, for example, \c getDay(), \c getYear(), \c getHours(),
+\c getMilliseconds(), \c getMinutes(), \c getMonth(), \c getSeconds(),
+\c getTime().
+
+A complementary set of functions are also provided, including \c
+setYear(), \c setHours(), \c setMilliseconds(), \c setMinutes(), \c
+setMonth(), \c setSeconds(), \c setTime().
+
+The functions operate using local time.
+
+Conversion between Date objects to and from strings are provided by \c
+parse() and \c Date::toString().
+
+Elapsed time (in milliseconds) can be obtained by creating two dates,
+casting them to \c Number and subtracting one value from the other.
+\code
+var date1 = new Date();
+// time flies..
+var date2 = new Date();
+var timedifference = date2.getTime() - date1.getTime();
+\endcode
+
+\section3 Static Date Functions
+
+\list
+
+\i parse( dateString : String ) : Number;
+\code
+    var d = new Date( Date.parse( "1976-01-25T22:30:00" ) );
+    d = Date.parse( "1976-01-25T22:30:00" );
+\endcode
+This is a static function that parses a string, \c dateString, which
+represents a particular date and time. It returns the number of
+milliseconds since midnight on the 1st January 1970. The string must
+be in the ISO 8601 extended format: \c{YYYY-MM-DD} or with time
+\c{YYYY-MM-DDTHH:MM:SS}.
+
+\endlist
+
+\section3 Date Construction
+
+\code
+Date()
+Date( milliseconds )
+Date( year, month, day, optHour, optMinutes, optSeconds, optMilliseconds )
+\endcode
+\PP
+\code
+    var today = new Date();
+    var d = new Date( 1234567 );
+    var date = new Date( 1994, 4, 21 );
+    var moment = new Date( 1968, 5, 11, 23, 55, 30 ); 
+\endcode 
+
+Dates can be constructed with no arguments, in which case the value is
+the date and time at the moment of construction using local time. A
+single integer argument is taken as the number of milliseconds since
+midnight on the 1st January 1970.
+
+\section3 Date Functions
+
+\list
+
+\i getDate() : Number; 
+\code
+    var d = new Date( 1975, 12, 25 );
+    var x = d.getDate();  // x == 25
+\endcode
+Returns the day of the month using local time. The value is always in
+the range 1..31.
+
+\i getDay() : Number; 
+\code
+    var d = new Date( 1975, 12, 25, 22, 30, 15 );
+    var x = d.getDay();  // x == 4
+\endcode
+Returns the day of the week using local time. The value is always in
+the range 1..7, with the week considered to begin on Monday.
+
+Example:
+\code
+    var IndexToDay = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ];
+    var d = new Date( 1975, 12, 28 );
+    System.println( IndexToDay[ d.getDay() - 1 ] ); // Prints "Sun"
+\endcode
+
+\i getYear() : Number;
+\code
+    var d = new Date( 1975, 12, 25 );
+    var x = d.getYear();  // x == 1975
+\endcode
+
+Returns the year using local time.
+
+\i getHours() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22 );
+    var x = d.getHours();  // x == 22
+\endcode
+Returns the hour using local time. The value is always in the range
+0..23.
+
+\i getMilliseconds() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22 );
+    var x = d.getMilliseconds();  // x == 0
+\endcode
+Returns the milliseconds component of the date using local time. The
+value is always in the range 0..999. In the example, \c x is 0,
+because no milliseconds were specified, and the default for
+unspecified components of the time is 0.
+
+\i getMinutes() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getMinutes();  // x == 30
+\endcode
+Returns the minutes component of the date using local time. The
+value is always in the range 0..59.
+
+\i getMonth() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getMonth();  // x == 12
+\endcode
+Returns the months component of the date using local time. The
+value is always in the range 1..12.
+
+Example:
+\code
+    var IndexToMonth = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+    var d = new Date( 1975, 12, 25 );
+    System.println( IndexToMonth[ d.getMonth() - 1] ); // Prints "Dec"
+\endcode
+
+\i getSeconds() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getSeconds();  // x == 0
+\endcode
+Returns the seconds component of the date using local time. The
+value is always in the range 0..59. In the example \c x is 0 because
+no seconds were specified, and the default for unspecified
+components of the time is 0.
+
+\i getTime() : Number;
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getTime();  // x == 1.91457e+11
+\endcode
+Returns the number of milliseconds since midnight on the 1st January
+1970 using local time.
+
+\i setDate( dayOfTheMonth : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setDate( 30 );  // d == 1975-12-30T22:30:00
+\endcode
+Sets the day of the month to the specified \c dayOfTheMonth in local
+time.
+
+\i setYear( year : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setYear( 1980 );         // d == 1980-12-30T22:30:00
+\endcode
+Sets the year to the specified \c year in local time.
+
+\i setHours( hour : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setHours( 10 );  // d == 1980-12-30T10:30:00
+\endcode
+Sets the \c hour to the specified hour, which must be in the range
+0..23, in local time. The minutes, seconds and milliseconds past the
+hour (\c optMinutes, \c optSeconds and \c optMilliseconds) can also be
+specified.
+
+\i setMilliseconds( milliseconds : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMilliseconds( 998 );  // d == 1980-12-30T10:30:00:998
+\endcode
+Sets the \c milliseconds component of the date to the specified value
+in local time.
+
+\i setMinutes( minutes : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMinutes( 15 );  // d == 1980-12-30T10:15:00
+\endcode
+Sets the \c minutes to the specified minutes, which must be in the
+range 0..59, in local time. The seconds and milliseconds past the
+minute (\c optSeconds and \c optMilliseconds) can also be specified.
+
+\i setMonth( month : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMonth( 0 );  // d == 1980-01-11T22:30:00
+\endcode
+Sets the \c month to the specified month, which must be in the range
+0..11, in local time.
+
+\i setSeconds()
+
+\c{setSeconds( seconds )}
+
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setSeconds( 25 );  // d == 1980-12-30T22:30:25
+\endcode
+Sets the \c seconds to the specified seconds, which must be in the
+range 0..59, in local time.
+
+\i setTime( milliseconds : Number );
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var duplicate = new Date();
+    duplicate.setTime( d.getTime() );
+\endcode
+Sets the date and time to the local date and time given in terms of
+\c milliseconds since midnight on the 1st January 1970.
+
+\i toString() : String;
+\code
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var s = d.toString(); // s == "1975-12-25T22:30:00"
+\endcode
+
+Converts the date into a string on the ISO 8601 extended format:
+\c{YYYY-MM-DDTHH:MM:SS}.
+
+
+\omit
+********************************************************************************
+				class Function
+********************************************************************************
+\endomit
+\section2 Function Type
+
+Functions are normally defined in the application's source code. In
+some situations it is desirable to create functions at run time.
+
+\code
+    var min = new Function( "x", "y", "return x < y ? x : y;" );
+    var m = min( 68, 9 ); // m == 9
+\endcode
+
+The first arguments are the names of the parameters; the last argument
+is a string which contains the function's definition. It is also
+possible to supply the list of argument names as one comma separated string.
+
+\code
+    var min = new Function( "x,y", "return x < y ? x : y;" );
+\endcode
+
+Variable numbers of arguments are also supported, using the \l
+arguments array, for example:
+\code
+    max = new Function(
+	  "var max = 0;"
+	+ "for ( var i = 0; i < arguments.length; i++ ) {"
+	+ "   if ( arguments[ i ] > max ) max = arguments[ i ];"
+	+ "}"
+	+ "return max;"
+	);
+    System.println( max( 50, 16, 24, 99, 1, 97 ) ); // Prints 99
+\endcode
+
+\omit
+********************************************************************************
+				class Number
+********************************************************************************
+\endomit
+\section2 Number
+
+A \Class Number is a datatype that represents a number. In most
+sittuations, programmers will use numeric literals like 3.142 directly
+in code. The \Class Number datatype is useful for obtaining system
+limits, e.g. \c MIN_VALUE and \c MAX_VALUE, and for performing number
+to string conversions with toString()
+
+\section3 Number Construction
+
+Numbers are not normally constructed, but instead created by simple
+assignment, e.g.
+\code
+    var x = 3.142;
+\endcode
+
+\section3 Number Properties
+
+\list
+
+\i MAX_VALUE : Number; The maximum value for floating point values.
+
+\i MIN_VALUE : Number; The minimum value for floating point values.
+
+\endlist
+
+A numeric variable can hold a non-numeric value, in which case \l
+isNaN() returns \c true. The result of an arithmetic expression may
+exceed the maximum or minimum representable values in which case the
+value of the expression will be \l Infinity, and \l isFinite() will
+return \c false.
+
+\section3 Number Functions
+
+\list 
+
+\i toString() : String; Returns the number as a string value.
+
+\endlist
+
+\omit
+
+\i toExponential()
+
+\c{toExponential( optDecimals )}
+
+\code
+    var x = 999.8765;
+    System.println( x.toExponential() );    // Prints: 9.998765e+1
+    System.println( x.toExponential( 1 ) ); // Prints: 9.9e+1
+\endcode
+This function returns a string representation of the number using
+scientific (exponential) notation. If \c optDecimals is given, it
+specifies the number of decimal places to use in the resultant string.
+
+\i toFixed()
+
+\c{toFixed( optDecimals )}
+
+\code
+    var x = 999.8765;
+    System.println( x.toFixed() );    // Prints: 999
+    System.println( x.toFixed( 1 ) ); // Prints: 999.9
+\endcode
+This function returns a string representation of the number using a
+fixed number of decimal places. The default number of places is zero;
+the number of decimal places to use can be given as \c optDecimals.
+The number is rounded if necessary.
+
+\i toPrecision()
+
+\c{toPrecision( optSignificanDigits )}
+
+\code
+    var x = 999.8765;
+    System.println( x.toPrecision() );    // Prints: 999.8765
+    System.println( x.toPrecision( 1 ) ); // Prints: 999.9
+\endcode
+This function returns a string representation of the number using
+a fixed number of decimal places or using scientific notation. By
+default all digits are used, but by specifying the number of
+significant digits (\c optSignificanDigits) to be less than the number
+available, rounding will occur.
+
+\i toString()
+
+\c{toString()}
+
+\code
+    var x = 999.8765;
+    System.println( x.toString() ); // Prints: 999.8765
+\endcode
+This function returns a string representation of the number. It is the
+same as using \l toPrecision() with no argument.
+\endomit
+
+\omit
+********************************************************************************
+				class Object
+********************************************************************************
+\endomit
+\section2 Object
+
+An \Class Object is the base type for all \QS objects.
+
+\Class Object provides a \Func toString() function which is usually
+overridden by subclasses.
+
+\omit
+********************************************************************************
+				class Point
+********************************************************************************
+\endomit
+\section2 Point
+
+The \Class Point class provides an implementation of a two dimensional point.
+
+The Point class provides three different constructors.
+
+\code
+    var point = new Point( 20, 30 );
+    var duplicate = new Point( point ); // 20, 30
+    var zero = new Point();		// 0, 0
+\endcode
+
+\section3 Point Properties
+
+\list
+
+\i x : Number; The x position of the point.
+
+\i y : Number; The y position of the point.
+
+\endlist
+
+\code
+    var p = new Point( 100, 200 );
+    System.println( "Point is: " + p.x + ", " + p.y );
+\endcode
+
+\omit
+********************************************************************************
+				class Rect
+********************************************************************************
+\endomit
+\section2 Rect
+
+A \Class Rect object represents a rectangle.
+
+The rectangle class provides three constructors.
+\code
+    var rect = new Rect( 10, 20, 30, 40 ); // x=10, y=20, width=30, height=40
+    var duplicate = new Rect( rect );	   // x=10, y=20, width=30, height=40
+    var empty = new Rect();		   // x=0, y=0, width=0, height=0
+\endcode
+
+\section3 Rect Properties
+
+\list 
+
+\i x : Number; The left position of the rectangle.
+
+\i y : Number; The right position of the rectangle.
+
+\i width : Number; The width of the rectangle.
+
+\i height : Number; The height of the rectangle.
+
+\i top : Number; The position of the top of the
+rectangle. This is defined as \c{ top = y }.
+
+\i bottom : Number; The position of the bottom of the
+rectangle. This is defined as \c{ bottom = y + height + 1 }.
+
+\i left : Number; The position of the rectangle's left
+side. This is defined as \c{ left = x }
+
+\i right : Number; The position of the rectangle's right
+side. This is defined as \c{ right = x + width + 1}.
+
+\i center : Point; The center of the rectangle.
+
+\endlist
+
+\section3 Rect Functions
+
+\list
+
+\i isNull() : Boolean; 
+\code
+    var empty = new Rect();
+    empty.isNull(); // true;
+
+    var square = new Rect( 10, 10, 10, 10 );
+    square.isNull(); // false;
+\endcode
+    
+Returns true if the rectangle has a width and height of 0.
+
+\i isEmpty() : Boolean; 
+\code
+    var rect = new Rect( 10, 10, -10, -10 );
+    rect.isEmpty(); // true
+    
+    var rect = new Rect( 10, 10, 10, 10 );
+    rect.isEmpty(); // false
+\endcode
+
+Returns true if the rectangle is empty, meaning that it has
+width and/or height that is negative.
+
+\i contains( otherRect : Rect ) : Boolean;
+\code
+    new Rect( 0, 0, 100, 100 ).contains( new Rect( 10, 10, 10, 10 ) ); // true
+    new rect( 10, 10, 10, 10 ).contains( new Rect( 0, 0, 100, 100 ) ); // false
+\endcode
+
+Returns true if the rectangle contains the other rectangle.
+
+\i intersection( otherRect : Rect ) : Rect; Returns the intersection
+between this rectangle and another rectangle. The intersection of two
+rectangles is the part of the rectangles that overlap. If they do not
+overlap, an empty rectangle is returned.
+
+\i union( otherRect : Rect ) : Rect; Returns the union of two
+rectangles. The union is a rectangle large enough to encompass both
+rectangles.
+
+\i intersects( otherRect : Rect ) : Boolean; Returns true if this
+rectangle intersects the other rectangle.
+
+\i normalize(); Normalizes this rectangle. This means changing the
+prefix of the width and/or height if they are negative. After being
+normalized, a rectangle will no longer be empty.
+
+\i moveLeft( pos : Number ); Moves the rectangle so that its \c left
+property is equal to \c pos.
+
+\i moveRight( pos : Number ); Moves the rectangle so that its \c right
+property is equal to \c pos.
+
+\i moveTop( pos : Number ); Moves the rectangle so that its \c top
+property is equal to \c pos.
+
+\i moveBottom( pos : Number ); Moves the rectangle so that its \c
+bottom property is equal to \c pos.
+
+\i moveBy( dx : Number, dy : Number ); Translates the rectangle by \c
+dx and \c dy. \c dx and \c dy will be added to \c x and \c y, and \c
+width and \c height will be left unchanged.
+
+\endlist
+
+\omit
+********************************************************************************
+				class Size
+********************************************************************************
+\endomit
+\section2 Size
+
+The \Class Size class represents a two dimensional size. The size is
+represented using width and height.
+
+The Size class provides three construtors:
+\code
+    var size = new Size( 100, 200 ); // width = 100, height = 200
+    var duplicate = new Size( size ); // width = 100, height = 200
+    var empty = new Size(); // width = 0, height = 0
+\endcode
+
+\section3 Size Properties
+
+\list
+
+\i width : Number; The width of the size.
+
+\i height : Number; The height of the size.
+
+\endlist
+
+\section3 Size Functions
+
+\list
+
+\i translate(); The translate function swaps the width and height of the size.
+
+\endlist
+
+\omit
+********************************************************************************
+				class RegExp
+********************************************************************************
+\endomit
+\section2 RegExp
+
+A \Class RegExp is a regular expression matcher for strings. 
+
+Regular expressions can be created either by using the
+\c{/expression/} syntax or by using the RegExp constructor as shown
+below. Note that when using the RegExp constructor, a string is
+passed, and all backslashes must be escaped using an extra backslash,
+i.e. \c \\d. Below are two ways to create regular expressions that
+matches the pattern "QUANTITY=471 # Order quantity" and gets
+the number 471.
+
+\code
+    var directRegex = /([A-Z]+)=(\d+)/;
+    var str = "QUANTITY=471 # Order quantity";
+    str.match(directRegex);
+    directRegex.capturedTexts[2]; // "471";
+	
+    var indirectRegex = new RegExp( "([A-Z]+)=(\\d+)" );
+\endcode
+
+\section3 RegExp Properties
+
+\list
+
+\i valid : Boolean; Returns true if the regular expression is
+syntactically valid; otherwise returns false.
+
+\i empty : Boolean; Returns true if the pattern is empty; otherwise
+returns false.
+
+\i matchedLength : Number; The length of the last matched
+string, or -1 if there was no match.
+
+\i capturedTexts : String[]; An array of all the captured
+texts from the previous match. This can be empty.
+
+\i global : Boolean; Specifies that the regexp should be matched
+globally. A global regexp will match every occurrence (i.e. as many
+times as possible), whereas a non-global regexp will match at most
+once (at the first match it encounters). This is particularly relevant
+for replace where every occurance of a pattern will be replaced when
+global is true.
+
+A regular expression can be set to global either by setting the global
+property on a regexp object or by specifying a trailing \c g in the
+pattern.
+
+\code 
+var re = /mypattern/g;     // Global by method #1
+
+var re = /mypattern/; 
+re.global = true           // Global by method #2
+\endcode
+
+\i ignoreCase : Boolean; Specifies that the regexp ignores case
+when matching. Case-insensitivity can is enabled by either
+specifying a trailing \c i after the pattern or by setting the \c
+ignoreCase property.
+
+\code
+var re = /mypattern/i;     // Case-insensitive by method #1
+
+var re = /mypattern/;
+re.ignoreCase = true;      // Case-insensitive by method #2
+\endcode
+
+\endlist
+
+\section3 RegExp Functions
+
+\list
+
+\i toString() : String; Returns the regular expression pattern as a
+string.
+
+\i search( text : String ) : Number;
+\code
+    var re = /\d+ cm/; // matches one or more digits followed by space then 'cm'
+    re.search( "A meter is 100 cm long" ); // returns 11
+\endcode
+
+Searches \c text for the pattern defined by the regular
+expression. The function returns the position in the text of the first
+match or -1 if no match is found.
+
+\i searchRev( text : String ) : Number; Same as \c search(), but
+searchRev searches from the end of the text.
+
+\i exactMatch( text : String ) : Boolean;
+Returns true if \c text exactly matches the pattern in this regular
+expresssion; otherwise returns false.
+
+\i cap( nth : Number ) : String;
+\code
+    re = /name: ([a-zA-Z ]+)/;
+    re.search( "name: John Doe, age: 42" );
+    re.cap(0);  // returns "name: John Doe"
+    re.cap(1);  // returns "John Doe"
+    re.cap(2);  // returns undefined, no more captures.
+\endcode
+
+Returns the \c nth capture of the pattern in the previously matched
+text. The first captured string (\c cap(0) ) is the part of the string that
+matches the pattern itself, if there is a match. The following
+captured strings are the parts of the pattern enclosed by parenthesis.
+In the example above we try to capture \c ([a-zA-Z ]+), which captures
+a sequence of one or more letters and spaces after the \c{name:}
+part of the string.
+
+\i pos( nth : Number ) : Number;
+\code
+    re = /name: ([a-zA-Z ]+)/;
+    re.search( "name: John Doe, age: 42" );
+    re.pos(0); // returns 0, position of "name: John Doe"
+    re.pos(1); // returns 6, position of "John Doe"
+    re.pos(2); // returns -1, no more captures
+\endcode
+
+Returns the position of the \c nth captured text in the search
+string. 
+
+\endlist
+
+\omit
+********************************************************************************
+				class String
+********************************************************************************
+\endomit
+
+\section2 String
+
+A \Class String is a sequence of zero or more Unicode characters.
+\QS's \Class String class uses the \QT QString class's functions and
+syntax.
+
+Strings can be created and concatenated as follows.
+
+\code
+    var text = "this is a";
+    var another = new String( "text" );
+    var concat = text + " " + another;  // concat == "this is a text"
+\endcode
+
+\section3 String Properties
+
+\list 
+
+\i length : Number; The length property specifies the length of the
+string.
+
+\endlist 
+
+\section3 Static String Functions
+
+\list 
+
+\i fromCharCode ( static function )
+
+\code
+    var s = String.fromCharCode( 65, 66, 67, 68 );
+    System.println( s ); // prints "ABCD"
+\endcode
+
+Returns a string made up of the characters with code \c code1, \c
+code2, etc, according to their Unicode character codes.
+
+\endlist
+
+\section3 String Functions
+
+\list
+
+\i charAt( pos : Number ) : String; Returns the character in the
+string at position \c pos. If the position is out of bounds, \c
+undefined is returned.
+
+\i charCodeAt( pos : Number ) : Number; Returns the character code of
+the character at position \c pos in the string. If the position is out
+of bounds, \c undefined is returned.
+
+\i indexOf( pattern : String or RegExp, pos : Number ) : Number;
+Returns the index of \c pattern in the string, starting at position \c
+pos. If no position is specified, the function starts at the beginning
+of the string. If the pattern is not found in the string, -1 is
+returned.
+
+\i lastIndexOf( pattern : String or RegExp, pos : Number ) : Number;
+Returns the last index of \c pattern in the string, starting at
+position \c pos and searching backwards from there. If no position is
+specified, the function starts at the end of the string. If the
+pattern is not found in the string, -1 is returned.
+
+\i match( pattern : RegExp ) : String; Returns the matched
+pattern if this string matches the pattern defined by \c regexp. If 
+the string doesn't match or \c regexp is not a valid regular
+expression, \c undefined is returned.
+
+\i search( pattern : String or RegExp ) : String; same as find.
+
+\i searchRev( pattern : String or RegExp ) : String; same as findRev.
+
+\i replace( pattern : RegExp, newValue : String ) : String; Replaces
+the first occurrence of \c pattern in the string with \c newvalue if
+the pattern is found in the string. A modified copy of string is
+returned.
+
+If \c pattern is a regular expression with global set, all occurances
+of \c pattern in the string will be replaced.
+
+\i split( pattern : String or RegExp ) : String[]; Returns an array of
+strings containing this string split on each occurrence of \c
+pattern.
+
+\i substring( startIndex : Number, endIndex : Number ) : String;
+Returns a copy of this string which is the substring starting at \c
+startIndex and ending at \c endIndex.
+
+\i toLowerCase() : String; Returns a lowercase copy of this string.
+
+\i lower() : String; Same as toLowerCase().
+
+\i toUpperCase() : String; Returns an uppercase copy of this string.
+
+\i upper() : String; Same as toUpperCase().
+
+\i isEmpty() : Boolean; Returns true if the string is empty, i.e. has
+a length of 0; otherwise returns false.
+
+\i left( length : Number ) : String; Returns a substring containing
+the \c length leftmost characters of this string.
+
+\i right( length : Number ) : String; Returns a substring containing
+the \c length rightmost characters of this string.
+
+\i mid( start : Number, length : Number ) : String; Returns a copy of
+this string which is the substring starting a \c start and is \c
+length characters long.
+
+\i find( pattern : String or RegExp, pos : Number ) : Number; Returns
+the first position of \c pattern after \c pos. If the pattern is not
+found, -1 is returned.  If \c pos is not specified, position 0 is
+used.
+
+\i findRev( pattern : Number, pos : Number ) : String; Returns the
+first position of \c pattern before \c pos, searching backward. If
+pattern is not found, -1 is returned. If \c pos is not specified, the
+search starts at the end of the string.
+
+\i startsWith( pattern : String or RegExp ) : Boolean; Returns true if
+the string starts with \c pattern; otherwise returns false.
+
+\i endsWith( pattern : String or RegExp ) : Boolean; Returns true if
+the string ends with \c pattern; otherwise returns false.
+
+\i arg( value : String or Number, fieldWidth : Number ) : String; This
+function will return a string that replaces the lowest numbered
+occurrence of %1, %2, ..., %9 with \c value.
+
+The \c fieldWidth parameter specifies the minimum amount of space that
+\c value is padded to. A positive \c fieldWidth will produce
+right-aligned text, whereas a negative \c fieldWidth will produce
+left-aligned text.
+
+\i argInt( value : Number, fieldWidth : Number, base : Number ) :
+String; This function behaves like arg above, but is specialized for
+the case where \c value is an integer.
+
+\c value is expressed in base \c base, which is 10 by default and must
+be between 2 and 36.
+
+\i argDec( value : Number, fieldWidth : Number, format : Number,
+precision : Number ) : String; This function behaves like \c arg() above,
+but is specialized for the case where \c value is a decimal value.
+
+Argument \c value is formatted according to the \c format specified,
+which is 'g' by default and can be any of the following:
+
+\list
+\i \c e - format as [-]9.9e[+|-]999
+\i \c E - format as [-]9.9E[+|-]999
+\i \c f - format as [-]9.9
+\i \c g - use \c e or \c f format, whichever is the most concise
+\i \c G - use \c E or \c f format, whichever is the most concise
+\endlist
+
+With 'e', 'E', and 'f', \c precision is the number of digits after the
+decimal point. With 'g' and 'G', \c precision is the maximum number of
+significant digits (trailing zeroes are omitted).
+
+\endlist
+
+\omit
+********************************************************************************
+				class Color
+********************************************************************************
+\endomit
+\section2 Color
+
+The \Class Color class is used to represent colors. Instances of
+\Class Color can be passed to C++ slots that take arguments of type
+QColor.
+
+\section3 Color Properties
+
+\list 
+
+\i red : Number; The red component of the color. This is a value between 0 and
+255.
+
+\i green : Number; The green component of the color. This value is between 0
+and 255.
+
+\i blue : Number; The blue component of the color. This value is between 0 and
+255.
+
+\i name : String; The name of the color, if a matching name for the
+color exists; otherwise an empty string.
+
+\i rgb : Number; The rgb color code of the color. The color code is a bitmask
+of the form \c 0xRRGGBB, where RR is the red component, GG is the
+green component, and BB is the blue component expressed as hexadecimal
+digits.
+
+\i hue : Number; The color's hue, as defined by the HSV color model.
+
+\i saturation : Number; The color's saturation, as defined by the HSV color
+model.
+
+\i value : Number; The colors's value, as defined by the HSV color model.
+
+\endlist
+
+\section3 Color Functions
+
+\list
+
+\i setRgb( colorcode ); Sets the color code of the color. The value is
+a bitmask on the form 0xRRGGBB, where RR=red, GG=green, and BB=blue,
+all as hexadecimal digits.
+
+\i setRgb( red, green, blue ); Sets the red, green and blue color values
+of the color to \c red, \c green and \c blue.
+
+\i light() : Color; Returns a Color that is a lighter version of this
+one.
+
+\i dark() : Color; Returns a Color that is a darker version of this
+one.
+
+\endlist
+
+\omit
+********************************************************************************
+				class Palette
+********************************************************************************
+\endomit
+\section2 Palette
+
+The \Class Palette class contains color groups for each widget state.
+A palette consists of three color groups: active, disabled, and
+inactive. All widgets contain a palette, and all widgets in Qt use
+their palette to draw themselves. This makes the user interface easily
+configurable and easier to keep consistent.
+
+\section3 Palette Properties
+
+\list
+
+\i active : ColorGroup; The active color group is used for the window
+that has the keyboard focus.
+
+\i inactive : ColorGroup; The inactive color group is used for the
+other windows.
+
+\i disabled : ColorGroup; The disabled color group is used for widgets
+(not windows) that are disabled.
+
+\endlist
+
+\omit
+********************************************************************************
+				class ColorGroup 
+********************************************************************************
+\endomit
+
+\section2 ColorGroup
+
+The \Class QColorGroup class contains a group of widget colors. 
+
+\section3 ColorGroup Properties
+
+\list
+
+\i background : Color; General background color.
+
+\i foreground : Color; General foreground color.
+
+\i base : Color; Used as background color for text entry widgets, for
+example; usually white or another light color.
+
+\i text : Color; The foreground color used with \c base.
+
+\i button : Color; General button background color.
+
+\i buttonText : Color; A foreground color used with the \c button
+color.
+
+\i light : Color; Used for 3D bevel and shadow effects. Lighter than
+\c button color.
+
+\i midlight : Color; Used for 3D bevel and shadow effects. Between \c
+button and \c light.
+
+\i dark : Color; Used for 3D bevel and shadow effects. Darker than \c
+button.
+
+\i mid : Color; Used for 3D bevel and shadow effects. Betwen \c button
+and \c dark.
+
+\i shadow : Color; Used for 3D bevel and shadow effects. A very dark
+color.
+
+\i highlight : Color; A color to indicate a selected item or the
+current item.
+
+\i highlightedText : Color; A text color that contrasts with \c
+highlight.
+
+\endlist
+
+\omit
+********************************************************************************
+				class ByteArray
+********************************************************************************
+\endomit
+\section2 ByteArray
+
+The \Class ByteArray class is an array optimized for storing raw
+bytes. Instances of \Class ByteArray can be passed to C++ slots
+that take arguments of type QByteArray.
+
+\section3 ByteArray Properties
+
+\list
+
+\i length : Number; The number of bytes in the byte array. This value
+is read-only.
+
+\i size : Number; The number of bytes in the byte array. This value is
+read-only.
+
+\endlist
+
+\section3 ByteArray Functions
+
+\list
+
+\i charAt( index : Number ) : String; Returns the character (byte) at
+the position index in the byte array. The byte is returned as a
+string.
+
+\endlist
+
+\omit
+********************************************************************************
+				class Font
+********************************************************************************
+\endomit
+\section2 Font
+
+The \Class Font class represents a font. Instances of \Class Font can
+be passed to C++ slots that take arguments of type QFont.
+
+\section3 Font Properties
+
+\list 
+
+\i family : String; The fonts family or name, such as \c SansSerif.
+
+\i pointSize : Number; The point size of the font. A point is 1/72
+inch. Using point size will give you a fixed sized independent of the
+device the font is used on. For instance, a screen has different
+resolution than a printer.
+
+\i pixelSize : Number; The pixel size of the font. The size of a pixel
+is determined by the device the font is used for. For instance, a
+printer may have a resolution of have 600 pixels/inch, whereas a
+monitor may only achieve 120 pixels/inch.
+
+\i bold : Boolean; True if the font is bold; otherwise false.
+
+\i italic : Boolean; True if the font is italic; otherwise false.
+
+\i underline : Boolean; True if the font is underline; otherwise
+false.
+
+\i strikeout : Boolean; True if the strikeout is on; otherwise false.
+
+\endlist
+
+\omit
+********************************************************************************
+				class Pixmap
+********************************************************************************
+\endomit
+\section2 Pixmap
+
+The \Class Pixmap class can be used to represent images in QSA.
+Instances of \Class Pixmap can be passed to C++ slots that take
+arguments of type QPixmap.
+
+The \Class Pixmap constructor can take a filename referring to an image that
+will then be loaded:
+
+\code 
+var background = new Pixmap( "background.png" );
+\endcode
+
+\section3 Pixmap Properties
+
+\list
+
+\i width : Number; The width of the pixmap. This value is read-only.
+
+\i height : Number; The height of the pixmap. This value is read-only.
+
+\i rect : Rect; The enclosing rectangle (0, 0, width, height) of the
+pixmap. This value is read-only.
+
+\i size : Size; The size of the rectangle. This value is read-only.
+
+\i depth : Number; The color depth of the pixmap. The pixmap depth is
+also called bits per pixel (bpp) or bit planes of a pixmap. A null
+pixmap has depth 0. This value is read-only.
+
+\endlist
+
+\section3 Pixmap Functions
+
+\list 
+
+\i isNull() : Boolean; Returns true if this is a null pixmap;
+otherwise returns false. A null pixmap has zero width, zero depth, and
+no contents.
+
+\i fill( color ); Fills the pixmap with the specified color.
+
+\i resize( size : Size ); Resizes the pixmap to the specified
+size.
+
+\i resize( width : Number, height : Number ); Resizes the pixmap to
+the specified dimensions.
+
+\i load( fileName : String ); Loads the pixmap data from the specified
+file.
+
+\i save( fileName : String ); Saves the pixmap to the specified
+file.
+
+\endlist
+
+\section1 Built-in Objects
+
+The built-in \c Math object provides functions that include: \c abs(),
+\c acos() and \c cos(), \c asin() and \c sin(), \c atan(), \c atan2()
+and \c tan(), \c ceil(), \c floor() and \c round(), \c exp() and \c
+log(), \c max() and \c min(), \c pow() and \c sqrt(), \c random(), and
+\c round().
+
+The built-in \c System object provides functions including: \c
+getenv(), \c setenv(), \c print() and \c println().
+
+\omit
+********************************************************************************
+				class Math
+********************************************************************************
+\endomit
+\section2 Math
+
+The \Class Math object always exists in a \QS program. Use the \Class
+Math object to access mathematical constants and functions, e.g.
+\code
+    var x, angle, y;
+    with ( Math ) {
+	x = PI * 2;
+	angle = 1.3;
+	y = x * sin( angle );
+    }
+\endcode
+The \Class Math object supports all the common mathematical functions,
+for example: \c abs(), \c acos() and \c cos(), \c asin() and \c sin(),
+\c atan(), \c atan2() and \c tan(), \c ceil(), \c floor() and \c
+round(), \c exp() and \c log(), \c max() and \c min(), \c pow() and \c
+sqrt(), \c random(), and \c round().
+
+See also, \l{+ operator}, \l{++ operator}, \l{- operator}, \l{--
+operator}, \l{* operator}, \l{/ operator}, \l{% operator}, \l{-=
+operator}, \l{+= operator}, \l{*= operator}, \l{/= operator} and \l{%=
+operator}.
+
+\section3 Math Properties
+
+All the \Class Math properties are read-only constants.
+
+\list
+\i E -- Euler's constant. The base for natural logarithms.
+\i LN2 -- Natural logarithm of 2.
+\i LN10 -- Natural logarithm of 10.
+\i LOG2E -- Base 2 logarithm of E.
+\i LOG10E -- Base 10 logarithm of E.
+\i PI -- Pi.
+\i SQRT1_2 -- Square root of 1/2.
+\i SQRT2 -- Square root of 2.
+\endlist
+
+\section3 Math Functions
+
+\list
+
+\i abs( number : Number ) : Number;
+
+Returns the absolute value of the given \c number. The equivalent of
+
+\code
+    x = x < 0 ? -x : x;
+\endcode
+
+\code
+    var x = -99;
+    var y = 99;
+    with ( Math ) {
+	x = abs( x );
+	y = abs( y );
+    }
+    if ( x == y ) System.println( "equal" );
+\endcode
+
+\i acos( number : Number ) : Number; Returns the arccosine of the
+given \c number in radians between 0 and \c Math.PI. If the number is
+out of range, returns \l NaN.
+
+\i asin( number : Number ) : Number; Returns the arcsine of the given
+\c number in radians between \c{-Math.PI/2} and \c{Math.PI/2}. If the
+number is out of range, returns \l NaN.
+
+\i atan( number : Number ) : Number; Returns the arctangent of the
+given \c number in radians between \c{-Math.PI/2} and
+\c{Math.PI/2}. If the number is out of range, returns \l NaN.
+
+\i atan2( yCoord : Number, xCoord : Number ) : Number; Returns the
+counter-clockwise angle in radians between the positive x-axis and the
+point at (\c xCoord, \c yCoord). The value returned is always between
+\c{-Math.PI} and \c{Math.PI}.
+
+Example:
+\code
+    function polar( x, y )
+    {
+	return Math.atan2( y, x );
+    }
+\endcode
+
+\i ceil( number : Number ) : Number; If the \c number is an integer,
+it returns the \c number. If the \c number is a floating point value,
+it returns the smallest integer greater than the \c number.
+
+Example:
+\code
+    var x = 913.41;
+    x = Math.ceil( x ); // x == 914
+    var y = -33.97;
+    y = Math.ceil( y ); // y == -33
+\endcode
+
+\i cos( number : Number ) : Number; Returns the cosine of the given \c
+number. The value will be in the range -1..1.
+
+\i exp( number : Number ) : Number; Returns \c{Math.E} raised to the
+power of the given \c number.
+
+\i floor( number : Number ) : Number; If the \c number is an integer,
+it returns the \c number. If the \c number is a floating point value,
+it returns the greatest integer less than the \c number.
+
+\i log( number : Number ) : Number; If the \c number is \> 0, it
+returns the natural logarithm of the given \c number. If the \c number
+is 0, it returns \c Infinity. If the \c number is \< 0, it returns \l
+NaN.
+
+\i max( number1 : Number, number2 : Number ) : Number; Returns the
+largest of \c number1 and \c number2.
+
+\i min( number1 : Number, number2 : Number ) : Number; Returns the
+smallest of \c number1 and \c number2.
+
+\i pow( number : Number, power : Number ) : Number; Returns the value
+of the \c number raised to the \c power.
+
+\i random() : Number; Returns a pseudo-random floating point number
+between 0 and 1. Pseudo random numbers are not truly random, but may
+be adequate for some applications, for example, games and simple
+simulations.
+
+\i round( number : Number ) : Number; Returns the \c number rounded to
+the nearest integer. If the fractional part of the \c number is \>=
+0.5, the \c number is rounded up; otherwise it is rounded down.
+
+\i sin( number : Number ) : Number; Returns the sine of the given \c
+number. The value will be in the range -1..1.
+
+\i sqrt( number : Number ) : Number; If the \c number is \>= 0, it
+returns the square root. If the \c number is \< 0, it returns \l NaN.
+
+\i tan( number : Number ) : Number; Returns the tangent of the given
+\c number.
+
+\endlist 
+
+\omit
+********************************************************************************
+				class System
+********************************************************************************
+\endomit
+
+\section2 System
+
+The \Class System object always exists in a \QS program. Use the
+\Class System object to access and manipulate environment variables,
+e.g. with \c getenv() and \c setenv(), and to print text to the
+console with \c print() and \c println().
+
+\section3 System Functions
+
+\list
+
+\i getenv( environmentVariable : String ) : String; Returns the string
+stored in the given \c environmentVariable.
+
+Example:
+\code
+    var q = System.getenv( "QTDIR" ); // q == "/usr/local/qt"
+\endcode
+
+\i print( expression : String ); Prints the \c expression (applying
+\Func toString() if necessary) to the console (\c stdout).
+
+\i println( expression : String ); Prints the \c expression (applying
+\Func toString() if necessary) to the console (\c stdout), followed by
+a newline.
+
+\i setenv( environmentVariable : String, value : String ); Sets the \c
+environmentVariable to the \c value. If the \c environmentVariable
+does not exist it is created. The environment is only changed within
+the context of the \QS process for the duration of the process.
+
+\endlist

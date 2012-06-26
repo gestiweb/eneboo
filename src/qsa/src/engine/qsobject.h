@@ -129,7 +129,9 @@ public:
    * Destructor.
    */
   ~QSObject();
-  bool isValid() const;
+  bool isValid() const {
+    return !!clss;
+  }
   void invalidate() {
     clss = 0;
   }

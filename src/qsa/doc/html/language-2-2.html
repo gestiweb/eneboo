@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/language-concepts.leaf:148 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Classes and Methods</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-2-1.html">Prev: Identifiers, Variables and Constants</a>] [<a href="language.html">Home</a>] [<a href="language-2-2-1.html">Next: Class Properties</a>]</p>
+<h3 align="center">Classes and Methods</h3>
+<p><font color=darkmagenta>Qt Script</font> is a fully object oriented language. Classes can be defined as shown below in the source files of a project.</p>
+<p>Example:</p>
+<pre>
+    class Circle {
+        var m_x;
+        var m_y;
+        var m_r;
+
+        function Circle( posx, posy, radius )
+        {
+            m_x = posx;
+            m_y = posy;
+            m_r = radius;
+        }
+        function setX( posx ) { m_x = posy; }
+        function setY( posy ) { m_y = posy; }
+        function setR( radius ) { m_r = radius; }
+        function x() { return m_x; }
+        function y() { return m_y; }
+        function r() { return m_r; }
+    }
+
+    class ColorCircle extends Circle {
+        var m_rgb;
+
+        function ColorCircle( posx, posy, radius, rgbcolor)
+        {
+            Circle( posx, posy, radius );
+            m_rgb = rgbcolor;
+        }
+        function setRgb( rgbcolor ) { m_rgb = rgbcolor; }
+        function rgb() { return m_rgb; }
+    }
+</pre>
+<p>A class's constructor is the function which has the same (case-sensitive) name as the class itself. The constructor should not contain an explicit return statement; it will return an object of its type automatically. <font color=darkmagenta>Qt Script</font> does not have a destructor function (a function that is called when the class is destroyed), for a class.</p>
+<p>The class's member variables are declared with <a href="language-5-3-4.html">var</a>, and its member functions (methods) with <a href="language-5-3-3.html">function</a>.</p>
+<p>The object instance itself is referred to using the <a href="language-5-2-7.html#7">this operator</a>. Inside a member function of a class, member variables and member functions can be accessed with an explicit this (e.g. <tt>this.x = posx;</tt>). This is not required, but can sometimes help to increase visibility.</p>
+<p><font color=darkmagenta>Qt Script</font> supports single inheritance, and if a class inherits from another class, the superclass's constructor can be called with <tt>super()</tt>.</p>
+<p>See also <a href="language-5-3-1.html">class</a>, <a href="language-5-3-3.html">function</a>, <a href="language-3-1-4.html">Function Type</a>, <a href="language-5-2-7.html#3">function operator</a>.</p>
+<blockquote>
+<p align="center"><b> Qualified Names</b></p>
+<p>When you declare an object of a particular type, the object itself becomes, in effect, a namespace. For example, in <font color=darkmagenta>Qt Script for Applications</font> there is a function called <tt>Math.sin()</tt>. If you wanted to have a <tt>sin()</tt> function in your own class that wouldn't be a problem, because objects of your class would call the function using the <tt>object.function()</tt> syntax. The period is used to distinguish the namespace a particular identifier belongs to.</p>
+<p>For example, in a <font color=darkmagenta>Qt Script for Applications</font> GUI application, every application object belongs to the <tt>Application</tt> object. This can lead to some rather lengthy code, for example <tt>Application.Dialog.ListBox.count</tt>. Such long names can often be shortened, for example, within a signal handler, e.g. <tt>this.ListBox.count</tt>. In practice, <font color=darkmagenta>Qt Script for Applications</font> is intelligent enough to work out the fully qualified name, so the code you would actually write is simply <tt>ListBox.count</tt>. The only time that you need to qualify your names is when an unqualified name is ambiguous.</p>
+</blockquote>
+<h4><a href="language-2-2-1.html">Class Properties</a></h4>
+<!-- eof -->
+<p align="right">[<a href="language-2-1.html">Prev: Identifiers, Variables and Constants</a>] [<a href="language.html">Home</a>] [<a href="language-2-2-1.html">Next: Class Properties</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

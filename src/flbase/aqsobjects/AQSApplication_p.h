@@ -109,6 +109,8 @@ public slots:
   void execMainScript(const QString &);
   void aboutAbanQ();
   void chooseFont();
+  void setDatabaseLockDetection(bool = true, int = 30000, int = -1, bool = true, const QString& = QString::null, const QString& = QString::null);
+  QString commaSeparator() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -430,6 +432,14 @@ inline void AQSApplication::aboutAbanQ()
 inline void AQSApplication::chooseFont()
 {
   AQ_CALL_VOID(chooseFont());
+}
+inline void AQSApplication::setDatabaseLockDetection(bool arg0,  int arg1,  int arg2,  bool arg3,  const QString &arg4,  const QString &arg5)
+{
+  AQ_CALL_VOID(setDatabaseLockDetection(arg0, arg1, arg2, arg3, arg4, arg5));
+}
+inline QString AQSApplication::commaSeparator() const
+{
+  AQ_CALL_RET_V(commaSeparator(), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

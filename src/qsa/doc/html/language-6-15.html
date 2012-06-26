@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:492 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>try</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-14.html">Prev: throw</a>] [<a href="language.html">Home</a>] [<a href="language-6-16.html">Next: while</a>]</p>
+<h3 align="center">try</h3>
+<pre>
+try {
+    Statements;
+}
+catch ( e ) {
+}
+
+try {
+    Statements;
+}
+finally {
+}
+</pre>
+<p>The <tt>try</tt> keyword is used to identify a statement block for which exceptions will be caught. There are two kinds of <tt>try</tt> block, <tt>try...catch</tt> and <tt>try...finally</tt>.</p>
+<p><b>try...catch</b></p>
+<p>If an exception occurs within a <tt>try...catch</tt> block, control is passed to the first <a href="language-6-3.html">catch</a> block. If that <tt>catch</tt> block does not accept the exception, control is passed on to the next <tt>catch</tt> block (if any), and so on, until there are no more <tt>catch</tt> blocks, in which case the exception is passed up the call chain until an enclosing <tt>catch</tt> block is found to accept it, or if none accept it, the program will terminate.</p>
+<p>A <tt>catch</tt> block has the form:</p>
+<pre>
+    catch ( e ) { /* statements */ }
+</pre>
+<p><b>try...finally</b></p>
+<p>If an exception occurs within a <tt>try...catch</tt> block, control is passed to the <a href="language-6-10.html">finally</a> block. This is useful if you want to ensure that something happens at the end of the block, no matter what.</p>
+<p>Examples:</p>
+<pre>
+    try {
+        file = new File;
+        file.open( filename );
+        process( file );
+    }
+    finally {
+        file.close();   
+    }
+</pre>
+<p>In this example, the file is always closed, even if an exception occurred.</p>
+<pre>
+    try {
+        var a = monthToName( 11 );
+        var b = monthToName( 2 );
+    }
+    catch ( e ) {
+        if ( e == "month number out of range" ) {
+            debug( "Code error: " + e );
+        }
+        else {
+            throw e;
+        }
+    }
+</pre>
+<p>In this example, the <tt>monthToName()</tt> function is called to set two variables. If the function fails, it throws an exception rather than returns an error value, so no explicit check for an error value is necessary. If one of the function calls failed <a href="language-5-1-2.html">debug()</a> is called; otherwise the exception is re-thrown so that it can be handled at a higher level. (See <a href="language-6-14.html">throw</a> for the definition of <tt>monthToName()</tt>.)</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-14.html">Prev: throw</a>] [<a href="language.html">Home</a>] [<a href="language-6-16.html">Next: while</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

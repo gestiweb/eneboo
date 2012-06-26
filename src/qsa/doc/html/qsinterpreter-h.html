@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsinterpreter.h:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>qsinterpreter.h Include File</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>qsinterpreter.h</h1>
+
+<p>This is the verbatim text of the qsinterpreter.h include file. It is provided only for illustration; the copyright remains with Trolltech.
+<hr>
+<pre>
+/****************************************************************************
+** $Id$
+**
+** Copyright (C) 2001-2006 Trolltech AS.  All rights reserved.
+**
+** This file is part of the Qt Script for Applications framework (QSA).
+**
+** This file may be distributed and/or modified under the terms of the
+** GNU General Public License version 2 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.
+**
+** Licensees holding a valid Qt Script for Applications license may use
+** this file in accordance with the Qt Script for Applications License
+** Agreement provided with the Software.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+** See http://www.trolltech.com/pricing.html or email sales@trolltech.com for
+**   information about QSA Commercial License Agreements.
+** See http://www.trolltech.com/gpl/ for GPL licensing information.
+**
+** Contact info@trolltech.com if any conditions of this licensing are
+** not clear to you.
+**
+*****************************************************************************/
+
+#ifndef QSINTERPRETER_H
+#define QSINTERPRETER_H
+
+#include "qsaglobal.h"
+#include "qsproject.h"
+#include "qsargument.h"
+
+#include &lt;qobject.h&gt;
+#include &lt;qvariant.h&gt;
+#include &lt;qobjectlist.h&gt;
+
+class QSProject;
+class QSInterpreterPrivate;
+class QuickInterpreter;
+class QSObjectFactory;
+class QSWrapperFactory;
+
+class QSA_EXPORT QSStackFrame
+{
+public:
+    QSStackFrame( const QString &amp;fun = QString::null,
+		  const QString &amp;file = QString::null,
+		  int line = 0,
+		  QObject *con = 0 ) :
+	fname( file ), func( fun ), ln( line ), cont( con )
+    {
+    }
+
+    QString scriptName() const { return fname; }
+    QString function() const { return func; }
+    int line() const { return ln; }
+    QObject *context() const { return cont; }
+private:
+    QString fname, func;
+    int ln;
+    QObject *cont;
+};
+
+bool operator==( const QSStackFrame &amp;a, const QSStackFrame &amp;b );
+
+class QSA_EXPORT QSStackTrace : public QValueList&lt;QSStackFrame&gt;
+{
+public:
+    QString toString() const;
+};
+
+class QSA_EXPORT QSInterpreter : public QObject
+{
+    friend class QSProject;
+    friend class QSWrapperFactory; // for access to interpreter()
+    friend class QSObjectFactory;
+    friend class QSInterfaceFactory;
+    friend class QSToolkitFactory;
+    friend QuickInterpreter *get_quick_interpreter( QSInterpreter *ip );
+
+    Q_OBJECT
+    Q_ENUMS( ErrorMode )
+    Q_PROPERTY( ErrorMode errorMode READ errorMode WRITE setErrorMode )
+    Q_PROPERTY( int timeoutInterval READ timeoutInterval WRITE setTimeoutInterval )
+
+public:
+    enum ErrorMode { Notify, Nothing };
+    enum ClassFlags { AllClasses, GlobalClasses };
+    enum FunctionFlags { FunctionNames = 0,
+			 FunctionSignatures = 1,
+			 IncludeMemberFunctions = 2 };
+
+    QSInterpreter( QObject *parent = 0, const char *name = 0 );
+    virtual ~QSInterpreter();
+
+    static QSInterpreter *defaultInterpreter();
+
+    QSArgument evaluate( const QString &amp;code, QObject *context = 0,
+			 const QString &amp;scriptName = QString::null );
+    QSArgument call( const QString &amp;function,
+		   const QSArgumentList &amp;arguments = QSArgumentList(),
+		   QObject *context = 0 );
+    QObject *currentContext() const;
+
+    bool checkSyntax( const QString &amp;code );
+
+    void setErrorMode( ErrorMode m );
+    ErrorMode errorMode() const;
+
+    QSProject* project() const;
+
+    QStringList functions( FunctionFlags flag = FunctionNames ) const;
+    QStringList functions( const QString &amp;context,
+			   uint mask = FunctionNames ) const;
+    QStringList functions( QObject *context,
+			   FunctionFlags flag = FunctionNames ) const;
+
+    QStringList classes( ClassFlags = AllClasses ) const;
+    QStringList classes( const QString &amp;context ) const;
+    QStringList classes( QObject *context ) const;
+
+    QStringList variables() const;
+    QStringList variables( const QString &amp;context ) const;
+    QStringList variables( QObject *context ) const;
+
+    bool hasFunction(const QString &amp;function) const;
+    bool hasClass(const QString &amp;className) const;
+    bool hasVariable(const QString &amp;variable) const;
+
+    void addTransientVariable(const QString &amp;variable, const QSArgument &amp;arg, QObject *context=0);
+    QSArgument variable(const QString &amp;variable, QObject *context=0) const;
+
+    QObjectList presentObjects() const;
+    void addTransientObject( QObject *object );
+
+    bool isRunning() const;
+
+    void throwError( const QString &amp;message );
+
+    void addObjectFactory( QSObjectFactory *factory );
+    void addWrapperFactory( QSWrapperFactory *factory );
+
+    QSStackTrace stackTrace() const;
+    QString errorMessage() const;
+    bool hadError() const;
+
+    void addTransientSignalHandler( QObject *sender,
+				    const char *signal,
+				    const char *qtscriptFunction );
+
+    void removeTransientSignalHandler( QObject *sender,
+				       const char *signal,
+				       const char *qtscriptFunction );
+
+    void setTimeoutInterval(int msecs);
+    int timeoutInterval() const;
+
+public slots:
+    void clear();
+    void stopExecution();
+
+signals:
+    void error( const QString &amp;message, const QString &amp;scriptName,
+		int lineNumber );
+    void error( const QString &amp;message, QObject *context,
+		const QString &amp;scriptName, int lineNumber );
+
+    void timeout(int runnningTime);
+
+private:
+    // disabled copy constructor and assignment operator
+    QSInterpreter( const QSInterpreter &amp; );
+    QSInterpreter&amp; operator=( const QSInterpreter &amp; );
+    QSInterpreter( QSProject *project, const char *name = 0);
+
+    void init();
+
+    // used by factory classes
+    QuickInterpreter *interpreter() const;
+
+    void removeObjectFactory( QSObjectFactory *factory );
+    void removeWrapperFactory( QSWrapperFactory *factory );
+
+private slots:
+    void runtimeError( const QString &amp;message, const QString &amp;filename, int lineNumber );
+    void runtimeError();
+    void parseError();
+
+private:
+    QSInterpreterPrivate *d;
+
+    uint running:1;
+};
+
+inline bool QSInterpreter::isRunning() const
+{
+    return running;
+}
+
+#endif
+</pre>
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

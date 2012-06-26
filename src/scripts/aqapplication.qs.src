@@ -63,6 +63,9 @@ class DockListView
     settings.writeEntry(key + "y", w.y);
     settings.writeEntry(key + "width", w.width);
     settings.writeEntry(key + "height", w.height);
+    settings.writeEntry(key + "offset", w.offset);
+    var area = w.area();
+    settings.writeEntry(key + "index", area ? area.findDockWindow(w) : -1);
   }
 
   function readState()
@@ -77,6 +80,13 @@ class DockListView
       w.undock();
       w.move(settings.readNumEntry(key + "x", w.x),
              settings.readNumEntry(key + "y", w.y));
+    }
+    w.offset = settings.readNumEntry(key + "offset", w.offset);
+    var index = settings.readNumEntry(key + "index", -1);
+    if (index != -1) {
+      var area = w.area();
+      if (area)
+        area.moveDockWindow(w, index);
     }
     var width = settings.readNumEntry(key + "width", w.width);
     var height = settings.readNumEntry(key + "height", w.height);
@@ -296,8 +306,11 @@ class MainWindow
 
     var maximized = settings.readBoolEntry(key + "maximized");
     if (!maximized) {
-      w.move(settings.readNumEntry(key + "x"),
-             settings.readNumEntry(key + "y"));
+      var x = settings.readNumEntry(key + "x");
+      var y = settings.readNumEntry(key + "y");
+      if (sys.osName() == "MACX" && y < 20)
+        y = 20;
+      w.move(x, y);
       w.resize(settings.readNumEntry(key + "width", w.width),
                settings.readNumEntry(key + "height", w.height));
     } else
@@ -342,6 +355,7 @@ class MainWindow
     this.initTabWidget();
     this.initHelpMenu();
     this.initConfigMenu();
+    this.initTextLabel();
     this.initDocks();
     this.initEventFilter();
   }
@@ -616,6 +630,12 @@ class MainWindow
                 connect(wb, "activated()", this.actSigMap_, "map()");
 				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
               }
+    var dumpDb = new QAction(ag);
+    dumpDb.name = "dumpDatabaseAction";
+    dumpDb.menuText = sys.translate("Copia de Seguridad");
+    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
+    connect(dumpDb, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     var load = new QAction(ac);
     load.name = "loadAbanQPackageAction";
@@ -701,6 +721,15 @@ class MainWindow
     font.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("font.png")));
     connect(font, "activated()", aqApp, "chooseFont()");
   }
+
+    function initTextLabel()
+    {
+    var w = this.w_;
+    var tL = w.child("tLabel");
+    var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='message'");
+    if (texto)
+    tL.text = texto;
+    }
 
   function initDocks()
   {
@@ -843,8 +872,8 @@ function initScript()
   mw.init();
   mw.updateMenuAndDocks();
   mw.initModule("sys");
-  mw.readState();
   mw.show();
+  mw.readState();
 }
 
 function reinitScript()
@@ -937,6 +966,11 @@ function triggerAction(signature)
         sys.openQSWorkbench();
       break;
       
+    case "dumpDatabase()":
+      if (ok)
+        sys.dumpDatabase();
+      break;
+
     case "exit()":
       if (ok)
         mw.close();

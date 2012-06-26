@@ -342,25 +342,24 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
   switch (type) {
     case QVariant::Double: {
       double fValue = field->value().toDouble();
-      int partDecimal = fieldTMD->partDecimal();
-      text.setNum(fValue, 'f', partDecimal);
       if (fValue < 0.0 && fgColorName.isEmpty()) {
         QPen pen(p->pen());
         pen.setColor(red);
         p->setPen(pen);
       }
-      p->drawText(2, 2, cr.width() - 4, cr.height() - 4, Qt::AlignRight | Qt::AlignVCenter,
-                  FLUtil::formatoMiles(text));
+      text = aqApp->localeSystem().toString(fValue, 'f', fieldTMD->partDecimal());
+      p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
+                  Qt::AlignRight | Qt::AlignVCenter, text);
     }
     break;
 
     case FLFieldMetaData::Unlock: {
       if (field->value().toBool())
-        p->drawPixmap((cr.width() - ok.width()) / 2, 2, ok, 0, 0, cr.width() - 4,
-                      cr.height() - 4);
+        p->drawPixmap((cr.width() - ok.width()) / 2, 2, ok,
+                      0, 0, cr.width() - 4, cr.height() - 4);
       else
-        p->drawPixmap((cr.width() - no.width()) / 2, 2, no, 0, 0, cr.width() - 4,
-                      cr.height() - 4);
+        p->drawPixmap((cr.width() - no.width()) / 2, 2, no,
+                      0, 0, cr.width() - 4, cr.height() - 4);
     }
     break;
 
@@ -381,22 +380,24 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
     }
     break;
 
-    case QVariant::Int:
-      if (field->value().toInt() < 0 && fgColorName.isEmpty()) {
+    case QVariant::Int: {
+      int fValue = field->value().toInt();
+      if (fValue < 0 && fgColorName.isEmpty()) {
         QPen pen(p->pen());
         pen.setColor(red);
         p->setPen(pen);
       }
-      text = field->value().toString();
-      p->drawText(2, 2, cr.width() - 4, cr.height() - 4, Qt::AlignRight | Qt::AlignVCenter,
-                  FLUtil::formatoMiles(text));
-      break;
+      text = aqApp->localeSystem().toString(fValue);
+      p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
+                  Qt::AlignRight | Qt::AlignVCenter, text);
+    }
+    break;
 
     case FLFieldMetaData::Serial:
     case QVariant::UInt:
-      text = field->value().toString();
-      p->drawText(2, 2, cr.width() - 4, cr.height() - 4, Qt::AlignRight | Qt::AlignVCenter,
-                  FLUtil::formatoMiles(text));
+      text = aqApp->localeSystem().toString(field->value().toUInt());
+      p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
+                  Qt::AlignRight | Qt::AlignVCenter, text);
       break;
 
     case QVariant::Pixmap: {
@@ -726,4 +727,9 @@ void FLDataTable::setColumnWidth(const QString &field, int w)
 
 void FLDataTable::handleError(const QSqlError &)
 {
+}
+
+int FLDataTable::indexOf(uint i) const
+{
+  return QDataTable::indexOf(i);
 }

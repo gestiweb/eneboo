@@ -25,12 +25,15 @@ class AQPackager
 {
 public:
   AQPackager(const QString & = QString::null) {}
-  bool pack(const QString &input, bool cleanTmp = true) { return false; }
+  bool pack(const QString &, bool = true, bool = false, bool = false, bool = true, bool = false) { return false; }
   bool unpack(const QString &) { return false; }
   QString output() const { return QString::null; }
   QString outputPackage() const { return QString::null; }
-  void setEncodeUtf8(bool b = true) {}
+  void setEncodeUtf8(bool = true) {}
   QStringList errorMessages() const { return QStringList(); }
+  QStringList logMessages() const { return QStringList(); }
+  void setFilter(const QStringList &) {}
+  QStringList filter() const { return QStringList(); }
 };
 
 #endif /* AQPACKAGER_H_ */

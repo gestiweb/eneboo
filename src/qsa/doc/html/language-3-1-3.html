@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:293 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Date</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1-2.html">Prev: Boolean</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-4.html">Next: Function Type</a>]</p>
+<h4 align="center">Date</h4>
+<p>Instances of the <font color=blue><tt>Date</tt></font> class are used to store and manipulate dates and times.</p>
+<p>A variety of get functions are provided to obtain the date, time or relevant parts, for example, <tt>getDay()</tt>, <tt>getYear()</tt>, <tt>getHours()</tt>, <tt>getMilliseconds()</tt>, <tt>getMinutes()</tt>, <tt>getMonth()</tt>, <tt>getSeconds()</tt>, <tt>getTime()</tt>.</p>
+<p>A complementary set of functions are also provided, including <tt>setYear()</tt>, <tt>setHours()</tt>, <tt>setMilliseconds()</tt>, <tt>setMinutes()</tt>, <tt>setMonth()</tt>, <tt>setSeconds()</tt>, <tt>setTime()</tt>.</p>
+<p>The functions operate using local time.</p>
+<p>Conversion between Date objects to and from strings are provided by <tt>parse()</tt> and <tt>Date::toString()</tt>.</p>
+<p>Elapsed time (in milliseconds) can be obtained by creating two dates, casting them to <tt>Number</tt> and subtracting one value from the other.</p>
+<pre>
+var date1 = new Date();
+// time flies..
+var date2 = new Date();
+var timedifference = date2.getTime() - date1.getTime();
+</pre>
+<h5><a name="1"></a>Static Date Functions</h5>
+<ul><li><p>parse( dateString : String ) : Number;</p>
+<pre>
+    var d = new Date( Date.parse( "1976-01-25T22:30:00" ) );
+    d = Date.parse( "1976-01-25T22:30:00" );
+</pre>
+<p>This is a static function that parses a string, <tt>dateString</tt>, which represents a particular date and time. It returns the number of milliseconds since midnight on the 1st January 1970. The string must be in the ISO 8601 extended format: <tt>YYYY-MM-DD</tt> or with time <tt>YYYY-MM-DDTHH:MM:SS</tt>.</p>
+</ul><h5><a name="2"></a>Date Construction</h5>
+<pre>
+Date()
+Date( milliseconds )
+Date( year, month, day, optHour, optMinutes, optSeconds, optMilliseconds )
+</pre>
+<p><p></p>
+<pre>
+    var today = new Date();
+    var d = new Date( 1234567 );
+    var date = new Date( 1994, 4, 21 );
+    var moment = new Date( 1968, 5, 11, 23, 55, 30 ); 
+</pre>
+<p>Dates can be constructed with no arguments, in which case the value is the date and time at the moment of construction using local time. A single integer argument is taken as the number of milliseconds since midnight on the 1st January 1970.</p>
+<h5><a name="3"></a>Date Functions</h5>
+<ul><li><p>getDate() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25 );
+    var x = d.getDate();  // x == 25
+</pre>
+<p>Returns the day of the month using local time. The value is always in the range 1..31.</p>
+<li><p>getDay() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30, 15 );
+    var x = d.getDay();  // x == 4
+</pre>
+<p>Returns the day of the week using local time. The value is always in the range 1..7, with the week considered to begin on Monday.</p>
+<p>Example:</p>
+<pre>
+    var IndexToDay = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ];
+    var d = new Date( 1975, 12, 28 );
+    System.println( IndexToDay[ d.getDay() - 1 ] ); // Prints "Sun"
+</pre>
+<li><p>getYear() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25 );
+    var x = d.getYear();  // x == 1975
+</pre>
+<p>Returns the year using local time.</p>
+<li><p>getHours() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22 );
+    var x = d.getHours();  // x == 22
+</pre>
+<p>Returns the hour using local time. The value is always in the range 0..23.</p>
+<li><p>getMilliseconds() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22 );
+    var x = d.getMilliseconds();  // x == 0
+</pre>
+<p>Returns the milliseconds component of the date using local time. The value is always in the range 0..999. In the example, <tt>x</tt> is 0, because no milliseconds were specified, and the default for unspecified components of the time is 0.</p>
+<li><p>getMinutes() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getMinutes();  // x == 30
+</pre>
+<p>Returns the minutes component of the date using local time. The value is always in the range 0..59.</p>
+<li><p>getMonth() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getMonth();  // x == 12
+</pre>
+<p>Returns the months component of the date using local time. The value is always in the range 1..12.</p>
+<p>Example:</p>
+<pre>
+    var IndexToMonth = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+    var d = new Date( 1975, 12, 25 );
+    System.println( IndexToMonth[ d.getMonth() - 1] ); // Prints "Dec"
+</pre>
+<li><p>getSeconds() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getSeconds();  // x == 0
+</pre>
+<p>Returns the seconds component of the date using local time. The value is always in the range 0..59. In the example <tt>x</tt> is 0 because no seconds were specified, and the default for unspecified components of the time is 0.</p>
+<li><p>getTime() : Number;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var x = d.getTime();  // x == 1.91457e+11
+</pre>
+<p>Returns the number of milliseconds since midnight on the 1st January 1970 using local time.</p>
+<li><p>setDate( dayOfTheMonth : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setDate( 30 );  // d == 1975-12-30T22:30:00
+</pre>
+<p>Sets the day of the month to the specified <tt>dayOfTheMonth</tt> in local time.</p>
+<li><p>setYear( year : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setYear( 1980 );         // d == 1980-12-30T22:30:00
+</pre>
+<p>Sets the year to the specified <tt>year</tt> in local time.</p>
+<li><p>setHours( hour : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setHours( 10 );  // d == 1980-12-30T10:30:00
+</pre>
+<p>Sets the <tt>hour</tt> to the specified hour, which must be in the range 0..23, in local time. The minutes, seconds and milliseconds past the hour (<tt>optMinutes</tt>, <tt>optSeconds</tt> and <tt>optMilliseconds</tt>) can also be specified.</p>
+<li><p>setMilliseconds( milliseconds : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMilliseconds( 998 );  // d == 1980-12-30T10:30:00:998
+</pre>
+<p>Sets the <tt>milliseconds</tt> component of the date to the specified value in local time.</p>
+<li><p>setMinutes( minutes : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMinutes( 15 );  // d == 1980-12-30T10:15:00
+</pre>
+<p>Sets the <tt>minutes</tt> to the specified minutes, which must be in the range 0..59, in local time. The seconds and milliseconds past the minute (<tt>optSeconds</tt> and <tt>optMilliseconds</tt>) can also be specified.</p>
+<li><p>setMonth( month : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setMonth( 0 );  // d == 1980-01-11T22:30:00
+</pre>
+<p>Sets the <tt>month</tt> to the specified month, which must be in the range 0..11, in local time.</p>
+<li><p>setSeconds()</p>
+<p><tt>setSeconds( seconds )</tt></p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    d.setSeconds( 25 );  // d == 1980-12-30T22:30:25
+</pre>
+<p>Sets the <tt>seconds</tt> to the specified seconds, which must be in the range 0..59, in local time.</p>
+<li><p>setTime( milliseconds : Number );</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var duplicate = new Date();
+    duplicate.setTime( d.getTime() );
+</pre>
+<p>Sets the date and time to the local date and time given in terms of <tt>milliseconds</tt> since midnight on the 1st January 1970.</p>
+<li><p>toString() : String;</p>
+<pre>
+    var d = new Date( 1975, 12, 25, 22, 30 );
+    var s = d.toString(); // s == "1975-12-25T22:30:00"
+</pre>
+<p>Converts the date into a string on the ISO 8601 extended format: <tt>YYYY-MM-DDTHH:MM:SS</tt>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-3-1-2.html">Prev: Boolean</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-4.html">Next: Function Type</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

@@ -52,10 +52,10 @@ protected:
     candidates[1].append(QString::fromLatin1("QString"));
     candidates[2].append(QString::fromLatin1("QString,QWidget*"));
     candidates[3].append(QString::fromLatin1("QString,QWidget*,WFlags"));
-    candidates[1].append(QString::fromLatin1("AQSqlCursor*"));
-    candidates[2].append(QString::fromLatin1("AQSqlCursor*,QString"));
-    candidates[3].append(QString::fromLatin1("AQSqlCursor*,QString,QWidget*"));
-    candidates[4].append(QString::fromLatin1("AQSqlCursor*,QString,QWidget*,WFlags"));
+    candidates[1].append(QString::fromLatin1("FLSqlCursor*"));
+    candidates[2].append(QString::fromLatin1("FLSqlCursor*,QString"));
+    candidates[3].append(QString::fromLatin1("FLSqlCursor*,QString,QWidget*"));
+    candidates[4].append(QString::fromLatin1("FLSqlCursor*,QString,QWidget*,WFlags"));
     QString sgt(castArgsSignature(args, candidates));
     if (sgt.isEmpty())
       return new AQFormDB;
@@ -77,17 +77,17 @@ protected:
       return new AQFormDB(*(argValue<QString *>(args[0])),
                           argValue<QWidget *>(args[1]),
                           static_cast<WFlags>(args[2].variant().toUInt()));
-    if (sgt == QString::fromLatin1("AQSqlCursor*"))
-      return new AQFormDB(argValue<AQSqlCursor *>(args[0]));
-    if (sgt == QString::fromLatin1("AQSqlCursor*,QString"))
-      return new AQFormDB(argValue<AQSqlCursor *>(args[0]),
+    if (sgt == QString::fromLatin1("FLSqlCursor*"))
+      return new AQFormDB(argValue<FLSqlCursor *>(args[0]));
+    if (sgt == QString::fromLatin1("FLSqlCursor*,QString"))
+      return new AQFormDB(argValue<FLSqlCursor *>(args[0]),
                           *(argValue<QString *>(args[1])));
-    if (sgt == QString::fromLatin1("AQSqlCursor*,QString,QWidget*"))
-      return new AQFormDB(argValue<AQSqlCursor *>(args[0]),
+    if (sgt == QString::fromLatin1("FLSqlCursor*,QString,QWidget*"))
+      return new AQFormDB(argValue<FLSqlCursor *>(args[0]),
                           *(argValue<QString *>(args[1])),
                           argValue<QWidget *>(args[2]));
-    if (sgt == QString::fromLatin1("AQSqlCursor*,QString,QWidget*,WFlags"))
-      return new AQFormDB(argValue<AQSqlCursor *>(args[0]),
+    if (sgt == QString::fromLatin1("FLSqlCursor*,QString,QWidget*,WFlags"))
+      return new AQFormDB(argValue<FLSqlCursor *>(args[0]),
                           *(argValue<QString *>(args[1])),
                           argValue<QWidget *>(args[2]),
                           static_cast<WFlags>(args[3].variant().toUInt()));
@@ -104,10 +104,10 @@ public:
     candidates[1].append(QString::fromLatin1("QString"));
     candidates[2].append(QString::fromLatin1("QString,QWidget*"));
     candidates[3].append(QString::fromLatin1("QString,QWidget*,WFlags"));
-    candidates[1].append(QString::fromLatin1("AQSqlCursor*"));
-    candidates[2].append(QString::fromLatin1("AQSqlCursor*,QString"));
-    candidates[3].append(QString::fromLatin1("AQSqlCursor*,QString,QWidget*"));
-    candidates[4].append(QString::fromLatin1("AQSqlCursor*,QString,QWidget*,WFlags"));
+    candidates[1].append(QString::fromLatin1("FLSqlCursor*"));
+    candidates[2].append(QString::fromLatin1("FLSqlCursor*,QString"));
+    candidates[3].append(QString::fromLatin1("FLSqlCursor*,QString,QWidget*"));
+    candidates[4].append(QString::fromLatin1("FLSqlCursor*,QString,QWidget*,WFlags"));
     return candidates;
   }
   //@AQ_END_DEF_PUB_SLOTS@

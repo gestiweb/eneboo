@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qseditor.cpp:71 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSEditor Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSEditor Class Reference</h1>
+
+<p>The QSEditor class provides an enhanced editor for editing
+Qt Script source code.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qseditor-h.html">qseditor.h</a>&gt;</tt>
+<p><a href="qseditor-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn><a href="#QSEditor"><b>QSEditor</b></a> ( QWidget&nbsp;*&nbsp;parent, const&nbsp;char&nbsp;*&nbsp;name = 0 )</li>
+<li class=fn><a href="#~QSEditor"><b>~QSEditor</b></a> ()</li>
+<li class=fn>bool <a href="#setScript"><b>setScript</b></a> ( QSScript&nbsp;*&nbsp;script )</li>
+<li class=fn>QSScript * <a href="#script"><b>script</b></a> () const</li>
+<li class=fn>bool <a href="#setInterpreter"><b>setInterpreter</b></a> ( QSInterpreter&nbsp;*&nbsp;interpreter, QObject&nbsp;*&nbsp;context = 0 )</li>
+<li class=fn>QSInterpreter * <a href="#interpreter"><b>interpreter</b></a> () const</li>
+<li class=fn>void <a href="#setText"><b>setText</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;text )</li>
+<li class=fn>QString <a href="#text"><b>text</b></a> () const</li>
+<li class=fn>bool <a href="#isModified"><b>isModified</b></a> () const</li>
+<li class=fn>void <a href="#commit"><b>commit</b></a> ()</li>
+<li class=fn>void <a href="#revert"><b>revert</b></a> ()</li>
+<li class=fn>bool <a href="#isActive"><b>isActive</b></a> () const</li>
+<li class=fn>bool <a href="#isUndoAvailable"><b>isUndoAvailable</b></a> () const</li>
+<li class=fn>bool <a href="#isRedoAvailable"><b>isRedoAvailable</b></a> () const</li>
+<li class=fn>void <a href="#undo"><b>undo</b></a> ()</li>
+<li class=fn>void <a href="#redo"><b>redo</b></a> ()</li>
+<li class=fn>void <a href="#cut"><b>cut</b></a> ()</li>
+<li class=fn>void <a href="#copy"><b>copy</b></a> ()</li>
+<li class=fn>void <a href="#paste"><b>paste</b></a> ()</li>
+<li class=fn>void <a href="#selectAll"><b>selectAll</b></a> ()</li>
+<li class=fn>bool <a href="#find"><b>find</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;expr, bool&nbsp;cs, bool&nbsp;wo, bool&nbsp;forward, bool&nbsp;startAtCursor )</li>
+<li class=fn>bool <a href="#replace"><b>replace</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;find, const&nbsp;QString&nbsp;&amp;&nbsp;replace, bool&nbsp;cs, bool&nbsp;wo, bool&nbsp;forward, bool&nbsp;startAtCursor, bool&nbsp;replaceAll )</li>
+<li class=fn>void <a href="#gotoLine"><b>gotoLine</b></a> ( int&nbsp;line )</li>
+<li class=fn>void <a href="#indent"><b>indent</b></a> ()</li>
+<li class=fn>void <a href="#readSettings"><b>readSettings</b></a> ()</li>
+<li class=fn>void <a href="#setErrorMark"><b>setErrorMark</b></a> ( int&nbsp;line )</li>
+<li class=fn>void <a href="#removeErrorMark"><b>removeErrorMark</b></a> ()</li>
+<li class=fn>QTextEdit * <a href="#textEdit"><b>textEdit</b></a> () const</li>
+<li class=fn>QSProject * <a href="#project"><b>project</b></a> () const</li>
+</ul>
+<h2>Signals</h2>
+<ul>
+<li class=fn>void <a href="#textChanged"><b>textChanged</b></a> ()</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSEditor class provides an enhanced editor for editing
+Qt Script source code.
+<p> For some applications <em>QSA Workbench</em> is too complex and it might
+be more appropriate to embed a simple editor into the application's
+user interface.  QSEditor provides a type of widget component which offers
+normal editor functionality as well as Qt Script syntax
+highlighting, completion, function argument hints, and
+auto-indentation.
+<p> The text in the QSEditor can be set using <a href="#setText">setText</a>() and retrieved
+using <a href="#text">text</a>().
+<p> A QSEditor can be associated with a <a href="qsscript.html">QSScript</a> object using
+<a href="#setScript">setScript</a>() and the QSScript can then be retrieved by using
+<a href="#script">script</a>().
+<p> When text is edited in the QSEditor, it is not directly reflected in
+the underlying script. To write the changes from the editor to the
+script, use <a href="#commit">commit</a>(). To revert the changes from the editor to the
+text in the script, use <a href="#revert">revert</a>().
+<p> The QSEditor will automatically become the active editor when it
+gets the focus. The active editor can be retrieved from <a href="qsproject.html">QSProject</a>.
+<p> Look at the examples/scriptbutton and examples/console examples to 
+see an example of the QSEditor
+class.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSEditor"></a>QSEditor::QSEditor ( QWidget&nbsp;*&nbsp;parent, const&nbsp;char&nbsp;*&nbsp;name = 0 )
+</h3>
+Constructs an editor not linked to any project.
+<p> The <em>parent</em> and <em>name</em> arguments are passed to the QWidget
+constructor.
+
+<h3 class=fn><a name="~QSEditor"></a>QSEditor::~QSEditor ()
+</h3>
+Destructs the editor.
+
+<h3 class=fn>void <a name="commit"></a>QSEditor::commit ()
+</h3>
+Updates the script with the text in the editor.
+<p> When the text in the editor is changed, the changes must be
+committed before they are reflected in the script.
+
+<h3 class=fn>void <a name="copy"></a>QSEditor::copy ()
+</h3>
+Copies the selected text to the clipboard.
+
+<h3 class=fn>void <a name="cut"></a>QSEditor::cut ()
+</h3>
+Cuts the selected text to the clipboard.
+
+<h3 class=fn>bool <a name="find"></a>QSEditor::find ( const&nbsp;QString&nbsp;&amp;&nbsp;expr, bool&nbsp;cs, bool&nbsp;wo, bool&nbsp;forward, bool&nbsp;startAtCursor )
+</h3>
+Finds the string <em>expr</em> in the editor and selects the
+result. If <em>cs</em> is TRUE, the search is case sensitive. If <em>wo</em>
+is TRUE, only whole words are searched. If <em>forward</em> is TRUE, the
+search is executed forward, otherwise backwards. If <em>startAtCursor</em> is
+TRUE, the search starts at the current cursor position, otherwise it
+starts at the beginning of the document.
+<p> Returns TRUE if <em>expr</em> was found, otherwise returns FALSE.
+
+<h3 class=fn>void <a name="gotoLine"></a>QSEditor::gotoLine ( int&nbsp;line )
+</h3>
+Moves the cursor to the line <em>line</em> in the editor.
+
+<h3 class=fn>void <a name="indent"></a>QSEditor::indent ()
+</h3>
+Indents the current line or selection.
+
+<h3 class=fn><a href="qsinterpreter.html">QSInterpreter</a>&nbsp;* <a name="interpreter"></a>QSEditor::interpreter () const
+</h3>
+Returns the interpreter that this editor uses for completion if it
+has been set; otherwise returns 0.
+<p> The interpreter can be set using functions
+<a href="qsproject.html#createEditor">QSProject::createEditor</a>(), <a href="#setScript">setScript</a>() or <a href="#setInterpreter">setInterpreter</a>().
+
+<h3 class=fn>bool <a name="isActive"></a>QSEditor::isActive () const
+</h3>
+
+Returns TRUE if the editor is active; otherwise returns FALSE.
+<p> See the class description for information on active editors.
+
+<h3 class=fn>bool <a name="isModified"></a>QSEditor::isModified () const
+</h3>
+Returns TRUE if the text in the editor is different from the
+text in the underlying script. This is the case whenever the
+user edited the script and the changes have not been committed
+or reverted.
+
+<h3 class=fn>bool <a name="isRedoAvailable"></a>QSEditor::isRedoAvailable () const
+</h3>
+Returns TRUE if redo is available; otherwise returns FALSE.
+
+<h3 class=fn>bool <a name="isUndoAvailable"></a>QSEditor::isUndoAvailable () const
+</h3>
+Returns TRUE if undo is available; otherwise returns FALSE.
+
+<h3 class=fn>void <a name="paste"></a>QSEditor::paste ()
+</h3>
+Pastes text from the clipboard into the editor.
+
+<h3 class=fn><a href="qsproject.html">QSProject</a>&nbsp;* <a name="project"></a>QSEditor::project () const
+</h3>
+Returns the project the editor is associated with; otherwise returns 0.
+
+<h3 class=fn>void <a name="readSettings"></a>QSEditor::readSettings ()
+</h3>
+Re-reads settings for syntax highlighting, indentation, etc. The
+settings are read from the QSettings path
+<tt>/Trolltech/QSAScriptEditor/</tt>.
+<p> The following settings are read for syntax highlighting:
+<p> <ul>
+<li> <tt>/Comment</tt>
+<li> <tt>/Number</tt>
+<li> <tt>/String</tt>
+<li> <tt>/Type</tt>
+<li> <tt>/Label</tt>
+<li> <tt>/Standard</tt>
+</ul>
+<p> For each of those, the following settings are read:
+<p> <ul>
+<li> <tt>/family</tt> (string)
+<li> <tt>/size</tt> (number)
+<li> <tt>/bold</tt> (bool)
+<li> <tt>/italic</tt> (bool)
+<li> <tt>/underline</tt> (bool)
+<li> <tt>/red</tt> (number)
+<li> <tt>/green</tt> (number)
+<li> <tt>/blue</tt> (number)
+</ul>
+<p> The font family for strings is e.g. saved in
+<tt>/Trolltech/QuickScriptEditor/String/family</tt>.
+<p> The following settings for indentation are read:
+<p> <ul>
+<li> <tt>/indentAutoIndent</tt> (bool) - whether auto indentation should be done
+<li> <tt>/indentTabSize</tt> (number) - the tab size for indentation
+<li> <tt>/indentIndentSize</tt> (number) - the indentation width
+<li> <tt>/indentKeepTabs</tt> (bool) - whether to keep tabs or to replace them with spaces
+</ul>
+<p> Code completion can be switched on or off via <tt>/completion</tt>. Wordwrapping can be switched on or off via <tt>/wordWrap</tt>.
+Parentheses matching can be switched on or off via <tt>/parenMatching</tt>.
+
+<h3 class=fn>void <a name="redo"></a>QSEditor::redo ()
+</h3>
+Redo the last editor operation.
+
+<h3 class=fn>void <a name="removeErrorMark"></a>QSEditor::removeErrorMark ()
+</h3>
+Removes all the error marks for the editor.
+
+<h3 class=fn>bool <a name="replace"></a>QSEditor::replace ( const&nbsp;QString&nbsp;&amp;&nbsp;find, const&nbsp;QString&nbsp;&amp;&nbsp;replace, bool&nbsp;cs, bool&nbsp;wo, bool&nbsp;forward, bool&nbsp;startAtCursor, bool&nbsp;replaceAll )
+</h3>
+Replaces the string <em>find</em> in the editor with <em>replace</em>. If
+<em>cs</em> is TRUE, the search is case sensitive. If <em>wo</em> is TRUE,
+only whole words are searched. If <em>forward</em> is TRUE, the search is
+executed forward, otherwise backwards. If <em>startAtCursor</em> is TRUE, the
+search starts at the current cursor position, otherwise it starts at
+the beginning of the document. If <em>replaceAll</em> is TRUE, all found
+occurrences of <em>find</em> are replaced by <em>replace</em>. Otherwise only the
+first occurrence is replaced.
+
+<h3 class=fn>void <a name="revert"></a>QSEditor::revert ()
+</h3>
+Reverts the contents in the editor back to the contents
+of the underlying script.
+<p> 
+<h3 class=fn><a href="qsscript.html">QSScript</a>&nbsp;* <a name="script"></a>QSEditor::script () const
+</h3>
+Returns the script that the editor is editing if any; otherwise
+returns 0.
+
+<h3 class=fn>void <a name="selectAll"></a>QSEditor::selectAll ()
+</h3>
+Selects all the text in the editor.
+
+<h3 class=fn>void <a name="setErrorMark"></a>QSEditor::setErrorMark ( int&nbsp;line )
+</h3>
+Highlights the line <em>line</em>. This can be used e.g., to show an
+error or warning.
+
+<h3 class=fn>bool <a name="setInterpreter"></a>QSEditor::setInterpreter ( <a href="qsinterpreter.html">QSInterpreter</a>&nbsp;*&nbsp;interpreter, QObject&nbsp;*&nbsp;context = 0 )
+</h3>
+Sets the interpreter that this editor will do completion for to <em>interpreter</em>
+with the contetext ( <tt>this</tt> object ) as <em>context</em>
+<p> This function is only for use when the editor is used outside a project. If
+the editor has been associated with a project with the functions
+<a href="qsproject.html#createEditor">QSProject::createEditor</a>() or <a href="#setScript">QSEditor::setScript</a>() this function
+will not have any effect.
+<p> <p>See also <a href="qsproject.html#createEditor">QSProject::createEditor</a>() and <a href="#setScript">setScript</a>().
+
+<h3 class=fn>bool <a name="setScript"></a>QSEditor::setScript ( <a href="qsscript.html">QSScript</a>&nbsp;*&nbsp;script )
+</h3>
+Sets the current script of the editor to be <em>script</em>.
+
+<h3 class=fn>void <a name="setText"></a>QSEditor::setText ( const&nbsp;QString&nbsp;&amp;&nbsp;text )
+</h3>
+Sets the editor contents to <em>text</em>.
+
+<h3 class=fn>QString <a name="text"></a>QSEditor::text () const
+</h3>
+Returns the text of the editor.
+
+<h3 class=fn>void <a name="textChanged"></a>QSEditor::textChanged ()<tt> [signal]</tt>
+</h3> 
+This signal is emitted if the text of the editor has been changed
+
+<h3 class=fn>QTextEdit * <a name="textEdit"></a>QSEditor::textEdit () const
+</h3>
+Returns the pointer to the real editor widget which is a
+QTextEdit. This might be 0 if an error occurred while initializing
+the editor.
+
+<h3 class=fn>void <a name="undo"></a>QSEditor::undo ()
+</h3>
+Undo the last editor operation.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

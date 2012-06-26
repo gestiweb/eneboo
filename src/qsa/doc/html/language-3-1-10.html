@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:867 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>RegExp</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1-9.html">Prev: Size</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-11.html">Next: String</a>]</p>
+<h4 align="center">RegExp</h4>
+<p>A <font color=blue><tt>RegExp</tt></font> is a regular expression matcher for strings.</p>
+<p>Regular expressions can be created either by using the <tt>/expression/</tt> syntax or by using the RegExp constructor as shown below. Note that when using the RegExp constructor, a string is passed, and all backslashes must be escaped using an extra backslash, i.e. <tt></tt>\d. Below are two ways to create regular expressions that matches the pattern "QUANTITY=471 # Order quantity" and gets the number 471.</p>
+<pre>
+    var directRegex = /([A-Z]+)=(\d+)/;
+    var str = "QUANTITY=471 # Order quantity";
+    str.match(directRegex);
+    directRegex.capturedTexts[2]; // "471";
+        
+    var indirectRegex = new RegExp( "([A-Z]+)=(\\d+)" );
+</pre>
+<h5><a name="1"></a>RegExp Properties</h5>
+<ul><li><p>valid : Boolean; Returns true if the regular expression is syntactically valid; otherwise returns false.</p>
+<li><p>empty : Boolean; Returns true if the pattern is empty; otherwise returns false.</p>
+<li><p>matchedLength : Number; The length of the last matched string, or -1 if there was no match.</p>
+<li><p>capturedTexts : String[]; An array of all the captured texts from the previous match. This can be empty.</p>
+<li><p>global : Boolean; Specifies that the regexp should be matched globally. A global regexp will match every occurrence (i.e. as many times as possible), whereas a non-global regexp will match at most once (at the first match it encounters). This is particularly relevant for replace where every occurance of a pattern will be replaced when global is true.</p>
+<p>A regular expression can be set to global either by setting the global property on a regexp object or by specifying a trailing <tt>g</tt> in the pattern.</p>
+<pre> 
+var re = /mypattern/g;     // Global by method #1
+
+var re = /mypattern/; 
+re.global = true           // Global by method #2
+</pre>
+<li><p>ignoreCase : Boolean; Specifies that the regexp ignores case when matching. Case-insensitivity can is enabled by either specifying a trailing <tt>i</tt> after the pattern or by setting the <tt>ignoreCase</tt> property.</p>
+<pre>
+var re = /mypattern/i;     // Case-insensitive by method #1
+
+var re = /mypattern/;
+re.ignoreCase = true;      // Case-insensitive by method #2
+</pre>
+</ul><h5><a name="2"></a>RegExp Functions</h5>
+<ul><li><p>toString() : String; Returns the regular expression pattern as a string.</p>
+<li><p>search( text : String ) : Number;</p>
+<pre>
+    var re = /\d+ cm/; // matches one or more digits followed by space then 'cm'
+    re.search( "A meter is 100 cm long" ); // returns 11
+</pre>
+<p>Searches <tt>text</tt> for the pattern defined by the regular expression. The function returns the position in the text of the first match or -1 if no match is found.</p>
+<li><p>searchRev( text : String ) : Number; Same as <tt>search()</tt>, but searchRev searches from the end of the text.</p>
+<li><p>exactMatch( text : String ) : Boolean; Returns true if <tt>text</tt> exactly matches the pattern in this regular expresssion; otherwise returns false.</p>
+<li><p>cap( nth : Number ) : String;</p>
+<pre>
+    re = /name: ([a-zA-Z ]+)/;
+    re.search( "name: John Doe, age: 42" );
+    re.cap(0);  // returns "name: John Doe"
+    re.cap(1);  // returns "John Doe"
+    re.cap(2);  // returns undefined, no more captures.
+</pre>
+<p>Returns the <tt>nth</tt> capture of the pattern in the previously matched text. The first captured string (<tt>cap(0)</tt> ) is the part of the string that matches the pattern itself, if there is a match. The following captured strings are the parts of the pattern enclosed by parenthesis. In the example above we try to capture <tt>([a-zA-Z ]+)</tt>, which captures a sequence of one or more letters and spaces after the <tt>name:</tt> part of the string.</p>
+<li><p>pos( nth : Number ) : Number;</p>
+<pre>
+    re = /name: ([a-zA-Z ]+)/;
+    re.search( "name: John Doe, age: 42" );
+    re.pos(0); // returns 0, position of "name: John Doe"
+    re.pos(1); // returns 6, position of "John Doe"
+    re.pos(2); // returns -1, no more captures
+</pre>
+<p>Returns the position of the <tt>nth</tt> captured text in the search string.</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-1-9.html">Prev: Size</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-11.html">Next: String</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

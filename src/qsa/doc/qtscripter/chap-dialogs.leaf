@@ -1,0 +1,156 @@
+\chapter Reference: Dialogs
+
+\section1 Introduction
+
+This chapter describes and explains every \QSAD dialog.
+
+\section1 The Menu Dialogs
+
+\section2 New Script Dialog
+
+\img qsad_newscriptdialog.png
+\caption New Script Name
+
+Click \Menu{File|New Script} to invoke the \Dialog{Input Script Name} dialog.
+Use this dialog to name the script file that you want to include
+in your project.
+
+\section2 Export Script Dialog
+
+\img exportscriptdialog.png
+\caption Export Script Dialog
+
+Click \Menu{File|Export Script As} to invoke the \Dialog{Save AS} dialog.
+Use this dialog to save the script file in your project.
+
+\section2 Import Script Dialog
+
+\img importscriptdialog.png
+\caption Import Script Dialog
+
+Click \Menu{File|Export Script As} to invoke the \Dialog{Save AS} dialog.
+Use this dialog to save the script file in your project.
+\section1 The Edit Dialogs
+
+\section2 Preferences Dialog 
+
+\img qsad_preferencesdialog.png
+\caption Preferences Dialog
+
+Click \Menu{Edit|Preferences} to invoke the \Dialog Preferences
+dialog.
+
+The 'Syntax Highlighting' section lets you change the way the syntax
+is viewed in the editor. Click the 'Element' listbox and choose an
+element. Click the 'Family' listbox to change the font style for that
+element. Click the 'Size' spinbox to choose a font size. You can
+change the font to Bold, Italic, or Underline by clicking the
+corresponding checkbox. Note, that all the fonts used derive from the
+'Standard' element, so if you want to change the font used for
+everything, change the 'Standard' element. Click the \Button{Change
+Color} button to invoke the \Dialog{Select Color Dialog}. As you make
+changes to each element, you can view the changes in the 'Preview'
+line edit.
+
+The 'Options' section has the Wordwrap, Completion, and Parentheses
+Matching checkboxes checked by default. Click the checkboxes to
+de-select them.  
+
+The Indentation section enables you to set the code intentation on the
+Qt Script Editor. Select your preferences by clicking the spinboxes
+for Tab Size and Indent Size. Check the Keep Tabs checkbox so that
+tabs are used for indentation otherwise, spaces will be used. Check
+Auto Indent to enable automatic indentation.
+
+\section1 The Search Dialogs
+
+\target dialog-find-text
+\section2 Find Text Dialog
+
+\img qsad_findtextdialog.png
+\caption Find Text
+
+Click \Menu{Search|Find} (or press \Key Ctrl+F) to invoke the \l{Find
+Text Dialog}. Use this dialog to find specific text in a project file.
+
+To find the text you want in a file, type the text in the 'Find'
+combobox. You can make the search more specific by checking any or all
+of the checkboxes in the 'Options' section. Click the 'Whole words
+only' checkbox to narrow the search to whole words. Click 'Case
+Sensitive' to search for text that is identical to the text typed in
+the combobox. Click 'Start at Beginning' to start the search from the
+beginning of the file. The 'Direction' section offers the 'Forward'
+radio button and the 'Backward' radio button to specify the direction
+to perform the search in the file. Click the \Button Find button to
+start the search. When the text is found, it is highlighted in the
+file. Continue clicking \Button Find to search for subsequent
+occurrences of the search text. 
+
+Click the \Button Close button to leave the dialog.
+
+\target dialog-replace-text
+\section2 Replace Text Dialog
+
+\img qsad_replacetextdialog.png
+\caption Replace Text
+
+Click \Menu{Search|Replace} (or press \Key {Ctrl+R}) to invoke the
+\Dialog{Replace Text Dialog}. Use this dialog to replace text in a
+project file.
+
+To replace text, type the text you would like to replace in the 'Find'
+combobox. Type the new text in the 'Replace' combobox. You can make
+the search more specific by checking any or all of the checkboxes in
+the 'Options' section. Click the 'Whole words only' checkbox to narrow
+the search to whole words. Click 'Case Sensitive' to search for text
+that identical to the text you typed in the combobox. Click 'Start at
+Beginning' to start the search from the beginning of the file. The
+'Direction' section offers the 'Forward' radio button and the
+'Backward' radio button to specify the direction to perform the search
+in the file.
+
+Click the \Button Replace button to search and replace the text. When
+the text is found, it is highlighted in the file. Continue clicking
+\Button Replace button to search and replace each occurrence of the
+text in the file. Click \Button {Replace All} button to replace all
+occurences of the search text in the file at once. 
+
+Click the \Button Close button to leave the dialog.
+
+\target dialog-go-to-line
+\section2 Goto Line Dialog
+
+\img qsad_gotolinedialog.png
+\caption Goto Line
+
+Click \Menu{Search|Goto line} (or press \Key {Alt+G}) to invoke the
+\Dialog{Goto Line Dialog}. Use this dialog to go to a specific line in
+the file. 
+
+To choose a line number, type the number in the 'Line' spinbox, or
+click the up and down arrows in the spinbox. Click the \Button Goto
+button. The cursor is placed at the beginning of the line in the file.
+
+Click the \Button Close button to leave the dialog.
+
+\section1 The Project Dialog
+
+\section2 Call Function Dialog
+
+\img qsad_callfunction.png
+\caption Call Function Dialog
+
+Click \Menu{Project|Call Function} (or press \Key {F5}) to invoke the
+\Dialog{Call Function Dialog}. Use this dialog to select the name of the function to run. 
+
+\section1 The Help Dialogs
+
+\target 
+\section2 About Qt Designer Dialog
+
+Click \Menu{Help|About} to invoke the \Dialog{About QSA Workbench Dialog}.
+This dialog provides information about \QSAD such as the version, the
+licensing terms, conditions, and disclaimers.
+
+
+

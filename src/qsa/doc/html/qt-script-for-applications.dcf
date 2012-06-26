@@ -1,0 +1,250 @@
+<!DOCTYPE DCF>
+<DCF ref="index.html" icon="qt-script-for-applications.png" imagedir="../../gif" title="Qt Script for Applications Reference Documentation">
+<section ref="qsargument.html" title="QSArgument Class Reference">
+    <keyword ref="qsargument.html">QSArgument</keyword>
+    <keyword ref="qsargument.html#Type">Type</keyword>
+    <keyword ref="qsargument.html#ptr">ptr</keyword>
+    <keyword ref="qsargument.html#qobject">qobject</keyword>
+    <keyword ref="qsargument.html#type">type</keyword>
+    <keyword ref="qsargument.html#typeName">typeName</keyword>
+    <keyword ref="qsargument.html#variant">variant</keyword>
+    <section ref="qsargument-members.html" title="List of All Member Functions"/>
+    <section ref="qsargument-h.html" title="Header File"/>
+</section>
+<section ref="qsargumentlist.html" title="QSArgumentList Class Reference">
+    <keyword ref="qsargumentlist.html">QSArgumentList</keyword>
+    <section ref="qsargumentlist-members.html" title="List of All Member Functions"/>
+    <section ref="qsargument-h.html" title="Header File"/>
+</section>
+<section ref="qseditor.html" title="QSEditor Class Reference">
+    <keyword ref="qseditor.html">QSEditor</keyword>
+    <keyword ref="qseditor.html#activate">activate</keyword>
+    <keyword ref="qseditor.html#commit">commit</keyword>
+    <keyword ref="qseditor.html#copy">copy</keyword>
+    <keyword ref="qseditor.html#cut">cut</keyword>
+    <keyword ref="qseditor.html#find">find</keyword>
+    <keyword ref="qseditor.html#gotoLine">gotoLine</keyword>
+    <keyword ref="qseditor.html#indent">indent</keyword>
+    <keyword ref="qseditor.html#interpreter">interpreter</keyword>
+    <keyword ref="qseditor.html#isActive">isActive</keyword>
+    <keyword ref="qseditor.html#isModified">isModified</keyword>
+    <keyword ref="qseditor.html#isRedoAvailable">isRedoAvailable</keyword>
+    <keyword ref="qseditor.html#isUndoAvailable">isUndoAvailable</keyword>
+    <keyword ref="qseditor.html#paste">paste</keyword>
+    <keyword ref="qseditor.html#project">project</keyword>
+    <keyword ref="qseditor.html#readSettings">readSettings</keyword>
+    <keyword ref="qseditor.html#redo">redo</keyword>
+    <keyword ref="qseditor.html#release">release</keyword>
+    <keyword ref="qseditor.html#removeErrorMark">removeErrorMark</keyword>
+    <keyword ref="qseditor.html#replace">replace</keyword>
+    <keyword ref="qseditor.html#revert">revert</keyword>
+    <keyword ref="qseditor.html#script">script</keyword>
+    <keyword ref="qseditor.html#selectAll">selectAll</keyword>
+    <keyword ref="qseditor.html#setErrorMark">setErrorMark</keyword>
+    <keyword ref="qseditor.html#setInterpreter">setInterpreter</keyword>
+    <keyword ref="qseditor.html#setScript">setScript</keyword>
+    <keyword ref="qseditor.html#setText">setText</keyword>
+    <keyword ref="qseditor.html#text">text</keyword>
+    <keyword ref="qseditor.html#textChanged">textChanged</keyword>
+    <keyword ref="qseditor.html#textEdit">textEdit</keyword>
+    <keyword ref="qseditor.html#undo">undo</keyword>
+    <keyword ref="qseditor.html#~QSEditor">~QSEditor</keyword>
+    <section ref="qseditor-members.html" title="List of All Member Functions"/>
+    <section ref="qseditor-h.html" title="Header File"/>
+</section>
+<section ref="qsinputdialogfactory.html" title="QSInputDialogFactory Class Reference">
+    <keyword ref="qsinputdialogfactory.html">QSInputDialogFactory</keyword>
+    <section ref="qsinputdialogfactory-members.html" title="List of All Member Functions"/>
+    <section ref="qsinputdialogfactory-h.html" title="Header File"/>
+</section>
+<section ref="qsinterpreter.html" title="QSInterpreter Class Reference">
+    <keyword ref="qsinterpreter.html">QSInterpreter</keyword>
+    <keyword ref="qsinterpreter.html#ClassFlags">ClassFlags</keyword>
+    <keyword ref="qsinterpreter.html#ErrorMode">ErrorMode</keyword>
+    <keyword ref="qsinterpreter.html#FunctionFlags">FunctionFlags</keyword>
+    <keyword ref="qsinterpreter.html#addObjectFactory">addObjectFactory</keyword>
+    <keyword ref="qsinterpreter.html#addTransientObject">addTransientObject</keyword>
+    <keyword ref="qsinterpreter.html#addTransientSignalHandler">addTransientSignalHandler</keyword>
+    <keyword ref="qsinterpreter.html#addTransientVariable">addTransientVariable</keyword>
+    <keyword ref="qsinterpreter.html#addWrapperFactory">addWrapperFactory</keyword>
+    <keyword ref="qsinterpreter.html#call">call</keyword>
+    <keyword ref="qsinterpreter.html#checkSyntax">checkSyntax</keyword>
+    <keyword ref="qsinterpreter.html#classes">classes</keyword>
+    <keyword ref="qsinterpreter.html#clear">clear</keyword>
+    <keyword ref="qsinterpreter.html#currentContext">currentContext</keyword>
+    <keyword ref="qsinterpreter.html#defaultInterpreter">defaultInterpreter</keyword>
+    <keyword ref="qsinterpreter.html#error">error</keyword>
+    <keyword ref="qsinterpreter.html#errorMessage">errorMessage</keyword>
+    <keyword ref="qsinterpreter.html#errorMode">errorMode</keyword>
+    <keyword ref="qsinterpreter.html#errorMode-prop">errorMode</keyword>
+    <keyword ref="qsinterpreter.html#evaluate">evaluate</keyword>
+    <keyword ref="qsinterpreter.html#functions">functions</keyword>
+    <keyword ref="qsinterpreter.html#hadError">hadError</keyword>
+    <keyword ref="qsinterpreter.html#hasClass">hasClass</keyword>
+    <keyword ref="qsinterpreter.html#hasFunction">hasFunction</keyword>
+    <keyword ref="qsinterpreter.html#hasVariable">hasVariable</keyword>
+    <keyword ref="qsinterpreter.html#isRunning">isRunning</keyword>
+    <keyword ref="qsinterpreter.html#presentObjects">presentObjects</keyword>
+    <keyword ref="qsinterpreter.html#project">project</keyword>
+    <keyword ref="qsinterpreter.html#removeTransientSignalHandler">removeTransientSignalHandler</keyword>
+    <keyword ref="qsinterpreter.html#setErrorMode">setErrorMode</keyword>
+    <keyword ref="qsinterpreter.html#setTimeoutInterval">setTimeoutInterval</keyword>
+    <keyword ref="qsinterpreter.html#stackTrace">stackTrace</keyword>
+    <keyword ref="qsinterpreter.html#stopExecution">stopExecution</keyword>
+    <keyword ref="qsinterpreter.html#throwError">throwError</keyword>
+    <keyword ref="qsinterpreter.html#timeout">timeout</keyword>
+    <keyword ref="qsinterpreter.html#timeoutInterval">timeoutInterval</keyword>
+    <keyword ref="qsinterpreter.html#timeoutInterval-prop">timeoutInterval</keyword>
+    <keyword ref="qsinterpreter.html#variable">variable</keyword>
+    <keyword ref="qsinterpreter.html#variables">variables</keyword>
+    <section ref="qsinterpreter-members.html" title="List of All Member Functions"/>
+    <section ref="qsinterpreter-h.html" title="Header File"/>
+</section>
+<section ref="qsobjectfactory.html" title="QSObjectFactory Class Reference">
+    <keyword ref="qsobjectfactory.html">QSObjectFactory</keyword>
+    <keyword ref="qsobjectfactory.html#create">create</keyword>
+    <keyword ref="qsobjectfactory.html#interpreter">interpreter</keyword>
+    <keyword ref="qsobjectfactory.html#registerClass">registerClass</keyword>
+    <keyword ref="qsobjectfactory.html#throwError">throwError</keyword>
+    <section ref="qsobjectfactory-members.html" title="List of All Member Functions"/>
+    <section ref="qsobjectfactory-h.html" title="Header File"/>
+</section>
+<section ref="qsproject.html" title="QSProject Class Reference">
+    <keyword ref="qsproject.html">QSProject</keyword>
+    <keyword ref="qsproject.html#StorageMode">StorageMode</keyword>
+    <keyword ref="qsproject.html#activeEditor">activeEditor</keyword>
+    <keyword ref="qsproject.html#addObject">addObject</keyword>
+    <keyword ref="qsproject.html#addSignalHandler">addSignalHandler</keyword>
+    <keyword ref="qsproject.html#clearObjects">clearObjects</keyword>
+    <keyword ref="qsproject.html#commitEditorContents">commitEditorContents</keyword>
+    <keyword ref="qsproject.html#createEditor">createEditor</keyword>
+    <keyword ref="qsproject.html#createScript">createScript</keyword>
+    <keyword ref="qsproject.html#createScriptInternal">createScriptInternal</keyword>
+    <keyword ref="qsproject.html#editor">editor</keyword>
+    <keyword ref="qsproject.html#editorTextChanged">editorTextChanged</keyword>
+    <keyword ref="qsproject.html#editors">editors</keyword>
+    <keyword ref="qsproject.html#editorsModified">editorsModified</keyword>
+    <keyword ref="qsproject.html#interpreter">interpreter</keyword>
+    <keyword ref="qsproject.html#load">load</keyword>
+    <keyword ref="qsproject.html#loadFromData">loadFromData</keyword>
+    <keyword ref="qsproject.html#object">object</keyword>
+    <keyword ref="qsproject.html#objects">objects</keyword>
+    <keyword ref="qsproject.html#projectChanged">projectChanged</keyword>
+    <keyword ref="qsproject.html#projectEvaluated">projectEvaluated</keyword>
+    <keyword ref="qsproject.html#removeObject">removeObject</keyword>
+    <keyword ref="qsproject.html#removeSignalHandler">removeSignalHandler</keyword>
+    <keyword ref="qsproject.html#revertEditorContents">revertEditorContents</keyword>
+    <keyword ref="qsproject.html#save">save</keyword>
+    <keyword ref="qsproject.html#saveToData">saveToData</keyword>
+    <keyword ref="qsproject.html#script">script</keyword>
+    <keyword ref="qsproject.html#scriptNames">scriptNames</keyword>
+    <keyword ref="qsproject.html#scripts">scripts</keyword>
+    <keyword ref="qsproject.html#scriptsModified">scriptsModified</keyword>
+    <keyword ref="qsproject.html#setStorageMode">setStorageMode</keyword>
+    <keyword ref="qsproject.html#storageMode">storageMode</keyword>
+    <section ref="qsproject-members.html" title="List of All Member Functions"/>
+    <section ref="qsproject-h.html" title="Header File"/>
+</section>
+<section ref="qsscript.html" title="QSScript Class Reference">
+    <keyword ref="qsscript.html">QSScript</keyword>
+    <keyword ref="qsscript.html#addCode">addCode</keyword>
+    <keyword ref="qsscript.html#addFunction">addFunction</keyword>
+    <keyword ref="qsscript.html#code">code</keyword>
+    <keyword ref="qsscript.html#codeChanged">codeChanged</keyword>
+    <keyword ref="qsscript.html#context">context</keyword>
+    <keyword ref="qsscript.html#name">name</keyword>
+    <keyword ref="qsscript.html#project">project</keyword>
+    <keyword ref="qsscript.html#setCode">setCode</keyword>
+    <section ref="qsscript-members.html" title="List of All Member Functions"/>
+    <section ref="qsscript-h.html" title="Header File"/>
+</section>
+<section ref="qsstackframe.html" title="QSStackFrame Class Reference">
+    <keyword ref="qsstackframe.html">QSStackFrame</keyword>
+    <keyword ref="qsstackframe.html#context">context</keyword>
+    <keyword ref="qsstackframe.html#function">function</keyword>
+    <keyword ref="qsstackframe.html#line">line</keyword>
+    <keyword ref="qsstackframe.html#scriptName">scriptName</keyword>
+    <section ref="qsstackframe-members.html" title="List of All Member Functions"/>
+    <section ref="qsinterpreter-h.html" title="Header File"/>
+</section>
+<section ref="qsstacktrace.html" title="QSStackTrace Class Reference">
+    <keyword ref="qsstacktrace.html">QSStackTrace</keyword>
+    <keyword ref="qsstacktrace.html#toString">toString</keyword>
+    <section ref="qsstacktrace-members.html" title="List of All Member Functions"/>
+    <section ref="qsinterpreter-h.html" title="Header File"/>
+</section>
+<section ref="qsutilfactory.html" title="QSUtilFactory Class Reference">
+    <keyword ref="qsutilfactory.html">QSUtilFactory</keyword>
+    <keyword ref="qsutilfactory.html#Utilities">Utilities</keyword>
+    <section ref="qsutilfactory-members.html" title="List of All Member Functions"/>
+    <section ref="qsutilfactory-h.html" title="Header File"/>
+</section>
+<section ref="qsworkbench.html" title="QSWorkbench Class Reference">
+    <keyword ref="qsworkbench.html">QSWorkbench</keyword>
+    <keyword ref="qsworkbench.html#close">close</keyword>
+    <keyword ref="qsworkbench.html#open">open</keyword>
+    <keyword ref="qsworkbench.html#project">project</keyword>
+    <keyword ref="qsworkbench.html#showFunction">showFunction</keyword>
+    <keyword ref="qsworkbench.html#showScript">showScript</keyword>
+    <keyword ref="qsworkbench.html#widget">widget</keyword>
+    <section ref="qsworkbench-members.html" title="List of All Member Functions"/>
+    <section ref="qsworkbench-h.html" title="Header File"/>
+</section>
+<section ref="qswrapperfactory.html" title="QSWrapperFactory Class Reference">
+    <keyword ref="qswrapperfactory.html">QSWrapperFactory</keyword>
+    <keyword ref="qswrapperfactory.html#create">create</keyword>
+    <keyword ref="qswrapperfactory.html#interpreter">interpreter</keyword>
+    <keyword ref="qswrapperfactory.html#registerWrapper">registerWrapper</keyword>
+    <keyword ref="qswrapperfactory.html#throwError">throwError</keyword>
+    <section ref="qswrapperfactory-members.html" title="List of All Member Functions"/>
+    <section ref="qswrapperfactory-h.html" title="Header File"/>
+</section>
+<section ref="example-spreadsheet.html" title="A Scriptable Spreadsheet">
+    <keyword ref="example-spreadsheet.html">A Scriptable Spreadsheet</keyword>
+</section>
+<section ref="console.html" title="Console">
+    <keyword ref="console.html">Console</keyword>
+</section>
+<section ref="filter.html" title="Filters example, Using QSA as software component glue">
+    <keyword ref="filter.html">Filters example, Using QSA as software component glue</keyword>
+</section>
+<section ref="game.html" title="Game Example">
+    <keyword ref="game.html">Game Example</keyword>
+</section>
+<section ref="functions.html" title="QSA - All Functions">
+    <keyword ref="functions.html">QSA - All Functions</keyword>
+</section>
+<section ref="headers.html" title="QSA - Header Files">
+    <keyword ref="headers.html">QSA - Header Files</keyword>
+</section>
+<section ref="classes.html" title="QSA - Library Classes">
+    <keyword ref="classes.html">QSA - Library Classes</keyword>
+</section>
+<section ref="examples.html" title="QSA Examples">
+    <keyword ref="examples.html">examples</keyword>
+</section>
+<section ref="index.html" title="Qt Script for Applications">
+    <keyword ref="index.html">Qt Script for Applications</keyword>
+</section>
+<section ref="articles.html" title="Qt Script for Applications Articles">
+    <keyword ref="articles.html">Qt Script for Applications Articles</keyword>
+</section>
+<section ref="scribblescripter.html" title="Scribblescripter Example">
+    <keyword ref="scribblescripter.html">Scribblescripter Example</keyword>
+</section>
+<section ref="example-scriptbutton.html" title="Scriptbutton">
+    <keyword ref="example-scriptbutton.html">Scriptbutton</keyword>
+</section>
+<section ref="example-textedit.html" title="Text Edit Example">
+    <keyword ref="example-textedit.html">Text Edit Example</keyword>
+</section>
+<section ref="credits.html" title="Thanks!">
+    <keyword ref="credits.html">Thanks!</keyword>
+</section>
+<section ref="plot.html" title="The Plot Application">
+    <keyword ref="plot.html">The Plot Application</keyword>
+</section>
+<section ref="wrappers.html" title="Wrappers Example">
+    <keyword ref="wrappers.html">Wrappers Example</keyword>
+</section>
+</DCF>

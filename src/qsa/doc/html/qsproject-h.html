@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsproject.h:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>qsproject.h Include File</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>qsproject.h</h1>
+
+<p>This is the verbatim text of the qsproject.h include file. It is provided only for illustration; the copyright remains with Trolltech.
+<hr>
+<pre>
+/****************************************************************************
+** $Id$
+**
+** Copyright (C) 2001-2006 Trolltech AS.  All rights reserved.
+**
+** This file is part of the Qt Script for Applications framework (QSA).
+**
+** This file may be distributed and/or modified under the terms of the
+** GNU General Public License version 2 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.
+**
+** Licensees holding a valid Qt Script for Applications license may use
+** this file in accordance with the Qt Script for Applications License
+** Agreement provided with the Software.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+** See http://www.trolltech.com/pricing.html or email sales@trolltech.com for
+**   information about QSA Commercial License Agreements.
+** See http://www.trolltech.com/gpl/ for GPL licensing information.
+**
+** Contact info@trolltech.com if any conditions of this licensing are
+** not clear to you.
+**
+*****************************************************************************/
+
+#ifndef QSPROJECT_H
+#define QSPROJECT_H
+
+#include "qsaglobal.h"
+
+#include &lt;qobject.h&gt;
+#include &lt;qobjectlist.h&gt;
+#include &lt;qdatetime.h&gt;
+#include &lt;qptrlist.h&gt;
+#include &lt;qstringlist.h&gt;
+
+#include &lt;qsscript.h&gt;
+
+class QSEditor;
+class QSProjectPrivate;
+class QSInterpreter;
+
+class QSA_EXPORT QSProject : public QObject
+{
+    friend class QSInterpreter;
+    friend class QSInterfaceFactory;
+    friend class QSEditor;
+
+    Q_OBJECT
+
+public:
+    enum StorageMode {
+	Bundle,
+	TextFiles
+    };
+
+    QSProject( QObject *parent = 0, const char *name = 0 );
+    virtual ~QSProject();
+
+    bool editorsModified() const;
+    bool scriptsModified() const;
+
+    QSInterpreter *interpreter() const;
+    QStringList scriptNames() const;
+    QPtrList&lt;QSScript&gt; scripts() const;
+    QSScript *script( const QString &amp;name ) const;
+    QSScript *script( QObject *context ) const;
+
+    QObject *object( const QString &amp;name ) const;
+    QObjectList objects() const;
+
+    QSScript *createScript( QObject *context, const QString &amp;code = QString::null );
+    QSScript *createScript( const QString &amp;name, const QString &amp;code = QString::null );
+
+    void addSignalHandler( QObject *sender, const char *signal,
+			   QObject *receiver, const char *qtscriptFunction );
+    void addSignalHandler( QObject *sender, const char *signal,
+			   const char *qtscriptFunction );
+    void removeSignalHandler( QObject *sender, const char *signal,
+			      QObject *receiver, const char *qtscriptFunction );
+    void removeSignalHandler( QObject *sender, const char *signal,
+			      const char *qtscriptFunction );
+
+    QSEditor *activeEditor() const;
+    QPtrList&lt;QSEditor&gt; editors() const;
+    QSEditor *editor( QSScript *script ) const;
+    QSEditor *createEditor( QSScript *script, QWidget *parent=0, const char *name = 0 );
+
+    void setStorageMode(StorageMode mode);
+    StorageMode storageMode() const;
+
+public slots:
+    bool load( const QString &amp;fileName );
+    bool save( const QString &amp;fileName = QString::null );
+
+    bool loadFromData( QByteArray data );
+    bool saveToData( QByteArray data );
+
+    void clearObjects();
+    void addObject( QObject *object );
+    void removeObject( const QObject *object );
+
+    void commitEditorContents();
+    void revertEditorContents();
+
+signals:
+    void editorTextChanged();
+    void projectChanged();
+    void projectEvaluated();
+
+private slots:
+    void objectDestroyed();
+    void invalidateProject();
+    void scriptChanged();
+    void evaluate();
+
+private:
+    // disabled copy constructor and assignment operator
+    QSProject( const QSProject &amp; );
+    QSProject&amp; operator=( const QSProject &amp; );
+
+    void initObjects();
+    void initEventHandlers();
+
+    QSScript *createScriptInternal( const QString &amp;name,
+				   const QString &amp;code,
+				   QObject *context );
+    bool saveInternal( QDataStream *strm );
+    bool loadInternal( QDataStream *strm );
+    void registerEditor( QSEditor *editor );
+    void unregisterEditor( QSEditor *editor );
+
+private:
+    QSProjectPrivate *d;
+
+};
+
+#endif
+
+</pre>
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

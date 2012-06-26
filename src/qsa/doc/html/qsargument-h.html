@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsargument.h:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>qsargument.h Include File</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>qsargument.h</h1>
+
+<p>This is the verbatim text of the qsargument.h include file. It is provided only for illustration; the copyright remains with Trolltech.
+<hr>
+<pre>
+/****************************************************************************
+** $Id$
+**
+** Copyright (C) 2001-2006 Trolltech AS.  All rights reserved.
+**
+** This file is part of the Qt Script for Applications framework (QSA).
+**
+** This file may be distributed and/or modified under the terms of the
+** GNU General Public License version 2 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.
+**
+** Licensees holding a valid Qt Script for Applications license may use
+** this file in accordance with the Qt Script for Applications License
+** Agreement provided with the Software.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+** See http://www.trolltech.com/pricing.html or email sales@trolltech.com for
+**   information about QSA Commercial License Agreements.
+** See http://www.trolltech.com/gpl/ for GPL licensing information.
+**
+** Contact info@trolltech.com if any conditions of this licensing are
+** not clear to you.
+**
+*****************************************************************************/
+
+#ifndef QSARGUMENT_H
+#define QSARGUMENT_H
+
+#include &lt;qsaglobal.h&gt;
+#include &lt;qvariant.h&gt;
+#include &lt;qvaluelist.h&gt;
+
+class QObject;
+
+class QSA_EXPORT QSArgument
+{
+    friend bool operator==( const QSArgument &amp;a, const QSArgument &amp;b );
+public:
+    enum Type { Invalid, Variant, QObjectPtr, VoidPointer };
+
+    QSArgument();
+    QSArgument( const QVariant &amp;v );
+    QSArgument( QObject *o );
+    QSArgument( void *p );
+
+    QVariant variant() const;
+    QObject *qobject() const;
+    void *ptr() const;
+    Type type() const;
+    QString typeName() const;
+
+
+private:
+    QVariant var;
+    QObject *qobj;
+    void *pt;
+    Type typ;
+};
+
+bool operator==( const QSArgument &amp;a, const QSArgument &amp;b );
+
+#if defined(Q_TEMPLATEDLL)
+// MOC_SKIP_BEGIN
+QSA_TEMPLATE_EXTERN template class QSA_EXPORT QValueList&lt;QSArgument&gt;;
+// MOC_SKIP_END
+#endif
+
+class QSA_EXPORT QSArgumentList : public QValueList&lt;QSArgument&gt;
+{
+public:
+    QSArgumentList() {}
+    QSArgumentList( const QValueList&lt;QVariant&gt; &amp;l ) {
+	for ( QValueList&lt;QVariant&gt;::ConstIterator it = l.begin(); it != l.end(); ++it )
+	    append( *it );
+    }
+    QSArgumentList( const QVariant &amp;v ) { append( v ); }
+    QSArgumentList( QObject *o ) { append( o ); }
+    QSArgumentList( void *p ) { append( p ); }
+
+};
+
+#endif
+</pre>
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

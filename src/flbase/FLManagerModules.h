@@ -101,6 +101,7 @@ public:
   @param n Nombre del fichero.
   @return QString con el contenido del fichero o vacía en caso de error.
   */
+  QString byteCodeToStr(const QByteArray &byteCode) const;
   QString contentCode(const QString &n);
 
   /**

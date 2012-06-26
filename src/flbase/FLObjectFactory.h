@@ -465,8 +465,7 @@ public slots:
    A馻de una base de datos a las conexiones disponibles utilizando los datos de otra conexi髇
 
    @param newConnName    Nombre a utilizar para la nueva conexion
-   @param sourceConnName Nombre de una conexi髇 existente a utilizar como origen de los datos
-   de conexi髇
+   @param sourceConnName Nombre de una conexi髇 existente a utilizar como origen de los datos de conexi髇
    @return TRUE si se pudo realizar la conexi髇, FALSE en caso contrario
    */
   bool addDatabase(const QString &newConnName, const QString &sourceConnName = "default") {
@@ -1741,6 +1740,15 @@ public slots:
     obj_->setForwardOnly(forward);
   }
 
+  /**
+  Comprueba si hay una colisi髇 de campos editados por dos sesiones simult醤eamente.
+
+  @return Lista con los nombres de los campos que colisionan
+  */
+  QStringList concurrencyFields() {
+    return obj_->concurrencyFields();
+  }
+
   FLSqlCursor *obj() {
     return obj_;
   }
@@ -2454,6 +2462,10 @@ public slots:
    */
   void setShowEditor(const bool show) {
     obj_->setShowEditor(show);
+  }
+
+  void setPartDecimal(int d) {
+    obj_->setPartDecimal(d);
   }
 
   FLFieldDB *obj() {
@@ -5293,6 +5305,33 @@ public slots:
    */
   QVariant nextCounter(const QString &name, FLSqlCursorInterface *cursor_) {
     return FLUtil::nextCounter(name, cursor_->obj());
+  }
+	
+  /**
+  dpinelo: Este m茅todo es una extensi贸n de nextCounter pero permitiendo la introducci贸n de una primera
+  secuencia de caracteres. Es 煤til cuando queremos mantener diversos contadores dentro de una misma tabla.
+  Ejemplo, Tabla Grupo de clientes: Agregamos un campo prefijo, que ser谩 una letra: A, B, C, D.
+  Queremos que la numeraci贸n de los clientes sea del tipo A00001, o B000023. Con esta funci贸n, podremos
+  seguir usando los m茅todos counter cuando agregamos esa letra.
+  
+  Este metodo devuelve el siguiente valor de un campo tipo contador de una tabla para una serie determinada.
+
+  Este metodo es muy util cuando se insertan registros en los que
+  la referencia es secuencial seg煤n una secuencia y no nos acordamos de cual fue el 煤ltimo
+  numero usado. El valor devuelto es un QVariant del tipo de campo es
+  el que se busca la ultima referencia. Lo m谩s aconsejable es que el tipo
+  del campo sea 'String' porque as铆 se le puede dar formato y ser
+  usado para generar un c贸digo de barras. De todas formas la funci贸n
+  soporta tanto que el campo sea de tipo 'String' como de tipo 'double'.
+
+  @param serie serie que diferencia los contadores
+  @param name Nombre del campo
+  @param cursor_ Cursor a la tabla donde se encuentra el campo.
+  @return Qvariant con el numero siguiente.
+  @author Andr茅s Ot贸n Urbano.
+   */
+  QVariant nextCounterSerial( const QString &serie, const QString & name, FLSqlCursorInterface * cursor_ ) {
+	  return FLUtil::nextCounter( serie, name, cursor_->obj() );
   }
 
   /**

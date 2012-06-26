@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:449 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>throw</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-13.html">Prev: switch</a>] [<a href="language.html">Home</a>] [<a href="language-6-15.html">Next: try</a>]</p>
+<h3 align="center">throw</h3>
+<pre>
+try {
+    Statements;
+    throw "an exception";
+}
+catch ( e ) {
+    if ( e == "an exception" ) {
+        ExceptionStatements;
+    }
+    else {
+        OtherExceptionStatements
+    }
+}
+</pre>
+<p>The <tt>throw</tt> keyword is used to raise user-defined exceptions.</p>
+<p>Example:</p>
+<pre>
+    function monthToName( i )
+    {
+        var IndexToMonth = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+        
+        if ( i &lt; 0 || i &gt; 11 ) {
+            throw "month number out of range";
+        }
+        else {
+            return IndexToMonth[ i ];
+        }
+    }
+</pre>
+<p>It is also possible to define a user-defined exception class and throw an object of that type, e.g.</p>
+<pre>
+    throw new AUserDefinedException( "month number out of range" );
+</pre>
+<p>See also <a href="language-6-15.html">try</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-13.html">Prev: switch</a>] [<a href="language.html">Home</a>] [<a href="language-6-15.html">Next: try</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

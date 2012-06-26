@@ -1,0 +1,122 @@
+
+/*! \page scribblescripter.html
+
+\ingroup examples
+
+\title Scribblescripter Example
+
+
+The Scribblescripter example is a simple drawing application which
+allows the end user to write macros to create drawings. The developer
+creates the Scribblescripter application and then makes it scriptable
+so that the end user can create their own scripts. The following
+text describes the application from the end user point of view,
+followed by a quick demonstration in how to create a new function for
+the application.
+
+The toolbar for this example is a standard toolbar that the
+application's developer has created. The Scribblescripts window is on
+the left side of the application and it displays a list of classes
+and functions that the user has implemented in Qt Script. If the
+user double clicks on a function in the list, the function is
+executed. For demonstration purposes, there are already two functions
+in the list. The right side of the application shows a drawing canvas
+which is exposed as an application object so that the user can access
+it from QSA.
+
+The application developer also includes two buttons at the bottom of
+the Scribblescripts window. To create and edit scripts, click the Edit
+Scripts button to open the QSA Workbench, where one can edit
+scripts. The user clicks the Update button to refresh the list in the
+Scribblescripts window if a new function has been created. The
+Scribblescripter example exposes one application object, the canvas.
+
+The API of its interface is as follows:
+
+\code
+CanvasInterface:
+
+Functions:
+
+PixmapInterface pixmap();
+setPixmap( PixmapInterface pixmap );
+Number width();
+Number height();
+Number visibleWidth();
+Number visibleHeight();
+\endcode
+
+The API of the Pixmap interface which is used in the canvas interface
+is as follows:
+
+\code 
+PixmapInterface:
+
+Properties:
+
+Color color
+QColor background
+Number penWidth
+
+Functions:
+
+PixmapInterface pixmap()
+setPixmap( PixmapInterface pixmap )
+clear()
+fillRect( Number x, Number y, Number w, Number h )
+scale( Number sx, Number sy )
+shear( Number sh, Number sv )
+rotate( Number val )
+translate( Number dx, Number dy )
+drawPoint( Number x, Number y )
+moveTo( Number x, Number y )
+lineTo( Number x, Number y )
+drawLine( Number x1, Number y1, Number x2, Number y2 )
+drawRect( Number x, Number y, Number w, Number h )
+drawWinFocusRect( Number x, Number y, Number w, Number h )
+drawRoundRect( Number x, Number y, Number w, Number h, Number xRnd, Number yRnd )
+drawEllipse( Number x, Number y, Number w, Number h )
+drawArc( Number x, Number y, Number w, Number h, Number a, Number alen )
+drawPie( Number x, Number y, Number w, Number h, Number a, Number alen )
+drawChord( Number x, Number y, Number w, Number h, Number a, Number alen )
+drawText( QString text, Number x, Number y )
+eraseRect( Number x, Number y, Number w, Number h )
+setWindow( Number x, Number y, Number w, Number h )
+setViewport( Number x, Number y, Number w, Number h )
+resize( Number w, Number h )
+
+\endcode
+
+\section1 Describing the two example scripts
+
+\section2 Qt()
+
+The Qt function draws the Qt Logo scaled to the size of the canvas onto the
+canvas. It uses the drawing function of the pixmap interface to do the
+drawing. 
+
+\section2 The Function drawText
+
+The drawText function opens a dialog to ask the user for some
+parameters,such as which text to draw, how often to draw it, etc. When
+the user accepts the settings, the pixmap interface is used to draw
+the given text using the given parameters.
+
+To Add a new function to this application: 
+\list
+\i Click the Edit Scripts button to open the Qt Script for
+Applications window
+\i Click main.qs, which is the file for adding new functions
+\i Add the new function to the file
+\i Return to the Scribblescripter application window
+\i Click the Update button to add the new function to the list
+\endlist
+
+
+
+
+
+
+
+
+*/

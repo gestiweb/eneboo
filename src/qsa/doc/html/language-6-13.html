@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:396 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>switch</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-12.html">Prev: return</a>] [<a href="language.html">Home</a>] [<a href="language-6-14.html">Next: throw</a>]</p>
+<h3 align="center">switch</h3>
+<pre>
+switch( expression ) {
+    case Value :
+        Statements;
+        break;
+    default :
+        DefaultStatements;
+        break;
+}
+</pre>
+<p>A <tt>switch</tt> statement provides a multi-way branch. The <em>expression</em> is evaluated once, then each <a href="language-6-2.html">case</a> is checked in order to find one with a <em>Value</em> that matches the value of the <em>expression</em>. If a match is made, the <em>Statements</em> of the matching case are executed, after which control passes to the statement following the <tt>switch</tt> block. If no matching <a href="language-6-2.html">case</a> is found, and there is a <a href="language-6-5.html">default</a> case, the <em>DefaultStatements</em> are executed, after which control passes to the statement following the <tt>switch</tt> block. If there is no matching case and no <a href="language-6-5.html">default</a>, no statements within the <tt>switch</tt> block are executed, and control passes to the statement following the <tt>switch</tt> block.</p>
+<p>Note that if a <a href="language-6-5.html">default</a> is used it <b>must</b> be come after all the <a href="language-6-2.html">case</a>s; this is because once <a href="language-6-5.html">default</a> is encountered it is treated as a matching <a href="language-6-2.html">case</a> regardless of what follows.</p>
+<p>Every <a href="language-6-2.html">case</a>, and the <a href="language-6-5.html">default</a> (if used) should have a <a href="language-6-1.html">break</a> as their last statement. If <a href="language-6-1.html">break</a> is not present, control will "drop through" to the following statements, which is not usually the desired behavior.</p>
+<p>The <em>expression</em> may be any arbitrary <font color=darkmagenta>Qt Script for Applications</font> expression that evaluates to an object that can be strictly compared. For example, an expression that evaluates to a <a href="language-3-1-2.html">Boolean</a>, <a href="language-3-1-3.html">Date</a>, <a href="language-3-1-5.html">Number</a> or <a href="language-3-1-11.html">String</a> value.</p>
+<p>Example:</p>
+<pre></pre>
+<p>In the example, if <tt>expr</tt> has the value 1, the <em>doActionOne()</em> function will be called. But if <tt>expr</tt> has the value 3, both <em>doActionThree()</em> and <em>doActionFour()</em> will be called, because case 3 doesn't have a <tt>break</tt> statement, and execution "falls through" to case 4. If <tt>expr</tt> is not 1, "two", 3 or 4 then the <a href="language-6-5.html">default</a> case will be matched and <em>doDefaultAction()</em> will be executed.</p>
+<p>See also <a href="language-6-1.html">break</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-12.html">Prev: return</a>] [<a href="language.html">Home</a>] [<a href="language-6-14.html">Next: throw</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

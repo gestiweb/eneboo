@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../examples/wrappers/wrappers.doc:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Wrappers Example</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>Wrappers Example</h1>
+
+  
+<p> 
+<p> The wrappers example shows how to provide additional interfaces for
+QObjects, and how to expose non-QObjects to QSA.
+<p> In the example we want to access the palette property of a QListView
+to modify some colors, and we also want to interact with the list
+view's items.
+<p> <h2> Wrapping a QObject
+</h2>
+<a name="1"></a><p> Slots and properties provide most of an object's functionallity, but
+may not give complete access, for example to palette functions. In
+these cases we must provide additional interfaces in the form of
+wrappers. A wrapper works by adding an extension interface to the
+object as it appears in QSA. The wrapper defines the additional slots
+we want to access from script. Our sample QListView wrapper looks like
+this:
+<p> <pre>
+class ListViewWrapper : public QObject
+{
+    Q_OBJECT
+public:
+    ListViewWrapper(QListView *lv) : listView(lv) {}
+
+public slots:
+    QPalette palette() const { return listView-&gt;palette(); }
+    void setPalette(const QPalette &amp;palette) { listView-&gt;setPalette(palette); }
+
+private:
+    QListView *listView;
+};
+</pre>
+ 
+<p> It contains a pointer to the QListView object and the two slots we
+need. How the wrapper becomes known to the interpreter is covered
+below.
+<p> <h2> Wrapping a non-QObject
+</h2>
+<a name="2"></a><p> QListViewItem is not a QObject and does not automatically expose any
+functionallity to QSA scripts. To call functions or access variables
+in a non-QObject subclass, we must provide a wrapper that defines the
+slots and properties we want to access. In the case of the
+QListViewItems for this example, we are only interested in the text of
+the first column. We have chosen to expose this text as a property, so
+the QListViewItem wrapper class looks like this:
+<p> <pre>
+class ItemWrapper : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText)
+
+public:
+    ItemWrapper(QListViewItem *lvi) : item(lvi) {};
+
+    QString text() const { return item-&gt;text(0); }
+    void setText(const QString &amp;txt) { item-&gt;setText(0, txt); }
+
+private:
+    QListViewItem *item;
+};
+</pre>
+ 
+<p> The approach for the QListViewItem is the same as for the QListView
+object above. We create a QObject subclass that holds a pointer to the
+object in question, and expose the properties or slots we are
+interested in.
+<p> <h2> Telling QSA about your wrappers
+</h2>
+<a name="3"></a><p> Letting the interpreter know that you have wrappers is done by
+registering the types with wrappers in a <a href="qswrapperfactory.html">QSWrapperFactory</a> and adding the factory to the interpreter.
+<p> Registering a wrapper is done by calling the function <a href="qswrapperfactory.html#registerWrapper">registerWrapper()</a> which
+takes the name of the class you wish to provide a wrapper for. QSA
+will then call the virtual function <a href="qswrapperfactory.html#create">create()</a> when a class of that type is encountered. The wrapper
+factory for our example looks like this:
+<p> <pre>
+class Wrappers : public <a href="qswrapperfactory.html">QSWrapperFactory</a>
+{
+public:
+    Wrappers()
+    {
+        // Tell the factory what which classes we provide wrappers for.
+        registerWrapper("QListView");
+        registerWrapper("QListViewItem");
+    }
+
+    QObject *create(const QString &amp;name, void *ptr)
+    {
+        if (name == "QListView")
+            return new ListViewWrapper((QListView *)ptr);
+        else if (name == "QListViewItem")
+            return new ItemWrapper((QListViewItem *)ptr);
+        return 0;
+    }
+};
+</pre>
+ 
+<p> We make the wrapper factory available to the interpreter by calling
+the function <a href="qsinterpreter.html#addWrapperFactory">QSInterpreter::addWrapperFactory()</a>.
+<p> <h2> Using the wrappers in scripts
+</h2>
+<a name="4"></a><p> In the example we provide two simple scripts. The first script
+(<tt>test.qs</tt>) connects to the QListView's selectionChanged() signal and
+changes the base and highlight color of the list view based on the
+text in the list view. Run the wrappers example to execute the script.
+<p> <em>WARNING: This example produces flashing colors.</em>
+<p> <pre>
+connect(listView, "selectionChanged(QListViewItem*)", changed);
+
+function changed(item)
+{
+    var color = new Color(item.text);
+    var palette = listView.palette();
+    var active = palette.active;
+    active.base = color;
+    active.highlight = color.dark();
+    palette.active = active;
+    listView.setPalette(palette);
+}
+</pre>
+ 
+<p> The second script (<tt>click.qs</tt>) connects to the list view's clicked(),
+enterPressed() and spacePressed() signals and changes the text in the
+current item to the value of a click counter.
+<p> <pre>
+connect(listView, "clicked(QListViewItem*)", clicked);
+connect(listView, "returnPressed(QListViewItem*)", clicked);
+connect(listView, "spacePressed(QListViewItem*)", clicked);
+var clickCount = 0;
+
+function clicked(item)
+{
+    item.text = "Item clicked %1".arg(++clickCount);
+}
+</pre>
+ 
+<p> <p>See also <a href="examples.html">QSA Examples</a>.
+
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

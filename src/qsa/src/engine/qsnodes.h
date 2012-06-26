@@ -47,37 +47,38 @@ class QSProgramNode;
 class QSTypeNode;
 class QSLookupInfo;
 
-enum Operator { OpEqual,
-                OpEqEq,
-                OpNotEq,
-                OpStrEq,
-                OpStrNEq,
-                OpPlusEq,
-                OpMinusEq,
-                OpMultEq,
-                OpDivEq,
-                OpPlusPlus,
-                OpMinusMinus,
-                OpLess,
-                OpLessEq,
-                OpGreater,
-                OpGreaterEq,
-                OpAndEq,
-                OpXOrEq,
-                OpOrEq,
-                OpModEq,
-                OpAnd,
-                OpOr,
-                OpBitAnd,
-                OpBitXOr,
-                OpBitOr,
-                OpLShift,
-                OpRShift,
-                OpURShift,
-                OpIs,
-                OpIn,
-                OpInstanceOf
-              };
+enum Operator {
+  OpEqual,
+  OpEqEq,
+  OpNotEq,
+  OpStrEq,
+  OpStrNEq,
+  OpPlusEq,
+  OpMinusEq,
+  OpMultEq,
+  OpDivEq,
+  OpPlusPlus,
+  OpMinusMinus,
+  OpLess,
+  OpLessEq,
+  OpGreater,
+  OpGreaterEq,
+  OpAndEq,
+  OpXOrEq,
+  OpOrEq,
+  OpModEq,
+  OpAnd,
+  OpOr,
+  OpBitAnd,
+  OpBitXOr,
+  OpBitOr,
+  OpLShift,
+  OpRShift,
+  OpURShift,
+  OpIs,
+  OpIn,
+  OpInstanceOf
+};
 
 class QSNode
 {
@@ -102,7 +103,7 @@ public:
   virtual bool setBreakpoint(int, int, bool);
 #endif
   virtual bool deref() {
-    Q_ASSERT(refCount>0);
+    Q_ASSERT(refCount > 0);
     return !--refCount;
   }
   virtual void ref() {

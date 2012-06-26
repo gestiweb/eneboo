@@ -1,0 +1,86 @@
+\chapter Built-in Variables and Constants
+
+\Q provides a number of convenient built-in constants and variables.
+
+The built-in variables include \l arguments.
+
+The built-in constants include \l Infinity, \l NaN and \l undefined.
+
+\section1 Built-in Variables
+
+\section2 arguments
+
+This is an \l Array of the arguments that were passed to the function.
+It only exists within the context of a function.
+
+Example:
+\code
+    function sum()
+    {
+	total = 0;
+	for ( i = 0; i < arguments.length; i++ ) {
+	    total += arguments[ i ];
+	}
+	return total;
+    }
+\endcode
+
+\omit
+
+\section2 Application.argv
+
+This is an \l Array variable which holds an ordered list of the
+command line arguments that were passed to the application (if any).
+\c{Application.argv[0]} is the name of the application, as passed to
+the \Q interpreter; any remaining arguments are in
+\c{Application.argv[1]} onwards.
+
+For \QSA, \c{Application.argv[0]} is the name of the C++ application
+which is scriptable using \QSA and the other arguments are those which
+were passed to the Qt/C++ on the command line.
+
+\Bold Example
+\code
+    function main()
+    {
+	for ( var i = 1; i < Application.argv.length; i++ ) {
+	    debug( Application.argv[i] );
+	}
+    }
+\endcode
+\endomit
+
+\section1 Built-in Constants
+
+\omit The built-in constants include \l Infinity, \l NaN and \l undefined.\endomit
+
+\section2 Infinity
+
+This is the value of any division by zero, i.e.
+\code
+    var i = 1/0;
+\endcode
+In \QS, division by zero does not raise an exception; instead it
+assigns the \c Infinity value as the result of the expression. Use \l
+isFinite() to test whether a value is finite or not.
+
+\section2 NaN
+
+Some functions that are supposed to return a numeric result may return
+\c NaN instead. Use \l isNaN() to check for this.
+
+\section2 undefined
+
+This is the value of a variable that does not have a defined value,
+i.e. has not been assigned to.
+
+Example:
+\code
+    var i;
+    // ...
+    if ( i == undefined ) {
+	i = 77;
+    }
+\endcode
+In this example, if execution reaches the \c if statement, and \c i
+has not been assigned a value, it will be assigned the value 77.

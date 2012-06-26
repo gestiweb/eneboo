@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:1164 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Color</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1-11.html">Prev: String</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-13.html">Next: Palette</a>]</p>
+<h4 align="center">Color</h4>
+<p>The <font color=blue><tt>Color</tt></font> class is used to represent colors. Instances of <font color=blue><tt>Color</tt></font> can be passed to C++ slots that take arguments of type QColor.</p>
+<h5><a name="1"></a>Color Properties</h5>
+<ul><li><p>red : Number; The red component of the color. This is a value between 0 and 255.</p>
+<li><p>green : Number; The green component of the color. This value is between 0 and 255.</p>
+<li><p>blue : Number; The blue component of the color. This value is between 0 and 255.</p>
+<li><p>name : String; The name of the color, if a matching name for the color exists; otherwise an empty string.</p>
+<li><p>rgb : Number; The rgb color code of the color. The color code is a bitmask of the form <tt>0xRRGGBB</tt>, where RR is the red component, GG is the green component, and BB is the blue component expressed as hexadecimal digits.</p>
+<li><p>hue : Number; The color's hue, as defined by the HSV color model.</p>
+<li><p>saturation : Number; The color's saturation, as defined by the HSV color model.</p>
+<li><p>value : Number; The colors's value, as defined by the HSV color model.</p>
+</ul><h5><a name="2"></a>Color Functions</h5>
+<ul><li><p>setRgb( colorcode ); Sets the color code of the color. The value is a bitmask on the form 0xRRGGBB, where RR=red, GG=green, and BB=blue, all as hexadecimal digits.</p>
+<li><p>setRgb( red, green, blue ); Sets the red, green and blue color values of the color to <tt>red</tt>, <tt>green</tt> and <tt>blue</tt>.</p>
+<li><p>light() : Color; Returns a Color that is a lighter version of this one.</p>
+<li><p>dark() : Color; Returns a Color that is a darker version of this one.</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-1-11.html">Prev: String</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-13.html">Next: Palette</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

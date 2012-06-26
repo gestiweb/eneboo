@@ -20,6 +20,10 @@
 #include "AQS_g.h"
 #include "AQSWrapperFactory_p.h"
 
+#include "AQConfig.h"
+
+QSWrapperFactory *globalAQSWrapper = 0;
+
 void __aq_baseclass_init_error( 
     const char * prefix, const char * clname, const char * bclname, 
     QObject *qo ) 
@@ -32,6 +36,8 @@ void __aq_baseclass_init_error(
 AQSWrapperFactory::AQSWrapperFactory()
 {
   d = new AQSWrapperFactoryPrivate;
+
+  globalAQSWrapper = this;
 
   AQ_GEN_REG_WRAP
 
@@ -48,7 +54,7 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL(SqlDatabase);
   AQ_REG_COMPAT_FL(Manager);
   AQ_REG_COMPAT_FL(ManagerModules);
-  AQ_REG_COMPAT_FL(Action);
+  AQ_REG_COMPAT_FL(Action); // <- Removed by InfoSial
   AQ_REG_COMPAT_FL(SqlCursor);
   AQ_REG_COMPAT_FL(SqlQuery);
   AQ_REG_COMPAT_FL(FieldDB);
@@ -57,9 +63,11 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL(FormRecordDB);
   AQ_REG_COMPAT_FL(FormSearchDB);
   AQ_REG_COMPAT_FLS2(DataTable, DataTableDB);
+  AQ_REG_COMPAT_FL2(Action, ActionMD);
   AQ_REG_COMPAT_FL2(RelationMetaData, RelationMD);
   AQ_REG_COMPAT_FL2(FieldMetaData, FieldMD);
   AQ_REG_COMPAT_FL2(TableMetaData, TableMD);
+  AQ_REG_COMPAT_FL2(DataTable, DataTableDB);
   //### Remove in AbanQ v3
 }
 
@@ -96,27 +104,52 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   if (className == AQ_QUOTEME(FL##FClass)) \
     return new FLS##Class(static_cast<QObject *>(ptr))
 #define AQ_CRE_COMPAT_FL(Class) \
-  if (className == AQ_QUOTEME(FL##Class)) \
-    return new AQS##Class(static_cast<QObject *>(ptr))
+  if (className == AQ_QUOTEME(FL##Class)) { \
+    AQS##Class *aqo = new AQS##Class(ptr); \
+    aqo->setWrap(); \
+    return aqo; \
+  }
+
 #define AQ_CRE_COMPAT_FL2(FClass,Class) \
-  if (className == AQ_QUOTEME(FL##FClass)) \
-    return new AQS##Class(static_cast<QObject *>(ptr))
+  if (className == AQ_QUOTEME(FL##FClass)) { \
+    AQS##Class *aqo = new AQS##Class(ptr); \
+    aqo->setWrap(); \
+    return aqo; \
+  }
+
+#define AQ_CRE_COMPAT_FL_OBJ(Class) \
+  if (className == AQ_QUOTEME(FL##Class)) { \
+    QObject *o = static_cast<QObject *>(ptr); \
+    if (qstrcmp(o->className(), AQ_QUOTEME(FL##Class)) != 0) return o; \
+    AQS##Class *qo = new AQS##Class(o); \
+    qo->setWrap(); \
+    return qo; \
+  }
+
+#define AQ_CRE_COMPAT_FL2_OBJ(FClass,Class) \
+  if (className == AQ_QUOTEME(FL##FClass)) { \
+    QObject *o = static_cast<QObject *>(ptr); \
+    if (qstrcmp(o->className(), AQ_QUOTEME(FL##FClass)) != 0) return o; \
+    AQS##Class *qo = new AQS##Class(o); \
+    qo->setWrap(); \
+    return qo; \
+  }
 
   AQ_CRE_COMPAT_FL(SqlDatabase);
   AQ_CRE_COMPAT_FL(Manager);
   AQ_CRE_COMPAT_FL(ManagerModules);
-  AQ_CRE_COMPAT_FL(ManagerModules);
-  AQ_CRE_COMPAT_FL(SqlCursor);
-  AQ_CRE_COMPAT_FL(SqlQuery);
-  AQ_CRE_COMPAT_FL(FieldDB);
-  AQ_CRE_COMPAT_FLS(TableDB);
-  AQ_CRE_COMPAT_FL(FormDB);
-  AQ_CRE_COMPAT_FL(FormRecordDB);
-  AQ_CRE_COMPAT_FL(FormSearchDB);
-  AQ_CRE_COMPAT_FLS2(DataTable, DataTableDB);
+  AQ_CRE_COMPAT_FL_OBJ(SqlCursor);
+  AQ_CRE_COMPAT_FL_OBJ(SqlQuery);
+  AQ_CRE_COMPAT_FL_OBJ(FieldDB);
+  AQ_CRE_COMPAT_FL_OBJ(TableDB);
+  AQ_CRE_COMPAT_FL_OBJ(FormDB);
+  AQ_CRE_COMPAT_FL_OBJ(FormRecordDB);
+  AQ_CRE_COMPAT_FL_OBJ(FormSearchDB);
+  AQ_CRE_COMPAT_FL2(Action, ActionMD);
   AQ_CRE_COMPAT_FL2(RelationMetaData, RelationMD);
   AQ_CRE_COMPAT_FL2(FieldMetaData, FieldMD);
-  AQ_CRE_COMPAT_FL2(TableMetaData, TableMD);
+  AQ_CRE_COMPAT_FL2_OBJ(TableMetaData, TableMD);
+  AQ_CRE_COMPAT_FL2_OBJ(DataTable, DataTableDB);
   //### Remove in AbanQ v3
 
   return 0;
@@ -165,4 +198,81 @@ QDomNode *AQS::toXml(QObject *o, bool includeChildren,
   if (!aqo)
     return 0;
   return toXml(aqo, includeChildren, includeComplexTypes);
+}
+
+QByteArray AQS::toHex(QByteArray *ba) const
+{
+  return ba ? byteArrayToHex(ba) : QByteArray();
+}
+
+QByteArray AQS::fromHex(QByteArray *ba) const
+{
+  return ba ? byteArrayFromHex(ba) : QByteArray();
+}
+
+QByteArray AQS::toBase64(QByteArray *ba) const
+{
+  return ba ? byteArrayToBase64(ba) : QByteArray();
+}
+
+QByteArray AQS::fromBase64(QByteArray *ba) const
+{
+  return ba ? byteArrayFromBase64(ba) : QByteArray();
+}
+
+QByteArray AQS::compress(QByteArray *ba) const
+{
+  return ba ? qCompress(*ba) : QByteArray();
+}
+
+QByteArray AQS::uncompress(QByteArray *ba) const
+{
+  return ba ? qUncompress(*ba) : QByteArray();
+}
+
+QString AQS::sha1(QByteArray *ba) const
+{
+  if (!ba)
+    return QByteArray();
+  return FLUtil::usha1((uchar *)(const char *)(*ba), ba->size());
+}
+
+extern "C" {
+  int xsltprocMain(int argc, char **argv);
+  int xsltprocMemory(const char *xsltStr, int sizeXslt,
+                     const char *xmlStr, int sizeXml,
+                     char **out, int *len);
+}
+
+int AQS::xsltproc(const QStringList &args) const
+{
+  if (args.isEmpty())
+    return 0;
+
+  int argc = args.size() + 1;
+  char *argv[argc];
+
+  argv[0] = "xsltproc";
+  for (int i = 1; i < argc; ++i) {
+    argv[i] = qstrdup((const char *)args[i - 1]);
+  }
+
+  int ret = xsltprocMain(argc, argv);
+  delete [] argv;
+  return ret;
+}
+
+QByteArray AQS::xsltproc(QByteArray *xslt, QByteArray *xml) const
+{
+  int len;
+  char *out = NULL;
+  xsltprocMemory((const char *)xslt->data(), xslt->size(),
+                 (const char *)xml->data(), xml->size(),
+                 &out, &len);
+  QByteArray ret;
+  if (out != NULL) {
+    ret.duplicate(out, len);
+    delete out;
+  }
+  return ret;
 }

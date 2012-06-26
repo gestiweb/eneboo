@@ -34,20 +34,22 @@
 class QSA_EXPORT QSUtilFactory : public QSObjectFactory
 {
 public:
-    enum Utilities {
-	None       = 0x0000,
-	File       = 0x0001,
-	Directory  = 0x0002,
-	Process    = 0x0004,
-	All        = 0xffff
-    };
-    QSUtilFactory(uint enableFlags = All);
+  enum Utilities {
+    None       = 0x0000,
+    File       = 0x0001,
+    Directory  = 0x0002,
+    Process    = 0x0004,
+    All        = 0xffff
+  };
+  QSUtilFactory(uint enableFlags = All);
 
-    virtual QObject *create( const QString &className,
-			     const QSArgumentList &arguments,
-			     QObject *context );
+  virtual QObject *create(const QString &className,
+                          const QSArgumentList &arguments,
+                          QObject *context);
 
-    QSInterpreter *interpreter() const { return QSObjectFactory::interpreter(); }
+  QSInterpreter *interpreter() const {
+    return QSObjectFactory::interpreter();
+  }
 
 };
 

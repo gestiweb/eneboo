@@ -1,0 +1,200 @@
+/*!
+
+\page plot.html
+
+\title The Plot Application
+
+This article presents a usage case of QSA that goes beyond the
+typical task of customizing an application. We will demonstrate Plot,
+a small mathematical application that allows the user to write
+formulas in Qt Script and visualize them using a one-dimensional
+curve. The visualization functionality is the core part of the
+application and it is implemented in C++. The user then uses Qt
+Script to write the function which will be visualized. This article will show
+how seamless Qt/C++ and Qt Script work together, and how little effort
+is involved in making a C++ API available in Qt Script and calling Qt
+Script functions from C++ code.
+
+If you are unfamiliar with QSA, please read through the
+introduction of the QSA documentation first to get an overview on how
+Qt and QSA integrate.
+
+The complete source code of the application can be downloaded from
+\link http://doc.trolltech.com/qsa-1.1/plot.tgz here\endlink.
+
+\section1 The Nuts and Bolts of the Plot Application
+
+Plot allows the user to interactively input formulas. To acheive this,
+the program provides interactive plot editors where Qt Script code
+can be written. Using a simple function call, a given Qt Script
+function will be vizualized.
+
+To provide this function call in Qt Script, we use a class called
+PlotObject, implemented in C++, with a function (C++ slot) plot()
+which takes the Qt Script function as a parameter. The plot() slot
+creates a widget to visualize the given Qt Script function. To
+calculate the y-values for a certain x-value, the plot widget will use
+QSInterpreter::call() to call the specified Qt Script function.
+
+Before we go into more implementation details of the program, here is
+a screenshot of Plot visualizing a sinus and cosinus function:
+
+\img plot.png
+
+\section1 The main window
+
+The Plot application consists of a main window which contains a
+QWorkspace as central widget. All of the plot editors and the
+windows visualizing functions can be contained inside the main window.
+
+The only menu/toolbar option the application provides is \e New, which
+opens a new plot editor.
+
+At the bottom of the window there is a QTextEdit which displays error messages and
+debug output.
+
+The main window's code can be found in \link http://doc.trolltech.com/qsa-1.1/mainwindow.ui.h
+mainwindow.ui.h \endlink. Although most of the code is
+straightforward, we will look at some of the code in the file in more
+detail when we have a look at the PlotEditor class.
+
+\section1 The PlotEditor class
+
+The PlotEditor class implements the interactive console which the user
+of the application will mainly work with. It allows the user to
+implement Qt Script functions and execute Qt Script calls. The code of
+that class can be found in the files \link http://doc.trolltech.com/qsa-1.1/ploteditor.h
+ploteditor.h\endlink and \link http://doc.trolltech.com/qsa-1.1/ploteditor.cpp ploteditor.cpp\endlink.
+
+PlotEditor inherits QSEditor. QSEditor already provides an editor with
+Qt Script support such as syntax highlighting, code completion,
+etc. 
+
+PlotEditor has one additional slot, called eval(), which evaluates Qt
+Script code that has been entered. This slot is connected to the
+returnPressed() signal of the editor, so that code is always evaluated
+when the user presses return or enter.
+
+Now we'll look at the implementation of the PlotEditor class. A
+PlotObject is instantiated in the constructor. All code entered in
+this editor should be evaluated in the context of that object and the
+editor should use this object as the completion context. In addition
+to providing a context for all code, which is essential in order to
+avoid polluting the global context, this object provides the function
+plot(), which the user will call to visualize a function. We'll
+elaborate more on that later on in the article.
+
+There is one important point to consider regarding code completion in
+the editor. We allow the user to open multiple plot editors. QSA only
+allows one QSEditor at a time to offer code completion. To start
+completion in a QSEditor, you can call QSEditor::activate(). To stop
+completion and allow another editor to start completion, you call
+QSEditor::release().
+
+What we want to do is to intercept window activation of our
+QWorkspace, and call release() on the previously active editor, and
+activate() on the newly active editor. To do this, we connect the slot
+windowActivated() in \link http://doc.trolltech.com/qsa-1.1/mainwindow.ui.h mainwindow.ui.h\endlink to
+the QWorkspace's windowActivated() signal and implement this
+functionality there.
+
+The only part missing from PlotEditor now is the eval() function,
+which is called when the user presses return. The easy solution would
+be to always evaluate the enitre buffer. But what we ideally want, is
+to evaluate only the last code block, which the user was working
+on. The eval() function implements a simple way to find this last
+block. The algorithm isn't perfect, but it is good enough for our
+purposes.
+
+First, the function checks if the last entered line is in the middle
+of a Qt Script function. It does that by checking if curly braces or
+parentheses mismatch. If this is the case, we don't want to evaluate
+any code and return. If this isn't the case, we can go on and try to
+read the code backwards, until we either assemble a syntactically
+correct code block, or we have to stop and return, since there is no
+more code. In the event that we find a syntactically correct code
+block, we evaluate this block.
+
+To check code for syntactical correctness, we use
+QSInterpreter::checkSyntax(), and to evaluate code, we use
+QSInterpreter::evaluate().
+
+\section1 The PlotObject class
+
+The PlotObject class (\link http://doc.trolltech.com/qsa-1.1/plotobject.h plotobject.h\endlink and
+\link http://doc.trolltech.com/qsa-1.1/plotobject.cpp plotobject.cpp\endlink) has already been
+mentioned in the previous section. It serves two purposes:
+
+\list 
+\i It provides a context to execute code in order to avoid polluting
+the global context.
+\i It provides the plot() function which the user can call to
+visualize a function.
+\endlist
+
+To provide a context, no code has to be written. The fact that
+PlotObject is a QObject subclass takes care of that.
+
+The plot() function is very simple too. It takes the name of the Qt
+Script function which should be visualized, as an argument. plot()
+then creates PlotWidget and passes the function parameter and the
+context (which is 'this') on to the PlotWidget's constructor. plot()
+also returns the PlotWidget it has created, so that the user can
+change properties on the PlotWidget later from Qt Script.
+
+\section1 The PlotWidget class
+
+This PlotWidget class is the heart of the application. This widget can
+visualize a mathematical function implemented in Qt Script. The
+implementation can be found in the files \link http://doc.trolltech.com/qsa-1.1/plotwidget.h
+plotwidget.h\endlink and \link http://doc.trolltech.com/qsa-1.1/plotwidget.cpp plotwidget.cpp\endlink.
+
+We will not walk through the whole code of that widget, but only
+discuss the most important parts.
+
+First, PlotWidget defines some properties such as curveColor, labels
+of the axis and the range of the x-axis. This way the user can
+customize this widget from Qt Script.
+
+Before the widget can draw anything, it has to calculate the y-values
+for all x-values in the range which should be visualized. The
+calculation is done in calculateValues(). This function iterates
+through the x-range and calls calculateY() for every x-value and
+stores the calculated y-value.
+
+The real work is done in calculateY(). This function calls the Qt
+Script function which the widget visualizes. This is done via
+QSInterpreter::call(). The first argument is the Qt Script function to
+call. The second one is a list of arguments which should be passed to
+this function. In our case this is the x-value. The third (optional)
+parameter is the context in which the function should be called. In our
+case, this is the PlotObject which we got passed in the PlotWidget's
+constructor.
+
+QSInterpreter::call() returns a QVariant. We are interested in a
+double value, so we call toDouble() on it and return that result.
+
+The main work of the PlotWidget is done in the paintEvent() function
+where the axis, labels and the actual curve is painted. But we will
+not go through that code, since it is not relevant to QSA for this
+example.
+
+\section1 Final words
+
+In summary, the Plot application is nothing more than a plain Qt/C++
+application that uses the QSA library. This article shows how QSA can
+be used to customize the application and give the user a lot of
+flexibility without having to use wrappers. It further demonstrates
+how to enable the user to call a C++ slot from Qt Script (plot()), how
+to modify a C++ object from Qt Script (modifying properties of the
+PlotWidget which is returned from plot()), and how to call a Qt Script
+function from C++ including passing arguments to it and using its
+return value (as used in calculateY()).
+
+For an example of how to use the application, please look at the
+screenshot. Basically every function which takes one input parameter
+and returns a numerical value can be visualized using Plot.
+
+*/
+
+

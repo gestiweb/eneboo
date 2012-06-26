@@ -41,6 +41,9 @@ public slots:
   bool rollback();
   bool commit(bool = true);
   int size() const;
+  void setForwardOnly(bool);
+  QSqlError *lastError() const;
+  QString lastQuery() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -114,6 +117,18 @@ inline bool AQSSqlCursor::commit(bool arg0)
 inline int AQSSqlCursor::size() const
 {
   AQ_CALL_RET_V(size(), int);
+}
+inline void AQSSqlCursor::setForwardOnly(bool arg0)
+{
+  AQ_CALL_VOID(setForwardOnly(arg0));
+}
+inline QSqlError *AQSSqlCursor::lastError() const
+{
+  AQ_CALL_RET_PTR(lastError(), QSqlError);
+}
+inline QString AQSSqlCursor::lastQuery() const
+{
+  AQ_CALL_RET_V(lastQuery(), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

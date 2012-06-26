@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-types-and-objects.leaf:997 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>String</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-3-1-10.html">Prev: RegExp</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-12.html">Next: Color</a>]</p>
+<h4 align="center">String</h4>
+<p>A <font color=blue><tt>String</tt></font> is a sequence of zero or more Unicode characters. <font color=darkmagenta>Qt Script</font>'s <font color=blue><tt>String</tt></font> class uses the <a href= http://doc.trolltech.com >Qt</a> QString class's functions and syntax.</p>
+<p>Strings can be created and concatenated as follows.</p>
+<pre>
+    var text = "this is a";
+    var another = new String( "text" );
+    var concat = text + " " + another;  // concat == "this is a text"
+</pre>
+<h5><a name="1"></a>String Properties</h5>
+<ul><li><p>length : Number; The length property specifies the length of the string.</p>
+</ul><h5><a name="2"></a>Static String Functions</h5>
+<ul><li><p>fromCharCode ( static function )</p>
+<pre>
+    var s = String.fromCharCode( 65, 66, 67, 68 );
+    System.println( s ); // prints "ABCD"
+</pre>
+<p>Returns a string made up of the characters with code <tt>code1</tt>, <tt>code2</tt>, etc, according to their Unicode character codes.</p>
+</ul><h5><a name="3"></a>String Functions</h5>
+<ul><li><p>charAt( pos : Number ) : String; Returns the character in the string at position <tt>pos</tt>. If the position is out of bounds, <tt>undefined</tt> is returned.</p>
+<li><p>charCodeAt( pos : Number ) : Number; Returns the character code of the character at position <tt>pos</tt> in the string. If the position is out of bounds, <tt>undefined</tt> is returned.</p>
+<li><p>indexOf( pattern : String or RegExp, pos : Number ) : Number; Returns the index of <tt>pattern</tt> in the string, starting at position <tt>pos</tt>. If no position is specified, the function starts at the beginning of the string. If the pattern is not found in the string, -1 is returned.</p>
+<li><p>lastIndexOf( pattern : String or RegExp, pos : Number ) : Number; Returns the last index of <tt>pattern</tt> in the string, starting at position <tt>pos</tt> and searching backwards from there. If no position is specified, the function starts at the end of the string. If the pattern is not found in the string, -1 is returned.</p>
+<li><p>match( pattern : RegExp ) : String; Returns the matched pattern if this string matches the pattern defined by <tt>regexp</tt>. If the string doesn't match or <tt>regexp</tt> is not a valid regular expression, <tt>undefined</tt> is returned.</p>
+<li><p>search( pattern : String or RegExp ) : String; same as find.</p>
+<li><p>searchRev( pattern : String or RegExp ) : String; same as findRev.</p>
+<li><p>replace( pattern : RegExp, newValue : String ) : String; Replaces the first occurrence of <tt>pattern</tt> in the string with <tt>newvalue</tt> if the pattern is found in the string. A modified copy of string is returned.</p>
+<p>If <tt>pattern</tt> is a regular expression with global set, all occurances of <tt>pattern</tt> in the string will be replaced.</p>
+<li><p>split( pattern : String or RegExp ) : String[]; Returns an array of strings containing this string split on each occurrence of <tt>pattern</tt>.</p>
+<li><p>substring( startIndex : Number, endIndex : Number ) : String; Returns a copy of this string which is the substring starting at <tt>startIndex</tt> and ending at <tt>endIndex</tt>.</p>
+<li><p>toLowerCase() : String; Returns a lowercase copy of this string.</p>
+<li><p>lower() : String; Same as toLowerCase().</p>
+<li><p>toUpperCase() : String; Returns an uppercase copy of this string.</p>
+<li><p>upper() : String; Same as toUpperCase().</p>
+<li><p>isEmpty() : Boolean; Returns true if the string is empty, i.e. has a length of 0; otherwise returns false.</p>
+<li><p>left( length : Number ) : String; Returns a substring containing the <tt>length</tt> leftmost characters of this string.</p>
+<li><p>right( length : Number ) : String; Returns a substring containing the <tt>length</tt> rightmost characters of this string.</p>
+<li><p>mid( start : Number, length : Number ) : String; Returns a copy of this string which is the substring starting a <tt>start</tt> and is <tt>length</tt> characters long.</p>
+<li><p>find( pattern : String or RegExp, pos : Number ) : Number; Returns the first position of <tt>pattern</tt> after <tt>pos</tt>. If the pattern is not found, -1 is returned. If <tt>pos</tt> is not specified, position 0 is used.</p>
+<li><p>findRev( pattern : Number, pos : Number ) : String; Returns the first position of <tt>pattern</tt> before <tt>pos</tt>, searching backward. If pattern is not found, -1 is returned. If <tt>pos</tt> is not specified, the search starts at the end of the string.</p>
+<li><p>startsWith( pattern : String or RegExp ) : Boolean; Returns true if the string starts with <tt>pattern</tt>; otherwise returns false.</p>
+<li><p>endsWith( pattern : String or RegExp ) : Boolean; Returns true if the string ends with <tt>pattern</tt>; otherwise returns false.</p>
+<li><p>arg( value : String or Number, fieldWidth : Number ) : String; This function will return a string that replaces the lowest numbered occurrence of %1, %2, ..., %9 with <tt>value</tt>.</p>
+<p>The <tt>fieldWidth</tt> parameter specifies the minimum amount of space that <tt>value</tt> is padded to. A positive <tt>fieldWidth</tt> will produce right-aligned text, whereas a negative <tt>fieldWidth</tt> will produce left-aligned text.</p>
+<li><p>argInt( value : Number, fieldWidth : Number, base : Number ) : String; This function behaves like arg above, but is specialized for the case where <tt>value</tt> is an integer.</p>
+<p><tt>value</tt> is expressed in base <tt>base</tt>, which is 10 by default and must be between 2 and 36.</p>
+<li><p>argDec( value : Number, fieldWidth : Number, format : Number, precision : Number ) : String; This function behaves like <tt>arg()</tt> above, but is specialized for the case where <tt>value</tt> is a decimal value.</p>
+<p>Argument <tt>value</tt> is formatted according to the <tt>format</tt> specified, which is 'g' by default and can be any of the following:</p>
+<ul><li><p><tt>e</tt> - format as [-]9.9e[+|-]999</p>
+<li><p><tt>E</tt> - format as [-]9.9E[+|-]999</p>
+<li><p><tt>f</tt> - format as [-]9.9</p>
+<li><p><tt>g</tt> - use <tt>e</tt> or <tt>f</tt> format, whichever is the most concise</p>
+<li><p><tt>G</tt> - use <tt>E</tt> or <tt>f</tt> format, whichever is the most concise</p>
+</ul><p>With 'e', 'E', and 'f', <tt>precision</tt> is the number of digits after the decimal point. With 'g' and 'G', <tt>precision</tt> is the maximum number of significant digits (trailing zeroes are omitted).</p>
+</ul><!-- eof -->
+<p align="right">[<a href="language-3-1-10.html">Prev: RegExp</a>] [<a href="language.html">Home</a>] [<a href="language-3-1-12.html">Next: Color</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

@@ -1,0 +1,57 @@
+\chapter What is Qt Script for Applications
+
+This chapter gives a brief overview of the \QSA toolkit.  
+
+\section1 Components of \QSA
+
+\QSA is a cross-platform toolkit for making C++ applications scriptable
+using an interpreted scripting language, \QS. The \QSA toolkit is made up
+of the following components:
+
+\list
+
+\i
+
+\QSA library, which the developer of the C++ application uses to make
+the application scriptable.
+
+\i
+
+\QS, an easy-to-learn, cross-platform interpreted scripting
+language. \QS is based on the ECMAScript standard. Microsoft's
+JScript, and Netscape's JavaScript are also based on the ECMAScript
+standard.
+
+\i 
+
+\QSAD (Qt Script for Applications Workbench), a scripting environment for editing, managing, and
+running scripts within your project. \QSAD includes an output
+window to view errors that occur when running the script. 
+
+\omit
+
+\i
+
+\QSAD is the cross-platform IDE used by the end-user to create scripts
+for C++ applications. \QSAD is based on Trolltech's highly successful
+visual form builder for C++, \e{Qt Designer}. \QSAD provides a
+complete development environment, including an integrated debugger, in
+which end-users can write, run, save and debug scripts.
+
+\endomit
+
+\i
+
+\QSA makes certain objects (QObject and its subclasses) available
+to the scripting engine. The only thing you have to do to make your
+application scriptable, is to pass these objects to a function of the
+\QSA library. No binding code is needed because it is done dynamically using
+Qt meta object system.
+
+\endlist
+
+The tutorial chapters that follow show you how to make an application
+scriptable and how to write a simple script for the application. 
+
+
+

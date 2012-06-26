@@ -21,7 +21,7 @@
 
 class FLManagerModules;
 class FLStaticLoaderWarning;
-struct AQStaticDirInfo;
+
 
 struct AQStaticDirInfo {
   inline AQStaticDirInfo(const QString &entry);

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/built-in-functions.leaf:145 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>parseInt()</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-5-1-8.html">Prev: parseFloat()</a>] [<a href="language.html">Home</a>] [<a href="language-5-1-10.html">Next: startTimer()</a>]</p>
+<h4 align="center">parseInt()</h4>
+<p><tt>parseInt( string, optBase )</tt></p>
+<p>Parses the <em>string</em> and returns the integer that the <em>string</em> represents in the given base <em>optBase</em>, or <a href="language-4-2-2.html">NaN</a> if the parse fails. If the base isn't specified, the base is determined as follows:</p>
+<ul><li><p>base 16 (hexadecimal) if the first non-whitespace characters are "0x" or "0X";</p>
+<li><p>base 8 (octal) if the first non-whitespace character is "0";</p>
+<li><p>base 10 otherwise.</p>
+</ul><p>Leading and trailing whitespace are ignored. If the string contains a number followed by non-numeric characters, the value of the number is returned and the trailing characters ignored.</p>
+<p>Example:</p>
+<pre>
+    var i = parseInt( "24" );       // i == 24
+    var h = parseInt( "0xFF" );     // h == 255
+    var x = parseInt( " 459xyz " ); // x == 459
+</pre>
+<p>See also <a href="language-5-1-8.html">parseFloat()</a>.</p>
+<!-- eof -->
+<p align="right">[<a href="language-5-1-8.html">Prev: parseFloat()</a>] [<a href="language.html">Home</a>] [<a href="language-5-1-10.html">Next: startTimer()</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

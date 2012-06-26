@@ -1,0 +1,52 @@
+\chapter Preface
+
+\section1 Introduction
+
+This guide presents \QSA, a tool for making C++ applications
+scriptable, using \QS, an interpreted scripting language. Some basic
+knowledge of scripting is needed to get the most out of this guide.
+
+This guide provides an introduction to \QSA, and its tools. 
+
+Here is a brief overview of the chapters:
+
+\list
+
+\i 
+
+Chapter one, \l{What is Qt Script for Applications}, introduces the
+\QSA toolkit and its components. This chapter also provides a look at
+\QSA's features and how it compares to other scripting languages.
+
+\i
+
+Chapter two, \l{How to Make Qt Applications Scriptable}, is a
+step-by-step tutorial on making applications scriptable.
+
+\i
+
+Chapter three, \l{How to Design and Implement Application Objects}
+explains how to make your C++ objects available to \QSA scripts.
+
+\i
+
+Chapter four, \l{Creating Qt Scripts},
+demonstrates how to create scripts for a scriptable application, using
+\QSAD (Qt Script for Applications Workbench).
+
+\omit
+\i
+
+Chapter five, \l{Debugging Qt Script Applications}, demonstrates how
+to debug scripts for a scriptable application.
+
+\i
+
+Chapter six, \l{Deploying QSA-enabled Applications}, explains how to
+deploy applications, which make use of the QSA library.
+\endomit
+
+\endlist
+
+
+

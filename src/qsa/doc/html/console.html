@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../examples/console/console.doc:1 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Console</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>Console</h1>
+
+ 
+<p> 
+<p> 
+<p> The console example demonstrates how QSA can be used as an interactive scripting
+console where each command you type is automatically run in the interpreter.
+<p> The console example consists of three different widgets. The Input
+widget is used for writing script code and it is the largest and most
+important one of these is the input widget. This widget lies in the
+center of the dialog. The output window widget is found in the
+uppermost text area it displays output from print commands. It also
+displays syntax and logic errors. The third widget is the history
+window, situated in the lowermost text area of the dialog.History
+displays all of the commands that the user has typed.
+<p> The following sections will show an example and description of the console application.
+<p> <h2> A Line by Line Example
+</h2>
+<a name="1"></a><p> We will start by stepping thought line by line of a simple example
+where we create a dialog that reads and displays the first and last
+name that is typed into a line edit. Altough some lines are grouped
+together, you should try to type them in one by one and press enter
+between each line. The example below relies strongly on the 
+<a href="qsa-6.html">Input Dialog Framework</a>.
+<p> <pre> var dialog = new Dialog; </pre>
+ 
+<p> We start by creating a dialog.
+<p> <pre> dialog.exec(); </pre>
+ 
+<p> To verify that the dialog actually changes, we will display the dialog before
+any changes have been made to it. The dialog pops up with only an <tt>Ok</tt>
+and <tt>Cancel</tt> button on it. The function <tt>exec()</tt> is in the <tt>Dialog</tt> class.
+Close the dialog and continue with the steps below.
+<p> <pre>
+dialog.title = "Name reading dialog";
+dialog.okButtonText = "Done"
+dialog.cancelButtonText = "Abort";
+dialog.exec();
+</pre>
+ 
+<p> The preceding code configures the dialog to fit our needs. We set the
+title and modify the text on the <tt>OK</tt> and <tt>Cancel</tt> buttons. When you
+type <tt>dialog.exec()</tt> at the end of the code, the dialog pops up with your
+changes. When you have confirmed that the changes have taken
+place, close the dialog.
+<p> <pre>
+var first = new LineEdit;
+first.label = "First name: ";
+dialog.add( first );
+dialog.exec(); 
+</pre>
+ 
+<p> This code creates a line edit which we will use to read the
+first name.  We change the label to "First name: " and add it to the
+dialog. When we call <tt>exec()</tt>, the dialog will now contain your new
+line edit. Close the dialog again.
+<p> <pre>
+var last = new LineEdit;
+last.label = "Last name: ";
+dialog.add( last );
+dialog.exec();
+</pre>
+ 
+<p> We need to add another line edit for typing the last name. Change
+the label to "Last name: ", and add the line edit to the dialog.
+Type in <tt>dialog.exec()</tt> to run the dialog. Type in your first and
+last name in the respective input fields and press \Button Done.
+<p> Finally, we need to add the following code to get the result from the
+dialog and print it out.
+<p> <pre>
+var fullName = last.text + ", " + first.text;
+print( "Full name is: " + fullName );
+</pre>
+ 
+<p> <h2> Console in Detail
+</h2>
+<a name="2"></a><p> The console example uses an instance of <a href="qsinterpreter.html">QSInterpreter</a> and the function <a href="qsinterpreter.html#evaluate()">QSInterpreter::evaluate()</a> to
+give line by line commands that are interpreted. To have some classes
+to play with, we make the <a href="qsinputdialogfactory.html">Input Dialog
+Framework</a> available to the scripting engine using the
+function <a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>.
+<p> The input widget is a <a href="qseditor.html">QSEditor</a>, which
+means that all script code is written with syntax highlighting and
+completion. To get completion on all the classes that an interpreter
+knows about, we have to tell the editor which interpreter we are
+using. (In the most common case of using <a href="qseditor.html">QSEditor</a>, it is handled using
+<a href="qsproject.html">QSProject</a>, but in this example we have
+no project and therefore have to make the binding ourselves). This is
+done by calling the function <a href="qseditor.html#setInterpreter">QSEditor::setInterpreter()</a>. Without making this binding, the
+syntax completion would, for example, not be able to tell that the
+input dialog framework was available in the interpreter.
+<p> We have installed an event filter on the QSEditor so that we can
+provide the line by line interpretation of the script code that we
+want. If the user presses enter, we perform a syntax check on the
+source code in the editor using <a href="qsinterpreter.html#checkSyntax">QSInterpreter::checkSyntax()</a>. If it passes, the code is
+evaluated. The return value from the interpreter (typically the value
+of the last statement executed) is always displayed in the output
+window. If you want to write multi-line commands, use \Key Control+Enter
+to go to the next line without evaluating the code.
+<p> <h2> Conclusion
+</h2>
+<a name="3"></a><p> The console example shows how QSA can be used as an input form for
+giving interactive commands. It also sho how <a href="qseditor.html">QSEditor</a> can be embedded
+in an arbitrary user interface without the use of QSA Workbench or the project.
+<p> <p>See also <a href="examples.html">QSA Examples</a>.
+
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

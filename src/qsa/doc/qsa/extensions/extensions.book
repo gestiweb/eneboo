@@ -1,0 +1,6 @@
+\title QSA Extensions Framework
+
+\granularity chapter
+
+\input chap-inputdialog.leaf
+\input chap-utilfactory.leaf

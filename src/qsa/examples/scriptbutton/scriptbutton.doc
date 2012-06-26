@@ -1,0 +1,49 @@
+/*! \page example-scriptbutton.html
+
+    \ingroup examples
+
+  \title Scriptbutton
+
+The Scriptbutton example demonstrates how to implement a GUI control with a
+customizable action on activation. ScriptButton is a specialized
+\c QPushButton class that can have a snippet of script code attached to
+it. The script will be executed whenever the user clicks on the
+button. To modify the behavior of the buttons, the user can right-click
+a button and choose to either rename the button label or edit the
+script code in a simple editor. 
+
+The Scriptbutton example also shows how to extend the scripting API of
+an existing C++ \c QObject class, which in this case is \c QWidget.
+Here we extend every QWidget class by two scripting functions: \c
+sendMousePressEvent() and \c sendMouseReleaseEvent(). These functions
+will show up in the API of every \c QWidget subclass and will then allow
+the scriptwriter to send mouse press and release events to any
+\c QWidget.   
+
+For demonstration purposes, the example widget contains both a
+\c QLCDNumber and \c QLineEdit widget with properties that can be changed by
+the buttons located on the right side of the dialog.
+ 
+\section1 Implementing Scriptbutton
+
+The scriptbutton is a \c QPushButton subclass and contains an extra
+property which stores the code that will be executed when clicking the
+button. To edit the code, a subclass of \c QSEditor is used. The
+scriptbutton's code is passed into a call to \c QSInterpreter::evaluate()
+in the scriptbutton's \c executeScript() slot, which is connected to
+its \c clicked() signal.
+
+\section1 Implementation of the QWidget Extension
+
+To extend the \c QWidget API for the script writer, we implement a class
+\c WidgetWrapper which inherits \c QObject and takes the widget it wraps in
+its constructor. \c WidgetWrapper then implements the two slots
+\c sendMousePressEvent() and \c sendMouseReleaseEvent() which send a mouse
+event to the wrapped widget.
+
+To make this wrapper known to the Qt Script Interpreter, we implement
+a \c WidgetWrapperFactory which inherits \c QSWrapperFactory. This
+enables the Qt Script Interpreter to create a WidgetWrapper for every
+\c QWidget it exposes to Qt Script. 
+ 
+*/   

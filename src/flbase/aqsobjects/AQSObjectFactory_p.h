@@ -49,7 +49,7 @@
 #define AQ_CRE_VOIDPTR(Class) \
   if (className == AQ_QUOTEME(Q##Class)) { \
     AQS##Class *aqo = new AQS##Class(AQS##Class::Q##Class##_(arguments)); \
-    if ((!aqo || !aqo->isValid()) && candidateCtors) \
+    if ((!aqo || !aqo->AQSBaseObject::isValid()) && candidateCtors) \
       *candidateCtors = AQS##Class::candidateConstructors(); \
     return aqo; \
   }
@@ -57,7 +57,7 @@
 #define AQ_CRE_VOIDPTR_AQOBJECT(Class) \
   if (className == AQ_QUOTEME(AQ##Class)) { \
     AQS##Class *aqo = new AQS##Class(AQS##Class::AQ##Class##_(arguments)); \
-    if ((!aqo || !aqo->isValid()) && candidateCtors) \
+    if ((!aqo || !aqo->AQSBaseObject::isValid()) && candidateCtors) \
       *candidateCtors = AQS##Class::candidateConstructors(); \
     return aqo; \
   }

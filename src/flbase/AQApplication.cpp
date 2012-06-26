@@ -59,7 +59,10 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   QPixmap::setDefaultOptimization(QPixmap::BestOptim);
   qInitNetworkProtocols();
   FLDiskCache::init(this);
+#if 0
+  //#ifndef QSDEBUGGER
   AQ_DISKCACHE_CLR();
+#endif
 
 #ifdef QSDEBUGGER
   project_ = new QSProject(this, db()->database());
@@ -112,6 +115,11 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   FLApplication::call("aqAppScriptMain", argList, d->aqAppScriptObject_);
   QTimer::singleShot(0, this, SLOT(callInitScript()));
 
+#if 0
+  //#ifndef QSDEBUGGER
+  checkForUpdate();
+#endif
+
   AQ_UNSET_MNGLOADER
   initializing_ = false;
 
@@ -161,17 +169,16 @@ void AQApplication::callReinitScript()
 
 void AQApplication::setMainWidget(QWidget *mainWidget)
 {
-  if (d->oldApi_) {
-      FLApplication::setMainWidget(mainWidget);
-  } else {
+  if (!d->oldApi_)
+  {
       QApplication::setMainWidget(mainWidget);
 
       QObject *actual = mainWidget;
-      if (acl_) {
-          acl_->process(actual);
-      }
-  }
-   
+      if (acl_) acl_->process(actual);
+   }
+   else {
+      FLApplication::setMainWidget(mainWidget);
+   }
 }
 
 QSArgument AQApplication::call(const QString &function,

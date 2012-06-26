@@ -47,7 +47,7 @@ public slots:
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
-  QByteArray *byteCode(const QString &, int = 0, int = 0);
+  QByteArray byteCode(const QString &, int = 0, int = 0, bool = false);
   int errorType() const;
   QStringList errorMessages() const;
   QString code(QByteArray *);
@@ -73,9 +73,9 @@ public:
 };
 
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline QByteArray *AQSCompilerQSA::byteCode(const QString &arg0,  int arg1,  int arg2)
+inline QByteArray AQSCompilerQSA::byteCode(const QString &arg0,  int arg1,  int arg2,  bool arg3)
 {
-  AQ_CALL_RET_PTR(byteCode(arg0, arg1, arg2), QByteArray);
+  AQ_CALL_RET_V(byteCode(arg0, arg1, arg2, arg3), QByteArray);
 }
 inline int AQSCompilerQSA::errorType() const
 {

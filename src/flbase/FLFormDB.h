@@ -192,6 +192,10 @@ public slots:
   */
   void setMaximized();
 
+private slots:
+
+  void callInitScript();
+
 protected:
 
   /**
@@ -213,11 +217,6 @@ protected:
   Captura evento ocultar
   */
   virtual void hideEvent(QHideEvent *h);
-
-  /**
-  Muestra el formulario al principio y solo una vez
-  */
-  virtual void showForm();
 
   /**
   Inicializa componenentes del widget principal

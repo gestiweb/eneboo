@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/language-concepts.leaf:113 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Identifiers, Variables and Constants</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-2.html">Prev: Qt Script Language Concepts</a>] [<a href="language.html">Home</a>] [<a href="language-2-2.html">Next: Classes and Methods</a>]</p>
+<h3 align="center">Identifiers, Variables and Constants</h3>
+<p><font color=darkmagenta>Qt Script</font> identifiers match the regex pattern <b>[_A-Za-z][_A-Za-z0-9]*</b>. Identifiers are used for variables, constants, class names, function names and labels.</p>
+<p><font color=brown>ECMAScript</font> reserves some words which are valid identifiers for its own use. See the <a href="language-5.html">Built-in Functions and Operators</a> chapter for the complete list.</p>
+<p>Variables are declared using the <a href="language-5-3-4.html">var</a> keyword:</p>
+<pre>
+    var a;               // undefined
+    var c = "foliage";   // the string "foliage"
+    x = 1;               // global variable
+</pre>
+<p>If a variable is assigned to without being declared, it is automatically declared as a global variable. Using global variables can make your code difficult to debug and maintain and is not recommended.</p>
+<p>Constants are declared using the <a href="language-5-3-2.html">const</a> keyword:</p>
+<pre>
+    const x = "Willow";
+    const y = 42;
+</pre>
+<p>Constants must be defined at the point of declaration, because they cannot be changed later. If an attempt is made to assign to a constant, the <font color=darkmagenta>Qt Script for Applications</font> interpreter will issue an error message and stop.</p>
+<p>Constants are public globals if they are declared outside of any enclosing braces. When declared within the scope of some braces, e.g. within an <a href="language-6-9.html">if</a> statment, their scope is local to the enclosing block.</p>
+<!-- eof -->
+<p align="right">[<a href="language-2.html">Prev: Qt Script Language Concepts</a>] [<a href="language.html">Home</a>] [<a href="language-2-2.html">Next: Classes and Methods</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

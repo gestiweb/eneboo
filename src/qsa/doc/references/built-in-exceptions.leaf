@@ -1,0 +1,18 @@
+\chapter Built-in Exceptions
+
+The \Q interpreter supplies its own built-in exceptions, as well as
+recognizing user-defined exceptions. (See \l throw.)
+
+\PRELIMINARY
+
+The list of built-in exceptions is listed here:
+\list
+\omit
+    \i \Func ImportFailedException -- raised by \l{import}. The import
+    failed because the imported file contains a syntax error.
+    \i \Func ImportNotFoundException -- raised by \l{import}. No matching
+    file could be found to import.
+\endomit
+\i \Func ConstAssignException -- raised if an attempt is made to
+assign to a constant.
+\endlist

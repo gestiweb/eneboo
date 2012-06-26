@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../references/control-statements.leaf:597 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>with</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="language-6-16.html">Prev: while</a>] [<a href="language.html">Home</a>]</p>
+<h3 align="center">with</h3>
+<pre>
+with ( QualifyingName ) {
+    Statements;
+}
+</pre>
+<p>This keyword is used to indicate that any unqualified names in the <em>Statements</em> should be qualified by <em>QualifyingName</em>. QSA does not support declaring variables using the 'var' statement inside a with() block.</p>
+<p>Example:</p>
+<pre>
+// Without with
+    System.print "one ";
+    System.print "two ";
+    System.println "three";
+// With with
+    with ( System ) {
+        print "one ";
+        print "two ";
+        println "three";
+    }
+</pre>
+<p>If multiple qualifying names are required, with statements can be nested, e.g.</p>
+<pre>
+    with ( System ) {
+        with ( Math ) {
+            print abs( -4 );
+            print pow( 2, 3 );
+            print random();
+        }
+    }
+</pre>
+<p>Forcing the interpreter to do the lookup may be slower than using the fully qualified names.</p>
+<!-- eof -->
+<p align="right">[<a href="language-6-16.html">Prev: while</a>] [<a href="language.html">Home</a>]</p>
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

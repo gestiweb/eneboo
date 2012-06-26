@@ -6,7 +6,8 @@ else {
         error("settings.pro missing, unable to build")
 }
 TEMPLATE = lib
-CONFIG += warn_off exceptions plugin
+CONFIG += warn_off exceptions
+!mac:CONFIG += plugin
 CONFIG -= x11 qt
 DEFINES +=  NDEBUG _REENTRANT=1 __GNUC__ unix
 SLH = \ $${LITERAL_HASH}
@@ -29,5 +30,5 @@ linux-g++-64:QMAKE_CXXFLAGS = -pthread -pipe -O3 -finline-limit=20000 -fomit-fra
 win32:QMAKE_CXXFLAGS = -malign-double -pipe -O3 -finline-limit=20000 -fomit-frame-pointer -finline-functions
 QMAKE_LFLAGS += -Bsymbolic
 
-!win32:SOURCES = ./src/gnuwrapper.cpp 
+!win32:!mac:SOURCES = ./src/gnuwrapper.cpp 
 SOURCES += ./src/libhoard.cpp

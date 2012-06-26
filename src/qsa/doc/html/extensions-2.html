@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- extensions/chap-utilfactory.leaf:3 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSA Utility Framework</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><p align="right">[<a href="extensions-1.html">Prev: QSA Input Dialog Framework</a>] [<a href="extensions.html">Home</a>]</p>
+<h2 align="center">QSA Utility Framework</h2>
+<p>The QSA Utility Framework is a set of classes that extends QSA to enable the user to read and write files, access directory structures and start processes synchronously and asynchronously. The Utility Framework is available in the <a href="qsobjectfactory.html">QSObjectFactory</a> subclass <a href="qsutilfactory.html">QSUtilFactory</a></p>
+<h3><a name="1"></a>File Class Reference</h3>
+<p>The <tt>File</tt> class provides functionallity for reading and writing binary and text files. A <tt>File</tt> can be instantiated as an object, giving the scripter complete flexibility when reading and writing files. In addition, the <tt>File</tt> class provides a set of static convenence functions for reading and writing files in one go.</p>
+<p>Typical use of a <tt>File</tt> is:</p>
+<pre>
+// Reads an entire file in one go
+var log = File.read('file.log');
+// Writes an entire file in one go
+File.write('copy_of_file.log', log);
+
+// Read and write a file line by line
+var infile = new File('file.log');
+infile.open(File.ReadOnly);
+
+var outfile = new File('copy_of_file.log');
+outfile.open(File.WriteOnly);
+
+while (!infile.eof) {
+    var line = infile.readLine();
+    outfile.write( line );
+}
+
+infile.close();
+outfile.close();
+</pre>
+<h4><a name="1-1"></a>Enums</h4>
+<h5><a name="1-1-1"></a>AccessMode</h5>
+<p>The enum <tt>AccessMode</tt> is used in conjunction with <tt>File.open</tt> to specify the mode in which the file is opened.</p>
+<ul><li><p>ReadOnly; Opens the file in read-only mode.</p>
+<li><p>WriteOnly; Opens the file in write-only mode. If this flag is used with <tt>Append</tt>, the file is not truncated; but if used on its own (or with <tt>Truncate</tt>), the file is truncated.</p>
+<li><p>ReadWrite; Opens the file in read/write mode. The file is <em>not</em> truncated.</p>
+<li><p>Append; Opens the file in append mode. (You must actually use <tt>(WriteOnly | Append)</tt> to make the file writable and to go into append mode.) This mode is very useful when you want to write something to a log file. The file index is set to the end of the file. Note that the result is undefined if you position the file index manually using at() in append mode.</p>
+<li><p>Truncate; Truncates the file.</p>
+<li><p>Translate; Enables carriage returns and linefeed translation for text files under Windows.</p>
+</ul><h4><a name="1-2"></a>Static Functions</h4>
+<ul><li><p>exists( fileName : String ) : Boolean; Returns true if <tt>fileName</tt> exists; otherwise returns false.</p>
+<li><p>remove( fileName : String ); Deletes the file <tt>fileName</tt> if possible; otherwise throws an exception.</p>
+<li><p>write( fileName : String, content : String ); Writes the string <tt>content</tt> to the file <tt>fileName</tt> if possible (completely replacing the original contents if the file already exists); otherwise throws an exception.</p>
+<li><p>read( fileName : String ) : String; Reads and returns the contents of the file <tt>fileName</tt> if possible; otherwise throws an exception.</p>
+<li><p>isFile( fileName : String ) : Boolean; Returns true if <tt>fileName</tt> is a file; otherwise returns false.</p>
+<li><p>isDir( fileName : String ) : Boolean; Returns true if <tt>fileName</tt> is a directory; otherwise returns false.</p>
+</ul><h4><a name="1-3"></a>Constructor</h4>
+<ul><li><p>File( fileName : String ); Creates a file object with the with <tt>fileName</tt>. If <tt>fileName</tt> is missing or is not a String, an exception is thrown.</p>
+</ul><h4><a name="1-4"></a>Properties</h4>
+<p>The File object's properties are read-only.</p>
+<ul><li><p>name : String; The name of the file including the extension.</p>
+<li><p>path : String; The path of the file.</p>
+<li><p>fullName : String; The fullName of the file, including path, name, and extension.</p>
+<li><p>baseName : String; The name of the file, excluding its path and extension.</p>
+<li><p>extension : String; The file name's extension.</p>
+<li><p>symLink : String; The expansion of the symlink if the file is a symlink; otherwise empty;</p>
+<li><p>exists : Boolean; True if the file exists; otherwise false.</p>
+<li><p>readable : Boolean; True if the file is readable; otherwise false.</p>
+<li><p>writable : Boolean; True if the file is writable; otherwise false.</p>
+<li><p>executable : Boolean; True if the file is executable; otherwise false.</p>
+<li><p>hidden : Boolean; True if the file is hidden; otherwise false.</p>
+<li><p>eof : Boolean; True if reading has reached the end of the file; otherwise false.</p>
+<li><p>created : Date; The creation time of the file.</p>
+<li><p>lastModified : Date; The last modification time of the file.</p>
+<li><p>lastRead : Date; The last time the file was read.</p>
+<li><p>size : Number; The size of the file, in bytes.</p>
+</ul><h4><a name="1-5"></a>Member Functions</h4>
+<ul><li><p>open( accessMode : Number ); Opens the file in the mode <tt>accessMode</tt> if possible; otherwise throws an exception.</p>
+<li><p>close(); Closes the file.</p>
+<li><p>remove((); Deletes the file if possible; otherwise throws an exception.</p>
+<li><p>readByte() : Number; Reads one byte from the file if possible; otherwise throws an exception.</p>
+<li><p>read() : String; Returns the entire content of the file as a string if it can be read; otherwise throws an exception.</p>
+<li><p>readLine() : String; Reads one line from file if possible; otherwise throws an exception. Retains any trailing whitespace.</p>
+<li><p>readLines() : String[]; Returns the contents of the file as an array of Strings, one for each line. Linebreaks are strippped from the strings. If the file could not be read, an exception is thrown.</p>
+<li><p>writeByte( byte : Number ); Writes a byte to the file is possible; otherwise throws an exception.</p>
+<li><p>write( data : String, length : Number ); Writes <tt>length</tt> number of characters from <tt>data</tt> to the file if possible; otherwise throws an exception.</p>
+<li><p>writeLine( data : String ); Writes the line <tt>data</tt> to the file and adds a linebreak. If the file could not be written <tt>error</tt> is returned.</p>
+</ul><h3><a name="2"></a>Dir Class Reference</h3>
+<p>The <tt>Dir</tt> class provides access to directory structures and their contents in a platform-independent way. It provides a means of listing directory content, creating filenames with proper path separators, etc.</p>
+<p>An example use of the Dir class is:</p>
+<pre>
+var dir = new Dir;
+var codeFiles = dir.entryList('*.cpp');
+for (var i = 0; i &lt; codeFiles.length; ++i) 
+    print(codeFiles[i]);
+</pre>
+<h4><a name="2-1"></a>Enums</h4>
+<h5><a name="2-1-1"></a>FilterSpec</h5>
+<p>This enum describes the filtering options available to Dir for entryList(). The filter value is specified by OR-ing together values from the following list.</p>
+<ul><li><p>Dirs; List directories only.</p>
+<li><p>Files; List files only.</p>
+<li><p>Drives; List disk drives only.</p>
+<li><p>NoSymLinks; Do not list symbolic links (ignored by operating systems that don't support symbolic links).</p>
+<li><p>All; List directories, files, drives and symlinks (this does not list broken symlinks unless you specify System).</p>
+<li><p>TypeMask; A mask for the the Dirs, Files, Drives and NoSymLinks flags.</p>
+<li><p>Readable; List files for which the application has read access.</p>
+<li><p>Writable; List files for which the application has write access.</p>
+<li><p>Executable; List files for which the application has execute access. Executables must be combined with Dirs or Files.</p>
+<li><p>RWEMask; A mask for the Readable, Writable and Executable flags.</p>
+<li><p>Modified; Only list files that have been modified (ignored under Unix).</p>
+<li><p>Hidden; List hidden files (on Unix, files starting with a .).</p>
+<li><p>System; List system files (on Unix, FIFOs, sockets, and device files)</p>
+<li><p>AccessMask; A mask for the Readable, Writable, Executable Modified, Hidden and System flags</p>
+</ul><h5><a name="2-1-2"></a>SortSpec</h5>
+<p>This enum describes the sort options available to Dir for entryList(). The sort value is specified by OR-ing together values from the following list:</p>
+<ul><li><p>Name; Sort by name.</p>
+<li><p>Time; Sort by time (modification time).</p>
+<li><p>Size; Sort by file size.</p>
+<li><p>Unsorted; Do not sort.</p>
+<li><p>SortByMask; A Mask for Name, Time and Size.</p>
+<li><p>DirsFirst; Put the directories first, then the files.</p>
+<li><p>Reversed; Reverse the sort order.</p>
+<li><p>IgnoreCase; Sort case-insensitively.</p>
+</ul><h4><a name="2-2"></a>Static Properties</h4>
+<ul><li><p>current : String; The current directory.</p>
+<li><p>home : String; The home directory.</p>
+<li><p>root : String; The root directory.</p>
+<li><p>drives : String[]; An array of strings containing the drive names (c:, d:, etc); empty on Unix.</p>
+</ul><h4><a name="2-3"></a>Static Functions</h4>
+<p>Qt uses "/" as a directory separator throughout (although it understands the conventions of the platform it is used on). If you are working with paths, use "/" within your code, and use convertSeparators() when you want to display a path to the user.</p>
+<ul><li><p>cleanDirPath( filePath : String ) : String; Removes all multiple directory separators "/" and resolves any "."s or ".."s found in the path, <tt>filePath</tt>.</p>
+<li><p>convertSeparators( pathName : String ) : String; Returns <tt>pathName</tt> with the "/" separators converted to separators that are appropriate for the underlying operating system.</p>
+</ul><h4><a name="2-4"></a>Constructor</h4>
+<ul><li><p>Dir( path : String ); Creates a directory object for path <tt>path</tt>. If <tt>path</tt> is empty, the current directory is used.</p>
+</ul><h4><a name="2-5"></a>Properties</h4>
+<ul><li><p>name : String; Contains the name of the directory; this is not the same as the path, e.g. a directory with the name "mail", might have the path "/var/spool/mail"</p>
+<li><p>path : String; Contains the path, this may contain symbolic links, but never contains redundant ".", "..", or multiple separators.</p>
+<li><p>absPath : String; Contains the absolute path (a path that starts with "/" or with a drive specification), which may contain symbolic links, but never contains redundant ".", "..", or multiple separators.</p>
+<li><p>canonicalPath : String; Contains the canonical path, i.e. a path without symbolic links or redundant "." or ".." elements.</p>
+<li><p>readable : Boolean; True if the directory is readable; otherwise false.</p>
+<li><p>exists : Boolean; True if the directory exists; otherwise false.</p>
+</ul><h4><a name="2-6"></a>Member Functions</h4>
+<ul><li><p>filePath( fileName : String ) : String; Returns the path name of the file <tt>fileName</tt> in the directory.</p>
+<li><p>absFilePath( fileName : String ) : String; Returns the absolute path name of the file <tt>fileName</tt> in the directory.</p>
+<li><p>cd( dirName : String ); Changes the Dir's directory to <tt>dirName</tt> if possible; otherwise throws an exception.</p>
+<li><p>cdUp(); Changes directory by moving one directory up from the Dir's current directory if possible; otherwise throws an exception.</p>
+<li><p>entryList( filter : String, filterSpec : Number, sortSpec : Number ) : String[]; Returns a list of the names of all the files and directories in the directory, ordered in accordance with <tt>sortSpec</tt> and filtered in accordance with <tt>filterSpec</tt>.</p>
+<li><p>mkdir( dirName : String ); Creates the directory <tt>dirName</tt> if possible; otherwise throws an exception.</p>
+<li><p>mkdir(); Creates this directory if possible possible; otherwise throws an exception.</p>
+<li><p>mkdirs( dirName : String ); Creates the directory tree <tt>dirName</tt> if possible; otherwise throws an exception.</p>
+<li><p>mkdirs(); Creates this directory tree if possible; otherwise throws an exception.</p>
+<li><p>rmdir( dirName : String ); Deletes the directory <tt>dirName</tt> if possible; otherwise throws an exception.</p>
+<li><p>rmdir(); Deletes this directory if possible; otherwise throws an exception.</p>
+<li><p>rmdirs( dirName : String ); Deletes the directory structure <tt>dirName</tt> if possible; otherwise throws an exception.</p>
+<li><p>rmdirs(); Deletes this directory structure if possible; otherwise throws an exception.</p>
+<li><p>fileExists( fileName : String ) : Boolean; Returns true if the file <tt>fileName</tt> exists; otherwise returns false.</p>
+<li><p>setCurrent(); Sets the application's current working directory to this directory if possible; otherwise throws an exception.</p>
+</ul><h3><a name="3"></a>Process Class Reference</h3>
+<p>The Process class is used to start external programs and to communicate with them. The Process class can start programs synchronously using <tt>Process.execute()</tt>, and asynchronously using <tt>new Process(...).start()</tt>.</p>
+<h4><a name="3-1"></a>Static Properties</h4>
+<ul><li><p>stdout : String; Contains the data sent to <tt>stdout</tt> during the last call to <tt>Process.execute()</tt>. This property is read-only.</p>
+<li><p>stderr : String; Contains the data sent to <tt>stderr</tt> during the last call to <tt>Process.execute()</tt>. This property is read-only.</p>
+</ul><h4><a name="3-2"></a>Static Functions</h4>
+<ul><li><p>execute( command : String, stdin : String ); Executes <tt>command</tt> synchronously and passes <tt>stdin</tt> to its standard input if specified. When the program ends its output is accessible through <tt>Process.stdout</tt> and <tt>Process.stderr</tt>. <tt>command</tt> can contain both the program and command line arguments, e.g. <tt>"ls -la"</tt>. The function returns the executed commands return code on exit.</p>
+<li><p>execute( command : String[], stdin : String ); Same as above, except that <tt>command</tt> is an array of strings, where the first item is the name of the program and the following items are command line arguments. This version is useful if you have arguments that contain spaces or other characters that would need to be quoted if you just passed a single string command line, since it takes care of the quoting for you. Note that if the user passes an array of only one element this function behaves like the overload taking a string, thus splitting it into "command" and "arguments".</p>
+<p> executeNoSplit( command : String[], stdin : String ); Same as above, except that <tt>command</tt> is an array of strings, where the first item is the name of the program and the following items are command line arguments. This version is useful if you have arguments that contain spaces or other characters that would need to be quoted if you just passed a single string command line, since it takes care of the quoting for you. This function never splits the first argument, regardless of the number of strings in the command array.</p>
+</ul><h4><a name="3-3"></a>Constructor</h4>
+<ul><li><p>Process(); Creates a Process object without specifying the program or any arguments. This does <em>not</em> start a process.</p>
+<li><p>Process( command : String ); Creates a Process object that will execute <tt>command</tt>. This does <em>not</em> start the process.</p>
+<li><p>Process( command : String[] ); Same as above, except that <tt>command</tt> is an array of strings, where the first item is the name of the program and the following items are command line arguments. This version is useful if you have arguments that contain spaces or other characters that would need to be quoted if you just passed a single string command line, since it takes care of the quoting for you.</p>
+</ul><h4><a name="3-4"></a>Properties</h4>
+<ul><li><p>arguments : String[]; Contains an array of strings where the first item is the program to execute and the following items are the command line arguments.</p>
+<li><p>workingDirectory : String; Contains the working directory for the process.</p>
+<li><p>running : Boolean; True if the process is currently running; otherwise false. This property is read-only.</p>
+<li><p>exitStatus : Number; Contains the exitStatus of the program when it has finished. This property is read-only.</p>
+</ul><h4><a name="3-5"></a>Member Functions</h4>
+<ul><li><p>start( env : String[] ); Tries to run a process for the command and arguments that were specified with the <tt>argument</tt> property or that were specified in the constructor. The command is searched for in the path for executable programs; you can also use an absolute path in the command itself. If <tt>env</tt> is not specified, the process is started with the same environment as the starting process. If <tt>env</tt> is specified, then the values in the <tt>env</tt> stringlist are interpreted as environment setttings of the form <tt>VARIABLE=VALUE</tt> and the process is started with these environment settings. If the program could not be started, an exception is thrown.</p>
+<li><p>launch( stdin : String, env : String[] ); Runs the process and writes the data <tt>stdin</tt> to the process's standard input. If all the data is written to standard input, standard input is closed. The command is searched for in the path for executable programs; you can also use an absolute path in the command itself. If <tt>env</tt> is unspecified, the process is started with the same environment as the starting process. If <tt>env</tt> is specified, then the values in the string list are interpreted as environment setttings of the form <tt>VARIABLE=VALUE</tt> and the process is started with these environment settings. If the program could not be started, an exception is thrown.</p>
+<li><p>readStdout() : String; Reads what is currently available on the process's standard output.</p>
+<li><p>readSterr() : String; Reads what is currently available on the process's standard error.</p>
+<li><p>canReadLineStdout() : Boolean; Returns true if a line can be read from the process's standard output.</p>
+<li><p>canReadLineStderr() : Boolean; Returns true if a line can be read from the process's standard error.</p>
+<li><p>readLineStdout() : String; Reads one line of text from the process's standard output if available; otherwise returns an empty string.</p>
+<li><p>readLineStderr() : String; Reads one line of text from the process's standard error if available; otherwise returns an empty string.</p>
+<li><p>tryTerminate(); Asks the process to terminate. Processes can ignore this if they wish. If you want to be certain that the process really terminates, you can use <tt>kill()</tt> instead.</p>
+<li><p>kill(); Terminates the process. This is not a safe way to end a process since the process will not be able to do any cleanup. <tt>tryTerminate()</tt> is safer, but processes can ignore <tt>tryTerminate()</tt>.</p>
+<li><p>writeToStdin( buffer : String ); Writes the data <tt>buffer</tt> to the process's standard input. The process may or may not read this data.</p>
+<li><p>closeStdin(); Closes the process's standard input.</p>
+</ul><!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

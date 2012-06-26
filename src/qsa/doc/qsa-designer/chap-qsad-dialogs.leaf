@@ -1,0 +1,309 @@
+\chapter Reference: Dialogs
+
+\section1 Introduction
+
+This chapter describes and explains every \QSAD dialog.
+
+\section1 The Menu Dialogs
+
+\section2 Qt Designer New/File Dialog
+
+Click \Menu{File/New/File} to invoke the \Dialog{Name of File} dialog.
+Use this dialog to name the source code file that you want to include
+in your project.
+
+\section1 The Edit Dialogs
+
+\section2 Form Settings Dialog
+
+\img rd-formset.png
+\caption Form Settings
+
+Click \Menu{Edit|Form Settings} to invoke the \Dialog{Form Settings}
+dialog. Use this dialog to save the form's settings, pixmap, and
+layout properties. 
+
+\section3 Settings
+
+In the Settings section, you can change or add the name of the class
+that will be created by typing in the 'Class Name' line edit. Note
+that the default name is the form name, but it can be changed. You can
+also enter text to the 'Comment' and 'Author' line edits or leave them
+blank, since they are not required.
+
+\section3 Pixmaps
+
+The default (for projects) is 'Project Imagefile'. This is the
+recommended option. Images are handled automatically, with \QD storing
+the images in a subdirectory, and \Cmd uic producing code that
+contains the images and the necessary supporting code. Each image is
+stored just once, no matter how many forms it is used in. 
+
+If you do not want \QD to handle the images, (or are not using a
+project) choose either 'Save Inline' or 'Use Function'. 'Save Inline'
+saves the pixmaps in the \File .ui files. The disadvantage of this
+approach is that it stores images in the forms in which they're used,
+meaning that images cannot be shared across forms. Click 'Use
+Function' to use your own icon-loader function for loading pixmaps.
+Type the function's name (with no signature) in the 'Use Function'
+line edit. This function will be used in the generated code for
+loading pixmaps. Your function will be called with the text you put in
+the pixmap property (e.g. the image name) whenever an image is
+required. 
+
+\section3 Layouts
+
+Click the 'Default Margin' spinbox or the 'Default Spacing' spinbox to
+change the default layout settings of the current form. 
+
+To use the functions in the generated code to dynamically retrieve
+values for the layout's default margin and spacing, check the Use
+Functions chechbox. In the Margin and Spacing line edits, specify the
+function names (no signatures or parantheses) which should be used to
+retrieve the margin and spacing.  
+
+\section2 Preferences Dialog 
+
+Click \Menu{Edit|Preferences} to invoke the \Dialog Preferences
+dialog. This dialog has a tab for 'General' preferences. If you have
+the C++ Editor plugin, the dialog will also have a tab for the C++
+Editor.
+
+\section3 General Tab
+
+\img rd-prefgen1.png
+\caption Preferences- General Tab
+
+The 'General' tab has sections for Background, Grid, General, and
+Toolbars. 
+
+The Background section defaults to 'Pixmap'. To change the default, click the
+\Button {Select a Pixmap} button next to the 'Pixmap' radio button to invoke
+the \Dialog{Choose a Pixmap... Dialog}. Click the 'Color' radio button
+to change the background to a color instead of a pixmap. Click the
+\Button {Choose a Color} button located to the right of the 'Color'
+radio button to invoke the \Dialog{Select Color Dialog}.
+
+The 'General' section of the General tab has three checkboxes that are
+checked by default. Click the 'Restore last workspace on startup'
+checkbox to save the size and positions of the windows and toolbars of
+\QD. The next time you start up \QD, the windows and toolbars are
+restored to their last positions. Click the 'Show Splash Screen on
+startup' checkbox to display the \QD splash screen when you start up
+the application. Click the 'Disable Database Auto-Edit in Preview'
+checkbox to disable the ability to update or delete data in the
+database to which you are connected when working with database
+widgets. To change the path \QD uses to find it's online
+documentation, click the 'Documentation Path' line edit and type a new
+path. It would be unlikely to have to change this path. Another way to
+change the path is to click the \Button {(ellipsis)} button located
+to the right of the line edit. This invokes the \Dialog{Find Directory
+Dialog}.
+
+The 'Grid' section has options for customizing the grid on the form. The
+'Show Grid' checkbox located above the 'Grid' section is checked by
+default. Developers using \QD almost always use Qt's layouts to design
+their forms and rarely make any use of the grid. The grid is provided
+for the rare occasions when a form is created using widgets with fixed
+sizes and positions. When 'Show Grid' is checked, you can customize
+the grid's appearance. When it is unchecked, the 'Grid' section is
+disabled. The 'Snap to Grid' checkbox is also checked by default.
+When it is checked, widgets are placed on a dot (snap to the grid)
+using the X|Y resolution. When it is unchecked, the 'Grid-X' and
+'Grid-Y' spin boxes are disabled. Click the 'Grid X' and 'Grid Y'
+spinboxes to customize the grid settings for all forms.
+
+The 'Toolbars' section has a 'Show Text Labels' checkbox. Click the
+checkbox to display the text labels for each icon shown in the \QD
+toolbar.
+
+\section3 Qt Script Editor Tab
+
+\img 
+\caption 
+
+The Qt Script Editor tab provides options for customizing the editor.
+The 'Syntax Highlighting' section lets you change the way the syntax
+is viewed in the editor. Click the 'Element' listbox and choose an
+element. Click the 'Family' listbox to change the font style for that
+element. Click the 'Size' spinbox to choose a font size. You can
+change the font to Bold, Italic, or Underline by clicking the
+corresponding checkbox. Note, that all the fonts used derive from the
+'Standard' element, so if you want to change the font used for
+everything, change the 'Standard' element. Click the \Button{Change
+Color} button to invoke the \Dialog{Select Color Dialog}. As you make
+changes to each element, you can view the changes in the 'Preview'
+line edit.
+
+The 'Options' section has the Wordwrap, Completion, and Parentheses
+Matching checkboxes checked by default. Click the checkboxes to
+de-select them.  
+
+The Indentation section enables you to set the code intentation on the
+Qt Script Editor. Select your preferences by clicking the spinboxes
+for Tab Size and Indent Size. Check the Keep Tabs checkbox so that
+tabs are used for indentation otherwise, spaces will be used. Check
+Auto Indent to enable automatic indentation. 
+
+\section1 The Project Dialogs
+
+\section2 Manage Image Collection Dialog
+
+\img rd-image.png
+\caption Manage Image Collection
+
+Click \Menu{Project|Image Collection} to invoke the \Dialog{Manage
+Image Collection Dialog}. Use this dialog to view the project's images,
+add new images, or delete images.  
+
+To add an image, click the \Button Add button to invoke the
+\Dialog{Choose Images... Dialog}. 
+
+The Choose Images dialog shows the current the directory and the
+default file type. To choose a different directory, click the 'Look
+In' combobox. Choose a file and the name will appear in the 'File
+Name' combobox. To choose a different file type, click the 'File
+Type'combobox. As you choose different files, you can preview the
+images in the window located on the right side of the dialog. Click
+the 'Create New Folder' toolbar button to create a new directory.
+Click the 'List View' toolbar button to view folders and files in a
+list with only the names showing. Click the 'Details' toolbar button
+to view the folders and file names along with their size, type, date,
+and attributes. Click the Size, Type, Date, or Attributes column
+headers to sort the folders or files. Click \Button Open to open the
+selected file. Click \CANCEL to leave the dialog without opening a
+file.
+
+To delete an image from from the iconview, click the
+image and then click the \Button Delete button.
+
+Changes made to the image collection are applied immediately. Click
+the \Button Close button to leave the dialog.
+
+\section2 Project Settings Dialog
+
+Click \Menu {Project|Project Settings} to invoke the \Dialog{Project
+Settings Dialog}. Use this dialog to make changes to the project settings.
+
+
+\section3 Qt Script Tab
+
+The Qt Script tab enables you to choose a global Qt Script function
+to invoke when choosing \Menu {Qt Script|Run}. 
+
+\section1 The Search Dialogs
+
+\target dialog-find-text
+\section2 Find Text Dialog
+
+\img rd-find.png
+\caption Find Text
+
+Click \Menu{Search|Find} (or press \Key Ctrl+F) to invoke the \l{Find
+Text Dialog}. Use this dialog to find specific text in a project file.
+
+To find the text you want in a file, type the text in the 'Find'
+combobox. You can make the search more specific by checking any or all
+of the checkboxes in the 'Options' section. Click the 'Whole words
+only' checkbox to narrow the search to whole words. Click 'Case
+Sensitive' to search for text that is identical to the text typed in
+the combobox. Click 'Start at Beginning' to start the search from the
+beginning of the file. The 'Direction' section offers the 'Forward'
+radio button and the 'Backward' radio button to specify the direction
+to perform the search in the file. Click the \Button Find button to
+start the search. When the text is found, it is highlighted in the
+file. Continue clicking \Button Find to search for subsequent
+occurrences of the search text. 
+
+Click the \Button Close button to leave the dialog.
+
+\target dialog-replace-text
+\section2 Replace Text Dialog
+
+\img rd-replace.png
+\caption Replace Text
+
+Click \Menu{Search|Replace} (or press \Key {Ctrl+R}) to invoke the
+\Dialog{Replace Text Dialog}. Use this dialog to replace text in a
+project file.
+
+To replace text, type the text you would like to replace in the 'Find'
+combobox. Type the new text in the 'Replace' combobox. You can make
+the search more specific by checking any or all of the checkboxes in
+the 'Options' section. Click the 'Whole words only' checkbox to narrow
+the search to whole words. Click 'Case Sensitive' to search for text
+that identical to the text you typed in the combobox. Click 'Start at
+Beginning' to start the search from the beginning of the file. The
+'Direction' section offers the 'Forward' radio button and the
+'Backward' radio button to specify the direction to perform the search
+in the file.
+
+Click the \Button Replace button to search and replace the text. When
+the text is found, it is highlighted in the file. Continue clicking
+\Button Replace button to search and replace each occurrence of the
+text in the file. Click \Button {Replace All} button to replace all
+occurences of the search text in the file at once. 
+
+Click the \Button Close button to leave the dialog.
+
+\target dialog-go-to-line
+\section2 Goto Line Dialog
+
+\img rd-goto.png
+\caption Goto Line
+
+Click \Menu{Search|Goto line} (or press \Key {Alt+G}) to invoke the
+\Dialog{Goto Line Dialog}. Use this dialog to go to a specific line in
+the file. 
+
+To choose a line number, type the number in the 'Line' spinbox, or
+click the up and down arrows in the spinbox. Click the \Button Goto
+button. The cursor is placed at the beginning of the line in the file.
+
+Click the \Button Close button to leave the dialog.
+
+\section1 The Tools Dialog
+
+\img rd-configtb.png
+\caption Configure Toolbox
+
+Click \Menu{Tools|Configure Toolbox} to invoke the \Dialog{Configure
+Toolbox Dialog}. This dialog is used to view a list of available tools
+and a list of the tools in the Common Widgets category in the toolbox.
+To add widgets to the Common Widgets category, click a widget from the
+Available Widgets list and then click the \Button Add. The selected
+widget now appears in the Common Widgets category. To remove a widget
+from the Common Widgets list, click a widget, then click \Button
+Remove. To move a widget up or down in the Common Widgets list, click
+the up or down arrows. 
+
+Click \OK to accept the configurations to the toolbox. Click \CANCEL
+to leave the dialog. 
+
+\section1 The Help Dialogs
+
+\target dialog-qt-designer
+\section2 About Qt Designer Dialog
+
+Click \Menu{Help|About} to invoke the \Dialog{About Qt Designer Dialog}.
+This dialog provides information about \QD such as the version, the
+licensing terms, conditions, and disclaimers.
+
+Click the 'x' located at the top right corner of the dialog to close
+the dialog.
+
+\target dialog-qt-designer
+\section2 About Qt Dialog
+
+Click \Menu{Help|About Qt} to invoke the \Dialog{About Qt Dialog}.
+This dialog provides information about Qt.
+
+Click the 'x' located at the title of the dialog to close
+the dialog.
+
+
+
+
+
+
+

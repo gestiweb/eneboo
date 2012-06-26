@@ -35,27 +35,30 @@
 class QPixmap;
 
 class QUICKCORE_EXPORT QSPixmapClass : public QSSharedClass,
-				       public QuickEnvClass {
+  public QuickEnvClass
+{
 public:
-    QSPixmapClass( QSClass *b, QuickInterpreter *i );
-    QString name() const { return QString::fromLatin1("Pixmap"); }
+  QSPixmapClass(QSClass *b, QuickInterpreter *i);
+  QString name() const {
+    return QString::fromLatin1("Pixmap");
+  }
 
-    virtual QSObject fetchValue( const QSObject *obj,
-				 const QSMember &mem ) const;
+  virtual QSObject fetchValue(const QSObject *obj,
+                              const QSMember &mem) const;
 
-    QVariant toVariant( const QSObject *obj, QVariant::Type ) const;
-    QString debugString( const QSObject *obj ) const;
+  QVariant toVariant(const QSObject *obj, QVariant::Type) const;
+  QString debugString(const QSObject *obj) const;
 
-    QSObject construct( const QSList &args ) const;
-    QSObject construct( const QPixmap &p ) const;
+  QSObject construct(const QSList &args) const;
+  QSObject construct(const QPixmap &p) const;
 
-    QPixmap *pixmap( const QSObject *obj ) const;
+  QPixmap *pixmap(const QSObject *obj) const;
 
-    static QSObject isNull( QSEnv *env );
-    static void fill( QSEnv *env );
-    static void resize( QSEnv *env );
-    static void load( QSEnv *env );
-    static void save( QSEnv *env );
+  static QSObject isNull(QSEnv *env);
+  static void fill(QSEnv *env);
+  static void resize(QSEnv *env);
+  static void load(QSEnv *env);
+  static void save(QSEnv *env);
 };
 
 #endif

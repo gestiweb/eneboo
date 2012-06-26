@@ -110,6 +110,9 @@ public:
   inline void clearScopeChain() {
     scopeChain->clear();
   }
+  inline const ScopeChain *fullScopeChain() const {
+    return scopeChain;
+  }
 
   static void printScopeChain(const ScopeChain *chain);
   void printScopeChain() const;

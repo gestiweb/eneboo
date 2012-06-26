@@ -1,0 +1,278 @@
+\chapter Creating Scripts Using Qt Script for Applications
+
+In this chapter we'll demonstrate how to create scripts for a
+scriptable application. We will explain how to create a dialog using
+\QS and then create and implement a convertToEuro() function. We will
+write the scripts using the \c spreadsheet application that we created
+in an earlier chapter.
+
+\img dialog.png
+\caption Settings for Euro Converter Finished Dialog
+
+\section1 Creating a New Macro
+
+A 'Macro' is simply a global \QS function.
+
+Run the \c spreadsheet application if it isn't already running.
+Click the \Toolbutton New button located on the Scripts toolbar to
+invoke the \Widget{New Macro} dialog. Once we create a new macro, a
+toolbar button will appear on the Scripts toolbar as a shortcut to
+execute the macro.
+
+\img newscript.png
+\caption New Macro Toolbar Button
+
+Follow the steps below to create the new macro:
+
+\list
+
+\i
+The combobox is labelled 'Call Function'. Enter the name of the new
+global function. Functions that already exist can be viewed by
+clicking the arrow on the combobox, or by typing the name of the
+function in the combobox.
+
+\i
+In addition to the function name, the macro can have a 'display name'
+that appears, for example, in the application's \Menu Scripts menu.
+Enter 'Euro Conversion' in the 'Name' line edit.
+
+\i
+If you want to associate an icon with the macro, click the ellipsis
+button (\Button{...}) to invoke the \Widget{Open File} dialog and
+select an icon to represent the macro. The icon will appear on the
+application's toolbar as a shortcut to the script you create.
+
+\endlist
+
+Click \OK when you have entered the information in the \Widget {New
+Script} dialog. The \Widget {Add Function} message box will pop up,
+saying "The function doesn't exist. Do you want to add it?". Click
+\Button Yes.
+
+\caption Adding the New Function
+
+\img addfunction.png
+
+The \QSAD scripting environment opens with the new empty function added to
+it. We will implement the scripting function in the following section.
+
+\section1 Implementing the Macro and Creating a Dialog
+
+In this section, we will implement the functionality of the
+convert-to-euro macro. We want to present the user with a dialog in which they
+can: 1) enter a range of rows and columns which are read from the
+spreadsheet, 2) specify where in the spreadsheet the results should be
+written, and 3) select a currency type to convert into Euros.
+
+In \QSAD, we write the code to calculate the input values which are the input
+column, start row, end row, and ouput column. We initialize these
+variables to 1, but if the user selects a range in the spreadsheet, we
+then use the selection for the initial values.
+
+\quotefile spreadsheet/euro.qs
+\skipto var input
+\printuntil }
+
+In \QS, we have some global objects. The most important one for our
+example is called \c{Application}. This object contains other objects, but the
+most important are the application objects. These are the objects
+that the C++ application makes available to our script. In the \c
+spreadsheet example, the sheets are available this way, e.g.,
+Application.sheet1. 
+
+To create a new dialog, write the following code. An explanation of the
+code will follow.
+
+\quotefile spreadsheet/euro.qs
+\skipto d = new Dialog
+\printuntil cancelButtonText =
+
+Every dialog includes an Ok and Cancel button by default. After
+creating the new dialog, simply change the caption property to
+"Settings for Euro Convertor. Change the \Property text of the OK
+Button to 'Calculate'. Change the \Property text property of the
+Cancel button to 'Cancel'.
+
+\section1 Adding Widgets to the Dialog
+
+The Settings for Euro dialog consists of three spinboxes for selecting
+the columns and rows on the spreadsheet, a spinbox to output the
+result of the conversion, a group box to lay out the spinboxes, three
+radiobuttons in a group box to select the currency to convert from,
+and text labels for each of the widgets. If you run the dialog
+application and resize it, all the widgets scale properly. The layout
+of the widgets is determined by the order in which you write the code
+for each widget.
+
+\section2 Add A Group Box and Spinboxes
+
+We'll start with the first group box and its widgets. Write the
+following code in the editor to create the group box:
+
+\quotefile spreadsheet/euro.qs
+\skipto var g = new GroupBox
+\printuntil d.add( g )
+
+This code creates the new group box. Set its \Property title to
+"Conversion Range:". Then add the group box to the dialog. Note
+that every time a widget is created, it must be added its parent.  
+
+Write the following code to add multiple spin boxes and text labels to
+the group box:
+
+\quotefile spreadsheet/euro.qs
+\skipto var spinColumn 
+\printuntil g.add( spinOutput )
+
+With this code, we create the first spin box in the group box and and
+name it spinColumn. This spin box corresponds to the column in the
+spreadsheet from which the numbers will be read. Set the \Property
+label property to "Column:". Set the \Property minimum property to 1
+and the \Property maximum property to 100. Set the \Property number
+property to the calculated input column. Add the spin box to the group
+box.
+
+Create the second spin box and name it spinStartRow. This spin box
+corresponds to first row in the spreadsheet from which the numbers
+will be read. Set the \Property label property to "Start at Row:". Set
+the \Property minimum property to 1 and the \Property maximum property
+to 100. Set the \Property number property to the calculated start row.
+Add the spin box to the group box.
+
+Create the third spin box and and name it spinEndRow. This spin box
+corresponds to the last row in the spreadsheet from which the numbers
+will be read. Set the \Property label property to "Start at Row:". Set
+the \Property minimum property to 1 and the \Property maximum property
+to 100. Set the \Property number property to the calculated end row.
+Add the spin box to the group box.
+
+Create the fourth spin box and and name it spinOutput. This spin box
+corresponds to the column in the spreadsheet to which the converted
+values will be returned. Set the \Property label property to "Start at
+Row:". Set the \Property minimum property to 1 and the \Property
+maximum property to 100. Set the \Property number property to the
+calculated output column. Add the spin box to the group box.
+
+\section2 Widget Lay Out
+
+We'll add a column to the dialog to set layout so that the new group
+box will be added beside the current group box.:
+
+\quotefile spreadsheet/euro.qs
+\skipto d.newColumn
+\printline d.newColumn
+
+\section2 Add a Group Box and Radio Buttons
+
+Now we'll add the second group box and its widgets. Write the following
+code to create the second group box:
+
+\quotefile spreadsheet/euro.qs
+\skipto g = new GroupBox
+\printuntil d.add
+
+This code creates the new group box similar to the first group box we
+created earlier in the chapter. Change the \Property title property to
+"Convert From:". Add the group box to the dialog. 
+
+Write the following code to add multiple radio buttons to the group
+box:
+
+\quotefile spreadsheet/euro.qs
+\skipto var radioUSD = new RadioButton
+\printuntil g.add( radioNOK )
+
+We create the first radio button and name it radioUSD. Set its
+\Property text property to "USD". Set the \Property checked property
+to true to make this radio button checked. Add the radio button to
+the group box.
+
+Create the second radio button and name it radioYEN. Set its
+\Property text property to "YEN". Add the radio button to
+the group box.
+
+Create the third radio button and name it radioNOK. Set its
+\Property text property to "NOK". Add the radio button to
+the group box.
+
+\section1 Running the Dialog
+
+To run the dialog, click the \Button {Call Function} button in \QSAD.
+The Call Function dialog pops up with a drop down list of functions
+you created. Select convertToEuro and click \OK. The Output Window
+displays errors found in the code. 
+
+\omit
+To run the dialog, type the following code:
+
+\quotefile spreadsheet/euro.qs
+\skipto if ( !d.exec
+\printuntil return
+
+The function now runs the dialog modally. The user clicks OK and the
+function returns True, otherwise False. If the function returns False,
+we return and do nothing. Otherwise we go on with the calculation.
+\endomit
+
+The first block of code reads what currency the user
+chose and then initializes the divisor accordingly.
+
+\quotefile spreadsheet/euro.qs
+\skipto var divisor
+\printuntil divisor = 0.1
+
+The second block of code reads the range that the user has entered in the
+dialog.
+
+\quotefile spreadsheet/euro.qs
+\skipto inputCol = sp
+\printuntil endRow = sp
+
+The third block of code checks that the entered range is valid. If it
+is not valid, a warning is issued and the operation is canceled.
+
+\quotefile spreadsheet/euro.qs
+\skipto if ( endRow
+\printuntil }
+
+The fourth block of code reads the value from the spreadsheet,
+calculates the results and then writes the results to the spreadsheet.
+
+\quotefile spreadsheet/euro.qs
+\skipto for ( var
+\printuntil }
+
+\section1 Running the EuroConvertor Macro
+
+We are now ready to run the macro and invoke the dialog we just
+created.
+
+\list
+
+\i In the spreadsheet, type a few numbers in column A, rows 1-3.
+
+\i Select the cells you entered the numbers into so that they are highlighted.
+
+\i Click the \Toolbutton {Euro Conversion} toolbar button. The
+\Widget {Settings for Euro Converter} dialog pops up.
+
+\i The 'Column', 'Start at Row', 'End at Row' and 'Output Column'
+spinboxes are defaulted to the selection you made on the spreadsheet.
+
+\i Select a currency to convert the numbers you entered on the
+spreadsheet to euro.
+
+\i Click \Button Calculate.
+
+\i The results of the conversion are output starting at the 'Output
+Column' indicated in the dialog.
+
+\endlist
+
+We've now coded a dialog and written the code to provide its
+functionality, all purely using \QS. This should provide a taste of
+the power and flexibility that \QSA can provide for your \QT C++
+applications.
+
+

@@ -30,18 +30,18 @@
 #define QSERRORS_H
 
 enum QSErrorCode {
-    QSErrNoError,
-    QSErrGeneral,
-    QSErrNestedClass,
-    QSErrClassRedef,
-    QSErrClassBaseInvalid,
-    QSErrClassBaseFinal,
-    QSErrAttributeDuplication,
-    QSErrAttributeConflict,
-    QSErrAttrStaticContext,
-    QSErrTypeUnknown,
-    QSErrPositionGlobal,
-    QSErrParseError
+  QSErrNoError,
+  QSErrGeneral,
+  QSErrNestedClass,
+  QSErrClassRedef,
+  QSErrClassBaseInvalid,
+  QSErrClassBaseFinal,
+  QSErrAttributeDuplication,
+  QSErrAttributeConflict,
+  QSErrAttrStaticContext,
+  QSErrTypeUnknown,
+  QSErrPositionGlobal,
+  QSErrParseError
 };
 
 #endif

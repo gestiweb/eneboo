@@ -69,231 +69,259 @@ email                : mail@infosial.com
 
 class PSPrinterUnixPrivate;
 
-class FL_EXPORT PSPrinter : public QPaintDevice {
-  public:
-    enum PrinterMode { ScreenResolution, PrinterResolution, HighResolution, Compatible };
+class FL_EXPORT PSPrinter : public QPaintDevice
+{
+public:
+  enum PrinterMode { ScreenResolution, PrinterResolution, HighResolution, Compatible };
 
-    PSPrinter( PrinterMode mode = ScreenResolution );
-    ~PSPrinter();
+  PSPrinter(PrinterMode mode = ScreenResolution);
+  ~PSPrinter();
 
-    enum Orientation { Portrait, Landscape };
+  enum Orientation { Portrait, Landscape };
 
-    enum PageSize { A4, B5, Letter, Legal, Executive,
-                    A0, A1, A2, A3, A5, A6, A7, A8, A9, B0, B1,
-                    B10, B2, B3, B4, B6, B7, B8, B9, C5E, Comm10E,
-                    DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom
+  enum PageSize { A4, B5, Letter, Legal, Executive,
+                  A0, A1, A2, A3, A5, A6, A7, A8, A9, B0, B1,
+                  B10, B2, B3, B4, B6, B7, B8, B9, C5E, Comm10E,
+                  DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom
                 };
 
-    enum PageOrder { FirstPageFirst, LastPageFirst };
+  enum PageOrder { FirstPageFirst, LastPageFirst };
 
-    enum ColorMode { GrayScale, Color };
+  enum ColorMode { GrayScale, Color };
 
-    enum PaperSource { OnlyOne, Lower, Middle, Manual, Envelope,
-                       EnvelopeManual, Auto, Tractor, SmallFormat,
-                       LargeFormat, LargeCapacity, Cassette, FormSource
+  enum PaperSource { OnlyOne, Lower, Middle, Manual, Envelope,
+                     EnvelopeManual, Auto, Tractor, SmallFormat,
+                     LargeFormat, LargeCapacity, Cassette, FormSource
                    };
 
-    QString printerName() const;
-    virtual void setPrinterName( const QString & );
-    bool outputToFile() const;
-    virtual void setOutputToFile( bool );
-    QString outputFileName() const;
-    virtual void setOutputFileName( const QString & );
+  QString printerName() const;
+  virtual void setPrinterName(const QString &);
+  bool outputToFile() const;
+  virtual void setOutputToFile(bool);
+  QString outputFileName() const;
+  virtual void setOutputFileName(const QString &);
 
-    QString printProgram() const;
-    virtual void setPrintProgram( const QString & );
+  QString printProgram() const;
+  virtual void setPrintProgram(const QString &);
 
-    QString printerSelectionOption() const;
-    virtual void setPrinterSelectionOption( const QString & );
+  QString printerSelectionOption() const;
+  virtual void setPrinterSelectionOption(const QString &);
 
-    QString docName() const;
-    virtual void setDocName( const QString & );
-    QString creator() const;
-    virtual void setCreator( const QString & );
+  QString docName() const;
+  virtual void setDocName(const QString &);
+  QString creator() const;
+  virtual void setCreator(const QString &);
 
-    Orientation orientation() const;
-    virtual void setOrientation( Orientation );
-    PageSize pageSize() const;
-    virtual void setPageSize( PageSize );
+  Orientation orientation() const;
+  virtual void setOrientation(Orientation);
+  PageSize pageSize() const;
+  virtual void setPageSize(PageSize);
 #ifdef Q_WS_WIN
-    short winPageSize() const;
+  short winPageSize() const;
 #endif
 
-    virtual void setPageOrder( PageOrder );
-    PageOrder pageOrder() const;
+  virtual void setPageOrder(PageOrder);
+  PageOrder pageOrder() const;
 
-    void setResolution( int );
-    int resolution() const;
+  void setResolution(int);
+  int resolution() const;
 
-    virtual void setColorMode( ColorMode );
-    ColorMode colorMode() const;
+  virtual void setColorMode(ColorMode);
+  ColorMode colorMode() const;
 
-    virtual void setFullPage( bool );
-    bool fullPage() const;
-    QSize margins() const;
-    void setMargins( uint top, uint left, uint bottom, uint right );
-    void margins( uint *top, uint *left, uint *bottom, uint *right ) const;
+  virtual void setFullPage(bool);
+  bool fullPage() const;
+  QSize margins() const;
+  void setMargins(uint top, uint left, uint bottom, uint right);
+  void margins(uint *top, uint *left, uint *bottom, uint *right) const;
 
-    int fromPage() const;
-    int toPage() const;
-    virtual void setFromTo( int fromPage, int toPage );
-    int minPage() const;
-    int maxPage() const;
-    virtual void setMinMax( int minPage, int maxPage );
-    int numCopies() const;
-    virtual void setNumCopies( int );
+  int fromPage() const;
+  int toPage() const;
+  virtual void setFromTo(int fromPage, int toPage);
+  int minPage() const;
+  int maxPage() const;
+  virtual void setMinMax(int minPage, int maxPage);
+  int numCopies() const;
+  virtual void setNumCopies(int);
 
-    bool  collateCopiesEnabled() const;
-    void  setCollateCopiesEnabled( bool );
+  bool  collateCopiesEnabled() const;
+  void  setCollateCopiesEnabled(bool);
 
-    bool  collateCopies() const;
-    void  setCollateCopies( bool );
+  bool  collateCopies() const;
+  void  setCollateCopies(bool);
 
-    bool newPage();
-    bool abort();
-    bool aborted() const;
+  bool newPage();
+  bool abort();
+  bool aborted() const;
 
-    bool setup( QWidget *parent = 0 );
+  bool setup(QWidget *parent = 0);
 
-    PaperSource paperSource() const;
-    virtual void setPaperSource( PaperSource );
+  PaperSource paperSource() const;
+  virtual void setPaperSource(PaperSource);
 
-    QIODevice *outDevice();
+  QIODevice *outDevice();
 
-  protected:
-    bool cmd( int, QPainter *, QPDevCmdParam * );
-    int metric( int ) const;
+protected:
+  bool cmd(int, QPainter *, QPDevCmdParam *);
+  int metric(int) const;
 
 #if defined(Q_WS_WIN)
-    virtual void setActive();
-    virtual void setIdle();
+  virtual void setActive();
+  virtual void setIdle();
 #endif
 
-  private:
+private:
 #if defined(Q_WS_X11) || defined(Q_WS_QWS) || defined(Q_WS_WIN) || defined(Q_WS_MAC)
-    QPaintDevice *pdrv;
-    int pid;
+  QPaintDevice *pdrv;
+  int pid;
 #endif
 #if defined(Q_WS_MAC)
-    PMPageFormat pformat;
-    PMPrintSettings psettings;
-    PMPrintSession psession;
-    bool prepare( PMPrintSettings * );
-    bool prepare( PMPageFormat * );
+  PMPageFormat pformat;
+  PMPrintSettings psettings;
+  PMPrintSession psession;
+  bool prepare(PMPrintSettings *);
+  bool prepare(PMPageFormat *);
 #endif
 #if defined(Q_WS_WIN)
-    void readPdlg( void* );
-    void readPdlgA( void* );
-    void  writeDevmode( HANDLE );
-    void  writeDevmodeA( HANDLE );
-    void  reinit();
+  void readPdlg(void *);
+  void readPdlgA(void *);
+  void  writeDevmode(HANDLE);
+  void  writeDevmodeA(HANDLE);
+  void  reinit();
 
-    bool viewOffsetDone;
-    QPainter* painter;
-    HANDLE hdevmode;
-    HANDLE hdevnames;
+  bool viewOffsetDone;
+  QPainter *painter;
+  HANDLE hdevmode;
+  HANDLE hdevnames;
 #endif
 
-    int state;
-    QString printer_name;
-    QString option_string;
-    QString output_filename;
-    bool output_file;
-    QString print_prog;
-    QString doc_name;
-    QString creator_name;
+  int state;
+  QString printer_name;
+  QString option_string;
+  QString output_filename;
+  bool output_file;
+  QString print_prog;
+  QString doc_name;
+  QString creator_name;
 
-    PageSize page_size;
-    PaperSource paper_source;
-    PageOrder page_order;
-    ColorMode color_mode;
-    Orientation orient;
-  uint  to_edge :
-    1;
-  uint  appcolcopies :
-    1;
-  uint  usercolcopies :
-    1;
-  uint  res_set :
-    1;
-    short from_pg, to_pg;
-    short min_pg, max_pg;
-    short ncopies;
-    int res;
+  PageSize page_size;
+  PaperSource paper_source;
+  PageOrder page_order;
+  ColorMode color_mode;
+  Orientation orient;
+uint  to_edge :
+  1;
+uint  appcolcopies :
+  1;
+uint  usercolcopies :
+  1;
+uint  res_set :
+  1;
+  short from_pg, to_pg;
+  short min_pg, max_pg;
+  short ncopies;
+  int res;
 
-    QBuffer *buffer;
+  QBuffer *buffer;
 
-  private:
+  // ### AbanQ
+  QSize customPaperSize_;
+public:
+  void setCustomPaperSize(const QSize &s) {
+    customPaperSize_ = s;
+  }
+  QSize customPaperSize() const {
+    return customPaperSize_;
+  }
+  // ### AbanQ
+
+private:
 #if defined(Q_DISABLE_COPY)
-    PSPrinter( const PSPrinter & );
-    PSPrinter &operator=( const PSPrinter & );
+  PSPrinter(const PSPrinter &);
+  PSPrinter &operator=(const PSPrinter &);
 #endif
 
-    PSPrinterUnixPrivate * D;
+  PSPrinterUnixPrivate *D;
 };
 
 
-inline QString PSPrinter::printerName() const {
+inline QString PSPrinter::printerName() const
+{
   return printer_name;
 }
 
-inline bool PSPrinter::outputToFile() const {
+inline bool PSPrinter::outputToFile() const
+{
   return output_file;
 }
 
-inline QString PSPrinter::outputFileName() const {
+inline QString PSPrinter::outputFileName() const
+{
   return output_filename;
 }
 
-inline QString PSPrinter::printProgram() const {
+inline QString PSPrinter::printProgram() const
+{
   return print_prog;
 }
 
-inline QString PSPrinter::docName() const {
+inline QString PSPrinter::docName() const
+{
   return doc_name;
 }
 
-inline QString PSPrinter::creator() const {
+inline QString PSPrinter::creator() const
+{
   return creator_name;
 }
 
-inline PSPrinter::PageSize PSPrinter::pageSize() const {
+inline PSPrinter::PageSize PSPrinter::pageSize() const
+{
   return page_size;
 }
 
-inline PSPrinter::Orientation PSPrinter::orientation() const {
+inline PSPrinter::Orientation PSPrinter::orientation() const
+{
   return orient;
 }
 
-inline int PSPrinter::fromPage() const {
+inline int PSPrinter::fromPage() const
+{
   return from_pg;
 }
 
-inline int PSPrinter::toPage() const {
+inline int PSPrinter::toPage() const
+{
   return to_pg;
 }
 
-inline int PSPrinter::minPage() const {
+inline int PSPrinter::minPage() const
+{
   return min_pg;
 }
 
-inline int PSPrinter::maxPage() const {
+inline int PSPrinter::maxPage() const
+{
   return max_pg;
 }
 
-inline int PSPrinter::numCopies() const {
+inline int PSPrinter::numCopies() const
+{
   return ncopies;
 }
 
-inline bool PSPrinter::collateCopiesEnabled() const {
+inline bool PSPrinter::collateCopiesEnabled() const
+{
   return appcolcopies;
 }
 
-inline void PSPrinter::setCollateCopiesEnabled( bool v ) {
+inline void PSPrinter::setCollateCopiesEnabled(bool v)
+{
   appcolcopies = v;
 }
 
-inline bool PSPrinter::collateCopies() const {
+inline bool PSPrinter::collateCopies() const
+{
   return usercolcopies;
 }
 

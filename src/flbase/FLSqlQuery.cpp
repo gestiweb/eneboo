@@ -266,12 +266,13 @@ void FLSqlQuery::setTablesList(const QString &tl)
 
 void FLSqlQuery::setValueParam(const QString &name, const QVariant &v)
 {
-  (*d->parameterDict_)[ name ] ->setValue(v);
+  if (d->parameterDict_)
+    (*d->parameterDict_)[ name ] ->setValue(v);
 }
 
 QVariant FLSqlQuery::valueParam(const QString &name) const
 {
-  return (*d->parameterDict_)[ name ] ->value();
+  return d->parameterDict_ ? (*d->parameterDict_)[ name ] ->value() : QVariant();
 }
 
 int FLSqlQuery::size() const

@@ -1,0 +1,529 @@
+\chapter Creating Scripts Using Qt Script for Applications
+
+In this chapter we'll demonstrate how to create scripts for a
+scriptable application. We will explain how to create a dialog using
+\QS and then create and implement a convertToEuro() function. We will
+write the scripts using the \c spreadsheet application that we created
+in an earlier chapter.
+
+\img finisheddialog.png
+\caption Settings for Euro Converter Finished Dialog
+
+\section1 Creating a New Macro
+
+A 'Macro' is simply a global \QS function.
+
+Run the \c spreadsheet application if it isn't already running.
+
+Click the \Toolbutton New button located on the Scripts toolbar to
+invoke the \Widget{New Macro} dialog. Once we create a new macro, a
+toolbar button will appear on the Scripts toolbar as a shortcut to
+execute the macro.
+
+\img newscript.png
+\caption New Macro Toolbar Button
+
+Follow the steps below to create the new macro:
+
+\list
+
+\i
+The combobox is labelled 'Call Function'. Enter the name of the new
+global function. Functions that already exist can be viewed by
+clicking the arrow on the combobox, or by typing the name of the
+function in the combobox.
+
+\i
+In addition to the function name, the macro can have a 'display name'
+that appears, for example, in the application's \Menu Scripts menu.
+Enter 'Euro Conversion' in the 'Name' line edit.
+
+\i
+If you want to associate an icon with the macro, click the ellipsis
+button (\Button{...}) to invoke the \Widget{Open File} dialog and
+select an icon to represent the macro. The icon will appear on the
+application's toolbar as a shortcut to the script you create.
+
+\endlist
+
+Click \OK when you have entered the information in the \Widget {New
+Script} dialog. The \Widget {Add Function} message box will pop up,
+saying "The function doesn't exist. Do you want to add it?". Click
+\Button Yes.
+
+\img addfunction.png
+\caption Adding the New Function
+
+##Please note that \QSAD pops up automatically when you set up the macro
+for the new script in the \Widget{New Macro} dialog. This is the
+recommended way to open the IDE when creating a new function. Another
+way to access \QSAD is to click the \Toolbutton {Open QSA Workbench}
+toolbar button on the Scripts toolbar.#####
+
+##\QSAD### pops up and the source code editor is open with the new
+empty function added to it. We will implement the scripting function
+in the following section.
+
+\section1 Creating a New Dialog
+
+Before we implement our new function, we need to create a dialog which
+will allow the user to enter data, call our function, and display the
+results. It is possible to write macros that the user can execute
+directly. But in this example, we want to present the user with a
+dialog in which they can: 1) enter a range of rows and columns which
+are read from the spreadsheet, 2) specify where in the spreadsheet the
+results should be written, and 3) select a currency type to convert
+into Euros.
+
+In the ###editor, write the following code to create a new dialog:
+
+\quotefile runfile/euro.qs
+\skipto d = new Dialog
+\printuntil cancelButtonText =
+
+\omit
+It is possible to create dialogs where widgets have fixed sizes and
+positions but such dialogs don't scale so the results are
+unsatisfactory if the text is translated into a different language
+that takes up more space, or if used on a smaller screen. \QSAD uses
+layouts which place widgets in relation to each other and which allows
+them to scale perfectly.
+
+Click \Menu{File|New|Dialog} to create a new dialog. A new dialog
+called 'Dialog1' will appear. Note that this dialog is also listed in
+the Project Overview list. The Properties tab of the Property
+Editor/Signal Handler's window shows the dialog's default property
+settings.
+
+Click in the Value column beside the \Property name property and
+change the dialog's name to 'EuroSettings'.  Change the dialog's
+\Property caption to 'Settings for Euro Converter'. The properties are
+ordered in accordance with the inheritance hierarchy, and \Property
+caption is roughly in the middle of the property editor. Save the
+form: click \Menu File|Save.
+
+\img propedit.png
+\caption Property Editor
+\sidebar Using the Property Editor
+
+The Properties tab of the Property Editor/Signal Handlers window, has
+two columns, the Property column which lists property names and the
+Value column which lists the values of the properties. Some property
+names have a plus sign '+' in a square to their left; this signifies
+that the property name is the collective name for a set of related
+properties. Click the form to make the Property Editor show the form's
+properties. Click the \Property sizePolicy property's plus sign; you
+will see four properties appear indented below sizePolicy: hSizeType,
+vSizeType, horizontalStretch and verticalStretch. These properties are
+edited in the same way as any other properties.
+
+Some properties have simple values, for example, the \Property name
+property has a text value, the \Property width property (within
+\Property minimumSize for example) has a numeric value. To change a
+text value click the existing text and type in your new text. To
+change a numeric value click the value and either type in a new
+number, or use the spin buttons to increase or decrease the existing
+number until it reaches the value you want. Some properties have a
+fixed list of values, for example the \Property mouseTracking property
+is boolean and can take the values True or False. The \Property cursor
+property also has a fixed list of values. If you click the cursor
+property or the \Property mouseTracking property the value will be
+shown in a drop down combobox; click the down arrow to see what values
+are available. Some properties have complex sets of values; for
+example the \Property font property. If you click the font property an
+ellipsis button (\Button {...}) will appear; click this button and a
+\Dialog {Select Font} dialog will pop up which you can use to change
+any of the font settings. Other properties have ellipsis buttons which
+lead to different dialogs depending on what settings the property can
+have. For example, if you have a lot of text to enter for a \Property
+text property, you could click the ellipsis button to invoke the
+multi-line text editor dialog.
+
+The names of properties which have changed are shown in bold. If
+you've changed a property but want to revert it to its default value
+click the property's value and then click the red 'X' button
+to the right of the value. Some properties have an
+\e initial value, e.g. 'TextEdit1', but no default
+value; if you revert a property that has an initial value but no default
+value (by clicking the red 'X') the value will become empty unless the
+property, e.g. name, is not allowed to be empty.
+\endsidebar
+\endomit
+
+\section1 Adding Widgets and Laying Out the Dialog
+
+The Settings for Euro dialog consists of two spinboxes for selecting
+the columns and rows on the spreadsheet, a group box to lay out these
+spinboxes, another spinbox to select the column to output the result
+to, a combobox to select the currency to convert from, and some text
+labels and checkboxes. If you run the dialog application and resize
+it, all the widgets scale properly.
+
+The \QSA approach to laying out a dialog is to place the required
+widgets on the dialog in the approximate positions that they should
+occupy and then use the layout tools to size and position them
+correctly. Most of the widgets we need are on the Toolbox toolbar
+located by default on the left side of \QSAD. The widgets are listed
+in categories; to display a group of widgets, click on the category
+button. We'll now add the Settings for Euro dialog's widgets.
+
+\list
+
+\i
+We'll start with the group box and its widgets. Click the Containers
+category button to display the container widgets. Click the
+\Toolbutton {Group Box} toolbar button and click towards the top left
+of the dialog. Once the group box is on the form click and drag it to
+make it a little bigger so that we can place widgets inside it. Change
+its \Property title to 'Convert Range'.
+
+\img addgroupbox1.png
+\caption Add a Group Box to the Dialog
+
+\i
+Next, we'll add multiple text labels to the group box. Double-click
+the \Toolbutton {Text Label} widget and click inside the left side of
+the group box, and add three text labels one above the other. Click
+the \Toolbutton Pointer toolbar button (or press \Key F2) to stop
+placing multiple text labels on the dialog. Change the \Property text for
+the top label to 'Column:', change the \Property text for the second label
+to 'Start at Row:' and change the third label to 'End at Row:'.
+\endlist
+
+\img addlabels1.png
+\caption Add Text Labels to the Group Box
+
+Note: When you double-click a widget from the toolbar, you enter
+'click-to-place' mode; this means that whenever you click the form a
+new widget of the type you double-clicked will be placed. This is a
+shortcut instead of having to click the widget each time. To stop
+adding the widget to the toolbar, click the \Toolbutton Pointer button
+or press \Key F2.
+
+\img pointer.png
+\caption Pointer Toolbar Button
+
+We also need to add multiple spinboxes to the group box.
+
+\list
+
+\i
+Double-click the \Toolbutton {Spin Box} toolbar button and click to
+the right of each text label to add a spinbox. Click the \Toolbutton
+Pointer toolbar button (or press \Key F2) to stop placing multiple
+spinboxes on the dialog. Change the \Property name of the top spinbox to
+'spinColumn', its \Property maxValue to 1000 and its \Func minValue to 1.
+Change the \Property name of the second spinbox to 'spinStartRow' and the
+third spinbox to 'spinEndRow'. Change the \Property maxValue and
+\Property minValue of the spinboxes just as we did for the first spinbox.
+
+\img addspinbox1.png
+\caption Add the Spinboxes to the Group Box.
+
+\endlist
+
+Now we are ready to lay out the group box. Click the group box and
+then click the \Toolbutton {Lay out in a grid} toolbar button.
+
+\img layoutgroupbox1.png
+\caption Lay Out the Group Box Widget
+
+We are now ready to add the rest of the widgets to the form.
+
+\list
+
+\i
+Double-click the \Toolbutton {Text Label} toolbar button and click
+just to the right of the group box. Click again just below the text
+label to add a second text label. Click the \Toolbutton Pointer toolbar
+button (or press \Key F2) to stop placing multiple text labels on the
+dialog. Change the \Property text of the first label to 'Output Column:'
+and the second label to 'Convert From:'.
+
+\i
+Click the \Toolbutton {Spin Box} toolbar button and click to the right
+of the 'Output Column' text label. Change the spinbox's \Property name to
+'spinOutputColumn'. Change the \Property maxValue to 1000 and the
+\Property minValue to 1.
+
+\i
+Click the \Toolbutton {Combo Box} toolbar button and click to the
+right of the 'Convert From:' text label. Change the \Property name to
+'comboCurrency'. We will need to have different values to choose from
+in the combo box.
+
+\list
+
+\i
+
+Right click the combobox and click \Menu Edit on the
+context menu.
+
+\i 
+
+Click \Button {New Item}. You will see New Item added to the listbox.
+Go the the Text line edit and type 'NOK'. Click \Button {New Item} and
+name it 'USD'. Add one more new item and name it 'YEN'.
+
+\img newitemscombobox.png
+\caption Populating the Combobox
+
+\i
+
+Click \OK to accept the new items added to the combobox.
+
+\endlist
+
+\img addmorewidgets1.png
+\caption Add the Rest if the Widgets to the Dialog
+
+\i
+Double click the \Toolbutton {Push Button} toolbar button and click
+towards the bottom right of the dialog, placing two pushbuttons next
+to each other. Click the \Toolbutton Pointer toolbar button (or press
+\Key F2) to stop placing multiple push buttons on the dialog. Change
+the \Property name of the button on the left to 'buttonCalculate' and
+change its \Property text to 'Calculate'. Change the \Property name of
+the second button to 'buttonCancel' and the \Property text to
+'Cancel'.
+
+\img addpushbuttons.png
+\caption Add Pushbuttons to the Dialog
+
+\i
+Click the first push button and then \Key Shift+Click the second push
+button so that both buttons are selected. Click the \Toolbutton {Lay
+out Horizontally} toolbar button so that both buttons are laid out
+next to each other. Now click the \Toolbutton {Break Layout} toolbar
+button so that the buttons remain next to each other, but not grouped
+together.
+
+\i Finally, we need to lay out the dialog. Click on the dialog form
+itself (i.e. not on any widgets or other layouts) and click
+\Toolbutton {Lay Out in a Grid}.
+
+\img nospacers.png
+\caption Lay Out Dialog in a Grid
+
+\endlist
+
+We have now placed all of our widgets on the dialog, but the dialog
+does not look quite right. The Calculate push button takes up too
+much space. We really need a couple of spacers to ensure that the
+widgets are all laid out properly.
+
+\list
+
+\i Click \Toolbutton Undo to undo the Lay Out in a Grid.
+
+
+\i
+Click the \Toolbutton Spacer toolbar button. Click the dialog just
+below the combo box. Select \Menu Vertical. A vertical spacer will
+appear.
+
+\i
+Click the \Toolbutton Spacer toolbar button. Click the dialog to the
+left of the \Button Cancel button and drag towards the left to the
+edge of the dialog. Dragging the spacer into place is an alternative
+to selecting 'Horizontal' or 'Vertical' from the Spacer menu.
+
+\img spacers.png
+\caption Add Vertical and Horizontal Spacers to the Dialog
+
+\i
+Click the dialog directly below the group box and drag the rubber band
+until it touches the group box, the Output Column label, the Convert
+From label, their corresponding widgets, and the vertical spacer.
+Release the rubber band and you will see that all the desired widgets
+are highlighted. Make sure the push buttons and the horizontal spacer
+are not highlighted. Click \Toolbutton {Lay out in a Grid}.
+
+\i Next, click the dialog form and click \Toolbutton {Lay out in a
+Grid}.
+
+\img layoutingrid1.png
+\caption Lay Out Dialog in a Grid with Spacers
+
+\i
+Finally, click the \Toolbutton {Adjust Size} toolbar button. The
+dialog is now laid out. Press \Key Ctrl+T to preview the form.
+
+\img adjustgrid.png
+\caption Adjust the Size for the Dialog
+
+\endlist
+
+\section2 Implementing the Script's Functionality
+
+In \QS, we have some global objects. The most important one for our
+example is called Application. This object contains other objects, the
+most important being the application objects. These are the objects
+that the C++ application makes available to our script. In the \c
+spreadsheet example, the sheets are available this way, e.g.
+Application.sheet1. Other important objects which the Application
+object are the dialogs we create in the project, for example,
+Application.EuroSettings.
+
+We will now implement the script's functionality.
+
+When we first create our new macro, \QSAD automatically pops up and
+the source code editor is open with the new, empty function added to
+it (this is file \File main.qs). To open this editor again, click
+\File main.qs in the Project Overview window.
+
+All global functions are implemented in this file. We want to write
+one line of code to execute our dialog.
+
+\quotefile spreadsheet/.examplefiles/main.qs
+\skipto function convertToEuro
+\printuntil }
+
+Now we want to implement the \Func init() function of the dialog which
+will read the user's selection on the spreadsheet and initialize the
+spinboxes with these values.
+
+Click the dialog and then right click \Menu Source in the context menu
+to open the source code editor. We want the code to do the following:
+
+The first line of code finds out if the user has made a selection on
+the spreadsheet.
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto if ( Application.sheet1
+\printuntil if ( Application.sheet1
+
+The second line of code retrieves the selection from the spreadsheet,
+if a selection was made.
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto var r= Application.sheet1.selection(
+\printuntil var r= Application.sheet1.selection(
+
+The code that follows uses the values from the selection and
+initializes the values of the spinboxes in the dialog.
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto spinStartRow
+\printuntil }
+
+We now need to set up a signal handler for the \Button Calculate
+button, then implement the functionality of the signal handler.
+
+Click the 'Calculate' button, then click the Signal Handlers tab in
+the Property Editor/Signal Handlers window. Right click the \Func
+clicked() signal, then click \Menu{New Signal Handler}. A name is
+suggested for the new signal and will will accept it, so press \Key
+Enter. This will create a signal handler called
+'buttonCalculate_clicked()' and it is added to the source code editor
+as an empty function.
+
+Note that there is an easier and more convenient way to create signal
+handlers for the default signals of widgets. We will show this later
+on when we connect the Cancel button. 
+
+This function is connected to the clicked signal of the button. When
+the \Button Calculate button is clicked, we want the function to read
+the values the user has given in the dialog, and to also read the
+values from the spreadsheet and then calculate the results. When the
+results are calculated, we want to be able to write the results to the
+spreadsheet.
+
+The first block of code reads what currency the user
+chose and then initializes the divisor accordingly:
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto function buttonCalculate_clicked()
+\printuntil }
+
+The second block of code reads the range the user has entered in the
+dialog:
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto const inputColumn
+\printuntil const endRow
+
+The third block of code checks that the entered range is valid. If it
+is not valid, a warning is issued and the operation is canceled.
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto if (endRow
+\printuntil }
+
+The fourth block of code reads the value from the spreadsheet,
+calculates the results and then writes them back to the spreadsheet.
+
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto for ( var
+\printuntil Application.sheet1.setText
+
+The last line of code simply closes the dialog.
+
+\quotefile spreadsheet/.examplefiles/EuroSettings.ui.qs
+\skipto accept();
+\printuntil }
+
+Finally, we need to connect the \Button Cancel button to the dialog
+to close the dialog.
+
+Double click the Cancel button to create a signal handler. The signal
+handler is automatically connected to the default signal of the
+button, which in this case is the clicked signal. The source code
+editor opens and the cursor points to the new and empty signal handler
+function. The only thing we want this function to do is to close the
+dialog, so write "reject()" into the function body.
+
+\section1 Running the EuroConvertor Macro
+
+We are now ready to run the macro and invoke the dialog we just
+created.
+
+\list
+
+\i In the spreadsheet, type a few numbers in column A, rows 1-3.
+
+\i Select the cells you entered the numbers into so that they are highlighted.
+
+\i Click the \Toolbutton {Euro Conversion} toolbar button. The
+\Widget {Settings for Euro Converter} dialog pops up.
+
+\i The 'Column', 'Start at Row', 'End at Row' and 'Output Column'
+spinboxes are defaulted to the selection you made on the spreadsheet.
+
+\i Select a currency to convert the numbers you entered on the
+spreadsheet to euro.
+
+\i Click \Button Calculate.
+
+\i The results of the conversion are output starting at the 'Output
+Column' indicated in the dialog.
+
+\endlist
+
+\section1 Error Handling and Warnings
+
+Sometimes an error occurs while parsing or executing the script. If
+this occurs, a message box will pop up with information about the
+error and gives the option to debug the error or ignore it.
+
+\img errormessagebox.png
+\caption Error Message Box
+
+If you ignore the error, the script execution is stopped. If you
+choose to debug the error, \QSAD pops up and the error message is
+displayed in the Warnings/Errors tab of the debugger window. In
+addition, the piece of code that caused the error is highlighted in
+the source editor.    
+
+\img errorhighlightcode.png
+\caption Highlighted Code in the Source Editor
+
+Warnings are also displayed in the Warnings/Error window when
+developing a script and testing it out by executing it while \QSAD is
+open.
+
+We've now designed a dialog and written the code to provide its
+functionality, all purely using \QS. This should provide a taste of
+the power and flexibility that \QSA can provide for your \QT C++
+applications.

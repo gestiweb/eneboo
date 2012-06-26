@@ -81,6 +81,7 @@ static inline bool silentConnect(const QString &conn)
 
 void aq_main(int argc, char **argv) 
 {
+
   QPalette p(QColor(229, 229, 229), QColor(229, 229, 229));
   p.setColor(QPalette::Active, QColorGroup::Dark, QColor(246, 242, 246));
   p.setColor(QPalette::Inactive, QColorGroup::Dark, QColor(246, 242, 246));
@@ -88,11 +89,8 @@ void aq_main(int argc, char **argv)
   p.setColor(QPalette::Active, QColorGroup::Base, QColor(255, 255, 248));
   p.setColor(QPalette::Inactive, QColorGroup::Base, QColor(255, 255, 248));
   p.setColor(QPalette::Disabled, QColorGroup::Base, QColor(255, 255, 248));
-  p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(95, 150, 205));
   p.setColor(QPalette::Active, QColorGroup::HighlightedText, Qt::white);
-  p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(95, 150, 205));
   p.setColor(QPalette::Inactive, QColorGroup::HighlightedText, Qt::white);
-  p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(95, 150, 205));
   p.setColor(QPalette::Disabled, QColorGroup::HighlightedText, Qt::white);
   p.setColor(QPalette::Inactive, QColorGroup::Text, Qt::black);
   p.setColor(QPalette::Disabled, QColorGroup::Text, QColor(100, 100, 100));
@@ -102,6 +100,16 @@ void aq_main(int argc, char **argv)
   p.setColor(QPalette::Active, QColorGroup::ButtonText, QColor(30, 30, 30));
   p.setColor(QPalette::Inactive, QColorGroup::ButtonText, QColor(30, 30, 30));
   p.setColor(QPalette::Disabled, QColorGroup::ButtonText, QColor(100, 100, 100));
+  p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(95, 150, 205));
+
+ if (FLSettings::readEntry("style", "QtCurve") == "QtEneboo")
+    {
+    p.setColor(QPalette::Active, QColorGroup::Highlight, QColor(255, 226, 181));
+    p.setColor(QPalette::Inactive, QColorGroup::Highlight, QColor(255, 110, 1));
+    p.setColor(QPalette::Active, QColorGroup::HighlightedText, Qt::black);
+    p.setColor(QPalette::Inactive, QColorGroup::HighlightedText, Qt::black);
+    p.setColor(QPalette::Disabled, QColorGroup::HighlightedText, Qt::black);
+    }
 
   QString formAlone, callFunction, arguments, strConn, silentConn;
   bool quitAfterCall = false, autoLogin_ = false, noMax = false;

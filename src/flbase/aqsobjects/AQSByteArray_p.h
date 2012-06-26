@@ -29,6 +29,7 @@ class AQSByteArray : public AQSAbstractMemArray
   Q_OBJECT
 
   Q_PROPERTY(QString string READ string WRITE setString);
+  Q_PROPERTY(QString binaryString READ binaryString);
   Q_PROPERTY(QByteArray toVariant READ toVariant);
 
   AQ_DECLARE_AQS_VOID(ByteArray, AbstractMemArray);
@@ -70,6 +71,11 @@ public slots:
     return byteArrayFromHex(o_);
   }
 
+  // TODO: agregar funciones de hash que devuelvan un QByteArray binario
+  // QByteArray md5Digest() const {}
+  // QByteArray sha1Digest() const {}
+  // QByteArray sha256Digest() const {}
+
   QByteArray toBase64() const {
     if (!o_)
       return QByteArray();
@@ -92,6 +98,12 @@ public slots:
     if (!o_)
       return QByteArray();
     return qUncompress(*o_);
+  }
+
+  QString sha1() const {
+    if (!o_)
+      return QByteArray();
+    return globalAQS->sha1(o_);
   }
 
   int rand() {
@@ -132,6 +144,13 @@ public slots:
       return QString::null;
     return QString(*o_);
   }
+  
+  // Esta función asegura que los bytes \0 se pasan correctamente a QString.
+  QString binaryString() const {
+    if (!o_)
+      return QString::null;
+    return QString(*o_,'b');
+  }
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
@@ -144,16 +163,16 @@ public slots:
   bool resize(uint);
   bool truncate(uint);
   bool fill(char, int = -1);
-  QByteArray *assign(QByteArray *);
-  QByteArray *assign(AQSByteArray *);
-  QByteArray *duplicate(QByteArray *);
-  QByteArray *duplicate(AQSByteArray *);
+  QByteArray assign(QByteArray *);
+  QByteArray assign(AQSByteArray *);
+  QByteArray duplicate(QByteArray *);
+  QByteArray duplicate(AQSByteArray *);
   int find(char, uint = 0) const;
   int contains(char) const;
   void sort();
   int bsearch(char) const;
   virtual void detach();
-  QByteArray *copy() const;
+  QByteArray copy() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -219,21 +238,21 @@ inline bool AQSByteArray::fill(char arg0,  int arg1)
 {
   AQ_CALL_RET_V(fill(arg0, arg1), bool);
 }
-inline QByteArray *AQSByteArray::assign(QByteArray *arg0)
+inline QByteArray AQSByteArray::assign(QByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(assign(*arg0), QByteArray);
+  AQ_CALL_RET_V(assign(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::assign(AQSByteArray *arg0)
+inline QByteArray AQSByteArray::assign(AQSByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(assign(*arg0), QByteArray);
+  AQ_CALL_RET_V(assign(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::duplicate(QByteArray *arg0)
+inline QByteArray AQSByteArray::duplicate(QByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(duplicate(*arg0), QByteArray);
+  AQ_CALL_RET_V(duplicate(*arg0), QByteArray);
 }
-inline QByteArray *AQSByteArray::duplicate(AQSByteArray *arg0)
+inline QByteArray AQSByteArray::duplicate(AQSByteArray *arg0)
 {
-  AQ_CALL_RET_PTR(duplicate(*arg0), QByteArray);
+  AQ_CALL_RET_V(duplicate(*arg0), QByteArray);
 }
 inline int AQSByteArray::find(char arg0,  uint arg1) const
 {
@@ -255,9 +274,9 @@ inline void AQSByteArray::detach()
 {
   AQ_CALL_VOID(detach());
 }
-inline QByteArray *AQSByteArray::copy() const
+inline QByteArray AQSByteArray::copy() const
 {
-  AQ_CALL_RET_PTR(copy(), QByteArray);
+  AQ_CALL_RET_V(copy(), QByteArray);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/ide/qsworkbench.cpp:34 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSWorkbench Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSWorkbench Class Reference</h1>
+
+<p>The QSWorkbench class provides an interface to QSA Workbench, the
+QSA simple scripting environment.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsworkbench-h.html">qsworkbench.h</a>&gt;</tt>
+<p><a href="qsworkbench-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn><a href="#QSWorkbench"><b>QSWorkbench</b></a> ( QSProject&nbsp;*&nbsp;project, QWidget&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )</li>
+<li class=fn>QWidget * <a href="#widget"><b>widget</b></a> ()</li>
+<li class=fn>QSProject * <a href="#project"><b>project</b></a> ()</li>
+</ul>
+<h2>Public Slots</h2>
+<ul>
+<li class=fn>void <a href="#open"><b>open</b></a> ()</li>
+<li class=fn>void <a href="#close"><b>close</b></a> ()</li>
+<li class=fn>void <a href="#showScript"><b>showScript</b></a> ( QSScript&nbsp;*&nbsp;script )</li>
+<li class=fn>void <a href="#showFunction"><b>showFunction</b></a> ( QSScript&nbsp;*&nbsp;script, const&nbsp;QString&nbsp;&amp;&nbsp;function )</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSWorkbench class provides an interface to QSA Workbench, the
+QSA simple scripting environment.
+<p> 
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSWorkbench"></a>QSWorkbench::QSWorkbench ( <a href="qsproject.html">QSProject</a>&nbsp;*&nbsp;project, QWidget&nbsp;*&nbsp;parent = 0, const&nbsp;char&nbsp;*&nbsp;name = 0 )
+</h3>
+Creates the simple scripting environment for the project <em>project</em>,
+with parent <em>parent</em> and name <em>name</em>.
+
+<h3 class=fn>void <a name="close"></a>QSWorkbench::close ()<tt> [slot]</tt>
+</h3>
+Hides QSA Workbench. Hiding the Scripting environement does
+not trigger any change in the project.
+
+<h3 class=fn>void <a name="open"></a>QSWorkbench::open ()<tt> [slot]</tt>
+</h3>
+Opens QSA Workbench, the QSA simple scripting environment.
+
+<h3 class=fn><a href="qsproject.html">QSProject</a>&nbsp;* <a name="project"></a>QSWorkbench::project ()
+</h3>
+Returns the project edited in QSA Workbench.
+
+<h3 class=fn>void <a name="showFunction"></a>QSWorkbench::showFunction ( <a href="qsscript.html">QSScript</a>&nbsp;*&nbsp;script, const&nbsp;QString&nbsp;&amp;&nbsp;function )<tt> [slot]</tt>
+</h3>
+Makes <em>script</em> the current script in the editor and highlights the
+declaration of <em>function</em>, if found.
+
+<h3 class=fn>void <a name="showScript"></a>QSWorkbench::showScript ( <a href="qsscript.html">QSScript</a>&nbsp;*&nbsp;script )<tt> [slot]</tt>
+</h3>
+Makes <em>script</em> the current script in the editor.
+
+<h3 class=fn>QWidget * <a name="widget"></a>QSWorkbench::widget ()
+</h3>
+Returns the QSA Workbench main widget.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

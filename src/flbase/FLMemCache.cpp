@@ -23,7 +23,7 @@ QCache<QString> *FLMemCache::str_cache = 0;
 void FLMemCache::init()
 {
   if (!str_cache) {
-    str_cache = new QCache<QString>(251, 401);
+    str_cache = new QCache<QString>(503, 1009);
     str_cache->setAutoDelete(true);
   }
 }

@@ -1,0 +1,64 @@
+
+\chapter Creating Scripts using Qt Script for Applications
+
+In this chapter we'll demonstrate how to use \QS to create scripts for a
+scriptable application. 
+
+\img 
+\caption
+
+\section1 Creating a New Macro
+
+A 'Macro' is simply a global \QS function.
+
+Run the \c spreadsheet application if it isn't already running.
+
+Click the \Toolbutton New button located on the Scripts toolbar to
+invoke the \Widget{New Macro} dialog. Once we create a new macro, a
+toolbar button will appear on the Scripts toolbar as a shortcut to
+execute the macro.
+
+\img newscript.png
+\caption New Macro Toolbar Button
+
+Follow the steps below to create the new macro:
+
+\list
+
+\i
+\i
+
+\endlist
+
+\section1 Creating a Dialog
+
+Before we implement our new function, we need to create a dialog which
+will allow the user to enter data, select options, and display the
+results. It is possible to write macros that the user can execute
+directly. But in this example, we want to present the user with a
+dialog in which they can: 1) enter their name, 2) Select a pizza
+topping, 3)select a pizza size, 4) Order ice cream.
+
+\section2 Creating a New Dialog
+
+\img
+\caption
+
+\section1 Adding Widgets and Laying Out the Dialog
+
+
+\section2 Implementing the Script's Functionality
+
+In \QS, we have some global objects. The most important one for our
+example is called Application. This object contains other objects, the
+most important being the application objects. These are the objects
+that the C++ application makes available to our script. In the \c
+spreadsheet example, the sheets are available this way, e.g.
+Application.sheet1. Other important objects which the Application
+object are the dialogs we create in the project, for example,
+Application.######.
+
+We will now implement the script's functionality.
+
+
+

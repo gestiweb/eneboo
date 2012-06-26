@@ -65,6 +65,72 @@ const double D32 = 4294967296.0;
 
 // TODO: -0
 
+// ### AbanQ
+static inline int aqToDigit(char c)
+{
+  if ((c >= '0') && (c <= '9'))
+    return c - '0';
+  else if ((c >= 'a') && (c <= 'z'))
+    return 10 + c - 'a';
+  else if ((c >= 'A') && (c <= 'Z'))
+    return 10 + c - 'A';
+  return -1;
+}
+
+double aqIntegerFromString(const char *buf, int size, int radix)
+{
+  if (size == 0)
+    return NaN;
+
+  double sign = 1.0;
+  int i = 0;
+  if (buf[0] == '+') {
+    ++i;
+  } else if (buf[0] == '-') {
+    sign = -1.0;
+    ++i;
+  }
+
+  if (((size - i) >= 2) && (buf[i] == '0')) {
+    if (((buf[i + 1] == 'x') || (buf[i + 1] == 'X'))
+        && (radix < 34)) {
+      if ((radix != 0) && (radix != 16))
+        return 0;
+      radix = 16;
+      i += 2;
+    } else {
+      if (radix == 0) {
+        radix = 8;
+        ++i;
+      }
+    }
+  } else if (radix == 0) {
+    radix = 10;
+  }
+
+  int j = i;
+  for (; i < size; ++i) {
+    int d = aqToDigit(buf[i]);
+    if ((d == -1) || (d >= radix))
+      break;
+  }
+  double result;
+  if (j == i) {
+    if (!qstrcmp(buf, "Infinity"))
+      result = Inf;
+    else
+      result = NaN;
+  } else {
+    result = 0;
+    double multiplier = 1;
+    for (--i ; i >= j; --i, multiplier *= radix)
+      result += aqToDigit(buf[i]) * multiplier;
+  }
+  result *= sign;
+  return result;
+}
+// ### AbanQ
+
 using namespace QS;
 
 QSObject::QSObject()
@@ -150,10 +216,13 @@ bool QSObject::isDefined() const
   Return false otherwise.
 */
 
+//### AbanQ
+#if 0
 bool QSObject::isValid() const
 {
   return clss;
 }
+#endif
 
 /*!
   \fn QSObject::invalidate()

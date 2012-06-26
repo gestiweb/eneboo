@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsscript.cpp:32 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSScript Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSScript Class Reference</h1>
+
+<p>The QSScript class provides encapsulation of a script
+written in Qt Script.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsscript-h.html">qsscript.h</a>&gt;</tt>
+<p><a href="qsscript-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn>QString <a href="#name"><b>name</b></a> () const</li>
+<li class=fn>QString <a href="#code"><b>code</b></a> () const</li>
+<li class=fn>QObject * <a href="#context"><b>context</b></a> () const</li>
+<li class=fn>void <a href="#setCode"><b>setCode</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;code )</li>
+<li class=fn>void <a href="#addCode"><b>addCode</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;code )</li>
+<li class=fn>bool <a href="#addFunction"><b>addFunction</b></a> ( const&nbsp;QString&nbsp;&amp;&nbsp;functionName, const&nbsp;QString&nbsp;&amp;&nbsp;functionBody = QString::null )</li>
+<li class=fn>QSProject * <a href="#project"><b>project</b></a> () const</li>
+</ul>
+<h2>Signals</h2>
+<ul>
+<li class=fn>void <a href="#codeChanged"><b>codeChanged</b></a> ()</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSScript class provides encapsulation of a script
+written in Qt Script.
+<p> A script is a container for a script written in Qt Script. It always
+belongs to a project and it can only be created using the
+<a href="qsproject.html#createScript">QSProject::createScript</a>() functions. The QSScript can be associated
+with a QObject which will serve as the context ( <tt>this</tt> ) when the
+script is evaluated. QSScripts and their contexts, if any, are
+associated by name as follows:
+<p> <pre>
+  script-&gt;name() == script-&gt;context()-&gt;name()
+  </pre>
+ 
+<p> Use the functions <a href="#setCode">setCode</a>(), <a href="#addCode">addCode</a>(), and <a href="#addFunction">addFunction</a>() to modify
+the contents of the script. Use the function <a href="#code">code</a>() to retreive the
+contents in the script. When the script is changed, the signal
+<a href="#codeChanged">codeChanged</a>() is emitted.
+
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn>void <a name="addCode"></a>QSScript::addCode ( const&nbsp;QString&nbsp;&amp;&nbsp;code )
+</h3>
+Appends the code <em>code</em> to the code in this script.
+This function will emit <a href="#codeChanged">codeChanged</a>()
+
+<h3 class=fn>bool <a name="addFunction"></a>QSScript::addFunction ( const&nbsp;QString&nbsp;&amp;&nbsp;functionName, const&nbsp;QString&nbsp;&amp;&nbsp;functionBody = QString::null )
+</h3>
+A function called <em>functionName</em> is added to this script.
+The name must match the regular expression
+<tt>/^[A-Za-z_][A-Za-z_0-9]*$/</tt>.
+<p> The code for the function can be passed in the <em>functionBody</em>
+parameter. If <em>functionBody</em> was specified, its text will appear in
+the editor; if the <em>functionBody</em> is empty a new empty function
+will be created.
+<p> This function returns TRUE on success (i.e. the <em>functionName</em> was
+valid); otherwise returns FALSE.
+
+<h3 class=fn>QString <a name="code"></a>QSScript::code () const
+</h3>
+Returns the scriptcode.
+
+<h3 class=fn>void <a name="codeChanged"></a>QSScript::codeChanged ()<tt> [signal]</tt>
+</h3>
+
+<p> This signal is emitted whenever the scriptcode has changed.
+
+<h3 class=fn>QObject * <a name="context"></a>QSScript::context () const
+</h3>
+Returns the context of the script if the script has context;
+otherwise returns 0.
+<p> The name of the context <tt>context()-&gt;name()</tt> is to be the same
+name as this script.
+
+<h3 class=fn>QString <a name="name"></a>QSScript::name () const
+</h3>
+Returns the name of the script. If the script has a context,
+this name is the same as the name of the object <tt>context()-&gt;name()</tt>.
+
+<h3 class=fn><a href="qsproject.html">QSProject</a>&nbsp;* <a name="project"></a>QSScript::project () const
+</h3>
+Returns the project that this script belongs to.
+
+<h3 class=fn>void <a name="setCode"></a>QSScript::setCode ( const&nbsp;QString&nbsp;&amp;&nbsp;code )
+</h3>
+Sets the code in this script to <em>code</em>.
+This function will emit <a href="#codeChanged">codeChanged</a>().
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

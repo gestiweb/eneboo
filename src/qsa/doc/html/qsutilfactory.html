@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- ../../src/qsa/qsutilfactory.cpp:29 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>QSUtilFactory Class</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="black"><td>
+|<a href="index.html"><font color="white">Home</font></a>
+<font color="white">|</font>
+<a href="qsa.html">
+<font color="white">Tutorial</font></a>
+<font color="white">|</font>
+<a href="classes.html"><font color="white">Classes</font></a>
+<font color="white">|</font>
+<a href="functions.html"><font color="white">Functions</font></a>
+<font color="white">|</font>
+<a href="qtscripter.html"><font color="white">QSA&nbsp;Workbench</font></a>
+<font color="white">|</font>
+<a href="language.html"><font color="white">Language</font></a>
+<font color="white">|</font>
+<a href="http://doc.trolltech.com"><font color="white">Qt&nbsp;API</font></a>
+<font color="white">|</font>
+<a href="articles.html"><font color="white">QSA&nbsp;Articles</font></a>
+</td>
+<td align="right"><a href="index.html"><font
+color="white"><i>Qt&nbsp;Script for Applications</i></font></a></td>
+<td align="right" valign="center"><img src="logo32.png" align="right" width="64" height="32" border="0"></td></tr></table><h1 align=center>QSUtilFactory Class Reference</h1>
+
+<p>The QSUtilFactory class extends QSA with classes to allow
+file access, directory traversal and executing external processes.
+<a href="#details">More...</a>
+<p><tt>#include &lt;<a href="qsutilfactory-h.html">qsutilfactory.h</a>&gt;</tt>
+<p>Inherits <a href="qsobjectfactory.html">QSObjectFactory</a>.
+<p><a href="qsutilfactory-members.html">List of all member functions.</a>
+<h2>Public Members</h2>
+<ul>
+<li class=fn>enum <a href="#Utilities-enum"><b>Utilities</b></a> { None = 0x0000, File = 0x0001, Directory = 0x0002, Process = 0x0004, All = 0xffff }</li>
+<li class=fn><a href="#QSUtilFactory"><b>QSUtilFactory</b></a> ( uint&nbsp;enableFlags = All )</li>
+</ul>
+<hr><a name="details"></a><h2>Detailed Description</h2>
+
+
+<p> The QSUtilFactory class extends QSA with classes to allow
+file access, directory traversal and executing external processes.
+<p> To extend the interpreter with the Utililty Framework you must
+create an instance of the QSUtilFactory class and add it to the
+interpreter using the function <a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>().
+For example:
+<p> <pre>
+  <a href="qsproject.html">QSProject</a> proj;
+  <a href="qsinterpreter.html">QSInterpreter</a> *ip = proj-&gt;<a href="qsproject.html#interpreter">interpreter</a>();
+  ip-&gt;<a href="qsinterpreter.html#addObjectFactory">addObjectFactory</a>( new QSUtilFactory );
+  </pre>
+ 
+<p> The script extensions provided by the QSUtilFactory are
+described in detail in <a href="extensions-2.html">Utility
+  Framework</a>
+
+<hr><h2>Member Type Documentation</h2>
+<h3 class=fn><a name="Utilities-enum"></a>QSUtilFactory::Utilities</h3>
+
+<p> The Utilities enum can be used to enable and disable script access
+to the classes that the utility factory provides, thereby
+controlling the access that end users can have to the underlying
+system.
+<ul>
+<li><tt>QSUtilFactory::None</tt> - No classes are available. If no access is required then
+there is no point in adding the QSUtilFactory to the interpreter at
+all.
+<li><tt>QSUtilFactory::File</tt> - Gives access to the File class.
+<li><tt>QSUtilFactory::Directory</tt> - Gives access to the Directory class.
+<li><tt>QSUtilFactory::Process</tt> - Gives access to Process class.
+<li><tt>QSUtilFactory::All</tt> - Gives access to all the classes in availble in the
+factory. This is the default.
+</ul><p> 
+<hr><h2>Member Function Documentation</h2>
+<h3 class=fn><a name="QSUtilFactory"></a>QSUtilFactory::QSUtilFactory ( uint&nbsp;enableFlags = All )
+</h3> Instantiates the QSUtilFactory and enables the script classes
+specified in <em>enableFlags</em>. <em>enableFlags</em> is a bitmask of the
+<a href="#Utilities-enum">Utilities</a> enum.
+<p> The QSUtilityFactory must be added to an interpreter before its
+classes can be used
+<p> <p>See also <a href="qsinterpreter.html#addObjectFactory">QSInterpreter::addObjectFactory</a>() and <a href="#Utilities-enum">Utilities</a>.
+
+<!-- eof -->
+<hr><p>
+This file is part of <a href="index.html">Qt Script for Applications</a>,
+copyright &copy; 2001-2004
+<a href="http://www.trolltech.com/">Trolltech</a>. All Rights Reserved.<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2001-2006 Trolltech<td><a href="http://www.trolltech.com/trademarks.html">Trademarks</a>
+<td align=right><div align=right>QSA version 1.1.5</div>
+</table></div></address></body>
+</html>

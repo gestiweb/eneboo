@@ -1,0 +1,30 @@
+\chapter Introduction
+
+\Q's scripting language is called \QS, and it is an implementation of a subset of ECMAScript
+4.0. ECMAScript is also called JavaScript or JScript by some vendors.
+
+\QS provides the language features of ECMAScript, for example, \l
+while loops, \l class and \l function definitions, etc.
+
+\QS also supports Trolltech's innovative signals and slots mechanism.
+Signals and slots provide type-safe inter-object communication that
+supersedes the crash-prone callbacks and message maps approaches used
+by older tools.
+
+This language reference describes the language features provided by
+\QS. It is divided into the following chapters:
+\list
+\i \l{Qt Script Language Concepts}
+\i \l{Built-in Types and Objects}
+\i \l{Built-in Variables and Constants}
+\i \l{Built-in Functions and Operators} 
+\i \l{Control Statements}
+\omit
+\i \l{Built-in Exceptions}
+\endomit
+\endlist
+
+Readers are assumed to have a basic understanding of programming, and
+to have read the \link qsa.book Getting Started
+Guide\endlink that introduces \QS, \QD and some of the widget
+subclasses and other classes available to \Q developers.

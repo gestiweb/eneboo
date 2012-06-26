@@ -1,0 +1,49 @@
+\chapter Reference: Key Bindings
+
+\index Keypresses (QSA Workbench)
+\list
+
+\i Ctrl+A -- Selects all of the code in the editor.
+
+\i Ctrl+C -- Copies the selected code to the clipboard.
+
+\i Ctrl+D -- Removes the active script from the project.
+
+\i Alt+E -- Pulls down the \Menu Edit menu.
+
+\i Alt+F -- Pulls down the \Menu File menu.
+
+\i Ctrl+F -- Invokes the \Dialog{Find Text} dialog.
+
+\i Alt+G -- Invokes the \Dialog{Goto Line} dialog.
+
+\i Alt+H -- Pulls down the \Menu Help menu.
+
+\i Ctrl+I -- Invokes the \Dialog {Import Script} dialog.
+
+\i Ctrl+N -- Invokes the \Dialog {New Script} dialog to add a new
+script to the project.
+
+\i Ctrl+F4 -- Closes the tab in the code editor.
+
+\i Ctrl+R -- Invokes the \Dialog{Replace Text} dialog.
+
+\i Ctrl+E -- Invokes the \Dialog{Export Script} dialog.
+
+\i Ctrl+V -- Pastes the code in the clipboard into the editor.
+
+\i Ctrl+X -- Cuts the selected code from the editor and places it into
+the clipboard.
+
+\i Ctrl+Y -- Redoes the last undo action.
+
+\i Ctrl+Z -- Undoes the last action.
+
+\i Del -- Deletes code from the editor.
+
+\i F5 -- Invokes the \Dialog{Call function} dialog.
+
+\i F6 -- Calls the lasr function specified in the \Dialog {Call
+Function} dialog.
+
+\endlist
