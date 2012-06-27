@@ -213,7 +213,7 @@ echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION"
 echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "(C) 2011 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   export CC=${CROSS}gcc
   export CXX=${CROSS}g++
   export LD=${CROSS}ld
@@ -226,9 +226,13 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   export OBJDUMP=${CROSS}objdump
   export RESCOMP=${CROSS}windres
   export WINDRES=${CROSS}windres
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross"]
 
   OPT_PREFIX="$PWD/src/qt"
   BUILD_KEY="$VER-Build-mingw32-4.2"
+else
+  BUILD_KEY="$VER-Build-i686-apple-darwin8"
+fi
 else
   MAKE_INSTALL="install"
 fi
