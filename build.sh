@@ -226,7 +226,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   export OBJDUMP=${CROSS}objdump
   export RESCOMP=${CROSS}windres
   export WINDRES=${CROSS}windres
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross"]
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
 
   OPT_PREFIX="$PWD/src/qt"
   BUILD_KEY="$VER-Build-mingw32-4.2"
@@ -557,6 +557,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cd $QTDIR/tools/designer/uic
   $CMD_MAKE || exit 1
 fi
+
 if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   cd $QTDIR/tools/designer/uic
   $CMD_MAKE clean
@@ -564,6 +565,7 @@ if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
   $CMD_MAKE || exit 1
 fi
+
 cd $QTDIR
 $CMD_MAKE $MAKE_INSTALL || exit 1
 
