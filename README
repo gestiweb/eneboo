@@ -1,0 +1,8 @@
+Compilación cruzada mac
+
+Descargamos este comprimido y lo extraemos con root en /opt , de manera que nos muestre /opt/mac/bin , etc.
+
+https://github.com/downloads/Aulla/eneboo/mac2.tar.gz
+
+Ejecutamos alguno de los script marcados con mac_cross y cruzamos los dedos.
+
