@@ -1,11 +1,6 @@
 TEMPLATE	= app
 CONFIG		+= qt console warn_on release professional
 
-QMAKE_LINK            = echo $$QMAKE_LINK
-QMAKE_LINK_SHLIB      = echo $$QMAKE_LINK_SHLIB
-
-
-
 HEADERS	= uic.h \
 		  ../shared/widgetdatabase.h \
 		  ../shared/domtool.h \
