@@ -47,3 +47,7 @@ win32 {
     INCLUDEPATH += $$ROOT/src/qsa/src/qsa
     INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }
+mac { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
+}

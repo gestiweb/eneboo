@@ -2,11 +2,11 @@
 
 VERSION=$(git describe --tags)
 PROJECT="eneboo"
-PVERSION="${PROJECT}-${VERSION}-dba"
-SRC="eneboo-build-macx-dba"
-test -e "$SRC" || { echo "No existe compilación dbAdmin para MacOSX ! (falta carpeta $SRC)"; exit 1; }
+PVERSION="${PROJECT}-${VERSION}"
+SRC="src/qt"
+test -e "$SRC" || { echo "No existe compilación para MacOSX ! (falta carpeta $SRC)"; exit 1; }
 
-echo "Exportando compilación dbAdmin MacOSX para $PVERSION . . . "
+echo "Exportando compilación MacOSX para $PVERSION . . . "
 
 mv "$SRC" "$PVERSION"
 

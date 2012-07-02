@@ -39,6 +39,8 @@ win32 {
 mac {
 	INCLUDEPATH += $$ROOT/src/psprinter
 	include(../psprinter/psprinter.pri)
+	INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+        INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }
 
 SOURCES += mcalcobject.cpp \
