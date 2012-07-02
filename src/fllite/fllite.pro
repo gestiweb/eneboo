@@ -31,6 +31,7 @@ enable_hoard:LIBS *= -lhoard
 enable_hoard:!win32:LIBS *= -L$$PREFIX/lib -ldl
 LIBS *= -L$$PREFIX/lib -lflbase
 mac:LIBS *= -ladvance -lqui -lflmail -lqwt
+enable_digidoc:mac:LIBS *= -llibdigidoc -lcrypto -lssl -lxml2
 
 load(qsa)
 
@@ -43,6 +44,10 @@ IMAGES += images/splashdebugger.png \
 win32:QMAKE_LFLAGS += -mconsole -mwindows
 
 win32 { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
+}
+mac { 
     INCLUDEPATH += $$ROOT/src/qsa/src/qsa
     INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }

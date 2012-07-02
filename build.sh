@@ -163,10 +163,13 @@ MAKE_INSTALL=""
 QT_DEBUG="$QT_DEBUG $QT_DEBUG_OPT"
 
 BUILD_MACX="no"
-if [ "$OPT_QMAKESPEC" == "macx-g++" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
+if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
   BUILD_MACX="yes"
   OPT_MULTICORE="no"
   OPT_DIGIDOC="no"
+fi
+if [ "$OPT_QMAKESPEC" == "macx-g++-cross" ]; then
+  BUILD_MACX="yes"
 fi
 if [ "$OPT_QUICK_CLIENT" == "yes" ]; then
   QT_DEBUG="$QT_DEBUG -DFL_QUICK_CLIENT"
@@ -213,7 +216,7 @@ echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - STABLE -
 echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "(C) 2012 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
-if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   export CC=${CROSS}gcc
   export CXX=${CROSS}g++
   export LD=${CROSS}ld
@@ -226,9 +229,14 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   export OBJDUMP=${CROSS}objdump
   export RESCOMP=${CROSS}windres
   export WINDRES=${CROSS}windres
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
 
   OPT_PREFIX="$PWD/src/qt"
   BUILD_KEY="$VER-Build-mingw32-4.2"
+else
+  OPT_PREFIX="$PWD/src/qt"
+  BUILD_KEY="$VER-Build-i686-apple-darwin8"
+fi
 else
   MAKE_INSTALL="install"
 fi
@@ -403,6 +411,7 @@ cat > AQConfig.h <<EOF
 #define AQ_CIN(C)                   $AQ_CIN
 #define AQPACKAGER_VERSION_CHECK(V) $AQ_PACK_VER
 #define ENB_DATOS_COMP              "$DATOS_COMPILACION"
+
 class QApplication;
 class FLApplication;
 
@@ -551,13 +560,24 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cd $QTDIR/tools/designer/uic
   $CMD_MAKE || exit 1
 fi
+
 if  [ "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
-  cd $QTDIR/tools/designer/uic
-  $CMD_MAKE clean
-  rm -f Makefile
-  $QTDIR/bin/qmake -spec $QTDIR/mkspecs/linux-g++
-  $CMD_MAKE || exit 1
+ case `uname -m` in
+  amd64 | x86_64)
+    ln -s /opt/mac/cross/uic_64 $PWD/src/qt/bin/uic   
+  ;;
+  *)
+    ln -s /opt/mac/cross/uic_32 $PWD/src/qt/bin/uic
+  ;;
+  esac
+ln -s /opt/mac/SDKs/MacOSX10.4u.sdk/usr/lib/libiconv.dylib $PWD/src/qt/lib/libiconv.dylib
+if  [ "$CROSS" == "i686-apple-darwin8-" ];then
+ln -s /opt/mac/cross/libz_i686.dylib $PWD/src/qt/lib/libz.dylib
+else
+ln -s /opt/mac/cross/libz_powerpc.dylib $PWD/src/qt/lib/libz.dylib
 fi
+fi
+
 cd $QTDIR
 $CMD_MAKE $MAKE_INSTALL || exit 1
 
@@ -651,7 +671,12 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	${CROSS}install_name_tool -change libflbase.2.dylib @executable_path/../../../../lib/libflbase.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libadvance.0.dylib @executable_path/../../../../lib/libadvance.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
-	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
+	${CROSS}install_name_tool -change libhoard.3.dylib @executable_path/../../../../lib/libhoard.3.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libcrypto.0.dylib @executable_path/../../../../lib/libcrypto.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change liblibdigidoc.2.dylib @executable_path/../../../../lib/liblibdigidoc.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libssl.0.dylib @executable_path/../../../../lib/libssl.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+	${CROSS}install_name_tool -change libxml2.2.dylib @executable_path/../../../../lib/libxml2.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
+${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/linguist.app/Contents/MacOS/linguist
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../lib/libqt-mt.3.dylib $PREFIX/bin/lupdate
 	
@@ -670,6 +695,10 @@ if  [ "$BUILD_MACX" == "yes" ];then
 		${CROSS}install_name_tool -change libsqlite.2.dylib @executable_path/../../../../lib/libsqlite.2.dylib $i
 		${CROSS}install_name_tool -change libmysqlclient.15.dylib @executable_path/../../../../lib/libmysqlclient.15.dylib $i
 		${CROSS}install_name_tool -change libflmail.1.dylib @executable_path/../../../../lib/libflmail.1.dylib $i
+		${CROSS}install_name_tool -change libcrypto.0.dylib @executable_path/../../../../lib/libcrypto.0.dylib $i
+		${CROSS}install_name_tool -change liblibdigidoc.2.dylib @executable_path/../../../../lib/liblibdigidoc.2.dylib $i
+	  	${CROSS}install_name_tool -change libssl.0.dylib @executable_path/../../../../lib/libssl.0.dylib $i
+	  	${CROSS}install_name_tool -change libxml2.2.dylib @executable_path/../../../../lib/libxml2.2.dylib $i
 	done
 fi
 if [ "$OPT_QMAKESPEC" == "win32-g++-cross" ]; then
