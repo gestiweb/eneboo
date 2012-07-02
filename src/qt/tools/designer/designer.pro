@@ -2,8 +2,8 @@ TEMPLATE = subdirs
 
 CONFIG  += ordered
 
-SUBDIRS	=  uic \
-	   uilib \
+!macx-g++-cross:SUBDIRS	=  uic 
+SUBDIRS	+= uilib \
 	   designer \
             app
 
