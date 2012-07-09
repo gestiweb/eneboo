@@ -598,6 +598,11 @@ class MainWindow
       for (var j = 0; j < modules.length; ++j) {
         var ac = new QActionGroup(ag);
         ac.name = modules[j];
+        if (sys.isQuickBuild()) {
+            if (ac.name == "sys") {
+                continue;
+            }
+        }
 
         var actions = this.widgetActions(ac.name + ".ui", ac);
         if (actions == undefined) {

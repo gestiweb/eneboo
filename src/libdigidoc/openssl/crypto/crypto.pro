@@ -7,7 +7,8 @@ else {
 }
 
 TEMPLATE = lib
-CONFIG += warn_off plugin
+CONFIG += warn_off
+!mac: CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {

@@ -7,7 +7,8 @@ else {
 }
 TEMPLATE = lib
 
-CONFIG += warn_off create_prl plugin
+CONFIG += warn_off create_prl 
+!mac:CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {
@@ -20,8 +21,13 @@ win32 {
 
 DESTDIR = $$PREFIX/lib
 
-DEFINES += DIGIDOC_DEBUG WITH_SOAPDEFS_H SYSCONFDIR=\"$$PREFIX/share/abanq\"
+DEFINES += DIGIDOC_DEBUG WITH_SOAPDEFS_H SYSCONFDIR=\"$$PREFIX/share/abanq\" 
 
+mac {
+DEFINES += __FreeBSD__=8
+LIBS += -lz 
+
+}
 TARGET = libdigidoc
 
 INCLUDEPATH += $$ROOT/src $$ROOT/src/libdigidoc $$ROOT/src/libdigidoc/libxml2 \

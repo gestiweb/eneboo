@@ -665,7 +665,13 @@ void FLApplication::initToolBox()
     for (QStringList::Iterator itM = listModules.begin(); itM != listModules.end(); ++itM, ++c) {
       if (QChar(c) == 'Q')
         ++c;
-      if (*itM == "sys" && ap2->isDebuggerMode()) {
+        
+#ifdef FL_QUICK_CLIENT
+      if (*itM == "sys")
+        continue;
+#endif
+        
+    if (*itM == "sys" && ap2->isDebuggerMode()) {
        
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
@@ -751,10 +757,6 @@ void FLApplication::initToolBox()
         ++c;
 #endif
       }
-#ifdef FL_QUICK_CLIENT
-      if (*itM == "sys")
-        continue;
-#endif
 
       descripModule = QString(QChar(c)) + ": " + mngLoader_->idModuleToDescription(*itM);
       newModuleAction = new FLWidgetAction(tr(descripModule),

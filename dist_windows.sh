@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=src/qt
-DST=eneboo-build-win32
+DST=eneboo-build-win32$1
 
 mkdir "$DST" 2>/dev/null
 mkdir "$DST/bin" 2>/dev/null

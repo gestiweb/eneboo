@@ -1,17 +1,6 @@
 TEMPLATE	= app
 CONFIG		+= qt console warn_on release professional
 
-PRJ_MODULE      = UIC
-
-QMAKE_CC              = echo $$PRJ_MODULE ::   [CC___] $< && $$QMAKE_CC
-QMAKE_CXX             = echo $$PRJ_MODULE ::   [C++__] $< && $$QMAKE_CXX
-QMAKE_UIC             = echo $$PRJ_MODULE ::   [UIC__] $< && $$QMAKE_UIC
-QMAKE_AR              = echo $$PRJ_MODULE ::   [AR___] $< && $$QMAKE_AR
-QMAKE_LINK            = echo $$PRJ_MODULE ::   [LK___] $@ && $$QMAKE_LINK
-QMAKE_LINK_SHLIB      = echo $$PRJ_MODULE ::   [LK___] $@ && $$QMAKE_LINK_SHLIB
-
-
-
 HEADERS	= uic.h \
 		  ../shared/widgetdatabase.h \
 		  ../shared/domtool.h \

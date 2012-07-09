@@ -837,14 +837,14 @@ public slots:
   }
 
   bool isQuickBuild() const {
-#ifdef AQ_QUICK_BUILD
+#ifdef FL_QUICK_CLIENT
     return true;
 #endif
     return false;
   }
 
   bool isDebuggerBuild() const {
-#ifdef AQ_DEBUGGER_BUILD
+#ifdef AQ_DEBUGGER
     return true;
 #endif
     return false;

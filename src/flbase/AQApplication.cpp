@@ -170,15 +170,15 @@ void AQApplication::callReinitScript()
 void AQApplication::setMainWidget(QWidget *mainWidget)
 {
   if (!d->oldApi_)
-    {
+  {
       QApplication::setMainWidget(mainWidget);
 
-  QObject *actual = mainWidget;
-        if (acl_)
-                acl_->process(actual);
+      QObject *actual = mainWidget;
+      if (acl_) acl_->process(actual);
    }
-   else
-    FLApplication::setMainWidget(mainWidget);
+   else {
+      FLApplication::setMainWidget(mainWidget);
+   }
 }
 
 QSArgument AQApplication::call(const QString &function,
