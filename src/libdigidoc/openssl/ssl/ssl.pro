@@ -6,7 +6,8 @@ else {
 	error("settings.pro missing, unable to build")
 }
 TEMPLATE = lib
-CONFIG += warn_off plugin
+CONFIG += warn_off 
+!mac:CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {

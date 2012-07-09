@@ -20,6 +20,7 @@ INCLUDEPATH += $$ROOT $$ROOT/src/flbase $$ROOT/src/libpq $$ROOT/src/libmysql/inc
 mac {
 load(qsa)
 LIBS += -L$$PREFIX/lib -lflbase -lmysqlclient -ladvance -lqui -lflmail -lqwt
+enable_digidoc:LIBS += -llibdigidoc -lcrypto -lssl -lxml2
 } 
 else {
 LIBS += -L$$PREFIX/lib -lflbase -lmysqlclient

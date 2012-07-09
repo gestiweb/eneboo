@@ -30,6 +30,11 @@ win32 {
     INCLUDEPATH += $$ROOT/src/qsa/src/qsa
     INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }
+
+mac { 
+    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
+    INCLUDEPATH += $$ROOT/src/qsa/src/ide
+}
 enable_qwt:INCLUDEPATH += $$ROOT/src/qwt/src
 enable_digidoc:INCLUDEPATH += $$ROOT/src/libdigidoc \
     $$ROOT/src/libdigidoc/libxml2 \
@@ -54,6 +59,7 @@ LIBS += -L$$PREFIX/lib \
 enable_qwt:LIBS += -lqwt
 enable_digidoc:LIBS += -llibdigidoc \
     -lcrypto
+enable_digidoc:mac:LIBS += -lssl -lxml2
 load(qsa)
 VERSION = 2.4
 include(../serialport/serialport.pri)

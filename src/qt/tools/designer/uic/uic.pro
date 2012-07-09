@@ -1,5 +1,6 @@
 TEMPLATE	= app
 CONFIG		+= qt console warn_on release professional
+
 HEADERS	= uic.h \
 		  ../shared/widgetdatabase.h \
 		  ../shared/domtool.h \
@@ -25,6 +26,8 @@ TARGET		= uic
 INCLUDEPATH	+= ../shared
 DEFINES 	+= UIC
 DESTDIR		= ../../../bin
+
+INCLUDEPATH += += ../../../include
 
 target.path=$$bins.path
 INSTALLS        += target

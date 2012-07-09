@@ -23,6 +23,7 @@ INCLUDEPATH += $$ROOT/src/libpq/include \
 mac {
 load(qsa)
 LIBS += -L$$PREFIX/lib -lflbase -lpq -ladvance -lqui -lflmail -lqwt
+enable_digidoc:LIBS += -llibdigidoc -lcrypto -lssl -lxml2
 } 
 else {
 LIBS += -L$$PREFIX/lib -lflbase -lpq

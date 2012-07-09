@@ -6,7 +6,8 @@ else {
 	error("settings.pro missing, unable to build")
 }
 TEMPLATE = lib
-CONFIG += warn_off plugin
+CONFIG += warn_off
+!mac:CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {
@@ -15,7 +16,12 @@ win32 {
 	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm -lws2_32
 }
 else {
-        LIBS += -lz
+        LIBS += -lz 
+}
+
+mac {
+       LIBS += -L$$PREFIX/lib -liconv -L/opt/mac/SDKs/MacOSX10.4u.sdk/usr/lib
+	DEFINES += LIBXML_THREAD_ENABLED 
 }
 
 DESTDIR = $$PREFIX/lib
