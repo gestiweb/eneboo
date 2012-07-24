@@ -478,6 +478,10 @@ public slots:
   Muestra el dialogo "Acerca de"
   */
   void aboutAbanQ();
+  /**
+  Muestra cuadro de dialogo para configurar la carga estatica desde el disco local
+  */
+  void staticLoaderSetup();
 
   /** Uso interno */
   QTranslator *createSysTranslator(const QString &lang, bool loadDefault = false);
@@ -615,12 +619,6 @@ protected slots:
   Realiza comprobacion para detectar bloqueos en la conexion a la base de datos.
   */
   void checkDatabaseLocks(QObject *timer = 0);
-
-  /**
-  Uso interno.
-  Muestra cuadro de dialogo para configurar la carga estatica desde el disco local
-  */
-  void staticLoaderSetup();
 
   /**
   Uso interno
