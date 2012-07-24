@@ -639,6 +639,13 @@ class MainWindow
     connect(sLoad, "activated()", this.actSigMap_, "map()");
     this.actSigMap_.setMapping(sLoad, "activated():staticLoad():" + sLoad.name);
 
+    var resetSC = new QAction(ag);
+    resetSC.name = "resetScriptAction";
+    resetSC.menuText = sys.translate("Resetear &Scripts");
+    resetSC.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
+    connect(resetSC, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
+
     var dumpDb = new QAction(ag);
     dumpDb.name = "dumpDatabaseAction";
     dumpDb.menuText = sys.translate("Copia de Seguridad");
@@ -979,6 +986,11 @@ function triggerAction(signature)
     case "staticLoad()":
 	if (ok) 
         aqApp.staticLoaderSetup();
+      break;
+    
+    case "resetSC()":
+      if (ok)
+        sys.reinit();
       break;
 
     case "dumpDatabase()":
