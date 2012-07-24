@@ -308,7 +308,7 @@ void FLStaticLoaderWarning::updateScripts()
   paths_.clear();
 }
 
-//#define AQ_STATIC_LOADER_POPUP_WARN
+#define AQ_STATIC_LOADER_POPUP_WARN
 
 FLStaticLoaderWarning *FLModulesStaticLoader::warn_ = 0;
 
