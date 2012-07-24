@@ -229,7 +229,8 @@ IMAGES += images/infosial.png \
     images/check_x_on.png \
     images/export.png \
     images/import.png \
-    images/fileexport.png
+    images/fileexport.png \
+    images/image-svg.png
 include(aqsobjects/aqsobjects.pri)
 include(../../tools/qsac/qsac.pri)
 include(../../tools/packager/packager.pri)
