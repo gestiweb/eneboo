@@ -671,7 +671,7 @@ void FLApplication::initToolBox()
         continue;
 #endif
         
-    if (*itM == "sys" && ap2->isDebuggerMode()) {
+    if (*itM == "sys") {
        
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
@@ -698,18 +698,18 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
 
         ++c; 
-       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Importar Módulos desde Disco");
+       descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Reiniciar Scripts");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
                                              newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("import.png"));
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
 
-        ++c; */
+       // ++c; 
        /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Actualización y Soporte");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
@@ -737,7 +737,8 @@ void FLApplication::initToolBox()
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 
   if (ap2->isDebuggerMode())
-                                  {        
+                                  {      
+	++c;  
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("QSA WorkBench");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
@@ -2306,6 +2307,7 @@ QRect FLApplication::geometryForm(const QString &name) const
 
   return r;
 }
+
 
 void FLApplication::staticLoaderSetup()
 {
