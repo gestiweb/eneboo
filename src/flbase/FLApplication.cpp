@@ -686,18 +686,18 @@ void FLApplication::initToolBox()
 
         ++c;
        
-       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Exportar Módulos a Disco");
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Carga Estática desde Disco Duro");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
                                              newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("export.png"));
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("image-svg.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(exportModules()));
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
 
-        ++c; */
+        ++c; 
        /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Importar Módulos desde Disco");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,

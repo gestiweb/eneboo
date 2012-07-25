@@ -108,6 +108,7 @@ public slots:
   void activateModule(const QString &);
   void execMainScript(const QString &);
   void aboutAbanQ();
+  void staticLoaderSetup();
   void chooseFont();
   void setDatabaseLockDetection(bool = true, int = 30000, int = -1, bool = true, const QString& = QString::null, const QString& = QString::null);
   QString commaSeparator() const;
@@ -429,6 +430,11 @@ inline void AQSApplication::aboutAbanQ()
 {
   AQ_CALL_VOID(aboutAbanQ());
 }
+inline void AQSApplication::staticLoaderSetup()
+{
+   AQ_CALL_VOID(staticLoaderSetup());
+}
+
 inline void AQSApplication::chooseFont()
 {
   AQ_CALL_VOID(chooseFont());
