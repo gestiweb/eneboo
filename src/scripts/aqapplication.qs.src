@@ -990,7 +990,7 @@ function triggerAction(signature)
     
     case "resetSC()":
       if (ok)
-        sys.reinit();
+        aqApp.reinit();
       break;
 
     case "dumpDatabase()":
