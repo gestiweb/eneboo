@@ -575,7 +575,7 @@ ln -s /opt/mac/SDKs/MacOSX10.4u.sdk/usr/lib/libiconv.dylib $PWD/src/qt/lib/libic
 if  [ "$CROSS" == "i686-apple-darwin8-" ];then
 ln -s /opt/mac/cross/libz_i686.dylib $PWD/src/qt/lib/libz.dylib
 else
-ln -s /opt/mac/cross/libz_powerpc.dylib $PWD/src/qt/lib/libz.dylib
+ln -s /opt/mac/cross/libz.1.2.7_ppc.dylib $PWD/src/qt/lib/libz.dylib
 fi
 fi
 
