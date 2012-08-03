@@ -1,8 +1,112 @@
-Compilación cruzada mac
+Compilación cruzada
 
-Descargamos este comprimido y lo extraemos con root en /opt , de manera que nos muestre /opt/mac/bin , etc.
+Teoría
+Usar un compilador que funciona en linux, para crear ejecutables y librerías compatibles con otros sistemas operativos. 
 
-https://github.com/downloads/Aulla/eneboo/mac2.tar.gz
+Práctica
+Para MacOS tenemos un grupo de herramientas y un SDK (librerias de desarrollo) equivalentes a un gcc 4.0 y SDK 10.4. Teniendo en cuenta que en mac existen dos tipos de arquitecturas de procesador powerPC ( 601, 603, 604, G3, G4 y G5 ) , y i686 ( año 2006 en adelante), se facilitan 2 juegos de utilidades.
 
-Ejecutamos alguno de los script marcados con mac_cross y cruzamos los dedos.
+Ejecutables
+Según la arquitectura destino , los nombres comienzan por esta arquitectura
+
+/opt/mqc/bin/i686-apple-darwin8-ar
+/opt/mqc/bin/i686-apple-darwin8-as
+/opt/mqc/bin/i686-apple-darwin8-checksyms
+/opt/mqc/bin/i686-apple-darwin8-cpp
+/opt/mqc/bin/i686-apple-darwin8-g++
+/opt/mqc/bin/i686-apple-darwin8-g++-4.0.1
+/opt/mqc/bin/i686-apple-darwin8-gcc
+/opt/mqc/bin/i686-apple-darwin8-gcc-4.0.1
+/opt/mqc/bin/i686-apple-darwin8-gccbug
+/opt/mqc/bin/i686-apple-darwin8-gcov
+/opt/mqc/bin/i686-apple-darwin8-indr
+/opt/mqc/bin/i686-apple-darwin8-install_name_tool
+/opt/mqc/bin/i686-apple-darwin8-ld
+/opt/mqc/bin/i686-apple-darwin8-ld_classic
+/opt/mqc/bin/i686-apple-darwin8-libtool
+/opt/mqc/bin/i686-apple-darwin8-lipo
+/opt/mqc/bin/i686-apple-darwin8-nm
+/opt/mqc/bin/i686-apple-darwin8-nmedit
+/opt/mqc/bin/i686-apple-darwin8-otool
+/opt/mqc/bin/i686-apple-darwin8-pagestuff
+/opt/mqc/bin/i686-apple-darwin8-ranlib
+/opt/mqc/bin/i686-apple-darwin8-redo_prebinding
+/opt/mqc/bin/i686-apple-darwin8-seg_addr_table
+/opt/mqc/bin/i686-apple-darwin8-segedit
+/opt/mqc/bin/i686-apple-darwin8-seg_hack
+/opt/mqc/bin/i686-apple-darwin8-size
+/opt/mqc/bin/i686-apple-darwin8-strings
+/opt/mqc/bin/i686-apple-darwin8-strip
+/opt/mqc/bin/i686-apple-darwin9-ar // ??? ya estaba ahí 
+
+/opt/mqc/bin/powerpc-apple-darwin8-ar
+/opt/mqc/bin/powerpc-apple-darwin8-as
+/opt/mqc/bin/powerpc-apple-darwin8-checksyms
+/opt/mqc/bin/powerpc-apple-darwin8-cpp
+/opt/mqc/bin/powerpc-apple-darwin8-g++
+/opt/mqc/bin/powerpc-apple-darwin8-g++-4.0.1
+/opt/mqc/bin/powerpc-apple-darwin8-gcc
+/opt/mqc/bin/powerpc-apple-darwin8-gcc-4.0.1
+/opt/mqc/bin/powerpc-apple-darwin8-gccbug
+/opt/mqc/bin/powerpc-apple-darwin8-gcov
+/opt/mqc/bin/powerpc-apple-darwin8-indr
+/opt/mqc/bin/powerpc-apple-darwin8-install_name_tool
+/opt/mqc/bin/powerpc-apple-darwin8-ld
+/opt/mqc/bin/powerpc-apple-darwin8-ld_classic
+/opt/mqc/bin/powerpc-apple-darwin8-libtool
+/opt/mqc/bin/powerpc-apple-darwin8-lipo
+/opt/mqc/bin/powerpc-apple-darwin8-nm
+/opt/mqc/bin/powerpc-apple-darwin8-nmedit
+/opt/mqc/bin/powerpc-apple-darwin8-otool
+/opt/mqc/bin/powerpc-apple-darwin8-pagestuff
+/opt/mqc/bin/powerpc-apple-darwin8-ranlib
+/opt/mqc/bin/powerpc-apple-darwin8-redo_prebinding
+/opt/mqc/bin/powerpc-apple-darwin8-seg_addr_table
+/opt/mqc/bin/powerpc-apple-darwin8-segedit
+/opt/mqc/bin/powerpc-apple-darwin8-seg_hack
+/opt/mqc/bin/powerpc-apple-darwin8-size
+/opt/mqc/bin/powerpc-apple-darwin8-strings
+/opt/mqc/bin/powerpc-apple-darwin8-strip
+
+Especificaciones de los ejecutables
+
+/opt/mac/bin/i686-apple-darwin8-gcc -v
+Using built-in specs.
+Target: i686-apple-darwin8
+Configured with: ../gcc-5247.i686-apple-darwin8/configure --target=i686-apple-darwin8 --prefix=/usr --with-sysroot=/opt/mac/SDKs/MacOSX10.4u.sdk --disable-nls --enable-languages=c,c++,objc,obj-c++ --enable-version-specific-runtime-libs --with-gxx-include-dir=/include/c++/4.0.0 --with-as=/opt/mac/bin/i686-apple-darwin8-as --with-ld=/opt/mac/bin/i686-apple-darwin8-ld --with-arch=pentium-m --with-tune=prescott
+Thread model: posix
+gcc version 4.0.1 (Apple Computer, Inc. build 5247)
+
+/opt/mac/bin/powerpc-apple-darwin8-gcc -v
+Using built-in specs.
+Target: powerpc-apple-darwin8
+Configured with: ../gcc-5247.powerpc-apple-darwin8/configure --target=powerpc-apple-darwin8 --prefix=/usr --with-sysroot=/opt/mac/SDKs/MacOSX10.4u.sdk --disable-nls --enable-languages=c,c++,objc,obj-c++ --enable-version-specific-runtime-libs --with-gxx-include-dir=/include/c++/4.0.0 --with-as=/opt/mac/bin/powerpc-apple-darwin8-as --with-ld=/opt/mac/bin/powerpc-apple-darwin8-ld
+Thread model: posix
+gcc version 4.0.1 (Apple Computer, Inc. build 5247)
+
+
+Las 2 especificaciones hacen referencia a este /opt/mac/SDKs/MacOSX10.4u.sdk , para obtenerla y al mismo tiempo los binarios mac-cross ,descargamos este comprimido y lo extraemos con root en /opt , de manera que nos muestre /opt/mac/bin , etc.
+
+https://github.com/downloads/Aulla/eneboo/mac8.tar.gz
+
+
+
+Ejecutamos alguno de los script marcados con mac_cross y cruzamos los dedos. Se usarán los binarios adecuados al S.O. destino seleccionado.
+
+Estos binarios se pueden usar para compilar cualquier fuente , dando como resultado binarios válidos para la arquitectura elegida.Por ejemplo la librería libz.1.2.7.dylib para powerpc ha sido compilada con ese sistema en una distribución linux.
+
+
+Más información del proyecto odcctools
+
+Información y binarios ...
+
+http://biolpc22.york.ac.uk/pub/linux-mac-cross/
+
+Versión actualizada 
+
+https://github.com/mazhe/odcctools
+
+
+
+
 
