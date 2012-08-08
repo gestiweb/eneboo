@@ -1442,10 +1442,6 @@ QString::QString( int size, bool /*dummy*/ )
     Constructs a string that is a deep copy of \a ba interpreted as a
     classic C string.
 */
-QString::QString( const QByteArray& ba)
-{
-	QString(ba, 't');
-}
 
 QString::QString( const QByteArray& ba, char mode)
 {
