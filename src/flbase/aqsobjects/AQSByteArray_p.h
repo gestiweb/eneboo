@@ -29,7 +29,6 @@ class AQSByteArray : public AQSAbstractMemArray
   Q_OBJECT
 
   Q_PROPERTY(QString string READ string WRITE setString);
-  Q_PROPERTY(QString binaryString READ binaryString);
   Q_PROPERTY(QByteArray toVariant READ toVariant);
 
   AQ_DECLARE_AQS_VOID(ByteArray, AbstractMemArray);
@@ -70,11 +69,6 @@ public slots:
       return QByteArray();
     return byteArrayFromHex(o_);
   }
-
-  // TODO: agregar funciones de hash que devuelvan un QByteArray binario
-  // QByteArray md5Digest() const {}
-  // QByteArray sha1Digest() const {}
-  // QByteArray sha256Digest() const {}
 
   QByteArray toBase64() const {
     if (!o_)
@@ -143,13 +137,6 @@ public slots:
     if (!o_)
       return QString::null;
     return QString(*o_);
-  }
-  
-  // Esta función asegura que los bytes \0 se pasan correctamente a QString.
-  QString binaryString() const {
-    if (!o_)
-      return QString::null;
-    return QString(*o_,'b');
   }
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@

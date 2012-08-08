@@ -1122,14 +1122,15 @@ QChar* QString::latin1ToUnicode( const QByteArray& ba, uint* len )
     return result;
 }
 
-static QChar* internalLatin1ToUnicode(const QByteArray& ba, uint* len )
+static QChar* internalLatin1ToUnicode( const QByteArray& ba, uint* len )
 {
     if ( ba.isNull() ) {
 	*len = 0;
 	return 0;
     }
     int l = 0;
-    while ( l < (int)ba.size() && ba[l] ) l++;
+    while ( l < (int)ba.size() && ba[l] )
+	l++;
     char* str = ba.data();
     QChar *uc = QT_ALLOC_QCHAR_VEC( l );
     QChar *result = uc;
@@ -1139,24 +1140,6 @@ static QChar* internalLatin1ToUnicode(const QByteArray& ba, uint* len )
 	*uc++ = *str++;
     return result;
 }
-
-static QChar* internalByteArrayToUnicode(const QByteArray& ba, uint* len )
-{
-    if ( ba.isNull() ) {
-	*len = 0;
-	return 0;
-    }
-    int l = ba.size();
-    char* str = ba.data();
-    QChar *uc = QT_ALLOC_QCHAR_VEC( l );
-    QChar *result = uc;
-    if ( len )
-	*len = l;
-    while (l--)
-	*uc++ = *str++;
-    return result;
-}
-
 
 /*!
     \overload
@@ -1443,7 +1426,7 @@ QString::QString( int size, bool /*dummy*/ )
     classic C string.
 */
 
-QString::QString( const QByteArray& ba, char mode)
+QString::QString( const QByteArray& ba )
 {
 #ifndef QT_NO_TEXTCODEC
     if ( QTextCodec::codecForCStrings() ) {
@@ -1453,13 +1436,7 @@ QString::QString( const QByteArray& ba, char mode)
     }
 #endif
     uint l;
-    QChar *uc = NULL;
-    if (mode == 't') {
-        uc = internalLatin1ToUnicode(ba,&l);
-    } else {
-        uc = internalByteArrayToUnicode(ba,&l);
-    }
-    
+    QChar *uc = internalLatin1ToUnicode(ba,&l);
     d = new QStringData(uc,l,l);
 }
 
