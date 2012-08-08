@@ -6841,13 +6841,13 @@ public slots:
 
   @return TRUE si todo ha ido bien
   */
-  // Obsoleta
-  //   bool renderReport(const int initRow = 0, const int initCol = 0, const bool append = false, const bool displayReport = true) {
-  //     return obj_->renderReport(initRow, initCol, append, displayReport);
-  //   }
-  bool renderReport(const int initRow = 0, const int initCol = 0, const uint flags = FLReportViewerInterface::Display) {
-    return obj_->renderReport(initRow, initCol, flags);
-  }
+ // Muy Nueva ...
+ //bool renderReport(const int initRow = 0, const int initCol = 0, const uint flags = FLReportViewerInterface::Display) {
+ //   return obj_->renderReport(initRow, initCol, flags);
+ // }
+  bool renderReport(const int initRow = 0, const int initCol = 0, const bool append = false, const bool displayReport = true) {
+    return obj_->renderReport(initRow, initCol, append, displayReport);
+    }
 
   /**
    Establece los datos del informe a partir de una consulta
