@@ -58,7 +58,7 @@ QStringList FLSqlDatabase::driverAliases()
 
 QString FLSqlDatabase::defaultAlias()
 {
-  return "SQLite";
+  return "PostgreSQL";
 }
 
 QString FLSqlDatabase::driverAliasToDriverName(const QString &alias)
