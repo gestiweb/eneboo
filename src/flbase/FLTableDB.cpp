@@ -1514,15 +1514,37 @@ void FLTableDB::exportToOds()
  				QSqlQuery q(QString::null, cursor_->db()->db());
   				q.exec("SELECT contenido FROM fllarge WHERE refkey = '" + str + "'");
   				while (q.next()) {
-						//str = q.value(0).toString();
-						//QPixmap pixmap(str);
-						//uint alto = pixmap.width();
-						//uint ancho = pixmap.height();
-						//qWarning("%d", pixmap.width());
-						//AQOdsImage img("Bandera",alto,ancho,0,0,"path_al_fichero_temporal");
-						//row.opIn(img);
-						row.opIn(str);
+						str = q.value(0).toString();
 						}
+		   QString fileNameXpm(AQ_DISKCACHE_DIRPATH + '/' + mtd->name() +
+                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                   QString::fromLatin1(".xpm"));
+                   QString fileNamePng(AQ_DISKCACHE_DIRPATH + '/' + mtd->name() +
+                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                   QString::fromLatin1(".png"));
+						 QFile f( fileNameXpm );
+						 f.open( IO_WriteOnly );
+						QTextStream out(&f);
+						 out << str;
+						 f.close();
+						QImage imagen;
+						QPixmap xpm(fileNameXpm);
+						if(!xpm.isNull())
+								{
+						imagen = xpm.convertToImage();
+						imagen.save(fileNamePng,"PNG");
+						uint alto = ((imagen.width() * 2.54)/98) * 1000;
+						uint ancho = ((imagen.height() * 2.54)/98) * 1000;
+						QString nombreImagen = "Imagen"+ QString::number(r);						
+						AQOdsImage img(nombreImagen,alto,ancho,0,0,fileNamePng);
+						row.opIn(img);
+								} else 
+								{
+								qWarning("La imagen está vacia");
+								row.opIn(str);
+								}      
+
+						
 				}
 				else
 				{
