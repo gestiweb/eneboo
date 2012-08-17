@@ -1509,12 +1509,31 @@ void FLTableDB::exportToOds()
 
         default: {
           QString str(val.toString());
-          if (str.isEmpty())
-            row.coveredCell();
-          else
-            row.opIn(str);
+	  if (str.contains('RK@')) 
+				{
+ 				QSqlQuery q(QString::null, cursor_->db()->db());
+  				q.exec("SELECT contenido FROM fllarge WHERE refkey = '" + str + "'");
+  				while (q.next()) {
+						//str = q.value(0).toString();
+						//QPixmap pixmap(str);
+						//uint alto = pixmap.width();
+						//uint ancho = pixmap.height();
+						//qWarning("%d", pixmap.width());
+						//AQOdsImage img("Bandera",alto,ancho,0,0,"path_al_fichero_temporal");
+						//row.opIn(img);
+						row.opIn(str);
+						}
+				}
+				else
+				{
+          			if (str.isEmpty())
+           			 row.coveredCell();
+          			else
+            			row.opIn(str);
+				}
         }
       }
+    
     }
     row.close();
     progress.setProgress(r);
