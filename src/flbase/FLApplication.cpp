@@ -20,7 +20,6 @@ email                : mail@infosial.com
 
 #include "FLApplication.h"
 #include "FLAbout.h"
-#include "FLHelpWindow.h"
 #include "FLFormDB.h"
 #include "FLObjectFactory.h"
 #include "FLWidgetAction.h"
@@ -1113,9 +1112,7 @@ void FLApplication::aboutAbanQ()
 
 void FLApplication::helpIndex()
 {
-  FLHelpWindow *help = new FLHelpWindow(AQ_DATA + "/doc/index.html",
-                                        ".", 0, "help viewer");
-  help->show();
+  aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.com/pub/contrib/doc/standard/"), 0);
 }
 
 void FLApplication::statusHelpMsg(const QString &text)
@@ -1974,8 +1971,7 @@ void FLApplication::reinitP()
 
 void FLApplication::showDocPage(const QString &url)
 {
-  FLHelpWindow *docPage = new FLHelpWindow(url, ".", 0, "help viewer");
-  docPage->show();
+  aqApp->call("sys.openUrl", QSArgumentList(url), 0);
 }
 
 FLWorkspace *FLApplication::workspace() const
