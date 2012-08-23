@@ -235,8 +235,8 @@ void copy( const QString &source, const QString &dest )
     QString s = QDir::convertSeparators( source );
     QString d = QDir::convertSeparators( dest );
 #ifdef Q_OS_UNIX
-    system( "cp " + QFile::encodeName( s ) + " " + QFile::encodeName( d ) );
-    system( "chmod +w " + QFile::encodeName( d ) );
+   if(system( "cp " + QFile::encodeName( s ) + " " + QFile::encodeName( d ) )){};
+   if(system( "chmod +w " + QFile::encodeName( d ) )){};
 #else
     QT_WA(
     {
@@ -270,8 +270,8 @@ void symLink( const QString &source, const QString &dest )
     QFileInfo info( s );
     s = info.absFilePath();
     QString d = QDir::convertSeparators( dest );
-    system( "rm -f " + QFile::encodeName( d ) );
-    system( "ln -s " + QFile::encodeName( s ) + " " + QFile::encodeName( d ) );
+    if(system( "rm -f " + QFile::encodeName( d ) )){};
+    if(system( "ln -s " + QFile::encodeName( s ) + " " + QFile::encodeName( d ) )){};
 #else
     copy( source, dest );
 #endif
@@ -324,8 +324,8 @@ bool checkLicense()
     } else if( QFile::exists( *qtDir + "LICENSE.EVAL" ) ) {
 	qtLicense = Evaluation;
     } else if ( QFile::exists( *qtDir + "LICENSE.GPL" ) ||
-		!QFile::exists( *qtDir + "LICENSE" ) &&
-		!QFile::exists( QDir::homeDirPath() + "/.qt-license" ) ) {
+		( !QFile::exists( *qtDir + "LICENSE" ) &&
+		!QFile::exists( QDir::homeDirPath() + "/.qt-license" ) ) ) {
 	qtLicense = GPL;
     } else if ( QFile::exists( *qtDir + "LICENSE" ) ) {
 	QString text = licenseFile();
@@ -363,7 +363,7 @@ bool checkLicense()
 
     if ( qtLicense == Internal ||
 	 qtLicense == qsaLicense ||
-	 qtLicense == Enterprise && qsaLicense == Evaluation ) {
+	 ( qtLicense == Enterprise && qsaLicense == Evaluation ) ) {
 	return TRUE;
     } else if ( ( qtLicense == Enterprise || qtLicense == Professional ) &&
 		qsaLicense == GPL ) {

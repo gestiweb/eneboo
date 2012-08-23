@@ -947,7 +947,7 @@ QDataStream &QGDict::read( QDataStream &s )
 		    // but hey, serializing pointers?  can it be done
 		    // at all, ever?
 		    if ( k )
-			look_ptr( (void *)k, d, op_insert );
+			look_ptr( (void *)(ulong)k, d, op_insert );
 		}
 		break;
 	}
