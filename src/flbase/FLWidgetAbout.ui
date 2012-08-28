@@ -961,11 +961,18 @@ References
                         <property name="text">
                             <string>En la realización de Eneboo han participado:
 
+Motor Eneboo :
 InfoSiAL S.L. &lt;mail@infosial.com&gt; 
 Gestiweb Integración de Soluciones Web S.L. &lt;info@gestiweb.com&gt;
 Grupo Easy Soft. &lt;info@easysoftcommunity.com&gt;
 Digital5, S.L. &lt;info@digital5.es&gt;
-José A. Fernández &lt;aullasistemas@gmail.com&gt;</string>
+José A. Fernández &lt;aullasistemas@gmail.com&gt;
+
+Documentación :
+David Zafra Gómez (KLO Ingeniería Informática, www.klo.es)
+
+Instaladores (Wizards) :
+Calidae S.L. &lt;erp@calidae.com&gt;</string>
                         </property>
                         <property name="wordWrap">
                             <enum>WidgetWidth</enum>
