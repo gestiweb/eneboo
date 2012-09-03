@@ -89,7 +89,6 @@ SOURCES += AQApplication.cpp \
     FLObjectFactory.cpp \
     FLFieldDB.cpp \
     FLTableDB.cpp \
-    FLHelpWindow.cpp \
     FLWidgetAction.cpp \
     FLCodBar.cpp \
     FLMemCache.cpp \
@@ -143,7 +142,6 @@ HEADERS += AQApplication.h \
     FLObjectFactory.h \
     FLFieldDB.h \
     FLTableDB.h \
-    FLHelpWindow.h \
     FLWidgetAction.h \
     FLCodBar.h \
     FLMemCache.h \

@@ -607,13 +607,13 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   touch LICENSE
   # svn up 2> /dev/null
   cd $BASEDIR/src/$QSADIR
-  ./configure2/configure2
-  $QTDIR/bin/qmake CONFIG+="shared"
   rm -fr $BASEDIR/src/qt/LICENSE
-  for license in old_license.*
+  for license in $BASEDIR/src/qt/old_license.*
   do
-    mv "$license" "LICENSE${license#old_license}"
+    mv "$license" "LICENSE${license#$BASEDIR/src/qt/old_license}"
   done
+    ./configure2/configure2
+  $QTDIR/bin/qmake CONFIG+="shared"
 else
   ./configure
 fi

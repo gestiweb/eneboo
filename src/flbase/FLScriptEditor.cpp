@@ -21,7 +21,7 @@ email                : mail@infosial.com
 #include "FLSqlDatabase.h"
 #include "FLManagerModules.h"
 
-#ifdef WIN32
+#ifdef Q_OS_WIN32
 #undef QSDEBUGGER
 #endif
 
