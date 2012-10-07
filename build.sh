@@ -234,7 +234,8 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   OPT_PREFIX="$PWD/src/qt"
   BUILD_KEY="$VER-Build-mingw32-4.2"
 else
-  BUILD_KEY="$VER-Build-i686-apple-darwin8"
+  OPT_PREFIX="$PWD/src/qt"
+  BUILD_KEY="$VER-$CROSS"
 fi
 else
   MAKE_INSTALL="install"
