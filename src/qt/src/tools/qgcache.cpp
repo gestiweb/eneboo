@@ -638,7 +638,7 @@ void QGCache::statistics() const
 #if defined(QT_DEBUG)
     QString line;
     line.fill( '*', 80 );
-    qDebug( line.ascii() );
+    qDebug( "%s" , line.ascii() );
     qDebug( "CACHE STATISTICS:" );
     qDebug( "cache contains %d item%s, with a total cost of %d",
 	   count(), count() != 1 ? "s" : "", tCost );
@@ -659,7 +659,7 @@ void QGCache::statistics() const
 	   lruList->dumps != 1 ? "have" : "has", lruList->dumpCosts );
     qDebug( "Statistics from internal dictionary class:" );
     dict->statistics();
-    qDebug( line.ascii() );
+    qDebug( "%s" , line.ascii() );
 #endif
 }
 

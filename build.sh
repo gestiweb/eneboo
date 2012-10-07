@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR="$( cd -P "$( dirname "$0" )" && pwd )"
 cd "$DIR"
-VER="2.4.0"
+VER="2.4.1"
 
 REBUILD_QT=auto
 OPT_PREFIX=""
@@ -387,7 +387,11 @@ fi
 
 
 echo -e "\n\nRecopilando datos de la compilación \n"
-DATOS_COMPILACION="\n Versión eneboo: $VERSION \n Mkspecs: $OPT_QMAKESPEC \n Make: $CMD_MAKE \n Versión GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilación : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT \n QT_DEBUG_OPT: $QT_DEBUG_OPT" 
+
+if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
+DATOS_CROSS="Versión CROSS-GCC: $CC ( $(${CROSS}gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') ) \n"
+fi
+DATOS_COMPILACION="\n Versión eneboo: $VERSION \n  Mkspecs: $OPT_QMAKESPEC \n $DATOS_CROSS Make: $CMD_MAKE \n Versión GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilación : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT \n QT_DEBUG_OPT: $QT_DEBUG_OPT" 
 
 
 cat > AQConfig.h <<EOF
