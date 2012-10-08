@@ -35,6 +35,37 @@ email                : mail@infosial.com
 
 #include "AQConfig.h"
 
+
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+
+#include <openssl/sha.h>
+
+using namespace std;
+
+void test_sha256(const string name, const string str)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+    stringstream ss;
+    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+    ss << "  " << name;
+    const std::string tmp = ss.str();
+    const char* cstr = tmp.c_str();
+    qDebug(cstr);
+    // return ss.str();
+}
+
+
 class FLInfoMod
 {
 public:
@@ -334,8 +365,9 @@ QString FLManagerModules::content(const QString &n)
 
   if (notSysTable && staticBdInfo_ && staticBdInfo_->enabled_) {
     retFS = contentStatic(n);
-    if (!retFS.isEmpty())
+    if (!retFS.isEmpty()) {
       return retFS;
+    }
   }
 
   if (n.endsWith(".xml"))
@@ -353,8 +385,9 @@ QString FLManagerModules::content(const QString &n)
   else if (n.endsWith(".ts"))
     retFS = contentFS(transDir_ + n);
 
-  if (!retFS.isEmpty())
+  if (!retFS.isEmpty()) {
     return retFS;
+  }
 
   if (notSysTable) {
     QSqlQuery q(QString::null, db_->dbAux());
@@ -389,6 +422,7 @@ QString FLManagerModules::content(const QString &n)
 
   return QString::null;
 }
+
 
 #if 0
 QString FLManagerModules::contentCode(const QString &n)
@@ -458,6 +492,7 @@ QString FLManagerModules::contentCode(const QString &n)
   if (n == "sys.qs" || n == "plus_sys.qs")
     return contentCached(n);
   QString s(contentCached(n));
+  
 #if 1
   QRegExp rx;
   rx.setPattern("\\)\\s*:\\s*(FL\\w+|Object\\w*|String\\w*|Date\\w*|Number\\w*|Boolean\\w*|Array\\w*)");
@@ -490,7 +525,8 @@ QString FLManagerModules::contentFS(const QString &pN)
   return str_ret;
 }
 
-QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
+
+QString FLManagerModules::_contentCached(const QString &n, QString *shaKey)
 {
   if (n.isEmpty() || n.length() <= 3)
     return QString::null;
@@ -544,6 +580,20 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
     return *s;
 
   return str_ret;
+}
+
+QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
+{
+  QString ret = _contentCached(n,shaKey);
+  if (n && ret) {
+    test_sha256(n.latin1(), ret.latin1());
+      QString path = QString(".cache/") + n;
+      ofstream myfile;
+      myfile.open(path.latin1());
+      myfile << ret.utf8();
+      myfile.close();  
+  }
+  return ret;
 }
 
 void FLManagerModules::setContent(const QString &n, const QString &idM, const QString &content)
