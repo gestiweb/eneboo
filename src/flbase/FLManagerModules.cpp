@@ -35,6 +35,37 @@ email                : mail@infosial.com
 
 #include "AQConfig.h"
 
+
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+
+#include <openssl/sha.h>
+
+using namespace std;
+
+void test_sha256(const string name, const string str)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+    stringstream ss;
+    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+    ss << "  " << name;
+    const std::string tmp = ss.str();
+    const char* cstr = tmp.c_str();
+    qDebug(cstr);
+    // return ss.str();
+}
+
+
 class FLInfoMod
 {
 public:
@@ -343,8 +374,9 @@ QString FLManagerModules::content(const QString &n)
 
   if (notSysTable && staticBdInfo_ && staticBdInfo_->enabled_) {
     retFS = contentStatic(n);
-    if (!retFS.isEmpty())
+    if (!retFS.isEmpty()) {
       return retFS;
+    }
   }
 
   if (n.endsWith(".xml"))
@@ -362,8 +394,9 @@ QString FLManagerModules::content(const QString &n)
   else if (n.endsWith(".ts"))
     retFS = contentFS(transDir_ + n);
 
-  if (!retFS.isEmpty())
+  if (!retFS.isEmpty()) {
     return retFS;
+  }
 
   if (notSysTable) {
     QSqlQuery q(QString::null, db_->dbAux());
@@ -372,6 +405,20 @@ QString FLManagerModules::content(const QString &n)
            n.upper() + QString::fromLatin1("'"));
     if (q.next()) {
       QString ret = q.value(0).toString();
+
+      /* **** PRUEBAS COMPROBACION FICHEROS EN SHA-256 ****** */
+      QTextCodec *codec = QTextCodec::codecForName("ISO8859-15"); 
+      QCString ret_latin = codec->fromUnicode( ret );
+      
+      test_sha256(n.latin1(), (const char *)ret_latin);
+      QString path = QString(".cache/") + n;
+      ofstream myfile;
+      myfile.open(path.latin1());
+      myfile << ret_latin;
+      myfile.close();  
+      /* **** PRUEBAS COMPROBACION FICHEROS EN SHA-256 ****** */
+      
+      
       if (q.value(1).toString().isEmpty()) {
         FLSqlCursor cursor("flfiles", true, db_->dbAux());
         cursor.select(QString::fromLatin1("upper(nombre)='") +
@@ -472,6 +519,7 @@ QString FLManagerModules::contentCode(const QString &n)
   if (n == "sys.qs" || n == "plus_sys.qs")
     return contentCached(n);
   QString s(contentCached(n));
+  
   if (!s.startsWith("var form"))
     s.prepend("var form = this;\n");
   return s;
@@ -489,6 +537,7 @@ QString FLManagerModules::contentFS(const QString &pN)
   fi.close();
   return str_ret;
 }
+
 
 QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
 {
