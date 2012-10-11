@@ -579,18 +579,6 @@ if (tw.count == 0) ok =true;
     var mng = aqApp.db().managerModules();
     var areas = mng.listIdAreas();
 
-    var pg = new QProgressBar(mng.listAllIdModules().length, w, "pgBar",
-                              AQS.WType_Popup | AQS.WType_Modal);
-    pg.setCenterIndicator(false);
-    pg.setPercentageVisible(false);
-    pg.show();
-    if (!w.visible) {
-      var dw = aqApp.desktop();
-      pg.move((dw.width / 2) - (pg.width / 2),
-              (dw.height/ 1.8) - (pg.height / 2));
-    } else
-      pg.move((w.width / 2), (w.height / 2));
-
     for (var i = 0; i < areas.length; ++i) {
       var ag = new QActionGroup(agm);
       ag.name = areas[i];
@@ -623,7 +611,6 @@ if (tw.count == 0) ok =true;
 
         connect(ac, "activated()", this.actSigMap_, "map()");
         this.actSigMap_.setMapping(ac, "activated():initModule():" + ac.name);
-        pg.setProgress(pg.progress() + 1);
         if (ac.name == "sys" && ag.name == "sys")
           {
             if (sys.isDebuggerMode())
@@ -700,8 +687,6 @@ if (tw.count == 0) ok =true;
     connect(exit, "activated()", this.actSigMap_, "map()");
     this.actSigMap_.setMapping(exit, "activated():exit():" + exit.name);
 
-    pg.close();
-    pg.deleteLater();
   }
 
   function initTabWidget()
