@@ -32,7 +32,7 @@ class AQSReportViewer : public AQSWidget
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   void exec();
-  bool renderReport(int = 0, int = 0, uint = MReportViewer::Display);
+  bool renderReport(int = 0, int = 0, bool = false, bool = true);
   bool setReportData(FLSqlQuery *);
   bool setReportData(FLSqlCursor *);
   bool setReportData(QDomNode *);
@@ -99,9 +99,9 @@ inline void AQSReportViewer::exec()
 {
   AQ_CALL_VOID(exec());
 }
-inline bool AQSReportViewer::renderReport(int arg0,  int arg1,  uint arg2)
+inline bool AQSReportViewer::renderReport(int arg0,  int arg1,  bool arg2, bool arg3)
 {
-  AQ_CALL_RET_V(renderReport(arg0, arg1, arg2), bool);
+  AQ_CALL_RET_V(renderReport(arg0, arg1, arg2, arg3), bool);
 }
 inline bool AQSReportViewer::setReportData(FLSqlQuery *arg0)
 {
