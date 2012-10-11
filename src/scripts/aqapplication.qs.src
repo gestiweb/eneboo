@@ -409,17 +409,12 @@ class MainWindow
     var visible = false; 
     if ((actionName in this.ListaTabs_)) texto = ListaTabs_[actionName]; 
     
-    if(texto == undefined)
-                   {
-                    for (var i = 0; i < tw.count; ++i) if (tw.tabLabel(tw.page(i)) == fm.caption) texto = fm.caption + " (bís)"; 
-                   if (texto == undefined) texto = fm.caption; 
-                   }
-                   else 
+    if(texto != undefined) //Si existe el texto de ese actionName
                      { 
                       texto = this.ListaTabs_[actionName];
                         for (var i = 0; i < tw.count; ++i)
                                            {
-                       if (tw.tabLabel(tw.page(i)) == texto) 
+                       if (tw.tabLabel(tw.page(i)) == texto)  //Si la pestaña es visible...
                                                     {
                                                     this.ListaTabs_[actionName] = texto;
                                                     visible = true;
@@ -430,6 +425,16 @@ class MainWindow
                     }
    if (!visible) 
          {
+	texto = fm.caption //Cogemos el nuevo título
+	var ok:Boolean = false;
+	while (!ok) //Busca titulos repetidos
+                   {
+if (tw.count == 0) ok =true;
+                    for (var i = 0; i < tw.count; ++i) if (tw.tabLabel(tw.page(i)) == texto) {
+									texto = texto + " (bís)";
+											     } else ok = true; 
+                   }
+
          tw.addTab(fm,new QIconSet(iconSet16x16(new QPixmap(Pixmap))), texto);
          idx = tw.indexOf(fm);
          fm.setIdMDI(actionName);
@@ -560,18 +565,6 @@ class MainWindow
     var mng = aqApp.db().managerModules();
     var areas = mng.listIdAreas();
 
-    var pg = new QProgressBar(mng.listAllIdModules().length, w, "pgBar",
-                              AQS.WType_Popup | AQS.WType_Modal);
-    pg.setCenterIndicator(false);
-    pg.setPercentageVisible(false);
-    pg.show();
-    if (!w.visible) {
-      var dw = aqApp.desktop();
-      pg.move((dw.width / 2) - (pg.width / 2),
-              (dw.height/ 1.8) - (pg.height / 2));
-    } else
-      pg.move((w.width / 2), (w.height / 2));
-
     for (var i = 0; i < areas.length; ++i) {
       var ag = new QActionGroup(agm);
       ag.name = areas[i];
@@ -604,7 +597,6 @@ class MainWindow
 
         connect(ac, "activated()", this.actSigMap_, "map()");
         this.actSigMap_.setMapping(ac, "activated():initModule():" + ac.name);
-        pg.setProgress(pg.progress() + 1);
         if (ac.name == "sys" && ag.name == "sys")
           {
             if (sys.isDebuggerMode())
@@ -658,8 +650,6 @@ class MainWindow
     connect(exit, "activated()", this.actSigMap_, "map()");
     this.actSigMap_.setMapping(exit, "activated():exit():" + exit.name);
 
-    pg.close();
-    pg.deleteLater();
   }
 
   function initTabWidget()
