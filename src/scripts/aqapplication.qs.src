@@ -879,8 +879,8 @@ function initScript()
   mw.init();
   mw.updateMenuAndDocks();
   mw.initModule("sys");
-  mw.show();
   mw.readState();
+  mw.show();
 }
 
 function reinitScript()
