@@ -217,16 +217,19 @@ void FLReportViewer::showEvent(QShowEvent *e)
 
 bool FLReportViewer::renderReport(const int initRow, const int initCol, const bool append, const bool displayReport)
 {
-	uint flags = 0;
-	if (append) {
-		flags = flags | MReportViewer::Append;
-	}
-	if (displayReport) {
-		flags = flags | MReportViewer::Display;
-	}
-	
-	bool ret = renderReport(initRow, initCol, flags);
-	return ret;
+    if (!rptEngine_)
+        return false;
+    uint flags = 0;
+    if (append) {
+    	flags = flags | MReportViewer::Append;
+    }
+    if (displayReport) {
+    	flags = flags | MReportViewer::Display;
+    }
+    
+    bool ret = renderReport(initRow, initCol, flags);
+    report = rptViewer_->reportPages();
+    return ret;
 }
 
 bool FLReportViewer::renderReport(const int initRow, const int initCol, const uint flags)
