@@ -553,6 +553,7 @@ if (tw.count == 0) ok =true;
     connect(w.child("aboutAbanQAction"), "activated()", aqApp, "aboutAbanQ()");
     connect(w.child("fontAction"), "activated()", aqApp, "chooseFont()");
     connect(w.child("helpIndexAction"), "activated()", aqApp, "helpIndex()");
+    connect(w.child("urlEnebooAction"), "activated()", aqApp, "urlEneboo()");
   }
 
   function updateActionGroup()
@@ -718,6 +719,12 @@ if (tw.count == 0) ok =true;
       this.iconSet16x16(AQS.Pixmap_fromMimeSource("help_index.png"))
     );
     connect(helpIndex, "activated()", aqApp, "helpIndex()");
+    
+    var urlEneboo = w.child("urlEnebooAction");
+    urlEneboo.setIconSet(
+      this.iconSet16x16(AQS.Pixmap_fromMimeSource("icono_abanq.png"))
+    );
+    connect(urlEneboo, "activated()", aqApp, "urlEneboo()");
   }
 
   function initConfigMenu()
