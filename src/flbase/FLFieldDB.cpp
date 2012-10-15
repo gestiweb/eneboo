@@ -1563,6 +1563,47 @@ void FLFieldDB::setPixmapFromClipboard()
 }
 
 // Silix
+void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const int h)
+{
+  if (pixmap.isNull())
+    return;
+
+  QApplication::setOverrideCursor(waitCursor);
+
+  QPixmap pix;
+  QCString s;
+  QBuffer buffer(s);
+
+  QImage img = pixmap.convertToImage();
+  if (w != 0 && h != 0)
+    pix.convertFromImage(img.scale(w, h, QImage::ScaleMin));
+  else
+    pix.convertFromImage(img);
+
+  QApplication::restoreOverrideCursor();
+
+  if (pix.isNull())
+    return;
+
+  editorImg_->setPixmap(pix);
+
+  QApplication::setOverrideCursor(waitCursor);
+
+  buffer.open(IO_WriteOnly);
+  pix.save(&buffer, "XPM");
+
+  QApplication::restoreOverrideCursor();
+
+  if (s.isEmpty())
+    return;
+
+  if (!QPixmapCache::find(s.left(100)))
+    QPixmapCache::insert(s.left(100), pix);
+
+  updateValue(QString(s));
+}
+
+// Silix
 void FLFieldDB::savePixmap(const QString &filename, const char *format)
 {
   if (editorImg_) {
