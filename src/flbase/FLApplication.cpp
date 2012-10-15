@@ -886,6 +886,10 @@ void FLApplication::initStatusBar()
     return;
   mw->statusBar()->message(tr("Listo."));
   mw->statusBar()->setSizeGripEnabled(false);
+
+  QLabel *conexion = new QLabel(mw->statusBar());
+  conexion->setText(db()->user() + "@" + db()->database());
+  mw->statusBar()->addWidget(conexion, 0, true);
 }
 
 void FLApplication::initView()
