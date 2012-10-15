@@ -2266,6 +2266,21 @@ void QMYSQLDriver::Mr_Proper() {
   db_->dbAux()->commit();
   FLUtil::destroyProgressDialog();
 
+  // Silix
+  steps = 0;
+  FLUtil::createProgressDialog(tr("Borrando imágenes obsoletas"), 1);
+
+  if (db_->manager()->existsTable("fllarge_articulos")) {
+#ifdef FL_DEBUG
+    qWarning("Borrando imágenes obsoletas en fllarge_articulos");
+#endif
+    qry.exec("delete from fllarge_articulos where refkey not in (select imagen from articulos where imagen is not null)");
+  }
+  FLUtil::setProgress(++steps);
+
+  FLUtil::destroyProgressDialog();
+  //
+
   qry.exec("show tables");
   int qsize = qry.size();
   steps = 0;
