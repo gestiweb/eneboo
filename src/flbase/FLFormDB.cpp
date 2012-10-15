@@ -97,7 +97,7 @@ void FLFormDB::initForm()
 {
   if (cursor_ && cursor_->metadata()) {
     bool captionIsSet = false;
-    QString caption = " [ " + aqApp->lastTextCaption() + " ]";
+    QString caption = "";
     if (action_) {
       cursor_->setAction(action_);
       if (action_->caption() != QString::null) {
