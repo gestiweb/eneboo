@@ -2341,6 +2341,17 @@ public slots:
   }
 
   /**
+  Guarda imagen de campos tipo Pixmap en una ruta determinada.
+
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &filename, const char *format) {
+    obj_->savePixmap(filename, format);
+  }
+
+  /**
    Hace que el control tome el foco
    */
   void setFocus() {

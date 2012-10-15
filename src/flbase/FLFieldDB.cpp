@@ -1578,6 +1578,7 @@ void FLFieldDB::savePixmap(const QString &filename, const char *format)
   }
 }
 
+<<<<<<< HEAD
 // Silix
 QPixmap FLFieldDB::pixmap()
 {
@@ -1586,6 +1587,8 @@ QPixmap FLFieldDB::pixmap()
   return pix;
 }
 
+=======
+>>>>>>> ade9763... FLFieldDB -> Pixmap: poder guardar la imagen en una ruta determinada.
 void FLFieldDB::setFilter(const QString &f)
 {
   if (filter_ != f) {

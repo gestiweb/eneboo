@@ -432,6 +432,15 @@ public slots:
   void setPixmap(const QString &filename);
 
   /**
+  Guarda imagen de campos tipo Pixmap en una ruta determinada.
+
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &filename, const char *format);
+
+  /**
   Emite la señal de foco perdido
   */
   void emitLostFocus();
