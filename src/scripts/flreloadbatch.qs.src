@@ -231,7 +231,7 @@ function oficial_cargarModulo(nombreFichero: String) : Boolean {
   var versionSys = sys.version().match(/ [ 0 - 9 ] + .[ 0 - 9 ] + /);
   if (this.iface.compararVersiones(versionSys, versionMinimaFL) == 2) {
     var contVersion = MessageBox.warning(util.translate("scripts", "Este módulo necesita la versión ") + versionMinimaFL + util.translate("scripts", " o superior de la aplicación base,\nactualmente la versión instalada es la ") + sys.version() + util.translate("scripts", ".\nFacturaLUX puede fallar por esta causa.\n¿Desea continuar la carga?"), MessageBox.Yes, MessageBox.No);
-    if (contVersion == MessageBox.No) return;
+    if (contVersion != MessageBox.Yes) return;
   }
 
   if (!util.sqlSelect("flareas", "idarea", "idarea = '" + area + "'")) {
