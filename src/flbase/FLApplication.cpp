@@ -815,6 +815,11 @@ void FLApplication::initToolBox()
   aboutAction->setIconSet(QPixmap::fromMimeSource("about.png"));
   connect(aboutAction, SIGNAL(activated()), this, SLOT(aboutAbanQ()));
   aboutAction->addTo(helpToolBar);
+  
+  FLWidgetAction *urlAbanqAction = new FLWidgetAction(tr("Ayuda"), tr("Visita Eneboo.org"), tr("&Visita Eneboo.org"), QKeySequence(), helpToolBar, "visitaeneboo");
+  urlAbanqAction->setIconSet(QPixmap::fromMimeSource("about.png"));
+  connect(urlAbanqAction, SIGNAL(activated()), this, SLOT(urlEneboo()));
+  urlAbanqAction->addTo(helpToolBar);
 
   FLWidgetAction *aboutQt = new FLWidgetAction(tr("Ayuda"), tr("Acerca de Qt"), tr("&Acerca Qt"), QKeySequence(), helpToolBar, "acercaqt");
   aboutQt->setIconSet(QPixmap::fromMimeSource("aboutqt.png"));
@@ -1113,6 +1118,11 @@ void FLApplication::aboutAbanQ()
 void FLApplication::helpIndex()
 {
   aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.com/pub/contrib/doc/standard/"), 0);
+}
+
+void FLApplication::urlEneboo()
+{
+  aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.org/"), 0);
 }
 
 void FLApplication::statusHelpMsg(const QString &text)

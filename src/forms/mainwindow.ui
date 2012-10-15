@@ -78,6 +78,7 @@
         <action name="aboutQtAction"/>
         <separator/>
         <action name="aboutAbanQAction"/>
+        <action name="urlEnebooAction"/>
         <separator/>
         <action name="helpIndexAction"/>
     </item>
@@ -149,6 +150,17 @@
         </property>
         <property name="text">
             <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>urlEnebooAction</cstring>
+        </property>
+        <property name="text">
+            <string>Visita Eneboo.org</string>
+        </property>
+        <property name="menuText">
+            <string>Visita Eneboo.org</string>
         </property>
     </action>
 </actions>

@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR="$( cd -P "$( dirname "$0" )" && pwd )"
 cd "$DIR"
-VER="2.4.1"
+VER="2.4.X"
 
 REBUILD_QT=auto
 OPT_PREFIX=""
@@ -212,7 +212,7 @@ fi
 VERSION="$VER (Build $BUILD_NUMBER)"
 BUILD_KEY="$VER-Build"
 
-echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - STABLE - )"
+echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - DEV - )"
 echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "(C) 2012 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
@@ -738,12 +738,8 @@ cp -f ./src/tables/*.mtd $PREFIX/share/eneboo/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/eneboo/translations 2> /dev/null
 #cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
 rm $PREFIX/share/eneboo/scripts/* 2> /dev/null
-cp -f ./src/scripts/*.qs.src $PREFIX/share/eneboo/scripts 2> /dev/null
-for file in $PREFIX/share/eneboo/scripts/*.qs.src
-do
-  DST="${file%.src}"
-  mv "$file" "$DST"
-done
+cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
+
 
 cp -f ./src/docs/*.html $PREFIX/share/eneboo/doc 2> /dev/null
 cp -f ./src/*.xml $PREFIX/share/eneboo 2> /dev/null
