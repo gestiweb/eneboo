@@ -1448,6 +1448,22 @@ void FLFieldDB::setPixmap(const QString &filename)
   updateValue(QString(s));
 }
 
+// Silix
+void FLFieldDB::savePixmap(const QString &filename, const char *format)
+{
+  if (editorImg_) {
+    if (!filename.isEmpty()) {
+      QPixmap pix;
+      QApplication::setOverrideCursor(waitCursor);
+      pix.loadFromData(value().toCString());
+      if (!pix.isNull())
+        if (!pix.save(filename, format))
+          QMessageBox::warning(this, tr("Error"), tr("Error guardando fichero"));
+      QApplication::restoreOverrideCursor();
+    }
+  }
+}
+
 void FLFieldDB::setFilter(const QString &f)
 {
   if (filter_ != f) {
