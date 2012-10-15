@@ -340,3 +340,11 @@ void FLFormSearchDB::reject()
     disconnect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
   hide();
 }
+
+// Silix
+void FLFormSearchDB::setCaptionWidget(const QString &text) {
+  if (text.isEmpty())
+    return;
+
+  setCaption(text);
+}
