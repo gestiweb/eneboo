@@ -210,6 +210,7 @@ IMAGES += images/infosial.png \
     images/lock.png \
     images/file_open.png \
     images/eraser.png \
+    images/paste.png \
     images/locked.png \
     images/goto.png \
     images/settings.png \

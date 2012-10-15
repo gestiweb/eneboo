@@ -241,7 +241,7 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
   filter_(QString::null), cursor_(0), cursorAux(0), cursorInit(false), cursorAuxInit(false),
   topWidget_(0), showed(false), showAlias_(true), datePopup_(0), dateFrame_(0),
   datePickerOn_(false), autoComPopup_(0), autoComFrame_(0), accel_(0), keepDisabled_(false),
-  editorImg_(0), pbAux_(0), pbAux2_(0), pbAux3_(0), fieldAlias_(QString::null),
+  editorImg_(0), pbAux_(0), pbAux2_(0), pbAux3_(0), pbAux4_(0), fieldAlias_(QString::null),
   showEditor_(true), fieldMapValue_(0)
 {
 
@@ -1024,6 +1024,23 @@ void FLFieldDB::initEditor()
           }
         }
 
+        // Silix
+        if (!pbAux4_) {
+          pbAux4_ = new QPushButton(this, "pbAux4");
+          pbAux4_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
+                                             pbAux4_->sizePolicy().hasHeightForWidth()));
+          pbAux4_->setMinimumSize(QSize(22, 22));
+          pbAux4_->setFocusPolicy(QPushButton::NoFocus);
+          pbAux4_->setIconSet(QIconSet(QPixmap::fromMimeSource("paste.png")));
+          pbAux4_->setText(QString::null);
+          QToolTip::add(pbAux4_, tr("Pegar imagen desde el portapapeles"));
+          QWhatsThis::add(pbAux4_, tr("Pegar imagen desde el portapapeles"));
+          lytButtons->addWidget(pbAux4_);
+          if (showed)
+            disconnect(pbAux4_, SIGNAL(clicked()), this, SLOT(setPixmapFromClipboard()));
+          connect(pbAux4_, SIGNAL(clicked()), this, SLOT(setPixmapFromClipboard()));
+        }
+
         if (!pbAux_) {
           pbAux_ = new QPushButton(this, "pbAux");
           pbAux_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
@@ -1465,6 +1482,44 @@ void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const in
     pix.convertFromImage(img.scale(w, h, QImage::ScaleMin));
   else
     pix.convertFromImage(img);
+
+  QApplication::restoreOverrideCursor();
+
+  if (pix.isNull())
+    return;
+
+  editorImg_->setPixmap(pix);
+
+  QApplication::setOverrideCursor(waitCursor);
+
+  buffer.open(IO_WriteOnly);
+  pix.save(&buffer, "XPM");
+
+  QApplication::restoreOverrideCursor();
+
+  if (s.isEmpty())
+    return;
+
+  if (!QPixmapCache::find(s.left(100)))
+    QPixmapCache::insert(s.left(100), pix);
+
+  updateValue(QString(s));
+}
+
+// Silix
+void FLFieldDB::setPixmapFromClipboard()
+{
+  QImage img = QApplication::clipboard()->image();
+  if (img.isNull())
+    return;
+
+  QApplication::setOverrideCursor(waitCursor);
+
+  QPixmap pix;
+  QCString s;
+  QBuffer buffer(s);
+
+  pix.convertFromImage(img);
 
   QApplication::restoreOverrideCursor();
 
