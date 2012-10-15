@@ -2057,21 +2057,16 @@ void FLApplication::setCaptionMainWidget(const QString &text)
     QWidget *mwi = aqApp->mainWidget();
     if (mwi) {
       QString bd(db()->driverNameToDriverAlias(db()->driverName()));
-      mwi->setCaption(QString::fromLatin1("Eneboo " AQ_VERSION) +
-                      "  - [ " + lastTextCaption_ + " ] - [" + bd + " [*] " +
-                      db()->database() + " [*] " + db()->user() + "]");
+      mwi->setCaption(QString::fromLatin1("Eneboo " AQ_VERSION) + " - " + lastTextCaption_);
     }
     return;
   }
 
   AQ_SET_MNGLOADER
 
-  QString bd(db()->driverNameToDriverAlias(db()->driverName()));
   QString descripArea(mngLoader_->idAreaToDescription(mngLoader_->activeIdArea()));
   QString descripModule(mngLoader_->idModuleToDescription(mainWidget_->name()));
-  mainWidget_->setCaption(descripArea + "::" + descripModule +
-                          "  - [ " + lastTextCaption_ + " ] - [" + bd + " [*] " +
-                          db()->database() + " [*] " + db()->user() + "]");
+  mainWidget_->setCaption(lastTextCaption_ + " - " + descripArea + " - " + descripModule);
 
   AQ_UNSET_MNGLOADER
 }
