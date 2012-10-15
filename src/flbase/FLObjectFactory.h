@@ -2352,6 +2352,16 @@ public slots:
   }
 
   /**
+  Devueve el objeto imagen asociado al campo
+
+  @return imagen asociada al campo
+  @author Silix
+  */
+  QPixmap pixmap() {
+    return obj_->pixmap();
+  }
+
+  /**
    Hace que el control tome el foco
    */
   void setFocus() {

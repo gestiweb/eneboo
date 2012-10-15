@@ -1464,6 +1464,14 @@ void FLFieldDB::savePixmap(const QString &filename, const char *format)
   }
 }
 
+// Silix
+QPixmap FLFieldDB::pixmap()
+{
+  QPixmap pix;
+  pix.loadFromData(value().toCString());
+  return pix;
+}
+
 void FLFieldDB::setFilter(const QString &f)
 {
   if (filter_ != f) {
