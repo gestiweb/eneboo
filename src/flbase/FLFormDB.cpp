@@ -429,6 +429,14 @@ void FLFormDB::setMaximized()
   setWindowState(windowState() | WindowMaximized);
 }
 
+// Silix
+void FLFormDB::setCaptionWidget(const QString &text) {
+  if (text.isEmpty())
+    return;
+
+  setCaption(text);
+}
+
 void FLFormDB::emitFormReady()
 {
   emit formReady();
