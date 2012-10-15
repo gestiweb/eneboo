@@ -31,8 +31,9 @@ function init() {
 }
 
 function cargarFicheroEnBD(nombre, contenido, log, directorio) {
-  if (!util.isFLDefFile(contenido) && !nombre.endsWith(".qs") && !nombre.endsWith(".ar")) return;
+  if (!util.isFLDefFile(contenido) && !nombre.endsWith(".mod") && !nombre.endsWith(".xpm") && !nombre.endsWith(".signatures") && !nombre.endsWith(".checksum") && !nombre.endsWith(".certificates") && !nombre.endsWith(".qs") && !nombre.endsWith(".ar")) return;
 
+  
   var cursorFicheros = new FLSqlCursor("flfiles");
   var cursor = this.cursor();
 
@@ -173,6 +174,11 @@ function cargarDeDisco(directorio, comprobarLicencia) {
       sys.processEvents();
       this.setDisabled(true);
       cargarFicheros(directorio + "/", "*.xml");
+      cargarFicheros(directorio + "/", "*.mod");
+      cargarFicheros(directorio + "/", "*.xpm");
+      cargarFicheros(directorio + "/", "*.signatures");
+      cargarFicheros(directorio + "/", "*.certificates");
+      cargarFicheros(directorio + "/", "*.checksum");
       cargarFicheros(directorio + "/forms/", "*.ui");
       cargarFicheros(directorio + "/tables/", "*.mtd");
       cargarFicheros(directorio + "/scripts/", "*.qs");
@@ -195,6 +201,8 @@ function tipoDeFichero(nombre) {
 function exportarADisco(directorio) {
   if (directorio) {
     var curFiles = this.child("lineas").cursor();
+    var cursorModules = new FLSqlCursor("flmodules");
+    var cursorAreas = new FLSqlCursor("flareas");
     if (curFiles.size() != 0) {
       var dir = new Dir();
       var idModulo = this.cursor().valueBuffer("idmodulo");
@@ -222,28 +230,52 @@ function exportarADisco(directorio) {
 
         if (!contenido.isEmpty()) {
           switch (tipo) {
+          case ".xml":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
+          case ".mod":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
+          case ".xpm":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
+          case ".signatures":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
+          case ".certificates":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
+          case ".checksum":
+            sys.write("ISO-8859-1", directorio + "/" + file, contenido);
+            log.append(util.translate("scripts", "* Exportando " + file + "."));
+            break;
           case ".ui":
-            File.write(directorio + "/forms/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/forms/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".qs":
-            File.write(directorio + "/scripts/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/scripts/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".qry":
-            File.write(directorio + "/queries/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/queries/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".mtd":
-            File.write(directorio + "/tables/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/tables/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".kut":
-            File.write(directorio + "/reports/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/reports/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           case ".ts":
-            File.write(directorio + "/translations/" + file, contenido);
+            sys.write("ISO-8859-1", directorio + "/translations/" + file, contenido);
             log.append(util.translate("scripts", "* Exportando " + file + "."));
             break;
           default:
@@ -252,6 +284,8 @@ function exportarADisco(directorio) {
         }
         sys.processEvents();
       } while ( curFiles . next ());
+       cursorModules.select("idmodulo = '" + idModulo + "'");
+
       this.setDisabled(false);
       log.append(util.translate("scripts", "* Exportación finalizada."));
     }

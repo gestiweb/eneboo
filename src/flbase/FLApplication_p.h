@@ -493,6 +493,12 @@ public slots:
   Muestra la venta de ayuda con el índice
   */
   void helpIndex();
+  
+  /**
+  Muestra la url http://www.eneboo.org
+  */
+  void urlEneboo();
+  
   QLocale localeSystem() const {
     return localeSystem_;
   }
