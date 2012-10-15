@@ -20,7 +20,7 @@ var util = new FLUtil();
 
 function main() {
   var continuar = MessageBox.warning(util.translate("scripts", "Antes de cargar un módulo asegúrese de tener una copia de seguridad de todos los datos,\ny de que no hay ningun otro usuario conectado a la base de datos mientras se realiza la carga.\n\n¿Desea continuar?"), MessageBox.Yes, MessageBox.No);
-  if (continuar == MessageBox.No) return;
+  if (continuar != MessageBox.Yes) return;
 
   var nombreFichero = FileDialog.getOpenFileName("modfiles(*.mod)", util.translate("scripts", "Elegir Fichero"));
   if (nombreFichero) {
@@ -85,14 +85,14 @@ function main() {
     if (compararVersiones(versionSys, versionMinimaFL) == 2) {
       var contVersion = MessageBox.warning(
       util.translate("scripts", "Este módulo necesita la versión ") + versionMinimaFL + util.translate("scripts", " o superior de la aplicación base,\nactualmente la versión instalada es la ") + sys.version() + util.translate("scripts", ".\nFacturaLUX puede fallar por esta causa.\n¿Desea continuar la carga?"), MessageBox.Yes, MessageBox.No);
-      if (contVersion == MessageBox.No) return;
+      if (contVersion != MessageBox.Yes) return;
     }
 
     if (evaluarDependencias(dependencias) == false) return;
 
     if (!valorPorClave("flareas", "idarea", "idarea = '" + area + "'")) {
       var crearArea = MessageBox.warning(util.translate("scripts", "El área con el identificador ") + area + util.translate("scripts", " no existe. ¿Desea crearla?"), MessageBox.Yes, MessageBox.No);
-      if (crearArea == MessageBox.No) return;
+      if (crearArea != MessageBox.Yes) return;
       var dialogo = new Dialog;
       dialogo.width = 400;
       dialogo.caption = util.translate("scripts", "Crear área ") + area + ":";
@@ -115,7 +115,7 @@ function main() {
     var recargar;
     if (valorPorClave("flmodules", "idmodulo", "idmodulo = '" + modulo + "'")) {
       recargar = MessageBox.warning(util.translate("scripts", "El módulo ") + modulo + util.translate("scripts", " ya existe. ¿Desea recargarlo?"), MessageBox.Yes, MessageBox.No);
-      if (recargar == MessageBox.No) return;
+      if (recargar != MessageBox.Yes) return;
     }
 
     var curModulo = new FLSqlCursor("flmodules");
@@ -188,7 +188,7 @@ function evaluarDependencias(dependencias) {
 
     if (sys.isLoadedModule(dependencias[i]) == false) {
       res = MessageBox.warning(util.translate("scripts", "Este módulo depende del módulo ") + dependencias[i] + util.translate("scripts", ", que no está instalado.\nFacturaLUX puede fallar por esta causa.\n¿Desea continuar la carga?"), MessageBox.Yes, MessageBox.No);
-      if (res == MessageBox.No) return false;
+      if (res != MessageBox.Yes) return false;
     }
   }
   return true;
