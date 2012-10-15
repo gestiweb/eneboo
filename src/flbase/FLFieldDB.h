@@ -424,6 +424,16 @@ public slots:
   void setPixmap(const QString &filename);
 
   /**
+  Carga una imagen en el campo de tipo pixmap con el ancho y alto preferido
+
+  @param pixmap: pixmap a cargar en el campo
+  @param w: ancho preferido de la imagen
+  @param h: alto preferido de la imagen
+  @author Silix
+  */
+  void setPixmapFromPixmap(const QPixmap &pixmap, const int w = 0, const int h = 0);
+
+  /**
   Guarda imagen de campos tipo Pixmap en una ruta determinada.
 
   @param filename: Ruta al fichero donde se guardará la imagen
