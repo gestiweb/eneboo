@@ -76,6 +76,8 @@ public:
   QString version;
   QCString icono;
   QString areaDescripcion;
+  QDomDocument signatures;
+  QDomDocument certificates;
 };
 
 FLManagerModules::FLManagerModules(FLSqlDatabase *db) : db_(db)
@@ -124,10 +126,27 @@ void FLManagerModules::loadAllIdModules()
     infoMod->icono = q.value(4).toCString();
     infoMod->areaDescripcion = q.value(5).toString();
     dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
+
+    QString signatures = content(infoMod->idModulo + ".signatures");
+    QString certificates = content(infoMod->idModulo + ".certificates");
+
+    QDomDocument xmlDocSignatures;
+    xmlDocSignatures.setContent(signatures);
+
+    QDomDocument xmlDocCertificates;
+    xmlDocCertificates.setContent(certificates);
+    
+    infoMod->signatures = xmlDocSignatures;
+    infoMod->certificates = xmlDocCertificates;
+    
     if (infoMod->idModulo != "sys")
       listAllIdModules_->append(infoMod->idModulo);
     else
       sysModuleFound = true;
+    
+    checkSignatures(infoMod);
+        
+    
   }
   if (!sysModuleFound) {
     FLInfoMod *infoMod = new FLInfoMod();
@@ -139,6 +158,63 @@ void FLManagerModules::loadAllIdModules()
     infoMod->areaDescripcion = QString("Sistema");
     dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
   }
+}
+
+
+void FLManagerModules::checkSignatures(FLInfoMod *mod)
+{
+    QDomDocument sig = mod->signatures;
+    QDomDocument cert = mod->certificates;
+    
+    QDomElement sigRoot = sig.firstChild().toElement();
+    if (sigRoot.isNull()) {
+        return;
+    }
+    if (sigRoot.tagName() != "eneboo-signatures") {
+        qWarning("Signatures: XML Root Tag for signatures unknown: " + sigRoot.tagName());
+        return;
+    }
+    QDomNode n = sigRoot.firstChild();
+    while ( !n.isNull() ) {
+        if ( n.isElement() ) {
+            QDomElement e = n.toElement();
+            if (e.tagName() != "signed-document") {
+                qWarning("Signatures: tag unknown: " + e.tagName());
+            } else {
+                bool checkSignature = true;
+                qDebug("Signature found.");
+                QString checkval = e.attribute("check","true").lower();
+                if (
+                    checkval == "false" ||
+                    checkval == "f" ||
+                    checkval == "no" ||
+                    checkval == "n" ||
+                    checkval == "0"
+                    ) {
+                    checkSignature = false;
+                    qDebug("Signature will be ignored.");
+                } else if (
+                    checkval == "true" ||
+                    checkval == "t" ||
+                    checkval == "yes" ||
+                    checkval == "y" ||
+                    checkval == "1"
+                    ) {
+                    checkSignature = true;
+                    qDebug("Signature will be fully checked.");
+                } else {
+                    qWarning("Signatures: signed-document: Attribute check has unrecognized value: " + checkval);
+                }
+
+                
+                
+            }
+        }
+        n = n.nextSibling();
+    }
+    
+    
+
 }
 
 void FLManagerModules::loadIdAreas()
@@ -162,13 +238,13 @@ void FLManagerModules::loadIdAreas()
 void FLManagerModules::loadKeyFiles()
 {
   if (!dictKeyFiles) {
-    dictKeyFiles = new QDict < QString >(277);
+    dictKeyFiles = new QDict < QString >(3989);
     dictKeyFiles->setAutoDelete(true);
   } else
     dictKeyFiles->clear();
 
   if (!dictModFiles) {
-    dictModFiles = new QDict < QString >(277);
+    dictModFiles = new QDict < QString >(3989);
     dictModFiles->setAutoDelete(true);
   } else
     dictModFiles->clear();

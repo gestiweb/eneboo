@@ -39,21 +39,9 @@ class interna {
 //////////////////////////////////////////////////////////////////
 //// OFICIAL /////////////////////////////////////////////////////
 class oficial extends interna {
-  var netOp;
-  var codeBuffer;
-  var util;
 
   function oficial(context) {
     interna(context);
-  }
-  function recepcionDatos(datos) {
-    this.ctx.oficial_recepcionDatos(datos);
-  }
-  function finDatos() {
-    this.ctx.oficial_finDatos();
-  }
-  function progresoDatos(bytesDone, bytesTotal) {
-    this.ctx.oficial_progresoDatos(bytesDone, bytesTotal);
   }
 }
 //// OFICIAL /////////////////////////////////////////////////////
@@ -87,21 +75,7 @@ const iface = new ifaceCtx(this);
 //////////////////////////////////////////////////////////////////
 //// INTERNA /////////////////////////////////////////////////////
 function interna_main() {
-  this.iface.util = new FLUtil;
-
-  if (MessageBox.Yes == MessageBox.warning(this.iface.util.translate("scripts", "Se va a proceder a conectar a través de Internet\n" + "con los sistemas de InfoSiAL S.L. para obtener la\n" + "herramienta de actualización de AbanQ.\n\n" + "¿ Desea continuar ?\n\n"), MessageBox.No, MessageBox.Yes)) {
-    this.iface.netOp = new FLNetwork("http://updates.infosial.com");
-
-    connect(this.iface.netOp, "data(QString)", this, "iface.recepcionDatos");
-    connect(this.iface.netOp, "finished()", this, "iface.finDatos");
-    connect(this.iface.netOp, "dataTransferProgress(int,int)", this, "iface.progresoDatos");
-
-    this.iface.util.createProgressDialog(this.iface.util.translate("scripts", "Conectando"), 100);
-    this.iface.codeBuffer = "";
-    this.iface.netOp.get("updater.qs");
-  } else {
-    MessageBox.information(this.iface.util.translate("scripts", "Actualización cancelada."), MessageBox.Ok);
-  }
+  sys.updateAbanQ();
 }
 
 //// INTERNA /////////////////////////////////////////////////////
@@ -109,29 +83,7 @@ function interna_main() {
 /** @class_definition oficial */
 //////////////////////////////////////////////////////////////////
 //// OFICIAL /////////////////////////////////////////////////////
-function oficial_recepcionDatos(datos) {
-  if (datos != undefined) this.iface.codeBuffer += datos;
-}
 
-function oficial_finDatos() {
-  this.iface.codeBuffer = sys.toUnicode(this.iface.codeBuffer, "Latin1");
-  this.iface.util.destroyProgressDialog();
-
-  if (sys.addSysCode(this.iface.codeBuffer)) {
-    sys.setScriptEntryFunction("sys.updaterMain");
-    sys.processEvents();
-    sys.reinit();
-  } else {
-    MessageBox.critical(
-    this.iface.util.translate("scripts", "Actualización cancelada.\n" + "Se ha producido un error al intentar obtener la herramienta de actualización.\n" + "Pruebe a repetir la actualización más tarde."), MessageBox.Ok);
-  }
-}
-
-function oficial_progresoDatos(bytesDone, bytesTotal) {
-  this.iface.util.setTotalSteps(bytesTotal);
-  this.iface.util.setProgress(bytesDone);
-  this.iface.util.setLabelText(this.iface.util.translate("scripts", "Descargando %1 de %2").arg(bytesDone).arg(bytesTotal));
-}
 
 //// OFICIAL /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
