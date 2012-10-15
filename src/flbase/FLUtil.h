@@ -627,6 +627,16 @@ public:
   */
   static bool execSql(const QString &sql, const QString &connName = "default");
 
+  /**
+  Guarda imagen Pixmap en una ruta determinada.
+
+  @param data Contenido de la imagen en una cadena de caracteres
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  static void savePixmap(const QString &data, const QString &filename, const char *format);
+
 private:
 
   /**
