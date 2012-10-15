@@ -441,6 +441,14 @@ public slots:
   void savePixmap(const QString &filename, const char *format);
 
   /**
+  Devueve el objeto imagen asociado al campo
+
+  @return imagen asociada al campo
+  @author Silix
+  */
+  QPixmap pixmap();
+
+  /**
   Emite la señal de foco perdido
   */
   void emitLostFocus();
