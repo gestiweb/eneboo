@@ -70,7 +70,6 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
   comboBoxNameDB->clear();
   comboBoxInsert(comboBoxNameDB, FLSettings::readListEntry("DBA/namesDB"));
   comboBoxNameDB->setCurrentText(FLSettings::readEntry("DBA/lastDB", "eneboo"));
-  lineEditUser->setFocus();
 
   connect(comboBoxNameDB, SIGNAL(activated(const QString &)), this, SLOT(changeDB(const QString &)));
 
@@ -98,9 +97,7 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
     lineEditPassword->setText(FLSettings::readEntry("DBA/password" + connectionPath_));
   }
 
-
-
-
+  lineEditPassword->setFocus();
 }
 
 FLConnectDBDialog::~FLConnectDBDialog() {}
