@@ -391,6 +391,13 @@ private:
   FLFieldMetaData *sortField_;
 
   /**
+  Almacena los metadatos del campo por el que está actualmente ordenada la tabla en segunda instancia
+
+  @author Silix - dpinelo
+   */
+  FLFieldMetaData *sortField2_;
+
+  /**
   Crónometro interno
   */
   QTimer *timer;
@@ -426,9 +433,23 @@ private:
   int sortColumn_;
 
   /**
+  Indica el número de columna por la que ordenar los registros
+
+  @author Silix - dpinelo
+  */
+  int sortColumn2_;
+
+  /**
   Indica el sentido ascendente o descendente del la ordenacion actual de los registros
   */
   bool orderAsc_;
+
+  /**
+  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
+
+  @author Silix - dpinelo
+  */
+  bool orderAsc2_;
 
   /**
   Almacena la última claúsula de filtro aplicada en el refresco
@@ -566,12 +587,21 @@ public slots:
   void putFirstCol( const QString & c );
 
   /**
+  Coloca la columna como segunda pasando el nombre del campo.
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol( const QString & c );
+
+  /**
   Mueve una columna de un campo origen a la columna de otro campo destino
 
   @param  from  Nombre del campo de la columna de origen
   @param  to    Nombre del campo de la columna de destino
+  @param  firstSearch dpinelo: Indica si se mueven columnas teniendo en cuenta que esta función
+          se ha llamado o no, desde el combo principal de búsqueda y filtrado
   */
-  void moveCol( const QString & from, const QString & to );
+  void moveCol( const QString & from, const QString & to, bool firstSearch = true );
 
   /**
   Inicia el cursor segun este campo sea de la tabla origen o de
@@ -637,12 +667,19 @@ protected slots:
   void putFirstCol( int c );
 
   /**
+  Coloca la columna indicada como segunda.
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol( int c );
+
+  /**
   Mueve una columna desde una posicion origen a otra posicion destino.
 
   @param  from  Posicion de la columna de origen
   @param  to    Posicion de la columna de destino
   */
-  void moveCol( int from, int to );
+  void moveCol( int from, int to, bool firstSearch = true);
 
   /**
   Filtra los registros de la tabla utilizando el primer campo, según el patrón dado.
@@ -658,7 +695,7 @@ protected slots:
   Conmuta el sentido de la ordenación de los registros de la tabla, de ascendente a descendente y
   viceversa. Los registros siempre se ordenan por la primera columna.
   */
-  void switchSortOrder( int );
+  void switchSortOrder( int col );
 
   /**
   Activa la tabla de datos

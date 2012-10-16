@@ -2834,6 +2834,15 @@ public slots:
   }
 
   /**
+  Establece el segundo campo de búsqueda
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol(const QString &c) {
+    obj_->putSecondCol(c);
+  }
+
+  /**
    Mueve una columna de un campo origen a la columna de otro campo destino
 
    @param  from  Nombre del campo de la columna de origen
