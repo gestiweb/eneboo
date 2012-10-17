@@ -2528,6 +2528,11 @@ signals:
    */
   void keyReturnPressed();
 
+  /**
+  Señal de foco perdido
+  */
+  void lostFocus();
+
 private:
 
   void connects() const;

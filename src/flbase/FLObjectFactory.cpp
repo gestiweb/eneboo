@@ -489,6 +489,8 @@ void FLFieldDBInterface::connects() const
           this, SIGNAL(keyF4Pressed()));
   connect(obj_, SIGNAL(keyReturnPressed()),
           this, SIGNAL(keyReturnPressed()));
+  connect(obj_, SIGNAL(lostFocus()),
+          this, SIGNAL(lostFocus()));
 }
 
 QStringList FLTableDBInterface::primarysKeysChecked()
