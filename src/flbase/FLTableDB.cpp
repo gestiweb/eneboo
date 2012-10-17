@@ -46,8 +46,8 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   sortField_(0), initSearch_(QString::null), checkColumnEnabled_(false),
   aliasCheckColumn_(tr("Seleccionar")), fieldNameCheckColumn_(QString::null),
   checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), sortColumn2_(1),
-  orderAsc2_(true), tdbFilterLastWhere_(QString::null), findHidden_(false),
-  filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0)
+  orderAsc2_(true), sortColumn3_(2), orderAsc3_(true), tdbFilterLastWhere_(QString::null),
+  findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0)
 {
 
 #ifndef Q_OS_WIN32
@@ -390,6 +390,7 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
         tableRecords_->setColumn(0, fieldNameCheckColumn_, aliasCheckColumn_);
         sortColumn_ = 1;
         sortColumn2_ = 2;
+        sortColumn3_ = 3;
         QSqlRecord *buffer_ = cursor_->editBuffer(true);
         for (uint i = 0; i < buffer_->count(); ++i)
           buffer_->setGenerated(i, true);
@@ -407,6 +408,7 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
         setTableRecordsCursor();
         sortColumn_ = 0;
         sortColumn2_ = 1;
+        sortColumn3_ = 2;
       }
       checkColumnVisible_ = false;
     }
@@ -431,6 +433,7 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     }
     QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
     s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
+    s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
     tableRecords_->setSort(s);
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
     comboBoxFieldToSearch->clear();

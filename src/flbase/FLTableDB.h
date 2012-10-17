@@ -440,6 +440,13 @@ private:
   int sortColumn2_;
 
   /**
+  Indica el número de columna por la que ordenar los registros
+
+  @author Silix
+  */
+  int sortColumn3_;
+
+  /**
   Indica el sentido ascendente o descendente del la ordenacion actual de los registros
   */
   bool orderAsc_;
@@ -450,6 +457,13 @@ private:
   @author Silix - dpinelo
   */
   bool orderAsc2_;
+
+  /**
+  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
+
+  @author Silix
+  */
+  bool orderAsc3_;
 
   /**
   Almacena la última claúsula de filtro aplicada en el refresco
