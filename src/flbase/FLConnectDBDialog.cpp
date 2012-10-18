@@ -107,6 +107,14 @@ FLConnectDBDialog::~FLConnectDBDialog() {}
 
 void FLConnectDBDialog::tryConnect()
 {
+  QString usuario = lineEditUser->text();
+  usuario = usuario.replace(QRegExp("^[\\s\\t]+|[\\s\\t]+$"), "");
+  if (usuario.isEmpty()) {
+    error_ = true;
+    this->accept();
+    return ;
+  }
+
   FLSqlDatabase *db = new FLSqlDatabase();
 
   if (!db->loadDriver(FLSqlDatabase::driverAliasToDriverName(comboBoxDB->currentText()))) {
@@ -119,7 +127,7 @@ void FLConnectDBDialog::tryConnect()
     return ;
   }
 
-  if (!db->connectDB(comboBoxNameDB->currentText(), lineEditUser->text(),
+  if (!db->connectDB(comboBoxNameDB->currentText(), usuario,
                      lineEditPassword->text(), lineEditHost->text(), lineEditPort->text().toInt())) {
     error_ = true;
     delete db;
@@ -127,7 +135,6 @@ void FLConnectDBDialog::tryConnect()
     return ;
   }
 
-  QString usuario = lineEditUser->text();
   QString host = lineEditHost->text();
   QString puerto = lineEditPort->text();
   // connectionPath_("%1");
@@ -137,7 +144,7 @@ void FLConnectDBDialog::tryConnect()
   connectionPath_ = connectionPath_ + comboBoxDB->currentText();
   connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
   FLSettings::writeEntry("DBA/rememberPasswd" + connectionPath_, rememberPasswd_);
-  FLSettings::writeEntry("DBA/username", lineEditUser->text());
+  FLSettings::writeEntry("DBA/username", usuario);
   if (rememberPasswd_)
     FLSettings::writeEntry("DBA/password" + connectionPath_, lineEditPassword->text());
   else
