@@ -1013,16 +1013,25 @@ bool QPSQLDriver::open(const QString &db, const QString &user, const QString &pa
   if (isOpen())
     close();
   QString connectString;
+  QString value_host = host;
+  QString value_db = db;
+  QString value_user = user;
+  QString value_password = password;
+  value_host = value_host.replace("'","\\'");
+  value_db = value_db.replace("'","\\'");
+  value_user = value_user.replace("'","\\'");
+  value_password = value_password.replace("'","\\'");
+  
   if (host.length())
-    connectString.append("host=").append(host);
+    connectString.append("host='").append(value_host).append("'");
   if (db.length())
-    connectString.append(" dbname=").append(db);
+    connectString.append(" dbname='").append(value_db).append("'");
   if (user.length())
-    connectString.append(" user=").append(user);
+    connectString.append(" user='").append(value_user).append("'");
   if (password.length())
-    connectString.append(" password=").append(password);
+    connectString.append(" password='").append(value_password).append("'");
   if (port > -1)
-    connectString.append(" port=").append(QString::number(port));
+    connectString.append(" port='").append(QString::number(port)).append("'");
 
   if (!connOpts.isEmpty())
     connectString += " " + QStringList::split(';', connOpts).join(" ");
