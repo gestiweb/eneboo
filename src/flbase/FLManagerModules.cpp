@@ -205,7 +205,42 @@ void FLManagerModules::checkSignatures(FLInfoMod *mod)
                 } else {
                     qWarning("Signatures: signed-document: Attribute check has unrecognized value: " + checkval);
                 }
+                QDomElement certificate, document, signature;
+                
+                QDomNode n1 = e.firstChild();
+                while ( !n1.isNull() ) {
+                    if ( n1.isElement() ) {
+                        QDomElement e = n.toElement();
+                        if (e.tagName() == "signer-certificate") {
+                            certificate = e;
+                        } else if (e.tagName() == "document") {
+                            document = e;
+                        } else if (e.tagName() == "signature") {
+                            signature = e;
+                        } else {
+                            qWarning("Signatures: tag unknown: " + e.tagName());
+                        }
+                    }
+                    n1 = n1.nextSibling();
+                }
+                
+                if (certificate.isNull()) {
+                    qError("Signatures: Certificate tag not found");
+                    continue;
+                }
+                
+                if (document.isNull()) {
+                    qError("Signatures: Document tag not found");
+                    continue;
+                }
+                
+                if (signature.isNull()) {
+                    qError("Signatures: Signature tag not found");
+                    continue;
+                }
+                
 
+                
                 
                 
             }
