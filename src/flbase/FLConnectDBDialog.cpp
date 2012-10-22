@@ -415,6 +415,6 @@ void FLConnectDBDialog::setRememberPasswd(bool on)
 void FLConnectDBDialog::setOldApi(bool on)
 {
   oldApi_ = on;
-  printf("--> Setting old api: %s\n", on ? "True" : "False");
+  // printf("--> Setting old api: %s\n", on ? "True" : "False");
   FLSettings::writeEntry("application/oldApi", oldApi_);
 }
