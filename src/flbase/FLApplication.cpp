@@ -1122,6 +1122,8 @@ void FLApplication::aboutAbanQ()
 void FLApplication::helpIndex()
 {
   aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.com/pub/contrib/doc/standard/"), 0);
+                                        ".", 0, "help viewer");
+  help->show();
 }
 
 void FLApplication::urlEneboo()
