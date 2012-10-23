@@ -225,17 +225,17 @@ void FLManagerModules::checkSignatures(FLInfoMod *mod)
                 }
                 
                 if (certificate.isNull()) {
-                    qError("Signatures: Certificate tag not found");
+                    qWarning("Signatures: Certificate tag not found");
                     continue;
                 }
                 
                 if (document.isNull()) {
-                    qError("Signatures: Document tag not found");
+                    qWarning("Signatures: Document tag not found");
                     continue;
                 }
                 
                 if (signature.isNull()) {
-                    qError("Signatures: Signature tag not found");
+                    qWarning("Signatures: Signature tag not found");
                     continue;
                 }
                 
