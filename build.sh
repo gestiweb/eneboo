@@ -682,7 +682,7 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	${CROSS}install_name_tool -change libssl.0.dylib @executable_path/../../../../lib/libssl.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libxml2.2.dylib @executable_path/../../../../lib/libxml2.2.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libxslt.1.dylib @executable_path/../../../../lib/libxslt.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
-	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
+${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/designer.app/Contents/MacOS/designer
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/linguist.app/Contents/MacOS/linguist
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/lupdate
 	${CROSS}install_name_tool -change libexslt.0.dylib @executable_path/../../../../lib/libexslt.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo

@@ -2,11 +2,11 @@
 
 VERSION=$(git describe --tags)
 PROJECT="eneboo"
-PVERSION="${PROJECT}-${VERSION}-dba"
-SRC="eneboo-build-linux64-dba"
-test -e "$SRC" || { echo "No existe compilacion dbAdmin para Linux 64 bits! (falta carpeta $SRC)"; exit 1; }
+PVERSION="${PROJECT}-${VERSION}-quick"
+SRC="eneboo-build-linux64-quick"
+test -e "$SRC" || { echo "No existe compilacion quick para Linux 64 bits! (falta carpeta $SRC)"; exit 1; }
 
-echo "Exportando compilacion dbAdmin Linux 64 bits para $PVERSION . . . "
+echo "Exportando compilacion quick Linux 64 bits para $PVERSION . . . "
 
 cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"

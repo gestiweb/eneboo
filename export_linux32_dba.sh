@@ -8,6 +8,7 @@ test -e "$SRC" || { echo "No existe compilacion dbAdmin para Linux 32 bits! (fal
 
 echo "Exportando compilacion dbAdmin Linux 32 bits para $PVERSION . . . "
 
+cp COPYING "$SRC"
 mv "$SRC" "$PVERSION"
 tar cf "$PVERSION-linux32.tar" "$PVERSION" --exclude="*.a" --exclude="*.o" --exclude="*.prl" --exclude="mkspecs" --exclude="include"  --exclude="templates" 
 bzip2 -9 "$PVERSION-linux32.tar"
