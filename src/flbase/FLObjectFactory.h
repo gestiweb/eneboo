@@ -354,6 +354,16 @@ public slots:
   }
 
   /**
+   Obtiene la contraseña del usuario conectado a la base de datos
+
+   @param connName Nombre de la conexion
+   @return Contraseña del usuario
+   */
+  QString passUser(const QString &connName = "default") const {
+    return FLSqlConnections::database(connName)->password();
+  }
+
+  /**
    Obtiene el nombre de la base de datos
 
    @param connName Nombre de la conexion
