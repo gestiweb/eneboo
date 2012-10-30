@@ -285,6 +285,33 @@ function exportarADisco(directorio) {
         sys.processEvents();
       } while ( curFiles . next ());
        cursorModules.select("idmodulo = '" + idModulo + "'");
+       
+       if (cursorModules.first())
+            {
+                    cursorAreas.select("idarea = '" + cursorModules.valueBuffer("idarea") + "'");
+                    cursorAreas.first();
+                     areaName = cursorAreas.valueBuffer("descripcion");
+
+       if (!File.exists(directorio + "/" + cursorModules.valueBuffer("idmodulo")+".xpm"))
+       		{
+          	sys.write("ISO-8859-1", directorio + "/" + cursorModules.valueBuffer("idmodulo")+".xpm", cursorModules.valueBuffer("icono"));
+                log.append(util.translate("scripts", "* Exportando " + cursorModules.valueBuffer("idmodulo") + ".xpm (Regenerado)."));
+		}
+				
+	if (!File.exists(directorio + "/" + cursorModules.valueBuffer("idmodulo")+".mod"))	
+		{	
+                 contenido = '<!DOCTYPE MODULE>\n<MODULE>\n<name>'+cursorModules.valueBuffer("idmodulo")+'</name>\n<alias>QT_TRANSLATE_NOOP("FLWidgetApplication","'+
+                 cursorModules.valueBuffer("descripcion")+'")</alias>\n<area>'+cursorModules.valueBuffer("idarea")+'</area>\n<areaname>QT_TRANSLATE_NOOP("FLWidgetApplication","'+
+                 areaName+'")</areaname>\n<version>'+cursorModules.valueBuffer("version")+'</version>\n<icon>'+cursorModules.valueBuffer("idmodulo")+
+                 '.xpm</icon>\n<flversion>'+cursorModules.valueBuffer("version")+'</flversion>\n<description>'+cursorModules.valueBuffer("idmodulo")+'</description>\n</MODULE>';
+                  
+                sys.write("ISO-8859-1", directorio + "/" + cursorModules.valueBuffer("idmodulo")+".mod",contenido);
+                log.append(util.translate("scripts", "* Generando " + cursorModules.valueBuffer("idmodulo") + ".mod (Regenerado)."));      
+		}
+                     
+          
+ 
+            }
 
       this.setDisabled(false);
       log.append(util.translate("scripts", "* Exportación finalizada."));
