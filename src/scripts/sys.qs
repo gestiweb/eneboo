@@ -17,81 +17,11 @@
  ***************************************************************************/
 
 function init() {
-  var qry = new AQSqlQuery;
-  qry.setSelect("valor");
-  qry.setFrom("flsettings");
-  qry.setWhere("flkey='sysmodver'");
-
-  if (!qry.exec() || !qry.next())
-    return;
-
-  var modVer = qry.value(0).toString();
-  if (modVer.charAt(0) == '@') {
-    var txt = "";
-    txt += sys.translate("La versión instalada de los módulos en esta  base\n");
-    txt += sys.translate("de datos está desactualizada, le recomendamos que\n");
-    txt += sys.translate("la actualice lo antes posible.\n");
-    txt += sys.translate("Mientras tanto, Eneboo necesita realizar algunos\n");
-    txt += sys.translate("ajustes para  poder ser  ejecutado con las nuevas\n");
-    txt += sys.translate("versiones.\n");
-    txt += sys.translate("No  debería  continuar  si no tiene una  copia de\n");
-    txt += sys.translate("seguridad que le  permita deshacer  los cambios y\n");
-    txt += sys.translate("volver al estado anterior en cualquier momento.\n\n");
-    txt += "\n\n";
-    txt += sys.translate("¿Desea continuar?");
-
-    var res = MessageBox.warning(txt, MessageBox.No, MessageBox.Yes);
-    if (res == MessageBox.No) {
-      sys.AQTimer.singleShot(0, aqApp.quit);  
-      return;
-    }
-    
-    modVer = '#' + modVer.mid(1);
-    AQSql.update("flsettings", ["valor"], [modVer], "flkey='sysmodver'");
-    sys.AQTimer.singleShot(0, sys.reinit);
-    return;
-  }
-
   if (isLoadedModule("flfactppal")) {
     var util: FLUtil = new FLUtil();
     var codEjercicio: String = flfactppal.iface.pub_ejercicioActual();
     var nombreEjercicio: String = util.sqlSelect("ejercicios", "nombre", "codejercicio='" + codEjercicio + "'");
     setCaptionMainWidget(nombreEjercicio);
-  }
-  //return;
-  if (sys.mainWidget() != undefined) {
-    var util = new FLUtil();
-    var curFiles = new FLSqlCursor("flfiles");
-    curFiles.select();
-    if (!curFiles.size()) {
-      var continuar = MessageBox.warning(util.translate("scripts", "No hay módulos cargados en esta base de datos,\nAbanQ puede cargar automáticamente la base de módulos\nde Facturación y Financiera incluidos en la instalación.\n\n¿Desea cargar ahora estos módulos base?\n"), MessageBox.Yes, MessageBox.No);
-      if (continuar == MessageBox.Yes) {
-        var dirModsFact = sys.installPrefix() + "/share/facturalux/modulos/facturacion/";
-        var dirModsCont = sys.installPrefix() + "/share/facturalux/modulos/contabilidad/";
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "principal/flfactppal.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "almacen/flfactalma.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "facturacion/flfacturac.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "tesoreria/flfactteso.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsFact + "informes/flfactinfo.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsCont + "principal/flcontppal.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        formflreloadbatch.iface.pub_cargarModulo(Dir.cleanDirPath(dirModsCont + "informes/flcontinfo.mod"));
-        while (formRecordflmodules.child("log"))
-        sys.processEvents();
-        sys.reinit();
-      }
-    }
   }
 }
 
@@ -264,10 +194,10 @@ class AQTimer {
 function loadModules(input, warnBackup)
 {
   if (input == undefined) {
-    var dir = new Dir(sys.installPrefix() + "/share/abanq/packages");
+    var dir = new Dir(sys.installPrefix() + "/share/eneboo/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
-              "AbanQ Packages (*.abanq)",
+              "Eneboo Packages (*.eneboopkg)\nAbanQ Packages (*.abanq)",
               AQUtil.translate("scripts", "Seleccionar Fichero")
             );
   }
@@ -311,7 +241,13 @@ function loadAbanQPackage(input, warnBackup)
         errorMsgBox(msg);
         ok = false;
       }
+      //debug("Versión " + unpacker.getVersion()); //devuelve el fabricante del paquete
+          //Por ahora los paquetes a cargar usan la misma estructura
+                   unpacker.jump(); //Espacio1
+                   unpacker.jump(); //Espacio2
+                   unpacker.jump(); //Espacio3
 
+ 
       if (ok)
         ok = loadModulesDef(unpacker);
 
@@ -385,6 +321,7 @@ function loadFilesDef(un)
 
 function registerFile(fil, un)
 {
+var Dump;
   if (fil.id.endsWith(".xpm")) {
     var cur = new AQSqlCursor("flmodules");
     if (!cur.select("idmodulo='" + fil.module + "'"))
@@ -409,9 +346,8 @@ function registerFile(fil, un)
   cur.setValueBuffer("sha", fil.shatext);
   if (fil.text.length > 0)
     cur.setValueBuffer("contenido", un.getText());
-  if (fil.binary.length > 0)
-    un.getBinary() // drop the binary data.
-    
+ if (fil.binary.length > 0)
+    Dump = un.getBinary(); // Hay que solicitarlo para que cuente el espacio.
   return cur.commitBuffer();
 }
 
@@ -800,6 +736,8 @@ function importModules(warnBackup)
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
     txt += sys.translate("datos mientras se realiza la importación.\n\n");
+    txt += sys.translate("Obtenga soporte en");
+    txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
