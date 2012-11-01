@@ -524,8 +524,6 @@ function updateAbanQ()
   /*
   var msg = "";
   msg += sys.translate("Se va a proceder a conectar a través de Internet\n");
-  msg += sys.translate("con los sistemas de InfoSiAL S.L. para obtener la\n");
-  msg += sys.translate("herramienta de actualización de AbanQ.\n\n");
   msg += sys.translate("¿ Desea continuar ?\n\n");
   if (MessageBox.Yes != MessageBox.warning(msg, MessageBox.No, MessageBox.Yes,
                         MessageBox.NoButton, "AbanQ"))
@@ -736,8 +734,6 @@ function importModules(warnBackup)
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
     txt += sys.translate("datos mientras se realiza la importación.\n\n");
-    txt += sys.translate("Obtenga soporte en");
-    txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
