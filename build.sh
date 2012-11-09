@@ -727,13 +727,7 @@ cp -f ./src/tables/*.mtd $PREFIX/share/eneboo/tables 2> /dev/null
 cp -f ./src/translations/*.ts $PREFIX/share/eneboo/translations 2> /dev/null
 #cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
 rm $PREFIX/share/eneboo/scripts/* 2> /dev/null
-cp -f ./src/scripts/*.qs.src $PREFIX/share/eneboo/scripts 2> /dev/null
-for file in $PREFIX/share/eneboo/scripts/*.qs.src
-do
-  DST="${file%.src}"
-  mv "$file" "$DST"
-done
-
+cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
 cp -f ./src/docs/*.html $PREFIX/share/eneboo/doc 2> /dev/null
 cp -f ./src/*.xml $PREFIX/share/eneboo 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/eneboo 2> /dev/null
