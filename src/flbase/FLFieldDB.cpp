@@ -2429,7 +2429,10 @@ void FLFieldDB::setDisabled(const bool b)
     cFondo = qApp->palette().color(QPalette::Disabled, QColorGroup::Background);
   } else {
     cTexto = qApp->palette().color(QPalette::Active, QColorGroup::Text);
-    cFondo = qApp->palette().color(QPalette::Active, QColorGroup::Base);
+    if (field->allowNull())
+      cFondo = qApp->palette().color(QPalette::Active, QColorGroup::Base);
+    else
+      cFondo = QColor(255, 233, 173);
   }
 
   switch (field->type()) {
@@ -2440,6 +2443,7 @@ void FLFieldDB::setDisabled(const bool b)
       if (field->hasOptionsList()) {
         if (editor_ && ::qt_cast<QComboBox *>(editor_)) {
           ::qt_cast<QComboBox *>(editor_)->setDisabled(b);
+          ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(cFondo);
           ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
         }
       } else {
@@ -2469,6 +2473,7 @@ void FLFieldDB::setDisabled(const bool b)
     case QVariant::Date:
       if (editor_ && ::qt_cast<FLDateEdit *>(editor_)) {
         ::qt_cast<FLDateEdit *>(editor_)->setDisabled(b);
+        ::qt_cast<FLDateEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
         ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
       }
       break;
@@ -2476,6 +2481,7 @@ void FLFieldDB::setDisabled(const bool b)
     case QVariant::Time:
       if (editor_ && ::qt_cast<QTimeEdit *>(editor_)) {
         ::qt_cast<QTimeEdit *>(editor_)->setDisabled(b);
+        ::qt_cast<QTimeEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
       }
       break;
 
