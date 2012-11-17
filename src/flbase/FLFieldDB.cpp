@@ -2593,7 +2593,6 @@ void FLFieldDB::setDisabled(const bool b)
     case QVariant::Date:
       if (editor_ && ::qt_cast<FLDateEdit *>(editor_)) {
         ::qt_cast<FLDateEdit *>(editor_)->setDisabled(b);
-        ::qt_cast<FLDateEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
         ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
       }
       break;
@@ -2602,7 +2601,6 @@ void FLFieldDB::setDisabled(const bool b)
       if (editor_ && ::qt_cast<QTimeEdit *>(editor_)) {
         ::qt_cast<QTimeEdit *>(editor_)->setDisabled(b);
         ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-        ::qt_cast<QTimeEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
       }
       break;
 
