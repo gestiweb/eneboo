@@ -2481,6 +2481,7 @@ void FLFieldDB::setDisabled(const bool b)
     case QVariant::Time:
       if (editor_ && ::qt_cast<QTimeEdit *>(editor_)) {
         ::qt_cast<QTimeEdit *>(editor_)->setDisabled(b);
+        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
         ::qt_cast<QTimeEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
       }
       break;
