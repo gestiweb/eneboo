@@ -1,0 +1,23 @@
+
+Compiling the application requires Qt 3, available at www.trolltech.com.
+It should already be installed if you are using KDE.
+
+Open a terminal window and cd into the source directory, teddy.
+Execute the following command to compile:
+
+qmake teddy.pro
+make
+
+
+Move the compiled application file: bin/teddy, 
+to wherever you wish to keep it.  The other files may be discarded.
+
+To un-install, simply delete the file.
+
+
+
+Delete temporary build files using the command:
+
+make clean
+
+
