@@ -77,8 +77,7 @@ void FLFormRecordDB::initForm()
       cursor_->setContext(iface);
     }
 
-    QString caption = cursor_->metadata()->alias() + " [ "
-                      + aqApp->lastTextCaption() + " ]";
+    QString caption = cursor_->metadata()->alias();
     switch (cursor_->modeAccess()) {
       case FLSqlCursor::INSERT:
         cursor_->transaction();
@@ -532,8 +531,7 @@ void FLFormRecordDB::acceptContinue()
       cursor_->commit();
       cursor_->setModeAccess(FLSqlCursor::INSERT);
       accepted = false;
-      QString caption = cursor_->metadata()->alias() + " [ "
-                        + aqApp->lastTextCaption() + " ]";
+      QString caption = cursor_->metadata()->alias();
       cursor_->transaction();
       setCaption(tr("Insertar ") + caption);
       if (initFocusWidget_)
@@ -694,4 +692,24 @@ void FLFormRecordDB::disablePushButtonCancel()
 {
   if (pushButtonCancel)
     pushButtonCancel->setDisabled(true);
+}
+
+// Silix
+void FLFormRecordDB::setCaptionWidget(const QString &text) {
+  if (text.isEmpty())
+    return;
+
+  switch (cursor_->modeAccess()) {
+    case FLSqlCursor::INSERT:
+      setCaption(tr("Insertar ") + text);
+      break;
+
+    case FLSqlCursor::EDIT:
+      setCaption(tr("Editar ") + text);
+      break;
+
+    case FLSqlCursor::BROWSE:
+      setCaption(tr("Visualizar ") + text);
+      break;
+  }
 }

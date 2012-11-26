@@ -82,7 +82,7 @@ FLFormSearchDB::~FLFormSearchDB()
 void FLFormSearchDB::initForm()
 {
   if (cursor_ && cursor_->metadata()) {
-    QString caption = " [ " + aqApp->lastTextCaption() + " ]";
+    QString caption = "";
     if (action_) {
       cursor_->setAction(action_);
       if (action_->caption() != QString::null)
@@ -339,4 +339,12 @@ void FLFormSearchDB::reject()
   if (cursor_)
     disconnect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
   hide();
+}
+
+// Silix
+void FLFormSearchDB::setCaptionWidget(const QString &text) {
+  if (text.isEmpty())
+    return;
+
+  setCaption(text);
 }

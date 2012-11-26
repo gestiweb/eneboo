@@ -47,6 +47,7 @@ function tipoDeFichero(nombre) {
 
 function editarFichero() {
   var cursor = this.cursor();
+  var util = new FLUtil();
 
   if (cursor.checkIntegrity()) {
     this.child("nombre").setDisabled(true);
@@ -59,27 +60,51 @@ function editarFichero() {
     temporal = temporal + "/" + cursor.valueBuffer("nombre");
 
     var contenido = this.child("contenido").text;
-
+    var comando:String;
     switch (tipo) {
     case ".ui":
-      File.write(temporal, contenido);
-      var comando = sys.installPrefix() + "/bin/designer";
-      this.setDisabled(true);
+	if (util.getOS() == "MACX")
+			{ 
+			File.write( temporal, contenido + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+			comando = sys.installPrefix() + "/bin/designer.app/Contents/MacOS/designer";
+			}
+	else
+			{
+      			File.write(temporal, contenido);
+      			comando = sys.installPrefix() + "/bin/designer";
+			}      
+	this.setDisabled(true);
       Process.execute([comando, temporal]);
       this.child("contenido").text = File.read(temporal);
       this.setDisabled(false);
       break;
     case ".ts":
-      File.write(temporal, contenido);
-      var comando = sys.installPrefix() + "/bin/linguist";
+	if (util.getOS() == "MACX")
+			{
+		        File.write( temporal, contenido + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+      			comando = sys.installPrefix() + "/bin/linguist.app/Contents/MacOS/linguist";
+			}
+	else
+			{
+     			File.write(temporal, contenido);
+      			comando = sys.installPrefix() + "/bin/linguist";
+      			}
       this.setDisabled(true);
       Process.execute([comando, temporal]);
       this.child("contenido").text = File.read(temporal);
       this.setDisabled(false);
       break;
     case ".kut":
-      File.write(temporal, contenido);
-      var comando = sys.installPrefix() + "/bin/kudesigner";
+	if (util.getOS() == "MACX")
+			{
+		        File.write( temporal, contenido + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+      			comando = sys.installPrefix() + "/bin/kudesigner.app/Contents/MacOS/kudesigner";
+			}
+	else
+			{
+      			File.write(temporal, contenido);
+      			comando = sys.installPrefix() + "/bin/kudesigner";
+			}
       this.setDisabled(true);
       Process.execute([comando, temporal]);
       this.child("contenido").text = File.read(temporal);
@@ -110,18 +135,25 @@ function editarFichero() {
 
 function editarFicheroXML() {
   var cursor = this.cursor();
-
+  var util = new FLUtil();
   if (cursor.checkIntegrity()) {
     var temporal = System.getenv("TMP");
     if (temporal.isEmpty()) temporal = System.getenv("TMPDIR");
     if (temporal.isEmpty()) temporal = System.getenv("HOME");
     if (temporal.isEmpty()) temporal = sys.installPrefix() + "/share/facturalux/tmp";
     temporal = temporal + "/" + cursor.valueBuffer("nombre");
-
+    var comando:String;
     var contenido = this.child("contenido").text;
-
-    File.write(temporal, contenido);
-    var comando = sys.installPrefix() + "/bin/teddy";
+    if (util.getOS() == "MACX")
+			{
+		        File.write( temporal, contenido + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+      			comando = sys.installPrefix() + "/bin/teddy.app/Contents/MacOS/teddy";
+			}
+	else
+			{
+    			File.write(temporal, contenido);
+   			comando = sys.installPrefix() + "/bin/teddy";
+			}
     this.setDisabled(true);
     Process.execute([comando, temporal]);
     this.child("contenido").text = File.read(temporal);

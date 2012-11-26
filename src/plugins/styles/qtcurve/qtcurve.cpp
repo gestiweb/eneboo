@@ -3300,9 +3300,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement pe, QPainter *p, const QRect &
                 if(NO_SECT!=itsHoverSect && HOVER_HEADER==itsHover && itsHoverWidget)
                 {
                     QHeader *hd(::qt_cast<QHeader *>(itsHoverWidget));
-
-                    if(hd && hd->isClickEnabled(itsHoverSect) && r==hd->sectionRect(itsHoverSect))
-                        flags|=Style_MouseOver;
+		    if (hd->mapToIndex(itsHoverSect) > 0) //Aulla. Evitamos que sea un index vacio
+                         if(hd && hd->isClickEnabled(itsHoverSect) && r==hd->sectionRect(itsHoverSect))
+                             flags|=Style_MouseOver;
                 }
 
                 bool sunken(flags &(Style_Down | Style_On | Style_Sunken));

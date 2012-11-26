@@ -1,0 +1,33 @@
+VERSION 1.0
+
+features:
+- optional word wrap on cells, set in preferences
+- flattened display so that all elements are indented within a single column
+- error/warning log with ability to open problem file in a text editor
+- expandable/retactable hierarchy
+- undo/redo
+- recent files
+- export to html with css
+- cut and paste as xml text
+- online help linked in menu
+- support for various encodings
+- cross platform support for Linux, Windows, and Mac OS X
+- improved find and replace
+
+-------------------------------------------------
+
+VERSION 0.2
+
+features:
+- single tag DTD editable (multi-tag inline DTD is still not supported - no one uses this kind of DTD anyway)
+- preference settings for fonts and colors
+- saved last window dimensions and last opened directory
+- open files by drag to icon or by command line (ie.  teddy file1.xml file2.xml ... fileN.xml )
+
+bug fixes:
+- library <math.h> explicitly included in teddy.cpp because some compilers do not implicitly include it  (Discovered by: Roberto Rosselli Del Turco)
+- corrected Mac OS X version to build statically w/o library dependencies  (Discovered by: Johannes la Poutré)
+- html exported xml now properly shows tab characters in CDATA and text cells
+
+
+
