@@ -31,8 +31,8 @@ function init() {
 
     var nombre = cursor.valueBuffer("nombre");
     var tipo = tipoDeFichero(nombre);
-    if (tipo == ".ui" || tipo == ".ts" || tipo == ".qs") pbXMLEditor.setEnabled(false);
-    else connect(pbXMLEditor, "clicked()", this, "editarFicheroXML");
+    pbXMLEditor.setEnabled(false);
+    
   }
 }
 
@@ -89,22 +89,6 @@ function editarFichero() {
      			File.write(temporal, contenido);
       			comando = sys.installPrefix() + "/bin/linguist";
       			}
-      this.setDisabled(true);
-      Process.execute([comando, temporal]);
-      this.child("contenido").text = File.read(temporal);
-      this.setDisabled(false);
-      break;
-    case ".kut":
-	if (util.getOS() == "MACX")
-			{
-		        File.write( temporal, contenido + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
-      			comando = sys.installPrefix() + "/bin/kudesigner.app/Contents/MacOS/kudesigner";
-			}
-	else
-			{
-      			File.write(temporal, contenido);
-      			comando = sys.installPrefix() + "/bin/kudesigner";
-			}
       this.setDisabled(true);
       Process.execute([comando, temporal]);
       this.child("contenido").text = File.read(temporal);
