@@ -119,7 +119,7 @@ function editarFichero() {
 
 function editarFicheroXML() {
   var cursor = this.cursor();
-
+  var util = new FLUtil();
   if (cursor.checkIntegrity()) {
     var temporal = System.getenv("TMP");
     if (temporal.isEmpty()) temporal = System.getenv("TMPDIR");
