@@ -4228,6 +4228,16 @@ public slots:
       obj_->setMaximized();
   }
 
+  /**
+  Establece el título de la ventana.
+
+  @param text Texto a establecer como título de la ventana
+  @author Silix
+  */
+  void setCaptionWidget(const QString &text) {
+    obj_->setCaptionWidget(text);
+  }
+
 signals:
 
   /**
@@ -4533,6 +4543,16 @@ public slots:
   void setMaximized() {
     if (obj_)
       obj_->setMaximized();
+  }
+
+  /**
+  Establece el título de la ventana.
+
+  @param text Texto a establecer como título de la ventana
+  @author Silix
+  */
+  void setCaptionWidget(const QString &text) {
+    obj_->setCaptionWidget(text);
   }
 
 signals:
@@ -4848,6 +4868,16 @@ public slots:
   void setMaximized() {
     if (obj_)
       obj_->setMaximized();
+  }
+
+  /**
+  Establece el título de la ventana.
+
+  @param text Texto a establecer como título de la ventana
+  @author Silix
+  */
+  void setCaptionWidget(const QString &text) {
+    obj_->setCaptionWidget(text);
   }
 
 signals:

@@ -97,7 +97,7 @@ void FLFormDB::initForm()
 {
   if (cursor_ && cursor_->metadata()) {
     bool captionIsSet = false;
-    QString caption = " [ " + aqApp->lastTextCaption() + " ]";
+    QString caption = "";
     if (action_) {
       cursor_->setAction(action_);
       if (action_->caption() != QString::null) {
@@ -427,6 +427,14 @@ void FLFormDB::showForDocument()
 void FLFormDB::setMaximized()
 {
   setWindowState(windowState() | WindowMaximized);
+}
+
+// Silix
+void FLFormDB::setCaptionWidget(const QString &text) {
+  if (text.isEmpty())
+    return;
+
+  setCaption(text);
 }
 
 void FLFormDB::emitFormReady()
