@@ -140,7 +140,7 @@ void FLLineEdit::focusInEvent(QFocusEvent *f)
     QLineEdit::setText(s);
     blockSignals(false);
   }
-  if (selectedText().isEmpty())
+  if (selectedText().isEmpty() && !isReadOnly())
     selectAll();
   QLineEdit::focusInEvent(f);
 }
