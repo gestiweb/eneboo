@@ -1893,17 +1893,20 @@ bool FLSqlCursor::select(const QString &filter, const QSqlIndex &sort)
   if (d->isQuery_) {
     FLSqlQuery *qry = d->db_->manager()->query(d->metadata_->query(), this);
     FLTableMetaData *mtdAux = d->db_->manager()->metadata(d->metadata_->name(), true);
-    QStringList fL = QStringList::split(',', mtdAux->fieldList(false));
+    QString mtdFieldList = mtdAux->fieldList(false);
+    QStringList fL = QStringList::split(',', mtdFieldList);
 
     for (QStringList::Iterator it = fL.begin(); it != fL.end(); ++it) {
-      if (!(*it).contains('.')) {
-        finalFilter.replace(d->metadata_->name() + '.' + *it, *it);
-        finalFilter.replace(QRegExp("([\\W])" + *it + "([\\W])"),
-                            "\\1" + d->metadata_->name() + '.' + *it + "\\2");
-        finalFilter.replace(QRegExp('^' + *it + "([\\W])"),
-                            d->metadata_->name() + '.' + *it + "\\1");
+      QString fieldName = *it;
+      if (!fieldName.contains('.')) {
+        // finalFilter.replace(d->metadata_->name() + '.' + fieldName, fieldName);
+        finalFilter.replace(QRegExp("([^A-Za-z0-9_.])" + fieldName + "([^A-Za-z0-9_.])"),
+                            "\\1" + d->metadata_->name() + '.' + fieldName + "\\2");
+        finalFilter.replace(QRegExp('^' + fieldName + "([^A-Za-z0-9_.])"),
+                            d->metadata_->name() + '.' + fieldName + "\\1");
       }
     }
+    
 
     if (qry) {
       QString where = qry->where();
@@ -2031,7 +2034,6 @@ void FLSqlCursor::setFilter(const QString &filter)
   if (!finalFilter.isEmpty() && !d->persistentFilter_.isEmpty() &&
       !finalFilter.contains(d->persistentFilter_))
     finalFilter += " OR " + d->persistentFilter_;
-
   QSqlCursor::setFilter(finalFilter);
 }
 
