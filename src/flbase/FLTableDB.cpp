@@ -45,7 +45,8 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   editonly_(false), reqEditOnly_(false), insertonly_(false), reqInsertOnly_(false),
   sortField_(0), initSearch_(QString::null), checkColumnEnabled_(false),
   aliasCheckColumn_(tr("Seleccionar")), fieldNameCheckColumn_(QString::null),
-  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), tdbFilterLastWhere_(QString::null),
+  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), sortColumn2_(1),
+  orderAsc2_(true), sortColumn3_(2), orderAsc3_(true), tdbFilterLastWhere_(QString::null),
   findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0)
 {
 
@@ -87,6 +88,7 @@ FLDataTable *FLTableDB::tableRecords()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
     connect(tableRecords_->horizontalHeader(), SIGNAL(clicked(int)), this, SLOT(switchSortOrder(int)));
@@ -107,6 +109,7 @@ void FLTableDB::setTableRecordsCursor()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
   }
@@ -122,7 +125,7 @@ void FLTableDB::setTableRecordsCursor()
 
 bool FLTableDB::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
+  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
     return FLWidgetTableDB::eventFilter(obj, ev);
   if (ev->type() == QEvent::KeyPress && obj == tableRecords_) {
     QKeyEvent *k = static_cast<QKeyEvent *>(ev);
@@ -174,7 +177,25 @@ void FLTableDB::putFirstCol(int c)
   moveCol(c, 0);
 }
 
-void FLTableDB::moveCol(const QString &from, const QString &to)
+// Silix - dpinelo
+void FLTableDB::putSecondCol(const QString &c)
+{
+  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
+  if (c != comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1)) {
+    moveCol(c, comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1), false);
+  }
+}
+
+// Silix - dpinelo
+void FLTableDB::putSecondCol(int c)
+{
+  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
+  if (c != (comboBoxFieldToSearch->currentItem() + 1)) {
+    moveCol(c, (comboBoxFieldToSearch->currentItem() + 1), false);
+  }
+}
+
+void FLTableDB::moveCol(const QString &from, const QString &to, bool firstSearch)
 {
   if (!topWidget || !cursor_ || !showed)
     return ;
@@ -209,12 +230,12 @@ void FLTableDB::moveCol(const QString &from, const QString &to)
 #endif
     return;
   }
-  moveCol(iFrom - sortColumn_, iTo - sortColumn_);
+  moveCol(iFrom - sortColumn_, iTo - sortColumn_, firstSearch);
 }
 
-void FLTableDB::moveCol(int from, int to)
+void FLTableDB::moveCol(int from, int to, bool firstSearch)
 {
-  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
+  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
     return ;
 
   if (comboBoxFieldToSearch->text(from) == "*" || comboBoxFieldToSearch->text(to) == "*")
@@ -252,10 +273,12 @@ void FLTableDB::moveCol(int from, int to)
   refresh(true);
   if (!textSearch.isEmpty()) {
     refresh(false, true);
-    disconnect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
-    lineEditSearch->setText(textSearch);
-    connect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
-    lineEditSearch->selectAll();
+    if (firstSearch) {
+      disconnect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
+      lineEditSearch->setText(textSearch);
+      connect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
+      lineEditSearch->selectAll();
+    }
     seekCursor();
     QTimer::singleShot(0, tableRecords_, SLOT(ensureRowSelectedVisible()));
   } else
@@ -337,7 +360,7 @@ void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 
 void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
 {
-  if (!lineEditSearch || !comboBoxFieldToSearch || !cursor_ || (topWidget && !topWidget->isShown()))
+  if (!lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_ || (topWidget && !topWidget->isShown()))
     return ;
 
   FLTableMetaData *tMD = cursor_->metadata();
@@ -366,6 +389,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
         setTableRecordsCursor();
         tableRecords_->setColumn(0, fieldNameCheckColumn_, aliasCheckColumn_);
         sortColumn_ = 1;
+        sortColumn2_ = 2;
+        sortColumn3_ = 3;
         QSqlRecord *buffer_ = cursor_->editBuffer(true);
         for (uint i = 0; i < buffer_->count(); ++i)
           buffer_->setGenerated(i, true);
@@ -382,6 +407,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
           cursor_->append(QSqlFieldInfo(*(recordCursor.field(i))));
         setTableRecordsCursor();
         sortColumn_ = 0;
+        sortColumn2_ = 1;
+        sortColumn3_ = 2;
       }
       checkColumnVisible_ = false;
     }
@@ -405,6 +432,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       }
     }
     QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
+    s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
+    s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
     tableRecords_->setSort(s);
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
     comboBoxFieldToSearch->clear();
@@ -419,9 +448,23 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       horizHeader->setLabel(i, field->alias());
       tableRecords_->setColumn(i, field->name(), field->alias());
     }
+    comboBoxFieldToSearch2->clear();
+    for (int i = sortColumn2_; i < tableRecords_->numCols(); ++i) {
+      field = tMD->field(tMD->fieldAliasToName(horizHeader->label(i)));
+      if (!field)
+        continue;
+      if (i == sortColumn2_)
+        sortField2_ = field;
+      if (comboBoxFieldToSearch2->count() == (i - sortColumn2_))
+        comboBoxFieldToSearch2->insertItem(field->alias());
+      horizHeader->setLabel(i, field->alias());
+      tableRecords_->setColumn(i, field->name(), field->alias());
+    }
     comboBoxFieldToSearch->insertItem("*");
+    comboBoxFieldToSearch2->setCurrentText(comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1));
     horizHeader->setClickEnabled(false);
     horizHeader->setClickEnabled(true, sortColumn_);
+    horizHeader->setClickEnabled(true, sortColumn2_);
     horizHeader->setSortIndicator(-1, Qt::Ascending);
     horizHeader->setSortIndicator(sortColumn_, (orderAsc_ ? Qt::Ascending : Qt::Descending));
     horizHeader->show();
@@ -947,11 +990,17 @@ void FLTableDB::setAliasCheckColumn(const QString &t)
   aliasCheckColumn_ = t;
 }
 
-void FLTableDB::switchSortOrder(int)
+void FLTableDB::switchSortOrder(int col)
 {
-  orderAsc_ = !orderAsc_;
+  if (checkColumnVisible_)
+    --col;
+  if (col == 0) {
+    orderAsc_ = !orderAsc_;
+  } else if (col == 1) {
+    orderAsc2_ = !orderAsc2_;
+  }
   tableRecords()->hide();
-  refresh(true, true);
+  refresh( true, true );
 }
 
 void FLTableDB::activeTabData(bool on)
