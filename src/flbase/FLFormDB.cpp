@@ -299,6 +299,7 @@ void FLFormDB::initMainWidget(QWidget *w)
     // QSize minSz = mWidget->baseSize();
     int border = 5, border_b = 48;
     QSize SzH = mWidget->sizeHint();
+    bool parentIsDesktop = true;
     /*
     qDebug("geo: " + QString::number(geo.width()) + "x"  + QString::number(geo.height()));
     qDebug("oSz: " + QString::number(oSz.width()) + "x"  + QString::number(oSz.height()));
