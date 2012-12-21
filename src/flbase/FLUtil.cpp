@@ -1022,9 +1022,30 @@ QString FLUtil::getOS()
 
 bool FLUtil::execSql(const QString &sql, const QString &connName)
 {
+  if (sql.isNull() || connName.isNull()) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil::execSql() : " + QApplication::tr("Tarea o nombre de conexión vacío"));
+#endif
+    return false;
+  }
+
+  QString tareas = sql;
+  if (!tareas.endsWith(";"))
+    tareas += ";";
+
   QSqlQuery q(FLSqlConnections::database(connName)->db());
-  return q.exec(sql);
+  QStringList commandList = QStringList::split(";", tareas);
+  for (QStringList::Iterator it = commandList.begin(); it != commandList.end(); ++it) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil : " + QApplication::tr("Ejecutando la sentencia \"%1;\"").arg(*it));
+#endif
+    if (!q.exec(*it))
+      return false;
+  }
+
+  return true;
 }
+
 
 QStringList FLUtil::findFiles(const QStringList &paths, const QString &filter,
                               bool breakOnFirstMatch)
@@ -1051,4 +1072,20 @@ QStringList FLUtil::findFiles(const QStringList &paths, const QString &filter,
     }
   }
   return result;
+}
+
+// Silix
+void FLUtil::savePixmap(const QString &data, const QString &filename, const char *format)
+{
+    if (!filename.isEmpty()) {
+      QPixmap pix;
+      pix.loadFromData(data.utf8());
+      if (!pix.isNull())
+        if (!pix.save(filename, format)) {
+#ifdef FL_DEBUG
+          qWarning("FLUtil : " + QApplication::tr("Error al intentar guardar la imagen en %1").arg(filename));
+#endif
+          return;
+        }
+    }
 }

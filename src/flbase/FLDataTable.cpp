@@ -548,7 +548,7 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
         } else
           return false;
 
-      if (ke->key() == Key_E || ke->key() == Key_Delete && !popup_)
+      if (ke->key() == Key_Delete && !popup_)
         if (insertonly_)
           return false;
         else if (cursor_ && !readonly_ && !editonly_) {

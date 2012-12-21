@@ -189,6 +189,34 @@
                         <string>Ordena los registros de la tabla por el campo seleccionado</string>
                     </property>
                 </widget>
+                <widget class="QComboBox">
+                    <property name="name">
+                        <cstring>comboBoxFieldToSearch2</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="focusPolicy">
+                        <enum>StrongFocus</enum>
+                    </property>
+                    <property name="autoMask">
+                        <bool>false</bool>
+                    </property>
+                    <property name="duplicatesEnabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Ordena los registros de la tabla por el campo seleccionado</string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string>Ordena los registros de la tabla por el campo seleccionado</string>
+                    </property>
+                </widget>
             </hbox>
         </widget>
         <widget class="QLayoutWidget">
@@ -572,6 +600,12 @@
         <slot>putFirstCol(const QString&amp;)</slot>
     </connection>
     <connection>
+        <sender>comboBoxFieldToSearch2</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>FLWidgetTableDB</receiver>
+        <slot>putSecondCol(const QString&amp;)</slot>
+    </connection>
+    <connection>
         <sender>pbClear</sender>
         <signal>clicked()</signal>
         <receiver>FLWidgetTableDB</receiver>
@@ -599,12 +633,14 @@
 <tabstops>
     <tabstop>lineEditSearch</tabstop>
     <tabstop>comboBoxFieldToSearch</tabstop>
+    <tabstop>comboBoxFieldToSearch2</tabstop>
 </tabstops>
 <slots>
     <slot access="protected">init()</slot>
     <slot access="protected">destroy()</slot>
     <slot access="protected">filterRecords( const QString &amp; )</slot>
     <slot>putFirstCol( const QString &amp; )</slot>
+    <slot>putSecondCol( const QString &amp; )</slot>
     <slot access="protected">tdbFilterClear()</slot>
     <slot access="protected">activeTabData( bool )</slot>
     <slot access="protected">activeTabFilter( bool )</slot>

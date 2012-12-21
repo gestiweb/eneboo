@@ -44,6 +44,7 @@
 #include <qsqldatabase.h>
 #include <qaccel.h>
 #include <qsplitter.h>
+#include <qclipboard.h>
 
 #include "FLWidgetFieldDB.h"
 
@@ -432,6 +433,39 @@ public slots:
   void setPixmap(const QString &filename);
 
   /**
+  Carga una imagen en el campo de tipo pixmap con el ancho y alto preferido
+
+  @param pixmap: pixmap a cargar en el campo
+  @param w: ancho preferido de la imagen
+  @param h: alto preferido de la imagen
+  @author Silix
+  */
+  void setPixmapFromPixmap(const QPixmap &pixmap, const int w = 0, const int h = 0);
+
+  /**
+  Carga una imagen desde el portapapeles en el campo de tipo pixmap
+  @author Silix
+  */
+  void setPixmapFromClipboard();
+
+  /**
+  Guarda imagen de campos tipo Pixmap en una ruta determinada.
+
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &filename, const char *format);
+
+  /**
+  Devueve el objeto imagen asociado al campo
+
+  @return imagen asociada al campo
+  @author Silix
+  */
+  QPixmap pixmap();
+
+  /**
   Emite la señal de foco perdido
   */
   void emitLostFocus();
@@ -626,6 +660,12 @@ private:
   Boton auxiliar multifunción
   */
   QPushButton *pbAux3_;
+
+  /**
+  Boton auxiliar multifunción
+  @author Silix
+  */
+  QPushButton *pbAux4_;
 
   /**
   Almacena el alias del campo que será mostrado en el formulario

@@ -354,6 +354,16 @@ public slots:
   }
 
   /**
+   Obtiene la contraseña del usuario conectado a la base de datos
+
+   @param connName Nombre de la conexion
+   @return Contraseña del usuario
+   */
+  QString passUser(const QString &connName = "default") const {
+    return FLSqlConnections::database(connName)->password();
+  }
+
+  /**
    Obtiene el nombre de la base de datos
 
    @param connName Nombre de la conexion
@@ -2341,6 +2351,39 @@ public slots:
   }
 
   /**
+  Carga una imagen en el campo de tipo pixmap con el ancho y alto preferido
+
+  @param pixmap: pixmap a cargar en el campo
+  @param w: ancho preferido de la imagen
+  @param h: alto preferido de la imagen
+  @author Silix
+  */
+  void setPixmapFromPixmap(const QPixmap &pixmap, const int w = 0, const int h = 0) {
+    obj_->setPixmapFromPixmap(pixmap, w, h);
+  }
+
+  /**
+  Guarda imagen de campos tipo Pixmap en una ruta determinada.
+
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &filename, const char *format) {
+    obj_->savePixmap(filename, format);
+  }
+
+  /**
+  Devueve el objeto imagen asociado al campo
+
+  @return imagen asociada al campo
+  @author Silix
+  */
+  QPixmap pixmap() {
+    return obj_->pixmap();
+  }
+
+  /**
    Hace que el control tome el foco
    */
   void setFocus() {
@@ -2494,6 +2537,11 @@ signals:
    Señal emitida si se pulsa la tecla Return
    */
   void keyReturnPressed();
+
+  /**
+  Señal de foco perdido
+  */
+  void lostFocus();
 
 private:
 
@@ -2798,6 +2846,15 @@ public slots:
    */
   void putFirstCol(const QString &c) {
     obj_->putFirstCol(c);
+  }
+
+  /**
+  Establece el segundo campo de búsqueda
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol(const QString &c) {
+    obj_->putSecondCol(c);
   }
 
   /**
@@ -5799,6 +5856,18 @@ public slots:
 
   bool execSql(const QString &sql, const QString &connName = "default") {
     return FLUtil::execSql(sql, connName);
+  }
+
+  /**
+  Guarda imagen Pixmap en una ruta determinada.
+
+  @param data Contenido de la imagen en una cadena de caracteres
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &data, const QString &filename, const char *format) {
+    FLUtil::savePixmap(data, filename, format);
   }
 
   /**
