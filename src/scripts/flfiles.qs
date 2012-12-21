@@ -31,8 +31,8 @@ function init() {
 
     var nombre = cursor.valueBuffer("nombre");
     var tipo = tipoDeFichero(nombre);
-    if (tipo == ".ui" || tipo == ".ts" || tipo == ".qs") pbXMLEditor.setEnabled(false);
-    else connect(pbXMLEditor, "clicked()", this, "editarFicheroXML");
+    pbXMLEditor.setEnabled(false);
+    
   }
 }
 

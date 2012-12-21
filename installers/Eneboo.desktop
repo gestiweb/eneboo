@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[es_ES]=/opt/eneboo-2.4/share/eneboo/images/icono48.png
+Name[es_ES]=Eneboo
+Exec=/usr/local/bin/eneboo
+Name=Eneboo
+Icon=/opt/eneboo-2.4/share/eneboo/images/icono48.png
+

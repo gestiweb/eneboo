@@ -1,0 +1,1 @@
+makeself --bzip2 eneboo-v2.4.0.1-dba eneboo-v2.4.0.1-dba-linux32.sh "Eneboo v2.4.0.1 dbAdmin Linux 32bits" ./install.sh

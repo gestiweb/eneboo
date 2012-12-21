@@ -24,6 +24,7 @@
 #include <qlistbox.h>
 #include <qimage.h>
 #include <qcheckbox.h>
+#include <qregexp.h>
 
 #include "FLWidgetConnectDB.h"
 

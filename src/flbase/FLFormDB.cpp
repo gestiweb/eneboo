@@ -294,53 +294,90 @@ void FLFormDB::initMainWidget(QWidget *w)
 
     QRect geo(aqApp->geometryForm(QObject::name()));
     pW->show();
+    QSize oSz = mWidget->size();
     mWidget->updateGeometry();
     // QSize minSz = mWidget->baseSize();
     int border = 5, border_b = 48;
     QSize SzH = mWidget->sizeHint();
+    /*
+    qDebug("geo: " + QString::number(geo.width()) + "x"  + QString::number(geo.height()));
+    qDebug("oSz: " + QString::number(oSz.width()) + "x"  + QString::number(oSz.height()));
+    qDebug("bSz: " + QString::number(bSz.width()) + "x"  + QString::number(bSz.height()));
+    qDebug("SzH: " + QString::number(SzH.width()) + "x"  + QString::number(SzH.height()));
+    */
 
-    if (geo.width() < SzH.width() || geo.width()>9000) {
+    if (geo.width() < 100 || geo.width()>9000) {
+        // qDebug(" -- reset Form Size and position -- ");
+        geo.setWidth(oSz.width());
+        geo.setHeight(oSz.height());
+        geo.moveCenter(desk.center());
+        
+        if (!parentIsDesktop) {
+            geo.moveTop(desk.top() + border - geo.top()+1);
+        }
+    }
+
+    if (geo.width() < SzH.width()) {
+        // qDebug(" -- geo width too small -- ");
         geo.setWidth(SzH.width());
         geo.moveTop(desk.top() + border - geo.top()+1);
     }
     if (geo.height() < SzH.height() || geo.width()>9000) {
+        // qDebug(" -- geo height too small -- ");
         geo.setHeight(SzH.height());
     }
     // Exceeds available horizontal area:
     if (geo.width() > desk.width() - border * 2) {
+        // qDebug(" -- geo width too big -- ");
         geo.setWidth(desk.width() - border * 2 - 5);
     }
     // Exceeds available vertical area:
     if (geo.height() > desk.height() - border - border_b) {
+        // qDebug(" -- geo height too big -- ");
         geo.setHeight(desk.height() - border - border_b - 5);
     }
+    if (parentIsDesktop) {
+        // Invalid position values, re-center
+        if (  geo.right() > 9000
+         || geo.left() < 1
+         || geo.bottom() > 9000
+         || geo.top() < 1 ) {
+            // qDebug(" -- geo invalid position -- ");
+            geo.moveCenter(desk.center());
+        }
+    
 
-    if ( geo.top() < desk.top() + border)  {
-        geo.moveTop(desk.top() + border - geo.top()+1);
+        if ( geo.top() < desk.top() + border)  {
+            // qDebug(" -- geo position too high -- ");
+            geo.moveTop(desk.top() + border - geo.top()+1);
+        }
+
+        if ( geo.left() < desk.left() + border) {
+            // qDebug(" -- geo position too left -- ");
+            geo.moveLeft(desk.left() + border - geo.left()+1);
+        }
+
+        if ( geo.bottom() > desk.bottom() - border_b ) {
+            int diff = geo.bottom() - desk.bottom() - border_b;
+            // qDebug(" -- geo position too low -- ");
+            geo.moveTop(-diff-1);
+        }
+
+        if ( geo.right() > desk.right() - border) {
+            int diff = geo.right() - desk.right() - border;
+            // qDebug(" -- geo position too right -- ");
+            geo.moveLeft(-diff-1);
+        }
+
+        // Outside of screen, re-center:
+        if (  geo.right() > desk.right() - border  
+         || geo.left() < desk.left() + border
+         || geo.bottom() > desk.bottom() - border_b
+         || geo.top() < desk.top() + border ) {
+            // qDebug(" -- geo position out of screen -- ");
+            geo.moveCenter(desk.center());
+        }
     }
-
-    if ( geo.left() < desk.left() + border) {
-        geo.moveLeft(desk.left() + border - geo.left()+1);
-    }
-
-    if ( geo.bottom() > desk.bottom() - border_b ) {
-        int diff = geo.bottom() - desk.bottom() - border_b;
-        geo.moveTop(-diff-1);
-    }
-
-    if ( geo.right() > desk.right() - border) {
-        int diff = geo.right() - desk.right() - border;
-        geo.moveLeft(-diff-1);
-    }
-
-    // Outside of screen, re-center:
-    if (  geo.right() > desk.right() - border  
-     || geo.left() < desk.left() + border
-     || geo.bottom() > desk.bottom() - border_b
-     || geo.top() < desk.top() + border ) {
-        geo.moveCenter(desk.center());
-    }
-
     mWidget->resize(geo.size());
 
     pW->updateGeometry();
