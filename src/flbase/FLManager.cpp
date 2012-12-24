@@ -1075,14 +1075,40 @@ FLAction *FLManager::action(const QString &n)
     if (!e.isNull()) {
       if (e.tagName() == "action") {
         QDomNode no2 = e.firstChild();
-
+        QDomElement e2 = no2.toElement();
+        
+        bool isAValidName = false;
+                
         while (!no2.isNull()) {
+            e2 = no2.toElement();
+            if (!e2.isNull()) {
+                if (e2.tagName() == "name") {
+                    isAValidName = (e2.text() == n);
+                    break;
+                }
+            }
+            no2 = no2.nextSibling();            
+        }
+        no2 = e.firstChild();
+        e2 = no2.toElement();
+        if (isAValidName) {
+            if (!e2.isNull()) {
+                if (e2.tagName() == "name") {
+                    // Primer tag es name, correcto.
+                } else {
+                    qDebug("WARN: El primer tag de la accion '" + n + "' no es name, se encontro '" + e2.tagName() + "'");
+                }
+            } else {
+                qDebug("WARN: Se encontro una accion vacia para '" + n + "'.");
+            }
+            
+        }
+        while (isAValidName && !no2.isNull()) {
           QDomElement e2 = no2.toElement();
 
           if (!e2.isNull()) {
             if (e2.tagName() == "name") {
-              if (e2.text() != n)
-                break;
+              // if (e2.text() != n) break;
               a->setName(e2.text());
               no2 = no2.nextSibling();
               continue;
