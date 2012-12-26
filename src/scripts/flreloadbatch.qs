@@ -353,6 +353,8 @@ function oficial_elegirOpcion(opciones: Array) : Array {
   for (var i: Number = 0; i < opciones.length; i++) {
     cB[i] = new CheckBox;
     bgroup.add(cB[i]);
+    if (util.getOS() == "WIN32")
+		opciones[i]=opciones[i].left(opciones[i].length -1); //Elimina caracter intruso al final de la cadena de texto
     cB[i].text = opciones[i];
     cB[i].checked = true;
   }
