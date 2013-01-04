@@ -7351,6 +7351,7 @@ void QTableHeader::setLabels(const QStringList & labels)
     int i = 0;
     bool updates = isUpdatesEnabled();
     const int c = QMIN(count(), (int)labels.count());
+    if (c < 1) return;
     setUpdatesEnabled(FALSE);
     for ( QStringList::ConstIterator it = labels.begin(); i < c; ++i, ++it ) {
 	if (i == c - 1) {
