@@ -85,8 +85,8 @@ FLDataTable *FLTableDB::tableRecords()
     tableRecords_->setFocusPolicy(QTable::StrongFocus);
     setFocusProxy(tableRecords_);
     tabDataLayout->addWidget(tableRecords_);
-    setTabOrder(tableRecords_, lineEditSearch);
-    setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(lineEditSearch ,comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, tableRecords_);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
     connect(tableRecords_->horizontalHeader(), SIGNAL(clicked(int)), this, SLOT(switchSortOrder(int)));
@@ -105,8 +105,8 @@ void FLTableDB::setTableRecordsCursor()
     tableRecords_->setFocusPolicy(QTable::StrongFocus);
     setFocusProxy(tableRecords_);
     tabDataLayout->addWidget(tableRecords_);
-    setTabOrder(tableRecords_, lineEditSearch);
-    setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(lineEditSearch ,comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, tableRecords_);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
   }
