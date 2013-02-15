@@ -182,9 +182,6 @@ public slots:
   void writeLine( const QString &data ) {
     write( data + QString::fromLatin1( "\n" ) );
   }
-  QByteArray readByteArray();
-  int writeByteArray( QByteArray data);
-  
 
 public:
   QSFile( const QString &file, QSInterpreter *i );
@@ -682,7 +679,7 @@ QString QSFileStatic::read( const QString &fileName ) {
     factory->interpreter()->throwError( QString::fromLatin1( "Could not read file '%1'" ).arg( fileName ) );
     return QString();
   }
-  return QString( file.readAll() , 'b');
+  return QString( file.readAll() );
 }
 
 void QSFileStatic::remove( const QString &file ) {
@@ -718,18 +715,8 @@ QString QSFile::read() {
     interpreter->throwError( QString::fromLatin1( "File '" ) + file->name() + QString::fromLatin1( "' is not open" ) );
     return QString::null;
   }
-  return QString( file->readAll() , 'b' );
+  return QString( file->readAll() );
 }
-
-QByteArray QSFile::readByteArray() {
-  if ( !file->isOpen() ) {
-    interpreter->throwError( QString::fromLatin1( "File '" ) + file->name() + QString::fromLatin1( "' is not open" ) );
-    QByteArray null;
-    return null;
-  }
-  return file->readAll();
-}
-
 
 QString QSFile::readLine() {
   QString buffer;
@@ -761,17 +748,6 @@ void QSFile::write( const QString &data, int length ) {
                              .arg( file->name() ).arg( ERRORSTRING( file ) ) );
   }
 }
-
-int QSFile::writeByteArray( QByteArray data) {
-  int written = file->writeBlock( data.data(), data.size() );
-  if ( written != data.size() ) {
-    interpreter->throwError( QString::fromLatin1( "Failed to write file '%1': %2" )
-                             .arg( file->name() ).arg( ERRORSTRING( file ) ) );
-  }
-  return written;
-}
-
-
 
 void QSFile::remove() {
   if ( !file->remove() ) {

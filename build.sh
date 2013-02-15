@@ -687,7 +687,10 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/lupdate
 	${CROSS}install_name_tool -change libexslt.0.dylib @executable_path/../../../../lib/libexslt.0.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
 	${CROSS}install_name_tool -change libxsltproc.1.dylib @executable_path/../../../../lib/libxsltproc.1.dylib $PREFIX/bin/Eneboo.app/Contents/MacOS/Eneboo
-	
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/kudesigner.app/Contents/MacOS/kudesigner
+
+	${CROSS}install_name_tool -change libqt-mt.3.dylib @executable_path/../../../../lib/libqt-mt.3.dylib $PREFIX/bin/teddy.app/Contents/MacOS/teddy
+
         mkdir -p $PREFIX/bin/designer.app/Contents/plugins/designer
         cp -f $PREFIX/plugins/designer/*.dylib $PREFIX/bin/designer.app/Contents/plugins/designer 2> /dev/null
 	
