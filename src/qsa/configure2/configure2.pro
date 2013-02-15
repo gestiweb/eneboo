@@ -5,7 +5,7 @@
 TEMPLATE = app
 CONFIG -= moc
 CONFIG += console
-INCLUDEPATH += .
+INCLUDEPATH += . ../../qt/include
 
 # Input
 SOURCES += main.cpp configutils.cpp
