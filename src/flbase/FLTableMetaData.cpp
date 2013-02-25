@@ -96,12 +96,14 @@ int FLTableMetaData::fieldType(const QString &fN) const
 {
   if (fN.isEmpty())
     return QVariant::Invalid;
+  else
+  	{
+ 	 FLFieldMetaData *field = d->fieldList_->find(fN.lower());
+  	if (field)
+    	    return field->d->type_;
 
-  FLFieldMetaData *field = d->fieldList_->find(fN.lower());
-  if (field)
-    return field->d->type_;
-
-  return QVariant::Invalid;
+	return QVariant::Invalid;
+	}
 }
 
 int FLTableMetaData::fieldLength(const QString &fN) const
