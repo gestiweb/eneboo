@@ -285,21 +285,23 @@ void FLFormDB::initMainWidget(QWidget *w)
 
     QWidget *pW = this->parentWidget();
     QRect desk;
+    bool parentIsDesktop = true;
+    
     if (!(pW && pW->isA("QWorkspaceChild"))) {
         desk = QApplication::desktop()->availableGeometry(this);
         pW = this;
     } else {
         desk = pW->parentWidget()->rect();
+        parentIsDesktop = false;
     }
 
     QRect geo(aqApp->geometryForm(QObject::name()));
     pW->show();
     QSize oSz = mWidget->size();
     mWidget->updateGeometry();
-    // QSize minSz = mWidget->baseSize();
-    int border = 5, border_b = 48;
+    QSize bSz = mWidget->baseSize();
     QSize SzH = mWidget->sizeHint();
-    bool parentIsDesktop = true;
+    int border = 5, border_b = 48;
     /*
     qDebug("geo: " + QString::number(geo.width()) + "x"  + QString::number(geo.height()));
     qDebug("oSz: " + QString::number(oSz.width()) + "x"  + QString::number(oSz.height()));
@@ -321,9 +323,8 @@ void FLFormDB::initMainWidget(QWidget *w)
     if (geo.width() < SzH.width()) {
         // qDebug(" -- geo width too small -- ");
         geo.setWidth(SzH.width());
-        geo.moveTop(desk.top() + border - geo.top()+1);
     }
-    if (geo.height() < SzH.height() || geo.width()>9000) {
+    if (geo.height() < SzH.height()) {
         // qDebug(" -- geo height too small -- ");
         geo.setHeight(SzH.height());
     }
