@@ -1,10 +1,11 @@
+PRJ_MODULE = kudesigner
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }
 else {
         error("settings.pro missing, unable to build")
 }
-PRJ_MODULE = kudesigner
+
 TEMPLATE = app
 
 CONFIG += warn_off qt link_prl
