@@ -1579,84 +1579,7 @@ void FLFieldDB::setPixmapFromClipboard()
   updateValue(QString(s));
 }
 
-// Silix
-void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const int h)
-{
-  if (pixmap.isNull())
-    return;
 
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  QImage img = pixmap.convertToImage();
-  if (w != 0 && h != 0)
-    pix.convertFromImage(img.scale(w, h, QImage::ScaleMin));
-  else
-    pix.convertFromImage(img);
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
-
-// Silix
-void FLFieldDB::setPixmapFromClipboard()
-{
-  QImage img = QApplication::clipboard()->image();
-  if (img.isNull())
-    return;
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  pix.convertFromImage(img);
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
 
 // Silix
 void FLFieldDB::savePixmap(const QString &filename, const char *format)
@@ -1674,10 +1597,6 @@ void FLFieldDB::savePixmap(const QString &filename, const char *format)
   }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3c07a75... FLFieldDB -> Pixmap: poder obtener el pixmap asociado a un campo.
 // Silix
 QPixmap FLFieldDB::pixmap()
 {
@@ -1686,11 +1605,6 @@ QPixmap FLFieldDB::pixmap()
   return pix;
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> ade9763... FLFieldDB -> Pixmap: poder guardar la imagen en una ruta determinada.
-=======
->>>>>>> 3c07a75... FLFieldDB -> Pixmap: poder obtener el pixmap asociado a un campo.
 void FLFieldDB::setFilter(const QString &f)
 {
   if (filter_ != f) {
