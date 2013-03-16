@@ -1,0 +1,396 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>ebcomportamiento</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>ebcomportamiento</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>714</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Opciones</string>
+    </property>
+    <property name="icon">
+        <pixmap>image13840</pixmap>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>tabMaestra</cstring>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Locales</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QTabWidget" row="0" column="0">
+                        <property name="name">
+                            <cstring>tabLocales</cstring>
+                        </property>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>tab</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Aspecto</string>
+                            </attribute>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>TabPage</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Inicio</string>
+                            </attribute>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>tab</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Desarrollo</string>
+                            </attribute>
+                        </widget>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Generales</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QTabWidget" row="0" column="0">
+                        <property name="name">
+                            <cstring>tabGenerales</cstring>
+                        </property>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>tab</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Datos Vertical</string>
+                            </attribute>
+                            <grid>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel" row="0" column="0">
+                                    <property name="name">
+                                        <cstring>textLabel1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Descripción (acepta HTML)</string>
+                                    </property>
+                                </widget>
+                                <spacer row="0" column="2">
+                                    <property name="name">
+                                        <cstring>spacer1</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>50</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                                <widget class="QLineEdit" row="0" column="1">
+                                    <property name="name">
+                                        <cstring>leNombreVertical</cstring>
+                                    </property>
+                                </widget>
+                                <spacer row="1" column="1">
+                                    <property name="name">
+                                        <cstring>spacer5</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>21</width>
+                                            <height>341</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </grid>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>tab</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Controles</string>
+                            </attribute>
+                            <grid>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QGroupBox" row="2" column="0">
+                                    <property name="name">
+                                        <cstring>gbFLField</cstring>
+                                    </property>
+                                    <property name="title">
+                                        <string>FLField</string>
+                                    </property>
+                                </widget>
+                                <widget class="QGroupBox" row="0" column="0">
+                                    <property name="name">
+                                        <cstring>gbGeneralNavegador</cstring>
+                                    </property>
+                                    <property name="title">
+                                        <string>Navegador</string>
+                                    </property>
+                                    <grid>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <spacer row="1" column="0">
+                                            <property name="name">
+                                                <cstring>spacer6</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Vertical</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>20</width>
+                                                    <height>171</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <widget class="QLayoutWidget" row="0" column="0">
+                                            <property name="name">
+                                                <cstring>layout5</cstring>
+                                            </property>
+                                            <grid>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLabel" row="1" column="0">
+                                                    <property name="name">
+                                                        <cstring>textLabel3</cstring>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Tamaño botones Form</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLineEdit" row="1" column="1">
+                                                    <property name="name">
+                                                        <cstring>leFormDBSize</cstring>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLabel" row="2" column="0">
+                                                    <property name="name">
+                                                        <cstring>textLabel4</cstring>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Tamaño botones FormSearch</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLabel" row="0" column="0">
+                                                    <property name="name">
+                                                        <cstring>textLabel2</cstring>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Tamaño botónes FormRecord</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLineEdit" row="0" column="1">
+                                                    <property name="name">
+                                                        <cstring>leFormRecordSize</cstring>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLineEdit" row="2" column="1">
+                                                    <property name="name">
+                                                        <cstring>leFormSearchDBSize</cstring>
+                                                    </property>
+                                                </widget>
+                                            </grid>
+                                        </widget>
+                                        <spacer row="0" column="1">
+                                            <property name="name">
+                                                <cstring>spacer7</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>190</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </grid>
+                                </widget>
+                                <widget class="QGroupBox" row="1" column="0">
+                                    <property name="name">
+                                        <cstring>gbFLTable</cstring>
+                                    </property>
+                                    <property name="title">
+                                        <string>FLTable</string>
+                                    </property>
+                                    <grid>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                                            <property name="name">
+                                                <cstring>textLabel1_2</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>&lt;p align="center"&gt;Estas opciones permiten modificar el comportamiento del control FLTableDB. Es muy aconsejable para que el módulo de control de acceso no tenga vulnerabilidades.&lt;/p&gt;</string>
+                                            </property>
+                                            <property name="alignment">
+                                                <set>WordBreak|AlignVCenter</set>
+                                            </property>
+                                        </widget>
+                                        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="2">
+                                            <property name="name">
+                                                <cstring>cbFLTableSC</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Desactivar atajos de teclado</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                                            <property name="name">
+                                                <cstring>cbFLTableDC</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Desactivar edición con doble click</string>
+                                            </property>
+                                        </widget>
+                                        <spacer row="1" column="0">
+                                            <property name="name">
+                                                <cstring>spacer5_2</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Vertical</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>20</width>
+                                                    <height>40</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <spacer row="5" column="1">
+                                            <property name="name">
+                                                <cstring>spacer4</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Vertical</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>20</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <widget class="QCheckBox" row="4" column="0" rowspan="1" colspan="2">
+                                            <property name="name">
+                                                <cstring>cbFLTableCalc</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Desactivar exportar a hoja de calculo</string>
+                                            </property>
+                                        </widget>
+                                    </grid>
+                                </widget>
+                            </grid>
+                        </widget>
+                    </widget>
+                </grid>
+            </widget>
+        </widget>
+        <widget class="QPushButton" row="1" column="2">
+            <property name="name">
+                <cstring>pbnCancelar</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Cancelar</string>
+            </property>
+            <property name="accel">
+                <string>Alt+C</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="1">
+            <property name="name">
+                <cstring>pbnAceptar</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Guardar</string>
+            </property>
+            <property name="accel">
+                <string>Alt+G</string>
+            </property>
+        </widget>
+        <spacer row="1" column="0">
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>301</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+    </grid>
+</widget>
+<images>
+    <image name="image13840">
+        <data format="PNG" length="1930">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af40000075149444154789ca5575b4c14591afecea942690a1b5b08d00d18420306c74124ac82665112c0c60b3a098cd1c8e88391c4f0b6896f4af64137eea32fde88249b88c10ce29a18dc3823b4465d37c14ce43238804b0b4243d39de6d24d777555fdfbc05687061a98dd3f39a95355e7fcdff75f4f15c306a5a3a3c3dcdede9ec3182b77b95cdf7cfcf8116363635014055bb76e456e6e2e0e1e3cb870e0c081eea1a1a19fcbcbcba776eddae55c4f2f5b6fc19d3b77b63f7efcf8bbf9f9f9efc7c6c6be75bbdd522010e044044dd316953006ce39525252505e5111aab2d9263232321c6eb7bb19406b7575b57fa38686a5b7b737fefc0f3fd4e7e7e777c5c7c70739e7c43927c61831c608407830c688734ea228526c6c2cd5d6d6d2ab57afa8bfbf7feee5cb972dcdcdcd877e17f8f3e7cfb36d36db6dabd51a100421026c29e86a6438e72408029d3d7b96262626c8e572517777f7a78e67cffee2f8f557cbbae0d7af5fcfdebb77ef0393c9b42ac07a04746f489244376fde245996c9eff7535f5f9ff2e4f1e36b8d8d8d3c2af8dffff6287bcf9e3d0fe2e2e248b73c1a81d8d858dab76f1fd96c36dab16347c43a9d58454505399d4e926599028100f5f4f4f81f3d7a7499885692e8edec8cb79595dd4e301a8973be2aa8ae5c9224ba7af52a8d8c8c90d7eba5d7af5f537575f58a7d49494964b7db49511452148582c120f5f6f6ceb7b7b7d7af2070fefcf97a6b56564010843509088240870e1da22f5fbe5028142245514896656a6d6d25a3d118b1d66030d0c3870fc3046459a6f9f9797afffefd8b5bb76e65020007164bedc3870fa7ff3d32b299884044ab8688b1c5aa351a8d30994ce17b00d8be7d3b24498a58af691a028100749d9c736cdebc19a9a9a9e569696917c3049e3e7dfaddc8c84889a669d0342d2a01bdf687868630303010be571405efdebd83d7eb8d582f8a228c462338e71004217c359bcd484f4ffffefefdfbdf0a6d6d6de6cecece3f7ffefc39331af0521104011e8f071e8f07717171585858c093274fd0d4d484a9a9a908f2168b05f5f5f5484d4d05632cecb1ff7a44fafaf5eb002e5ebc589a9e9e3e1b2ddb970f3dc30541a0c4c4444a4f4f274992c279a35f196374e6cc19f27abda4aa2a699a464444aaaa922ccbe4f3f9c86eb7b7898cb1728fc71319bc3544b7505555b8ddee15ef1963100401168b05b5b5b5888f8f071185add7df73ce9160341ee26eb7fb9b502814bd39fc4ed1340d313131b870e1020e1f3ebc6a3ee9e1d89698b80556abb52d5abbfd5f86d96ca62b57ae90dbed2645514855d58810689a16be9f9e76c9e2d8d8185455ddb0859c2f3a4b2f2bce3962626290949484e2e262d4d4d4e0e8d1a3d8b4691338e711a5bad47a0010c51888a15068c3e08c31180c06e4e5e561f7eeddc8c9c981c964c2b66ddb60b55a91999909499222482e27b05c9f68341a31333313b5f697b22e2a2a425d5d1d8e1f3f8e94941488a218d5c2f5c081c57c416161619b7ece234a5c4551a463c78e91dd6ea76030186ec1ffaf4c4d4dc93c2f3777411084353d50545484cb972fa3b8b838a29cf416abefdd4823d3d711117c3e9fc62dc9c9dd9224454d04499270eedc3994949484934a07d7dbb6aaaa50553582cc7ae0aaaa627a7afa8b284ad2cf89898913333333db976f668ca1a0a000369b2d025857d0d7d70797cb85e4e464e4e5e54114c555337fb9689a069fcf07bfdfdfc32b2b2b7f4b4b4b7b2508c20a700028282880d96c8e60af280a6edfbe8dd3a74fa3a6a606757575686e6e86a2286b022fd5e1743a033333332f78595959202b2bebc7b4b4b4d9a5f105164fb39c9c1cc4c4c4846b1e003e7dfa84bb77ef62707010f3f3f3e8efef475353131c0ec7bad603802ccb70bbddaf354d7bca01a0a1a1e185c9646ad15da833e59cc360304490628c616a6a0a0e872322dec3c3c398989858171c001c0ec7dcd0d0d08393274f8e7300282a2af29f3a75aad56ab5feb2b453298a82c9c9490088f84eb0582cc8cece0e2b648c212f2f0f191919ab02ea6ed7340d2e970b2e97ebc7d2d2d256000807bea5a565babfbf5f0e0683655eaf7793be21252505555555d04b9588603299603018303e3e8e502884c2c2425cba7409fbf7ef8f68b54b25140ac1eff7637c7cfcfde4e4e48de2e2e2cfab31e515151597737373fd7a73cacacaa2376fde902ccb11df76814080060606e8eddbb7343c3c1c7eaf1f3a4b455555f2783c343030f0a6ababab6acdf8343636f2aaaaa37fdab973a75310041245911a1a1a68767636dc01154589982f3ff5f4a13f733a9dd4ddddfdcf67cf9ead0017963fb0dbedf4af7f3cefdf2449e49c9c147c7e7f664f4f0f121212909f9f1fd18c044108cff5a17f576a1a21180c607070706e7474b4c5e974de3871e2c4cb750900c08d9b37834dd7ae758b26d34fc16070813166e9eaea9282c1a068b55ab165cb9615b1d6e79aa661c1efc7886324303a3adad9dbdb7b232121e1af478e1c5919736ce0ef1800eeddbb77a0a3a3e38f0e87e30f25252585a5a5a56985858530994c104511aaaa429665f87c3e78a6a7e7fc73735d6ea7f3457c72f2d3cacacaf1b574ff07549ef137d60d16530000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

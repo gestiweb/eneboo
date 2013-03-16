@@ -85,14 +85,22 @@
 		<name>flmrproper</name>
 		<scriptform>flmrproper</scriptform>
 	</action>
-	
-	<action>
-		<name>flupdates</name>
-		<scriptform>flupdates</scriptform>
-	</action>
         
 	<action>
 		<name>fllarge</name>
 		<table>fllarge</table>
+	</action>
+	<action>
+		<name>ebcomportamiento</name>
+		<scriptform>ebcomportamiento</scriptform>
+
+	</action>
+	<action>
+		<name>flloadmodpkg</name>
+		<scriptform>flloadmodpkg</scriptform>
+	</action>
+	<action>
+		<name>fldumpdb</name>
+		<scriptform>fldumpdb</scriptform>
 	</action>
 </ACTIONS>
