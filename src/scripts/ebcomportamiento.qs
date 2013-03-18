@@ -43,6 +43,10 @@ function cargarConfiguracion() {
 	w.child("cbFLTableDC").checked = leerValorLocal("FLTableDoubleClick");
 	w.child("cbFLTableSC").checked = leerValorLocal("FLTableShortCut");
 	w.child("cbFLTableCalc").checked = leerValorLocal("FLTableExport2Calc");
+	w.child("cbDebuggerMode").checked = leerValorLocal("isDebuggerMode");
+	w.child("cbSLConsola").checked = leerValorLocal("SLConsola");
+	w.child("cbSLInterface").checked = leerValorLocal("SLInterface");
+
 }
 
 
@@ -71,7 +75,12 @@ function grabarValorGlobal(valorName,value) {
 
 function leerValorLocal(valorName):String {
 	var util : FLUtil = new FLUtil();
-	var valor : String =  util.readSettingEntry("ebcomportamiento/"+ valorName );
+	var valor : String;
+	
+	if (valorName == "isDebuggerMode")
+		valor =  util.readSettingEntry("application/"+ valorName );
+	else
+		valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
 	if (!valor) //Entendemos que el valor existe
 		debug("No existe la entrada " + valorName + " (" + valor + ") local.");
 	return valor;
@@ -79,7 +88,11 @@ function leerValorLocal(valorName):String {
 
 function grabarValorLocal(valorName,value) {
 	var util : FLUtil = new FLUtil();
+	if (valorName == "isDebuggerMode")
+		util.writeSettingEntry("application/"+ valorName, value);
+	else
 	util.writeSettingEntry("ebcomportamiento/"+ valorName, value);
+	
 }
 
 
@@ -108,6 +121,9 @@ grabarValorLocal("FLFormSearchDBButton",w.child("leFormSearchDBSize").text); //H
 grabarValorLocal("FLTableDoubleClick",w.child("cbFLTableDC").checked);
 grabarValorLocal("FLTableShortCut",w.child("cbFLTableSC").checked);
 grabarValorLocal("FLTableExport2Calc",w.child("cbFLTableCalc").checked);
+grabarValorLocal("isDebuggerMode",w.child("cbDebuggerMode").checked);
+grabarValorLocal("SLConsola",w.child("cbSLConsola").checked);
+grabarValorLocal("SLInterface",w.child("cbSLInterface").checked);
 
 w_.close();
 

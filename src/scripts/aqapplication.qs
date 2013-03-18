@@ -621,23 +621,25 @@ if (tw.count == 0) ok =true;
                 wb.menuText = sys.translate("QSA Work Bench");
                 wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
                 connect(wb, "activated()", this.actSigMap_, "map()");
-				this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
+		this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
+		
+		var sLoad = new QAction(ag);
+    		sLoad.name = "StaticLoadAction";
+    		sLoad.menuText = sys.translate("Cargar &Estática desde Disco Duro");
+    		sLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("image-svg.png")));
+    		connect(sLoad, "activated()", this.actSigMap_, "map()");
+    		this.actSigMap_.setMapping(sLoad, "activated():staticLoad():" + sLoad.name);
+
+    		var resetSC = new QAction(ag);
+    		resetSC.name = "resetScriptAction";
+    		resetSC.menuText = sys.translate("Resetear &Scripts");
+    		resetSC.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
+    		connect(resetSC, "activated()", this.actSigMap_, "map()");
+    		this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
 
               }
 			
-    var sLoad = new QAction(ag);
-    sLoad.name = "StaticLoadAction";
-    sLoad.menuText = sys.translate("Cargar &Estática desde Disco Duro");
-    sLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("image-svg.png")));
-    connect(sLoad, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(sLoad, "activated():staticLoad():" + sLoad.name);
 
-    var resetSC = new QAction(ag);
-    resetSC.name = "resetScriptAction";
-    resetSC.menuText = sys.translate("Resetear &Scripts");
-    resetSC.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
-    connect(resetSC, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
 
     var dumpDb = new QAction(ag);
     dumpDb.name = "dumpDatabaseAction";

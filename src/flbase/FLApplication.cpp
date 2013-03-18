@@ -683,30 +683,6 @@ void FLApplication::initToolBox()
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(loadModules()));
 
-        ++c;
-       
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Carga Estática desde Disco Duro");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("image-svg.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
-
-        ++c; 
-       descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Reiniciar Scripts");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
 
        // ++c; 
        /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
@@ -748,6 +724,31 @@ void FLApplication::initToolBox()
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
+        
+        ++c;
+       
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Carga Estática desde Disco Duro");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("image-svg.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
+
+        ++c; 
+       descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Reiniciar Scripts");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
                                   }
 #endif
 

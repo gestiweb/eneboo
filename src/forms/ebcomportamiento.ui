@@ -255,6 +255,54 @@
                             <attribute name="title">
                                 <string>Desarrollo</string>
                             </attribute>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>cbDebuggerMode</cstring>
+                                </property>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>20</x>
+                                        <y>30</y>
+                                        <width>170</width>
+                                        <height>21</height>
+                                    </rect>
+                                </property>
+                                <property name="text">
+                                    <string>Activar modo desarrollo</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>cbSLConsola</cstring>
+                                </property>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>50</x>
+                                        <y>60</y>
+                                        <width>241</width>
+                                        <height>21</height>
+                                    </rect>
+                                </property>
+                                <property name="text">
+                                    <string>Mostrar carga estática en consola</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>cbSLInterface</cstring>
+                                </property>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>50</x>
+                                        <y>90</y>
+                                        <width>270</width>
+                                        <height>21</height>
+                                    </rect>
+                                </property>
+                                <property name="text">
+                                    <string>Mostrar carga estática en interface gráfico</string>
+                                </property>
+                            </widget>
                         </widget>
                     </widget>
                 </grid>
