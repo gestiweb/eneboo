@@ -697,17 +697,7 @@ void FLApplication::initToolBox()
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
         ++c;
         */
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Copia de Seguridad");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("fileexport.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(dumpDatabase()));
+
         
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 

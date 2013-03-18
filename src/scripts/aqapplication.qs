@@ -638,15 +638,7 @@ if (tw.count == 0) ok =true;
     		this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
 
               }
-			
 
-
-    var dumpDb = new QAction(ag);
-    dumpDb.name = "dumpDatabaseAction";
-    dumpDb.menuText = sys.translate("Copia de Seguridad");
-    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
-    connect(dumpDb, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     var load = new QAction(ac);
     load.name = "loadAbanQPackageAction";
