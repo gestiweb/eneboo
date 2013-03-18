@@ -740,7 +740,7 @@ if (tw.count == 0) ok =true;
     {
     var w = this.w_;
     var tL = w.child("tLabel");
-    var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='message'");
+    var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='verticalName'");
     if (texto)
     tL.text = texto;
     }
