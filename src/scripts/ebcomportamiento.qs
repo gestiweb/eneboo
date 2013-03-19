@@ -46,6 +46,7 @@ function cargarConfiguracion() {
 	w.child("cbDebuggerMode").checked = leerValorLocal("isDebuggerMode");
 	w.child("cbSLConsola").checked = leerValorLocal("SLConsola");
 	w.child("cbSLInterface").checked = leerValorLocal("SLInterface");
+	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 
 }
 
@@ -77,10 +78,15 @@ function leerValorLocal(valorName):String {
 	var util : FLUtil = new FLUtil();
 	var valor : String;
 	
-	if (valorName == "isDebuggerMode")
-		valor =  util.readSettingEntry("application/"+ valorName );
-	else
-		valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
+	switch (valorName) {
+    case "isDebuggerMode":
+      valor =  util.readSettingEntry("application/"+ valorName );
+      break;
+
+    default:
+	valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
+      break;
+  }
 	if (!valor) //Entendemos que el valor existe
 		debug("No existe la entrada " + valorName + " (" + valor + ") local.");
 	return valor;
@@ -88,11 +94,14 @@ function leerValorLocal(valorName):String {
 
 function grabarValorLocal(valorName,value) {
 	var util : FLUtil = new FLUtil();
-	if (valorName == "isDebuggerMode")
-		util.writeSettingEntry("application/"+ valorName, value);
-	else
-	util.writeSettingEntry("ebcomportamiento/"+ valorName, value);
-	
+	switch (valorName) {
+		case "isDebuggerMode":
+			util.writeSettingEntry("application/"+ valorName, value);
+			break;
+		default:
+			util.writeSettingEntry("ebcomportamiento/"+ valorName, value);
+			break;
+			}
 }
 
 
@@ -124,6 +133,7 @@ grabarValorLocal("FLTableExport2Calc",w.child("cbFLTableCalc").checked);
 grabarValorLocal("isDebuggerMode",w.child("cbDebuggerMode").checked);
 grabarValorLocal("SLConsola",w.child("cbSLConsola").checked);
 grabarValorLocal("SLInterface",w.child("cbSLInterface").checked);
+grabarValorLocal("ebCallFunction",w.child("leCallFunction").text);
 
 w_.close();
 

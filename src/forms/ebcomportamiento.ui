@@ -247,6 +247,35 @@
                             <attribute name="title">
                                 <string>Inicio</string>
                             </attribute>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel1_2</cstring>
+                                </property>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>10</x>
+                                        <y>60</y>
+                                        <width>123</width>
+                                        <height>21</height>
+                                    </rect>
+                                </property>
+                                <property name="text">
+                                    <string>Ejecutar esta función</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit">
+                                <property name="name">
+                                    <cstring>leCallFunction</cstring>
+                                </property>
+                                <property name="geometry">
+                                    <rect>
+                                        <x>140</x>
+                                        <y>60</y>
+                                        <width>400</width>
+                                        <height>21</height>
+                                    </rect>
+                                </property>
+                            </widget>
                         </widget>
                         <widget class="QWidget">
                             <property name="name">
@@ -312,7 +341,7 @@
                     <cstring>tab</cstring>
                 </property>
                 <attribute name="title">
-                    <string>Generales</string>
+                    <string>Globales</string>
                 </attribute>
                 <grid>
                     <property name="name">
