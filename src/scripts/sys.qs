@@ -23,15 +23,19 @@ function init() {
     var codEjercicio: String = flfactppal.iface.pub_ejercicioActual();
     var nombreEjercicio: String = util.sqlSelect("ejercicios", "nombre", "codejercicio='" + codEjercicio + "'");
     setCaptionMainWidget(nombreEjercicio);
-    
-    var valor:String = util.readSettingEntry("ebcomportamiento/ebCallFunction");
-    var funcion = new Function( valor );
-    try {
-    funcion(); //Ejecuta la función
+    var settings = new AQSettings;
+    var oldApi:Boolean = settings.readBoolEntry("application/oldApi");
+ if (!oldApi)
+ 	{
+    	var valor:String = util.readSettingEntry("ebcomportamiento/ebCallFunction");
+        var funcion = new Function( valor );
+    	try {
+    		funcion(); //Ejecuta la función
   	} catch(e) {
     		debug(e);
   		}
-  				}
+  	}
+  }
 }
 
 function afterCommit_flfiles(curFiles) {
