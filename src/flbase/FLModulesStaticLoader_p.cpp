@@ -314,8 +314,14 @@ FLStaticLoaderWarning *FLModulesStaticLoader::warn_ = 0;
 
 QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
 {
+   QString separator;
+#if defined(Q_OS_WIN32)
+   separator = "/";
+#else
+   separator ="";
+#endif
   for (AQStaticDirInfo *info = b->dirs_.first(); info; info = b->dirs_.next()) {
-    if (info->active_ && QFile::exists(info->path_ + n)) {
+    if (info->active_ && QFile::exists(info->path_ + separator + n)) {
       if (!warn_)
         warn_ = new FLStaticLoaderWarning;
 #ifdef AQ_STATIC_LOADER_POPUP_WARN
@@ -333,7 +339,7 @@ QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
         if (FLSettings::readBoolEntry("ebcomportamiento/SLConsola", true))
         qWarning("CARGA ESTATICA ACTIVADA:" + n + " -> " + info->path_);
       }
-      return FLManagerModules::contentFS(info->path_ + n);
+      return FLManagerModules::contentFS(info->path_ + separator + n);
     }
   }
   return QString::null;
