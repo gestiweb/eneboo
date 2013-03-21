@@ -34,6 +34,8 @@ email                : mail@infosial.com
 #include "FLSqlConnections.h"
 #include "FLAccessControl.h"
 #include "FLAccessControlFactory.h"
+#include "FLSettings.h"
+
 
 FL_EXPORT int FLSqlCursor::transaction_ = 0;
 FL_EXPORT QPtrStack < FLSqlSavePoint > * FLSqlCursor::stackSavePoints = 0;
@@ -1591,11 +1593,21 @@ void FLSqlCursor::openFormInMode(int m, bool cont)
 
 void FLSqlCursor::chooseRecord()
 {
+// --> Aulla Desactiva edición con doble click
+if (FLSettings::readBoolEntry("ebcomportamiento/FLTableDoubleClick", true))
+	{
+       if (d->browse)
+    browseRecord();
+	}
+	else
+	{
   if (d->edition)
     editRecord();
   else if (d->browse)
     browseRecord();
-
+	}
+	
+// <-- Aulla Desactiva edición con doble click
   emit recordChoosed();
 }
 
