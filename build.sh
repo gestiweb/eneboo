@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR="$( cd -P "$( dirname "$0" )" && pwd )"
 cd "$DIR"
-VER="2.4.X"
+VER="2.4.2.X"
 
 REBUILD_QT=auto
 OPT_PREFIX=""
@@ -212,8 +212,8 @@ fi
 VERSION="$VER (Build $BUILD_NUMBER)"
 BUILD_KEY="$VER-Build"
 
-echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - DEV - )"
-echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
+echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - ALFA - )"
+echo -e "(C) 2003-2013 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "(C) 2012 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
