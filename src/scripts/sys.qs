@@ -28,14 +28,18 @@ function init() {
  if (!oldApi)
  	{
     	var valor:String = util.readSettingEntry("ebcomportamiento/ebCallFunction");
-        var funcion = new Function( valor );
-    	try {
-    		funcion(); //Ejecuta la función
-  	} catch(e) {
-    		debug(e);
-  		}
+	if (valor)
+     		{
+        	var funcion = new Function( valor );
+    		try {
+    			funcion(); //Ejecuta la función
+  		    } catch(e) {
+    				debug(e);
+  			       }
+  	      }	
   	}
-  }
+  }		
+  
 }
 
 function afterCommit_flfiles(curFiles) {
