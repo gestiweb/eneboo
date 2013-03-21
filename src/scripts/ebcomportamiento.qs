@@ -74,32 +74,47 @@ function grabarValorGlobal(valorName,value) {
 	util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
 }
 
+
+
 function leerValorLocal(valorName):String {
 	var util : FLUtil = new FLUtil();
 	var valor : String;
 	
 	switch (valorName) {
     case "isDebuggerMode":
-      valor =  util.readSettingEntry("application/"+ valorName );
-      break;
-
+    		var settings = new AQSettings;
+      		valor =  settings.readBoolEntry("application/"+ valorName );
+      		break;
+      		
+    case "SLInterface":
+    case "SLConsola":
+    case "FLTableDoubleClick":
+    case "FLTableShortCut":
+    case "FLTableExport2Calc":
+       		var settings = new AQSettings;
+      		valor =  settings.readBoolEntry("ebcomportamiento/"+ valorName );
+      		break;
     default:
-	valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
-      break;
+	        valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
+ 	        break;
   }
 	if (!valor) //Entendemos que el valor existe
 		debug("No existe la entrada " + valorName + " (" + valor + ") local.");
 	return valor;
 }
 
+
+
 function grabarValorLocal(valorName,value) {
 	var util : FLUtil = new FLUtil();
 	switch (valorName) {
 		case "isDebuggerMode":
-			util.writeSettingEntry("application/"+ valorName, value);
+			var settings = new AQSettings;
+			settings.writeEntry("application/"+ valorName, value);
 			break;
 		default:
-			util.writeSettingEntry("ebcomportamiento/"+ valorName, value);
+			var settings = new AQSettings;
+			settings.writeEntry("ebcomportamiento/"+ valorName, value);
 			break;
 			}
 }
