@@ -26,6 +26,7 @@ email                : mail@infosial.com
 #include "FLSqlDatabase.h"
 #include "FLManager.h"
 #include "FLObjectFactory.h"
+#include "FLSettings.h"
 
 void FLCheckBox::drawButton(QPainter *p)
 {
@@ -524,7 +525,9 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
         emit recordChoosed();
         return true;
       }
-
+//-->Aulla : Desactiva atajos de teclado de FLTable
+if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", true))
+	{	
       if (ke->key() == Key_A && !popup_)
         if (cursor_ && !readonly_ && !editonly_) {
           cursor_->insertRecord();
@@ -562,6 +565,7 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
           cursor_->browseRecord();
           return true;
         }
+      } //<--Aulla : Desactiva atajos de teclado de FLTable
       return false;
     }
     break;
