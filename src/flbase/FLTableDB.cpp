@@ -35,6 +35,7 @@ email                : mail@infosial.com
 #include "FLSqlQuery.h"
 #include "FLDiskCache.h"
 #include "AQOds.h"
+#include "FLSettings.h"
 
 extern void qt_set_table_clipper_enabled(bool enabled);
 
@@ -1488,6 +1489,15 @@ void FLTableDB::exportToOds()
 {
   if (!cursor_)
     return ;
+//-->Aulla : Desactiva exportar a ODS
+if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc", true))
+	{
+	QMessageBox::information(this, tr("Opción deshabilitada"),
+                                                 tr("Esta opción ha sido deshabilitada por el administrador"),
+                                                  QMessageBox::Yes);
+	return;
+	}
+//>--Aulla : Desactiva exportar a ODS
   FLTableMetaData *mtd = cursor_->metadata();
   if (!mtd)
     return;
