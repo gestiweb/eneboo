@@ -47,6 +47,8 @@ function cargarConfiguracion() {
 	w.child("cbSLConsola").checked = leerValorLocal("SLConsola");
 	w.child("cbSLInterface").checked = leerValorLocal("SLInterface");
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
+	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
+	
 
 }
 
@@ -95,11 +97,10 @@ function leerValorLocal(valorName):String {
       		valor =  settings.readBoolEntry("ebcomportamiento/"+ valorName );
       		break;
     default:
-	        valor =  util.readSettingEntry("ebcomportamiento/"+ valorName );
+	        valor =  util.readSettingEntry("ebcomportamiento/"+ valorName ,"");
  	        break;
   }
-	if (!valor) //Entendemos que el valor existe
-		debug("No existe la entrada " + valorName + " (" + valor + ") local.");
+
 	return valor;
 }
 
@@ -107,6 +108,10 @@ function leerValorLocal(valorName):String {
 
 function grabarValorLocal(valorName,value) {
 	var util : FLUtil = new FLUtil();
+	
+	if (valorName == "maxPixImages" && value < 1 ) value = 600;
+
+			
 	switch (valorName) {
 		case "isDebuggerMode":
 			var settings = new AQSettings;
@@ -149,6 +154,7 @@ grabarValorLocal("isDebuggerMode",w.child("cbDebuggerMode").checked);
 grabarValorLocal("SLConsola",w.child("cbSLConsola").checked);
 grabarValorLocal("SLInterface",w.child("cbSLInterface").checked);
 grabarValorLocal("ebCallFunction",w.child("leCallFunction").text);
+grabarValorLocal("maxPixImages",w.child("leMaxPixImages").text);
 
 w_.close();
 

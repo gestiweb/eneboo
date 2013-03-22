@@ -37,6 +37,7 @@
 #include "FLSqlDatabase.h"
 #include "FLSqlConnections.h"
 #include "vdatepopup.h"
+#include "FLSettings.h"
 
 FLLineEdit::FLLineEdit(QWidget *parent, const char *name) :
   QLineEdit(parent, name),
@@ -248,8 +249,8 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
   pushButtonDB->setFlat(true);
   setFocusProxy(pushButtonDB);
 
-  // Silix
-  maxPixImages_ = 600;
+  // Silix //Aulla : Se carga valor desde clave local
+  maxPixImages_ = FLSettings::readEntry("ebcomportamiento/maxPixImages","600").toInt();
 
   topWidget_ = topLevelWidget();
 
