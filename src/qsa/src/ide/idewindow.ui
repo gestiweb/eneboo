@@ -763,6 +763,7 @@
     <include location="local" impldecl="in implementation">replacetext.h</include>
     <include location="local" impldecl="in implementation">gotoline.h</include>
     <include location="local" impldecl="in implementation">outputcontainer.h</include>
+    <include location="local" impldecl="in implementation">variablescontainer.h</include>
     <include location="local" impldecl="in implementation">preferences.h</include>
     <include location="local" impldecl="in implementation">preferencescontainer.h</include>
     <include location="local" impldecl="in implementation">projectcontainer.h</include>

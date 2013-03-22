@@ -1,5 +1,6 @@
 HEADERS	+= $$IDEDIR/qsworkbench.h \
-  	   $$IDEDIR/idewindow.ui.h
+  	   $$IDEDIR/idewindow.ui.h \
+  	   $$IDEDIR/variablescontainer.ui.h 
 
 SOURCES	+= $$IDEDIR/qsworkbench.cpp
 
@@ -7,6 +8,7 @@ FORMS = $$IDEDIR/findtext.ui \
 	$$IDEDIR/gotoline.ui \
 	$$IDEDIR/idewindow.ui \
 	$$IDEDIR/outputcontainer.ui \
+	$$IDEDIR/variablescontainer.ui \
 	$$IDEDIR/projectcontainer.ui \
 	$$IDEDIR/replacetext.ui \
 	$$IDEDIR/preferencescontainer.ui

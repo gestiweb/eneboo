@@ -516,7 +516,7 @@ void IdeWindow::init()
     projectContainer->scriptsListView->header()->hide();
     projectContainer->show();
 
-#ifdef QS_VARIABLE_WATCH
+
     variablesContainerDock = new QDockWindow( QDockWindow::InDock, this );
     variablesContainer = new QSVariablesContainer( variablesContainerDock, 0, FALSE );
     variablesContainerDock->setResizeEnabled( TRUE );
@@ -527,7 +527,7 @@ void IdeWindow::init()
     variablesContainerDock->setFixedExtentWidth( 150 );
     //variablesContainer->variablesListView->header()->hide();
     variablesContainer->show();
-#endif
+
 
     outputContainerDock = new QDockWindow( QDockWindow::InDock, this );
     outputContainer = new QSOutputContainer( outputContainerDock , 0, FALSE );
@@ -644,9 +644,9 @@ void IdeWindow::projectCall()
 	setRunningState(TRUE);
 	project->interpreter()->call( runFunction );
 	setRunningState(FALSE);
-#ifdef QS_VARIABLE_WATCH
+
 	variablesContainer->updateScope(project->interpreter());
-#endif
+
     }
 }
 
@@ -775,10 +775,10 @@ void IdeWindow::setProject( QSProject *p )
     project->interpreter()->setTimeoutInterval(250);
     connect(project->interpreter(), SIGNAL(timeout(int)), this, SLOT(interpreterTimeout(int)));
 
-#ifdef QS_VARIABLE_WATCH
+
     connect( project, SIGNAL( projectEvaluated() ),
 	     variablesContainer, SLOT( updateScope() ) );
-#endif
+
 }
 
 
