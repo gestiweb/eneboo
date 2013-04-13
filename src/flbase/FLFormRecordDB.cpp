@@ -32,7 +32,7 @@ FLFormRecordDB::FLFormRecordDB(FLSqlCursor *cursor, const QString &actionName, Q
            | Qt::WStyle_NormalBorder | Qt::WType_Dialog | Qt::WShowModal | Qt::WStyle_SysMenu),
   pushButtonAccept(0), pushButtonAcceptContinue(0), pushButtonFirst(0), pushButtonPrevious(0),
   pushButtonNext(0), pushButtonLast(0), showAcceptContinue_(showAcceptContinue), iface(0),
-  accepting(false), initTransLevel(0), initialModeAccess(cursor ? cursor->modeAccess()
+  accepting(false),accepted(false), initTransLevel(0), initialModeAccess(cursor ? cursor->modeAccess()
                                                          : FLSqlCursor::BROWSE)
 {
   setFocusPolicy(QWidget::NoFocus);
