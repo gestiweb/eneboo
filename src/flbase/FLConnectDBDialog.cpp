@@ -106,7 +106,7 @@ void FLConnectDBDialog::tryConnect()
 {
   QString usuario = lineEditUser->text();
   usuario = usuario.replace(QRegExp("^[\\s\\t]+|[\\s\\t]+$"), "");
-  if (usuario.isEmpty()) {
+  if (usuario.isEmpty() && comboBoxDB->currentText() != "SQLite") {
     error_ = true;
     this->accept();
     return ;
@@ -122,7 +122,7 @@ void FLConnectDBDialog::tryConnect()
   
   QString puerto = lineEditPort->text();
   puerto = puerto.replace(QRegExp("[^0-9]+"), "");
-  if (puerto.isEmpty()) {
+  if (puerto.isEmpty() && comboBoxDB->currentText() != "SQLite") {
     error_ = true;
     this->accept();
     return ;
