@@ -846,7 +846,11 @@ QStringList SqliteDriver::tables(const QString &typeName) const
 
 QString SqliteDriver::formatDatabaseName(const QString &name)
 {
-  return AQ_DISKCACHE_DIRPATH + "/." + name;
+  if (name.find("\\", 0, false) == 0 || name.find("/", 0, false) == 0)
+  	return name;
+  else
+  	return AQ_DISKCACHE_DIRPATH + "/" + name;  
+
 }
 
 SqliteResult::SqliteResult(const QSqlDriver *d) : QSqlResult(d), driver(0), dataSet(0)

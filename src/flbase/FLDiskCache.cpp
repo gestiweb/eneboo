@@ -102,10 +102,25 @@ void FLDiskCache::init(FLApplication *app)
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
   } else {
+    if ( app->db()->driverName() != "FLsqlite")
     aqSetAndCreateDirPath(
       AQ_USRHOME + "/.eneboocache/" +
       app->db()->database()
     );
+    else
+    {
+    // --> Aulla : Reconstruimos un nombre válido para crear el directorio de la caché cuando usamos el driver SQLite
+    QString DBName = app->db()->database();
+    DBName.replace(AQ_DISKCACHE_DIRPATH,""); //Limpiamos el path
+    DBName.replace(".s3db","");//Limpiamos la extensión
+    aqSetAndCreateDirPath(
+      AQ_USRHOME + "/.eneboocache/" +
+      DBName
+    );
+    // <-- Aulla:
+    }
+    
+    
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
   }
