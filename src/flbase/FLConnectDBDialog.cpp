@@ -106,7 +106,7 @@ void FLConnectDBDialog::tryConnect()
 {
   QString usuario = lineEditUser->text();
   usuario = usuario.replace(QRegExp("^[\\s\\t]+|[\\s\\t]+$"), "");
-  if (usuario.isEmpty() && comboBoxDB->currentText() != "SQLite") {
+  if (usuario.isEmpty() && comboBoxDB->currentText() != "SQLite3") {
     error_ = true;
     this->accept();
     return ;
@@ -122,7 +122,7 @@ void FLConnectDBDialog::tryConnect()
   
   QString puerto = lineEditPort->text();
   puerto = puerto.replace(QRegExp("[^0-9]+"), "");
-  if (puerto.isEmpty() && comboBoxDB->currentText() != "SQLite") {
+  if (puerto.isEmpty() && comboBoxDB->currentText() != "SQLite3") {
     error_ = true;
     this->accept();
     return ;
@@ -139,8 +139,10 @@ void FLConnectDBDialog::tryConnect()
     this->accept();
     return ;
   }
-
-  if (!db->connectDB(comboBoxNameDB->currentText(), usuario,
+  QString DBName = comboBoxNameDB->currentText();
+  if (comboBoxDB->currentText() == "SQLite3") 
+  	DBName = DBName + ".s3db";
+  if (!db->connectDB(DBName, usuario,
                      lineEditPassword->text(), host, puerto.toInt())) {
     error_ = true;
     delete db;

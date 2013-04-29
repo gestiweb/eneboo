@@ -155,21 +155,21 @@ const char *SqliteDatabase::getErrorMsg() {
 
 int SqliteDatabase::connect() {
   disconnect();
-  if (conn = sqlite_open(db.c_str(),0,NULL)) {
-    //cout << "Connected!\n";
-    char* err=NULL;
-    if (setErr(sqlite_exec(getHandle(),"PRAGMA empty_result_callbacks=ON",NULL,NULL,&err),"PRAGMA empty_result_callbacks=ON") != SQLITE_OK) {
+  int result;
+result = sqlite3_open(db.c_str(),&conn);
+    //char* err=NULL;
+    if (result != SQLITE_OK) {
       return DB_CONNECTION_NONE;
     }
     active = true;
     return DB_CONNECTION_OK;
-  }
-  return DB_CONNECTION_NONE;
+  
+  //return DB_CONNECTION_NONE;
 };
 
 void SqliteDatabase::disconnect(void) {
   if (active == false) return;
-  sqlite_close(conn);
+  sqlite3_close(conn);
   active = false;
 };
 
@@ -193,19 +193,19 @@ long SqliteDatabase::nextid(const char* sname) {
   result_set res;
   char sqlcmd[512];
   sprintf(sqlcmd,"select nextid from %s where seq_name = '%s'",sequence_table.c_str(), sname);
-  if (last_err = sqlite_exec(getHandle(),sqlcmd,&callback,&res,NULL) != SQLITE_OK) {
+  if (last_err = sqlite3_exec(getHandle(),sqlcmd,&callback,&res,NULL) != SQLITE_OK) {
     return DB_UNEXPECTED_RESULT;
     }
   if (res.records.size() == 0) {
     id = 1;
     sprintf(sqlcmd,"insert into %s (nextid,seq_name) values (%d,'%s')",sequence_table.c_str(),id,sname);
-    if (last_err = sqlite_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
+    if (last_err = sqlite3_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
     return id;
   }
   else {
     id = res.records[0][0].get_asInteger()+1;
     sprintf(sqlcmd,"update %s set nextid=%d where seq_name = '%s'",sequence_table.c_str(),id,sname);
-    if (last_err = sqlite_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
+    if (last_err = sqlite3_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
     return id;    
   }
   return DB_UNEXPECTED_RESULT;
@@ -216,21 +216,21 @@ long SqliteDatabase::nextid(const char* sname) {
 // ---------------------------------------------
 void SqliteDatabase::start_transaction() {
   if (active) {
-    sqlite_exec(conn,"begin",NULL,NULL,NULL);
+    sqlite3_exec(conn,"begin",NULL,NULL,NULL);
     _in_transaction = true;
   }
 }
 
 void SqliteDatabase::commit_transaction() {
   if (active) {
-    sqlite_exec(conn,"commit",NULL,NULL,NULL);
+    sqlite3_exec(conn,"commit",NULL,NULL,NULL);
     _in_transaction = false;
   }
 }
 
 void SqliteDatabase::rollback_transaction() {
   if (active) {
-    sqlite_exec(conn,"rollback",NULL,NULL,NULL);
+    sqlite3_exec(conn,"rollback",NULL,NULL,NULL);
     _in_transaction = false;
   }  
 }
@@ -267,7 +267,7 @@ void SqliteDataset::set_autorefresh(bool val){
 
 //--------- protected functions implementation -----------------//
 
-sqlite* SqliteDataset::handle(){
+sqlite3* SqliteDataset::handle(){
   if (db != NULL){
     return ((SqliteDatabase*)db)->getHandle();
       }
@@ -290,7 +290,7 @@ void SqliteDataset::make_query(StringList &_sql) {
 	query = *i;
 	char* err=NULL; 
 	Dataset::parse_sql(query);
-	if (db->setErr(sqlite_exec(this->handle(),query.c_str(),NULL,NULL,&err),query.c_str())!=SQLITE_OK) {
+	if (db->setErr(sqlite3_exec(this->handle(),query.c_str(),NULL,NULL,&err),query.c_str())!=SQLITE_OK) {
 	  if (db->in_transaction()) db->rollback_transaction();
 	  return;
     }
@@ -354,7 +354,7 @@ int SqliteDataset::exec(const string &sql) {
   int res;
   exec_res.record_header.clear();
   exec_res.records.clear();
-  if(res = db->setErr(sqlite_exec(handle(),sql.c_str(),&callback,&exec_res,&errmsg),sql.c_str()) == SQLITE_OK)
+  if(res = db->setErr(sqlite3_exec(handle(),sql.c_str(),&callback,&exec_res,&errmsg),sql.c_str()) == SQLITE_OK)
     return res;
   else
     return DB_ERROR;
@@ -382,7 +382,7 @@ bool SqliteDataset::query(const char *query) {
 
   close();
 
-  if (  db->setErr(sqlite_exec(handle(),query,&callback,&result,&errmsg),query) == SQLITE_OK) {
+  if (  db->setErr(sqlite3_exec(handle(),query,&callback,&result,&errmsg),query) == SQLITE_OK) {
         active = true;
 	ds_state = dsSelect;
 	this->first();

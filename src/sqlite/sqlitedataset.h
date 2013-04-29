@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 #include <dataset.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 namespace dbiplus {
 /***************** Class SqliteDatabase definition ******************
@@ -43,7 +43,7 @@ namespace dbiplus {
 class FL_EXPORT SqliteDatabase: public Database {
 protected:
 /* connect descriptor */
-  sqlite *conn;
+  sqlite3 *conn;
   bool _in_transaction;
   int last_err;
 
@@ -56,7 +56,7 @@ public:
   Dataset *CreateDataset() const; 
 
 /* func. returns connection handle with SQLite-server */
-  sqlite *getHandle() {  return conn; }
+  sqlite3 *getHandle() {  return conn; }
 /* func. returns current status about SQLite-server connection */
   virtual int status();
   virtual int setErr(int err_code,const char * qry);
@@ -100,7 +100,7 @@ protected:
   bool autorefresh;
   char* errmsg;
   
-  sqlite* handle();
+  sqlite3* handle();
 
 /* Makes direct queries to database */
   virtual void make_query(StringList &_sql);
