@@ -22,7 +22,8 @@ email                : mail@infosial.com
 #include "FLCompoundKey.h"
 
 FLTableMetaDataPrivate::FLTableMetaDataPrivate(const QString &n, const QString &a, const QString &q) :
-  name_(n.lower()), alias_(a), compoundKey_(0), query_(q)
+  name_(n.lower()), alias_(a), compoundKey_(0), query_(q),
+  concurWarn_(true), detectLocks_(false)
 {
   fieldList_ = new FLTableMetaData::FLFieldMetaDataList(71);
   fieldList_->setAutoDelete(true);
