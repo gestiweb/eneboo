@@ -2807,7 +2807,7 @@ void QPSQLDriver::Mr_Proper()
   QStringList listOldBks(tables("").grep(rx));
 
   qry.exec("select nombre from flfiles where nombre similar to"
-           "'%[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]%:[[:digit:]][[:digit:]]$' or nombre similar to"
+           "'%[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]%:[[:digit:]][[:digit:]]%' or nombre similar to"
            "'%alteredtable[[:digit:]][[:digit:]][[:digit:]][[:digit:]]%' or (bloqueo='f' and nombre like '%.mtd')");
   FLUtil::createProgressDialog(tr("Borrando backups"), listOldBks.size() + qry.size() + 2);
   while (qry.next()) {
