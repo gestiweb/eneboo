@@ -139,8 +139,10 @@ function botonExportar_clicked() {
 function aceptarLicenciaDelModulo(directorio) {
   var licencia = Dir.cleanDirPath(directorio + "/COPYING");
   if (!File.exists(licencia)) {
-    MessageBox.critical(util.translate("scripts", "El fichero " + licencia + " con la licencia del módulo no existe.\nEste fichero debe existir para poder aceptar la licencia que contiene."), MessageBox.Ok);
-    return false;
+ var continuar = MessageBox.warning(util.translate("scripts", "El fichero " + licencia + " con la licencia del módulo no existe.\nEste fichero debe existir para poder aceptar la licencia que contiene.\n\n¿Desea continuar de todas maneras?"), MessageBox.Yes, MessageBox.No);
+    if (continuar == MessageBox.No) return false;
+    
+    return true;
   }
 
   var licencia = File.read(licencia);
