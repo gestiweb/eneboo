@@ -286,7 +286,7 @@ class MainWindow
   {
     var w = this.w_;
     var action;
-
+    var moduleName;
     this.dckMod_.readState();
     this.dckRec_.readState();
     this.dckMar_.readState();
@@ -313,7 +313,11 @@ class MainWindow
       for (var i = 0; i < openActions.length; ++i)
                 {
                  action = this.agMenu_.child(openActions[i], "QAction");
+				 moduleName = aqApp.db().managerModules().idModuleOfFile(action.name + ".ui");
+                 if (moduleName != undefined)
+                	{
                this.addForm(openActions[i],action.iconSet().pixmap());
+					}
                  }
       var idx = settings.readNumEntry(key + "currentPageIndex");
       if (idx >= 0 && idx < tw.count)
