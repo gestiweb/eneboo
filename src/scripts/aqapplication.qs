@@ -316,8 +316,9 @@ class MainWindow
 				 moduleName = aqApp.db().managerModules().idModuleOfFile(action.name + ".ui");
                  if (moduleName != undefined)
                 	{
-               this.addForm(openActions[i],action.iconSet().pixmap());
-					}
+                	this.initModule(moduleName);
+               		this.addForm(openActions[i],action.iconSet().pixmap());
+               		}
                  }
       var idx = settings.readNumEntry(key + "currentPageIndex");
       if (idx >= 0 && idx < tw.count)
