@@ -954,6 +954,21 @@ void FLTableDB::switchSortOrder(int)
   refresh(true, true);
 }
 
+void FLTableDB::setSortOrder(int ascending)
+{
+  if (orderAsc_ == ascending) return;
+  
+  orderAsc_ = ascending;
+  tableRecords()->hide();
+  refresh(true, true);
+}
+
+bool FLTableDB::isSortOrderAscending()
+{
+    return orderAsc_;
+}
+
+
 void FLTableDB::activeTabData(bool on)
 {
   if (topWidget && tabTable->visibleWidget() != tabData) {
