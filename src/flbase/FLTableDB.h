@@ -664,7 +664,7 @@ public slots:
   */
   void exportToOds();
 
-protected slots:
+// protected slots:
 
   /**
   Coloca la columna indicada como primera.
