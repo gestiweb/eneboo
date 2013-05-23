@@ -285,7 +285,7 @@ void FLTableDB::moveCol(int from, int to, bool firstSearch)
   } else
     refreshDelayed();
   if (!sender())
-    tableRecords_->setQuickFocus();
+    lineEditSearch->setFocus();
 }
 
 void FLTableDB::setReadOnly(const bool mode)
@@ -827,7 +827,7 @@ void FLTableDB::showWidget()
         refreshDelayed();
     }
     if (!topWidget->isA("FLFormRecordDB"))
-      tableRecords_->setQuickFocus();
+      lineEditSearch->setFocus();
   }
 
   if (cursorAux) {
