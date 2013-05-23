@@ -2749,6 +2749,18 @@ public slots:
     return obj_->filter();
   }
 
+  void switchSortOrder() {
+    obj_->switchSortOrder(-1);  
+  }
+  
+  bool isSortOrderAscending() {
+    return obj_->isSortOrderAscending();  
+  }
+  
+  void setSortOrder(int ascending) {
+    obj_->setSortOrder(ascending);  
+  }
+  
   /**
    Obtiene el filtro impuesto en el Find.
 

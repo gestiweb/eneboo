@@ -710,6 +710,10 @@ public slots:
   viceversa. Los registros siempre se ordenan por la primera columna.
   */
   void switchSortOrder( int col );
+  
+  void setSortOrder(int ascending);
+  
+  bool isSortOrderAscending();
 
   /**
   Activa la tabla de datos
