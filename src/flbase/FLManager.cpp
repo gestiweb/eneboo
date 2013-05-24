@@ -324,7 +324,7 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
     return 0;
 
   bool ck = false;
-  QString n, a, ol, rX, assocBy, assocWith;
+  QString n, a, ol, rX, assocBy, assocWith, so;
   bool aN = true, iPK = true, c = false, iNX = false, uNI = false, coun = false, oT = false, vG = true;
   int t = QVariant::Int, l = 0, pI = 4, pD = 0;
   QVariant dV = QVariant();
@@ -464,6 +464,11 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "searchoptions") {
+        so = e.text();
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
@@ -473,7 +478,9 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
 
   if (!ol.isEmpty())
     f->setOptionsList(ol);
-
+  if (!so.isEmpty())
+    f->setSearchOptions(so);
+  
   no = field->firstChild();
 
   while (!no.isNull()) {

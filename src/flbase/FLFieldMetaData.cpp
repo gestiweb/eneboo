@@ -150,6 +150,13 @@ void FLFieldMetaData::setRelationList(FLRelationMetaDataList *rl)
   d->relationList_ = rl;
 }
 
+void FLFieldMetaData::setSearchOptions(const QString &ol)
+{
+  d->searchOptions_.clear();
+  d->searchOptions_ = QStringList::split(',', ol);
+}
+
+
 void FLFieldMetaData::setOptionsList(const QString &ol)
 {
   d->optionsList_.clear();
@@ -170,6 +177,7 @@ void FLFieldMetaData::setOptionsList(const QString &ol)
   d->optionsList_ = QStringList::split(',', olTranslated);
   d->hasOptionsList_ = (!d->optionsList_.empty());
 }
+
 
 QVariant::Type FLFieldMetaData::flDecodeType(int fltype)
 {

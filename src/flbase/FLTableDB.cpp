@@ -534,6 +534,22 @@ void FLTableDB::filterRecords(const QString &p)
         bool searchField = true;
         if (!field->visibleGrid()) searchField = false;
         if (field->type() != QVariant::String) searchField = false;
+        QStringList sOptions = field->searchOptions();
+        QString allFieldSearchInclude = "allfieldsearch:include";
+        QString allFieldSearchExclude = "allfieldsearch:exclude";
+
+        if (sOptions.contains(allFieldSearchExclude) > 0) {
+          if (searchField) {
+            //qDebug("Excluding field in allfield search: " + field->name());
+            searchField = false;
+          }
+        }
+        if (sOptions.contains(allFieldSearchInclude) > 0) {
+          if (!searchField) {
+            //qDebug("Including field in allfield search: " + field->name());
+            searchField = true;
+          }
+        }
         
         if (searchField) {
           bfilter += " OR ";
