@@ -77,7 +77,7 @@ FLDataTable::FLDataTable(QWidget *parent, const char *name, bool popup)
   : QDataTable(parent, name),
     rowSelected(-1), colSelected(-1), cursor_(0), readonly_(false),
     editonly_(false), insertonly_(false), persistentFilter_(QString::null),
-    refreshing_(false), popup_(popup), showAllPixmaps_(false)
+    refreshing_(false), refresh_timer_(false), popup_(popup), showAllPixmaps_(false)
 {
   if (!name)
     setName("FLDataTable");
@@ -592,10 +592,17 @@ void FLDataTable::contentsMouseDoubleClickEvent(QMouseEvent *e)
 
 void FLDataTable::refresh()
 {
-  if (popup_)
-    QDataTable::refresh();
-  if (!refreshing_ && cursor_  && cursor_->metadata()) {
-    refreshing_ = true;
+  if (refreshing_) {
+      if (!refresh_timer_) {
+        QTimer::singleShot(500, this, SLOT(refresh()));
+        refresh_timer_ = true;
+      }
+      return;
+  }
+  refreshing_ = true;
+  refresh_timer_ = false;
+  if (popup_) QDataTable::refresh();
+  if (cursor_  && cursor_->metadata()) {
     cursor_->setFilter(persistentFilter_);
     FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
     if (sndCursor) {

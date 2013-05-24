@@ -48,7 +48,6 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), tdbFilterLastWhere_(QString::null),
   findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0)
 {
-
 #ifndef Q_OS_WIN32
   qt_set_table_clipper_enabled(false);
 #endif
@@ -312,6 +311,7 @@ QString FLTableDB::findFilter()
 
 void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 {
+  QString bfilter = filter_;
   if (!timer)
     return;
 
@@ -330,8 +330,9 @@ void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 
   if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
     return;
-  if (refreshData)
+  if (refreshData) {
     refresh(false, true);
+  }
   seekCursor();
 }
 
@@ -476,26 +477,27 @@ void FLTableDB::filterRecords(const QString &p)
 
   bool refreshData = filter_.contains("%");
   bool allFields = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem()) == "*";
-  filter_ = "";
+  int msec_refresh = 400;
+  QString bfilter = "";
   if (!p.isEmpty() && allFields) {
     FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
     if (fieldList) {
       FLFieldMetaData *field;
       QDictIterator<FLFieldMetaData> it(*fieldList);
+      bfilter = "( false";
       while ((field = it.current()) != 0) {
         ++it;
-        if (!field->visibleGrid())
-          continue;
-        if (!p.contains("'") && !p.contains("\\") && field->type() == QVariant::String) {
-          if (!filter_.isEmpty())
-            filter_ += " OR ";
-          else
-            filter_ = "(";
-          filter_ += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
+        bool searchField = true;
+        if (!field->visibleGrid()) searchField = false;
+        if (field->type() != QVariant::String) searchField = false;
+        
+        if (searchField) {
+          bfilter += " OR ";
+          bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
         }
       }
-      if (!filter_.isEmpty())
-        filter_ += ")";
+     bfilter += ")";
+     msec_refresh = 800;
     }
   }
 
@@ -513,14 +515,15 @@ void FLTableDB::filterRecords(const QString &p)
             break;
         }
 
-        filter_ = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
+        bfilter = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
         qry->deleteLater();
       }
     } else
-      filter_ = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
+      bfilter = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
   }
 
-  refreshDelayed(300, !filter_.isEmpty() || refreshData);
+  refreshDelayed(msec_refresh, !bfilter.isEmpty() || refreshData);
+  filter_ = bfilter;
 }
 
 QString FLTableDB::tableName() const
