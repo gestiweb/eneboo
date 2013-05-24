@@ -219,6 +219,7 @@ private:
   Indicador para evitar refrescos anidados
   */
   bool refreshing_;
+  bool refresh_timer_;
 
   /**
   Indica si el componente es emergente ( su padre es un widget del tipo Popup )
