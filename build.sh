@@ -489,6 +489,10 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   fi
 fi
 
+if [ "$CROSS" == "i686-apple-darwin8-" -o "$CROSS" == "powerpc-apple-darwin8-" ];then
+    echo "DEFINES *= SQLITE_WITHOUT_ZONEMALLOC" >> settings.pro
+fi
+
 if [ "$OPT_DEBUG" = "yes" ]
 then
   echo "CONFIG *= debug" >> settings.pro
