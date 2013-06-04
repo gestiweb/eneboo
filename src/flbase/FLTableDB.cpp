@@ -524,40 +524,58 @@ void FLTableDB::filterRecords(const QString &p)
   int msec_refresh = 400;
   QString bfilter = "";
   if (!p.isEmpty() && allFields) {
-    FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
-    if (fieldList) {
-      FLFieldMetaData *field;
-      QDictIterator<FLFieldMetaData> it(*fieldList);
-      bfilter = "( false";
-      while ((field = it.current()) != 0) {
-        ++it;
-        bool searchField = true;
-        if (!field->visibleGrid()) searchField = false;
-        if (field->type() != QVariant::String) searchField = false;
-        QStringList sOptions = field->searchOptions();
-        QString allFieldSearchInclude = "allfieldsearch:include";
-        QString allFieldSearchExclude = "allfieldsearch:exclude";
+    QString FTSFunction = cursor_->metadata()->FTSFunction();
+    if (FTSFunction.isEmpty()) {
+      FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
+      if (fieldList) {
+	FLFieldMetaData *field;
+	QDictIterator<FLFieldMetaData> it(*fieldList);
+	bfilter = "( false";
+	while ((field = it.current()) != 0) {
+	  ++it;
+	  bool searchField = true;
+	  if (!field->visibleGrid()) searchField = false;
+	  if (field->type() != QVariant::String) searchField = false;
+	  QStringList sOptions = field->searchOptions();
+	  QString allFieldSearchInclude = "allfieldsearch:include";
+	  QString allFieldSearchExclude = "allfieldsearch:exclude";
 
-        if (sOptions.contains(allFieldSearchExclude) > 0) {
-          if (searchField) {
-            //qDebug("Excluding field in allfield search: " + field->name());
-            searchField = false;
-          }
-        }
-        if (sOptions.contains(allFieldSearchInclude) > 0) {
-          if (!searchField) {
-            //qDebug("Including field in allfield search: " + field->name());
-            searchField = true;
-          }
-        }
+	  if (sOptions.contains(allFieldSearchExclude) > 0) {
+	    if (searchField) {
+	      //qDebug("Excluding field in allfield search: " + field->name());
+	      searchField = false;
+	    }
+	  }
+	  if (sOptions.contains(allFieldSearchInclude) > 0) {
+	    if (!searchField) {
+	      //qDebug("Including field in allfield search: " + field->name());
+	      searchField = true;
+	    }
+	  }
         
-        if (searchField) {
-          bfilter += " OR ";
-          bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
-        }
+	  if (searchField) {
+	    bfilter += " OR ";
+	    bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
+	  }
+	}
+        bfilter += ")";
+        msec_refresh = 800;
       }
-     bfilter += ")";
-     msec_refresh = 800;
+    } else {
+      QString ftsfilter = p;
+      QString tablename = cursor_->metadata()->name();
+      ftsfilter = ftsfilter.replace(",", " ");
+      ftsfilter = ftsfilter.replace("&", " ");
+      ftsfilter = ftsfilter.replace("|", " ");
+      ftsfilter = ftsfilter.replace("'", " ");
+      ftsfilter = ftsfilter.replace("\"", " ");
+      ftsfilter = ftsfilter.replace(":", " ");
+      ftsfilter = ftsfilter.replace("%", " ");
+      ftsfilter = ftsfilter.replace(QRegExp("\\s+"), " ");
+      ftsfilter = ftsfilter.replace(QRegExp("(^\\s+|\\s+$)"), "");
+      ftsfilter = ftsfilter.replace(" ", " & ");
+      bfilter += FTSFunction + "(" + tablename + ") @@ to_tsquery('" + ftsfilter + ":*')";
+      qDebug("Using Full Text Search: " + bfilter);
     }
   }
 

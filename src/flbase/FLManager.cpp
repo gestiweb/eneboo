@@ -580,7 +580,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   if (!mtd)
     return 0;
 
-  QString name, a, q;
+  QString name, a, q, ftsfun;
   bool v = true, ed = true, cw = true, dl = false;
 
   QDomNode no = mtd->firstChild();
@@ -628,6 +628,11 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "FTSFunction") {
+        ftsfun = e.text();
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
@@ -635,7 +640,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   FLTableMetaData *tmd = new FLTableMetaData(name, a, q);
   FLCompoundKey *cK = 0;
   QStringList assocs;
-
+  tmd->setFTSFunction(ftsfun);
   tmd->setConcurWarn(cw);
   tmd->setDetectLocks(dl);
   no = mtd->firstChild();
