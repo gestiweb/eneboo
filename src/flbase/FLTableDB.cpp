@@ -26,6 +26,7 @@ email                : mail@infosial.com
 #include "FLRelationMetaData.h"
 #include "FLFormSearchDB.h"
 #include "FLManager.h"
+#include "FLManagerModules.h"
 #include "FLAction.h"
 #include "FLApplication.h"
 #include "FLSqlDatabase.h"
@@ -520,7 +521,8 @@ void FLTableDB::filterRecords(const QString &p)
     return ;
 
   bool refreshData = filter_.contains("%");
-  bool allFields = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem()) == "*";
+  QString fieldSearch = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem());
+  bool allFields = fieldSearch == "*";
   int msec_refresh = 400;
   QString bfilter = "";
   if (!p.isEmpty() && allFields) {
@@ -592,12 +594,39 @@ void FLTableDB::filterRecords(const QString &p)
           if (qField.endsWith("." + sortField_->name()))
             break;
         }
-
         bfilter = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
         qry->deleteLater();
       }
     } else
       bfilter = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
+    fieldSearch = sortField_->name();
+  }
+
+  QString functionQSA = tableDB_filterRecords_functionName_;
+
+  if (functionQSA.isEmpty()) {
+    QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
+                                                           QString::fromLatin1(".mtd")));
+    functionQSA = idMod + QString::fromLatin1(".tableDB_filterRecords_") + cursor_->metadata()->name();
+  }
+                                                   
+  if (!functionQSA.isEmpty()) {
+    QValueList<QVariant> vargs = QValueList<QVariant>();
+    vargs.append(cursor_->metadata()->name());
+    vargs.append(p);
+    vargs.append(fieldSearch);
+    vargs.append(bfilter);
+    QSArgumentList args = QSArgumentList(vargs);
+    QVariant v = aqApp->call(functionQSA,args, 0).variant();
+    QString ret = v.toString();
+    if (!ret.isNull()) {
+      bfilter = ret;   
+      qDebug("functionQSA:" + functionQSA + " : " + ret.replace("%","%%"));
+    } else {
+      qDebug("functionQSA:" + functionQSA + " -> NULL");
+    }
+  } else {
+    qDebug("functionQSA: (empty)");
   }
 
   refreshDelayed(msec_refresh, !bfilter.isEmpty() || refreshData);

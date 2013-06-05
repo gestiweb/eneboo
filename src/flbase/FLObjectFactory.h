@@ -2660,6 +2660,13 @@ public slots:
   }
 
   /**
+   Establece el nombre de función a llamar cuando cambia el filtro de búsqueda
+   */
+  void setFilterRecordsFunction( QString fn) {
+    obj_->setFilterRecordsFunction(fn);
+    
+  } 
+  /**
    Establece si el componente esta en modo solo edición o no.
    */
   void setEditOnly(const bool mode) {

@@ -247,6 +247,14 @@ public:
   Ver FLTableDB::functionGetColor_
   */
   void setFunctionGetColor( const QString & f );
+
+  /**
+    Asigna el nombre de función a llamar cuando cambia el filtro.
+  */  
+  void setFilterRecordsFunction( QString fn) {
+    tableDB_filterRecords_functionName_ = fn;
+  }
+  
   
 protected:
 
@@ -541,6 +549,8 @@ private:
   Editor falso
   */
   QWidget * fakeEditor_;
+  
+  QString tableDB_filterRecords_functionName_;
 
 public slots:
 
