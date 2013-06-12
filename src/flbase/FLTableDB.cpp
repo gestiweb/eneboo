@@ -185,11 +185,15 @@ void FLTableDB::moveCol(const QString &from, const QString &to)
   QHeader *horizHeader = tableRecords()->horizontalHeader();
 
   int i = sortColumn_, hCount = horizHeader->count();
-  int iFrom = (from.isEmpty() ? sortColumn_ : sortColumn_ - 1), iTo = (to.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  int iFrom = (from.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  int iTo = (to.isEmpty() ? sortColumn_ : sortColumn_ - 1);
+  QString fromFieldName(tMD->fieldAliasToName(from));
+  QString toFieldName(tMD->fieldAliasToName(to));
+
   while (i < hCount && (iFrom < sortColumn_ || iTo < sortColumn_)) {
-    if (iFrom < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(from))
+    if (iFrom < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(fromFieldName))
       iFrom = i;
-    if (iTo < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(to))
+    if (iTo < sortColumn_ && horizHeader->label(i) == tMD->fieldNameToAlias(toFieldName))
       iTo = i;
     ++i;
   }
@@ -225,7 +229,8 @@ void FLTableDB::moveCol(int from, int to)
   tableRecords_->hide();
 
   int fromS = from + sortColumn_, toS = to + sortColumn_;
-  QString fieldName = tMD->fieldAliasToName(horizHeader->label(fromS)), fieldNameItem;
+  QString fieldName(tMD->fieldAliasToName(horizHeader->label(fromS)));
+  QString fieldNameItem;
   QString textSearch(lineEditSearch->text());
 
   if (!textSearch.isEmpty())
@@ -484,9 +489,13 @@ void FLTableDB::filterRecords(const QString &p)
         if (!p.contains("'") && !p.contains("\\") && field->type() == QVariant::String) {
           if (!filter_.isEmpty())
             filter_ += " OR ";
+          else
+            filter_ = "(";
           filter_ += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
         }
       }
+      if (!filter_.isEmpty())
+        filter_ += ")";
     }
   }
 
