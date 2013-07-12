@@ -1594,16 +1594,17 @@ void FLSqlCursor::openFormInMode(int m, bool cont)
 void FLSqlCursor::chooseRecord()
 {
 // --> Aulla Desactiva edición con doble click
-if (FLSettings::readBoolEntry("ebcomportamiento/FLTableDoubleClick", true))
+if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableDoubleClick", false))
 	{
+	  if (d->edition)
+    		editRecord();
+  else
        if (d->browse)
-    browseRecord();
+    		browseRecord();
 	}
 	else
 	{
-  if (d->edition)
-    editRecord();
-  else if (d->browse)
+ if (d->browse)
     browseRecord();
 	}
 	

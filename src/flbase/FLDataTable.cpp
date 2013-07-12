@@ -526,7 +526,7 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
         return true;
       }
 //-->Aulla : Desactiva atajos de teclado de FLTable
-if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", true))
+if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", false))
 	{	
       if (ke->key() == Key_A && !popup_)
         if (cursor_ && !readonly_ && !editonly_) {

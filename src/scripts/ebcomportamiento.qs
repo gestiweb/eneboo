@@ -32,7 +32,6 @@ function main() {
 function cargarConfiguracion() {
 	var w = this.w_;
 	w.child("leNombreVertical").text = leerValorGlobal("verticalName");
-	if ( w.child("leNombreVertical").text == "false" ) w.child("leNombreVertical").text = "";
 	w.child("cbFLTableDC").checked = leerValorLocal("FLTableDoubleClick");
 	w.child("cbFLTableSC").checked = leerValorLocal("FLTableShortCut");
 	w.child("cbFLTableCalc").checked = leerValorLocal("FLTableExport2Calc");
@@ -50,23 +49,24 @@ function cargarConfiguracion() {
 function leerValorGlobal(valorName):String {
 	var util : FLUtil = new FLUtil();
 	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
-	if (!valor) //Entendemos que el valor existe
-	  
-		{
-		debug("No existe la entrada " + valorName + " (" + valor + ")");
-		if(!util.sqlInsert("flsettings", "flkey,valor" , valorName + "," + valor))
-			{
-			debug("Error al crear la entrada");
-			MessageBox.warning("Se ha producido un problema al crear el valor " + valorName + "." , MessageBox.Yes);
-			valor = "Error";
-			}
-		}
+	debug ("el valor actual es " + valor);
 	return valor;
 }
 
 function grabarValorGlobal(valorName,value) {
 	var util : FLUtil = new FLUtil();
-	util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
+	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
+	if (valor)
+		{
+		debug("Actualizando variable global " + value);
+		util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
+		}
+		else
+		{
+		debug("Creando nueva variable global");
+		util.sqlInsert("flsettings", "flkey,valor" , valorName + "," + value);
+		}
+
 }
 
 

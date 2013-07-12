@@ -735,7 +735,7 @@ bool MReportViewer::printReport()
   QMessageBox *m = new QMessageBox(tr("Sugerencia"),
                                    tr("Si instala Ghostscript (http://www.ghostscript.com) y añade\n"
                                       "el directorio de instalación a la ruta de búsqueda de programas\n"
-                                      "del sistema (PATH), AbanQ podrá utilizarlo para optimizar\n"
+                                      "del sistema (PATH), Eneboo podrá utilizarlo para optimizar\n"
                                       "sustancialmente la calidad de impresión y para poder generar códigos\nde barras.\n\n"),
                                    QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton, this, 0, false);
   m->show();
