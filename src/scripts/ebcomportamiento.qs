@@ -32,13 +32,6 @@ function main() {
 function cargarConfiguracion() {
 	var w = this.w_;
 	w.child("leNombreVertical").text = leerValorGlobal("verticalName");
-	w.child("leFormRecordSize").text = leerValorLocal("FLFormRecordDBButton");
-	w.child("leFormDBSize").text = leerValorLocal("FLFormDBButton");
-	w.child("leFormSearchDBSize").text = leerValorLocal("FLFormSearchDBButton");
-	//w.child("leFormRecordSize").text = leerValorLocal("FLFormRecordDBButton");
-	if ( w.child("leFormRecordSize").text == "false" ) w.child("leFormRecordSize").text = "22";
-	if ( w.child("leFormDBSize").text == "false" ) w.child("leFormDBSize").text = "22";
-	if ( w.child("leFormSearchDBSize").text == "false" ) w.child("leFormSearchDBSize").text = "22";
 	if ( w.child("leNombreVertical").text == "false" ) w.child("leNombreVertical").text = "";
 	w.child("cbFLTableDC").checked = leerValorLocal("FLTableDoubleClick");
 	w.child("cbFLTableSC").checked = leerValorLocal("FLTableShortCut");
@@ -144,9 +137,6 @@ function guardar_clicked()
 {
 var w = this.w_;
 grabarValorGlobal("verticalName",w.child("leNombreVertical").text);
-grabarValorLocal("FLFormRecordDBButton",w.child("leFormRecordSize").text); //Hay que comprobar que sea numero mayor de 0!!
-grabarValorLocal("FLFormDBButton",w.child("leFormDBSize").text); //Hay que comprobar que sea numero mayor de 0!!
-grabarValorLocal("FLFormSearchDBButton",w.child("leFormSearchDBSize").text); //Hay que comprobar que sea numero mayor de 0!!
 grabarValorLocal("FLTableDoubleClick",w.child("cbFLTableDC").checked);
 grabarValorLocal("FLTableShortCut",w.child("cbFLTableSC").checked);
 grabarValorLocal("FLTableExport2Calc",w.child("cbFLTableCalc").checked);
