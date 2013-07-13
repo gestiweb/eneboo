@@ -212,7 +212,7 @@ fi
 VERSION="$VER (Build $BUILD_NUMBER)"
 BUILD_KEY="$VER-Build"
 
-echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - ALFA - )"
+echo -e "\nUtilidad de compilación e instalación de Eneboo $VERSION ( - ESTABLE- )"
 echo -e "(C) 2003-2013 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "(C) 2012 Gestiweb Integración de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
