@@ -26,6 +26,7 @@ email                : mail@infosial.com
 #include "FLRelationMetaData.h"
 #include "FLFormSearchDB.h"
 #include "FLManager.h"
+#include "FLManagerModules.h"
 #include "FLAction.h"
 #include "FLApplication.h"
 #include "FLSqlDatabase.h"
@@ -520,44 +521,63 @@ void FLTableDB::filterRecords(const QString &p)
     return ;
 
   bool refreshData = filter_.contains("%");
-  bool allFields = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem()) == "*";
+  QString fieldSearch = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem());
+  bool allFields = fieldSearch == "*";
   int msec_refresh = 400;
   QString bfilter = "";
   if (!p.isEmpty() && allFields) {
-    FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
-    if (fieldList) {
-      FLFieldMetaData *field;
-      QDictIterator<FLFieldMetaData> it(*fieldList);
-      bfilter = "( false";
-      while ((field = it.current()) != 0) {
-        ++it;
-        bool searchField = true;
-        if (!field->visibleGrid()) searchField = false;
-        if (field->type() != QVariant::String) searchField = false;
-        QStringList sOptions = field->searchOptions();
-        QString allFieldSearchInclude = "allfieldsearch:include";
-        QString allFieldSearchExclude = "allfieldsearch:exclude";
+    QString FTSFunction = cursor_->metadata()->FTSFunction();
+    if (FTSFunction.isEmpty()) {
+      FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
+      if (fieldList) {
+	FLFieldMetaData *field;
+	QDictIterator<FLFieldMetaData> it(*fieldList);
+	bfilter = "( false";
+	while ((field = it.current()) != 0) {
+	  ++it;
+	  bool searchField = true;
+	  if (!field->visibleGrid()) searchField = false;
+	  if (field->type() != QVariant::String) searchField = false;
+	  QStringList sOptions = field->searchOptions();
+	  QString allFieldSearchInclude = "allfieldsearch:include";
+	  QString allFieldSearchExclude = "allfieldsearch:exclude";
 
-        if (sOptions.contains(allFieldSearchExclude) > 0) {
-          if (searchField) {
-            //qDebug("Excluding field in allfield search: " + field->name());
-            searchField = false;
-          }
-        }
-        if (sOptions.contains(allFieldSearchInclude) > 0) {
-          if (!searchField) {
-            //qDebug("Including field in allfield search: " + field->name());
-            searchField = true;
-          }
-        }
+	  if (sOptions.contains(allFieldSearchExclude) > 0) {
+	    if (searchField) {
+	      //qDebug("Excluding field in allfield search: " + field->name());
+	      searchField = false;
+	    }
+	  }
+	  if (sOptions.contains(allFieldSearchInclude) > 0) {
+	    if (!searchField) {
+	      //qDebug("Including field in allfield search: " + field->name());
+	      searchField = true;
+	    }
+	  }
         
-        if (searchField) {
-          bfilter += " OR ";
-          bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
-        }
+	  if (searchField) {
+	    bfilter += " OR ";
+	    bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
+	  }
+	}
+        bfilter += ")";
+        msec_refresh = 800;
       }
-     bfilter += ")";
-     msec_refresh = 800;
+    } else {
+      QString ftsfilter = p;
+      QString tablename = cursor_->metadata()->name();
+      ftsfilter = ftsfilter.replace(",", " ");
+      ftsfilter = ftsfilter.replace("&", " ");
+      ftsfilter = ftsfilter.replace("|", " ");
+      ftsfilter = ftsfilter.replace("'", " ");
+      ftsfilter = ftsfilter.replace("\"", " ");
+      ftsfilter = ftsfilter.replace(":", " ");
+      ftsfilter = ftsfilter.replace("%", " ");
+      ftsfilter = ftsfilter.replace(QRegExp("\\s+"), " ");
+      ftsfilter = ftsfilter.replace(QRegExp("(^\\s+|\\s+$)"), "");
+      ftsfilter = ftsfilter.replace(" ", " & ");
+      bfilter += FTSFunction + "(" + tablename + ") @@ to_tsquery('" + ftsfilter + ":*')";
+      qDebug("Using Full Text Search: " + bfilter);
     }
   }
 
@@ -574,12 +594,39 @@ void FLTableDB::filterRecords(const QString &p)
           if (qField.endsWith("." + sortField_->name()))
             break;
         }
-
         bfilter = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
         qry->deleteLater();
       }
     } else
       bfilter = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
+    fieldSearch = sortField_->name();
+  }
+
+  QString functionQSA = tableDB_filterRecords_functionName_;
+
+  if (functionQSA.isEmpty()) {
+    QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
+                                                           QString::fromLatin1(".mtd")));
+    functionQSA = idMod + QString::fromLatin1(".tableDB_filterRecords_") + cursor_->metadata()->name();
+  }
+                                                   
+  if (!functionQSA.isEmpty()) {
+    QValueList<QVariant> vargs = QValueList<QVariant>();
+    vargs.append(cursor_->metadata()->name());
+    vargs.append(p);
+    vargs.append(fieldSearch);
+    vargs.append(bfilter);
+    QSArgumentList args = QSArgumentList(vargs);
+    QVariant v = aqApp->call(functionQSA,args, 0).variant();
+    QString ret = v.toString();
+    if (!ret.isNull()) {
+      bfilter = ret;   
+      qDebug("functionQSA:" + functionQSA + " : " + ret.replace("%","%%"));
+    } else {
+      qDebug("functionQSA:" + functionQSA + " -> NULL");
+    }
+  } else {
+    qDebug("functionQSA: (empty)");
   }
 
   refreshDelayed(msec_refresh, !bfilter.isEmpty() || refreshData);

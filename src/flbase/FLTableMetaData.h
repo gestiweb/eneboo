@@ -331,6 +331,12 @@ public:
   */
   void setDetectLocks(bool b = true);
 
+  /**
+  Establece el nombre de función a llamar para Full Text Search
+  */
+  QString FTSFunction();
+  void setFTSFunction(QString ftsfun);
+
 private:
 
   /**
@@ -433,6 +439,11 @@ public:
   Ver también FLSqlDatabase::detectRisksLocks
   */
   bool detectLocks_;
+  
+  /**
+  Indica el nombre de función a llamar para la búsqueda con Full Text Search
+  */
+  QString ftsfun_;
 };
 
 inline void FLTableMetaData::setCompoundKey(FLCompoundKey *cK)
@@ -503,6 +514,17 @@ inline bool FLTableMetaData::detectLocks() const
 inline void FLTableMetaData::setDetectLocks(bool b)
 {
   d->detectLocks_ = b;
+}
+
+inline QString FLTableMetaData::FTSFunction()
+{
+  return d->ftsfun_;
+}
+
+
+inline void FLTableMetaData::setFTSFunction(QString ftsfun)
+{
+  d->ftsfun_ = ftsfun;  
 }
 
 #endif
