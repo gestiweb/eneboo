@@ -360,7 +360,7 @@ class MainWindow
     this.initTabWidget();
     this.initHelpMenu();
     this.initConfigMenu();
-    this.initTextLabel();
+    this.initTextLabels();
     this.initDocks();
     this.initEventFilter();
   }
@@ -735,13 +735,18 @@ if (tw.count == 0) ok =true;
     connect(font, "activated()", aqApp, "chooseFont()");
   }
 
-    function initTextLabel()
+    function initTextLabels()
     {
     var w = this.w_;
     var tL = w.child("tLabel");
+    var tL2 = w.child("tLabel2");
     var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='verticalName'");
     if (texto)
     tL.text = texto;
+    tL2.text = sys.nameUser()+"@"+sys.nameBD();
+    if (sys.osName() == "MACX") 
+           tL2.text +="     ";
+    
     }
 
   function initDocks()
