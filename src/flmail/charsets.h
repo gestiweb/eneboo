@@ -38,17 +38,20 @@
 #include <qmap.h>
 #include <qtextcodec.h>
 
+#include "aqmailglobal.h"
+
 #ifdef Q_WS_WIN
 #if defined(Q_TEMPLATEDLL)
 // MOC_SKIP_BEGIN
-//template class FL_EXPORT QMap<QString, QString>;
+//template class AQMAIL_EXPORT QMap<QString, QString>
+;
 // MOC_SKIP_END
 #endif
 #endif
 
-typedef QMap<QString, QString> CodecsMap;
+typedef AQMAIL_EXPORT QMap<QString, QString> CodecsMap;
 
-class FL_EXPORT CharSets
+class AQMAIL_EXPORT CharSets
 {
 public:
     CharSets();

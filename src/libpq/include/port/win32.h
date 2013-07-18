@@ -177,7 +177,7 @@ typedef int gid_t;
 #endif
 typedef long key_t;
 
-#ifdef WIN32_CLIENT_ONLY
+#if defined(WIN32_CLIENT_ONLY) && !defined(AQ_WIN64)
 typedef int pid_t;
 #endif
 

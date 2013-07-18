@@ -29,6 +29,8 @@
 #include <qinputdialog.h>
 #include <qdict.h>
 
+#include "AQGlobal.h"
+
 class FLParameterQuery;
 class FLGroupByQuery;
 class FLFieldMetaData;
@@ -43,7 +45,7 @@ para trabajar con consultas parametrizadas y niveles de agrupamiento.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlQuery: public QObject
+class AQ_EXPORT FLSqlQuery: public QObject
 {
 
   Q_OBJECT

@@ -126,11 +126,11 @@ extern "C" {
 /**
  * Locale support
  */
-#if 1
+#ifndef WIN32
 #ifndef XSLT_LOCALE_XLOCALE
 #define XSLT_LOCALE_XLOCALE
 #endif
-#elif 0
+#elif defined(WIN32)
 #ifndef XSLT_LOCALE_WINAPI
 #define XSLT_LOCALE_WINAPI
 #endif

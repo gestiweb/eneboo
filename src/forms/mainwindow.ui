@@ -2,7 +2,7 @@
 <class>mainwindow</class>
 <widget class="QMainWindow">
     <property name="name">
-        <cstring>mainwindow</cstring>
+        <cstring>aqappmainwindow</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -57,6 +57,7 @@
     </item>
     <item text="&amp;Configuración" name="configMenu">
         <action name="fontAction"/>
+        <action name="styleAction"/>
     </item>
     <item text="&amp;Ventana" name="windowMenu">
     </item>
@@ -103,6 +104,17 @@
         </property>
         <property name="menuText">
             <string>&amp;Fuente</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>styleAction</cstring>
+        </property>
+        <property name="text">
+            <string>Estilo</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Estilo</string>
         </property>
     </action>
 </actions>

@@ -131,9 +131,12 @@
 # if defined(_MSC_VER) || defined(__BORLANDC__)
     typedef __int64 off_t;
 # else
-#  if !defined(_CYGWIN_TYPES_H)
+#  if !defined(_CYGWIN_TYPES_H) 
      typedef long long off_t;
-#    if defined(__MINGW32__)
+#if defined(AQ_WIN64)
+     typedef long long _off_t;
+#endif
+#    if defined(__MINGW32__) && !defined(AQ_WIN64)
 #      define	_OFF_T_
 #    endif
 #  endif

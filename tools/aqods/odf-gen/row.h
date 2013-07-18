@@ -40,7 +40,8 @@ public:
     : Element(sheet),
       _sheet(sheet),
       _column(0),
-      _row(0) {
+      _row(0),
+      _fixPrec(0) {
     _sheet.add_row();
     _row = _sheet.get_rows();
     _ostream << "<row>";
@@ -83,7 +84,10 @@ public:
 
   template < class T >
   void add_value(const T &value) {
-    _ostream << value;
+    if (_fixPrec > 0)
+      _ostream << std::fixed << std::setprecision(_fixPrec) << value;
+    else
+      _ostream << value;
   }
 
   template < class T >
@@ -175,14 +179,18 @@ public:
     return *this;
   }
 
+  void set_fixed_precision(unsigned int p) {
+    _fixPrec = p;
+  }
+
 private:
   Sheet &_sheet;
 
   Style _style;
   Color _bgcolor;
   Color _fgcolor;
-  unsigned int _column,
-           _row;
+  unsigned int _column, _row;
+  unsigned int _fixPrec;
 };
 
 #endif // ROW_H

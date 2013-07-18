@@ -39,6 +39,14 @@ public:
     DashDotDotLine
   };
 
+  enum ReportObjectType {
+    Invalid,
+    Label,
+    Field,
+    Calc,
+    Special
+  };
+
   /**
   Constructor
   */
@@ -57,7 +65,7 @@ public:
   /**
   Destructor
   */
-  virtual ~ MReportObject();
+  virtual ~MReportObject();
 
 protected:
 
@@ -222,6 +230,15 @@ public:
   Sets the object's id
   */
   void setObjectId(int id);
+
+  /**
+  Run-time type information
+  */
+  virtual int RTTI() const;
+
+#ifdef FL_DEBUG
+  static long countRefReportObject;
+#endif
 
 protected:
 

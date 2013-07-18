@@ -8,8 +8,10 @@
 #define HAVE_ISNAN /**/
 /* #undef HAVE_LIBHISTORY */
 /* #undef HAVE_LIBREADLINE */
+#ifndef WIN32
 #define HAVE_LIBPTHREAD /**/
 #define HAVE_PTHREAD_H /**/
+#endif
 
 /* Define if IPV6 support is there */
 #if !defined(_WIN32)
@@ -112,7 +114,9 @@
 /* #undef HAVE_LIBHISTORY */
 
 /* Define if pthread library is there (-lpthread) */
+#ifndef WIN32
 #define HAVE_LIBPTHREAD /**/
+#endif
 
 /* Define if readline library is there (-lreadline) */
 /* #undef HAVE_LIBREADLINE */
@@ -160,7 +164,9 @@
 #define HAVE_PRINTF 1
 
 /* Define if <pthread.h> is there */
+#ifndef WIN32
 #define HAVE_PTHREAD_H /**/
+#endif
 
 /* Define to 1 if you have the <resolv.h> header file. */
 #if !defined(_WIN32)
@@ -269,9 +275,8 @@
 #define HAVE_VSPRINTF 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
-#if !defined(_WIN32)
-#define HAVE_ZLIB_H 1
-#endif
+//#define HAVE_ZLIB_H 1
+
 
 /* Define to 1 if you have the `_stat' function. */
 /* #undef HAVE__STAT */

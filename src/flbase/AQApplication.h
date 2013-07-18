@@ -19,13 +19,14 @@
 #ifndef AQAPPLICATION_H_
 #define AQAPPLICATION_H_
 
+#include "AQGlobal.h"
 #include "FLApplication_p.h"
 
 class AQApplicationPrivate;
 
-extern FLApplication *aqApp;
+extern AQ_EXPORT FLApplication *aqApp;
 
-class AQApplication : public FLApplication
+class AQ_EXPORT AQApplication : public FLApplication
 {
   Q_OBJECT
 
@@ -46,9 +47,15 @@ public slots:
   QSArgument call(const QString &function,
                   const QString &nameObjectContext) const;
 
+  AQApplication *self();
+
+  void setProxyDesktop(QWidget *w);
+
 private slots:
   void callInitScript();
   void callReinitScript();
+  void callReinitScriptDelayed();
+  void resizeProxyDesktop(int s);
 
 private:
   AQApplicationPrivate *d;

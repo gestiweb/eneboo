@@ -69,6 +69,17 @@ public slots:
   QStringList tables(uint) const;
   QSqlError *lastError() const;
   QString connectOptions() const;
+  QSqlDatabase *db() const;
+  QSqlDatabase *dbAux() const;
+  bool interactiveGUI() const;
+  void setInteractiveGUI(bool = true);
+  bool qsaExceptions() const;
+  void setQsaExceptions(bool = true);
+  QString md5TuplesState() const;
+  QString md5TuplesStateTable(const QString &) const;
+  bool existsTable(const QString &) const;
+  int transactionLevel() const;
+  FLSqlCursor *lastActiveCursor() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -233,6 +244,50 @@ inline QSqlError *AQSSqlDatabase::lastError() const
 inline QString AQSSqlDatabase::connectOptions() const
 {
   AQ_CALL_RET_V(connectOptions(), QString);
+}
+inline QSqlDatabase *AQSSqlDatabase::db() const
+{
+  AQ_CALL_RET(db());
+}
+inline QSqlDatabase *AQSSqlDatabase::dbAux() const
+{
+  AQ_CALL_RET(dbAux());
+}
+inline bool AQSSqlDatabase::interactiveGUI() const
+{
+  AQ_CALL_RET_V(interactiveGUI(), bool);
+}
+inline void AQSSqlDatabase::setInteractiveGUI(bool arg0)
+{
+  AQ_CALL_VOID(setInteractiveGUI(arg0));
+}
+inline bool AQSSqlDatabase::qsaExceptions() const
+{
+  AQ_CALL_RET_V(qsaExceptions(), bool);
+}
+inline void AQSSqlDatabase::setQsaExceptions(bool arg0)
+{
+  AQ_CALL_VOID(setQsaExceptions(arg0));
+}
+inline QString AQSSqlDatabase::md5TuplesState() const
+{
+  AQ_CALL_RET_V(md5TuplesState(), QString);
+}
+inline QString AQSSqlDatabase::md5TuplesStateTable(const QString &arg0) const
+{
+  AQ_CALL_RET_V(md5TuplesStateTable(arg0), QString);
+}
+inline bool AQSSqlDatabase::existsTable(const QString &arg0) const
+{
+  AQ_CALL_RET_V(existsTable(arg0), bool);
+}
+inline int AQSSqlDatabase::transactionLevel() const
+{
+  AQ_CALL_RET_V(transactionLevel(), int);
+}
+inline FLSqlCursor *AQSSqlDatabase::lastActiveCursor() const
+{
+  AQ_CALL_RET(lastActiveCursor());
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

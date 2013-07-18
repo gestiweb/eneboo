@@ -67,16 +67,20 @@ QSClass::~QSClass()
 
 void QSClass::clear()
 {
-  Q_ASSERT(mmap);
-  for (QSMemberMap::ConstIterator it = mmap->begin(); it != mmap->end(); ++it) {
-    if ((*it).type() == QSMember::ScriptFunction) {
-      Q_ASSERT((*it).scriptFunction);
-      if ((*it).scriptFunction->deref())
-        delete(*it).scriptFunction;
+  //Q_ASSERT(mmap);
+  if (mmap) {
+    for (QSMemberMap::ConstIterator it = mmap->begin(); it != mmap->end(); ++it) {
+      if ((*it).type() == QSMember::ScriptFunction) {
+        //Q_ASSERT((*it).scriptFunction);
+        if ((*it).scriptFunction) {
+          if ((*it).scriptFunction->scopeDefinition() && (*it).scriptFunction->deref())
+            delete(*it).scriptFunction;
+        }
+      }
     }
+    delete mmap;
+    mmap = 0;
   }
-  delete mmap;
-  mmap = 0;
   staticMembers.clear();
 }
 
@@ -456,6 +460,7 @@ void QSClass::write(QSObject *objPtr, const QSMember &mem,
 void QSClass::write(QSObject *objPtr, int index, const QSObject &val) const
 {
   QSInstanceData *idata = (QSInstanceData *)objPtr->shVal();
+  idata->ensureSize(index + 1, createUndefined());
   idata->setValue(index, val);
 }
 
@@ -494,12 +499,17 @@ QSObject QSClass::invoke(QSObject *objPtr, const QSMember &mem) const
     case QSMember::ScriptFunction: {
       Q_ASSERT(mem.scriptFunction);
 
+      QSFunctionScopeClass *scopeDef = mem.scriptFunction->scopeDefinition();
 #ifdef QSDEBUGGER
       Debugger *dbg = env()->engine()->debugger();
       //### AbanQ
       int oldSourceId = -1;
       if (dbg) {
-        QString n(mem.scriptFunction->scopeDefinition()->identifier());
+        if (!scopeDef) {
+          dbg->setSourceId(mem.scriptFunction->sourceId());
+          return createUndefined();
+        }
+        QString n(scopeDef->identifier());
         // arguments as string for call stack info
         const QSList *args = env()->arguments();
         QString argStr = QString::fromLatin1("");
@@ -515,7 +525,7 @@ QSObject QSClass::invoke(QSObject *objPtr, const QSMember &mem) const
         dbg->setSourceId(mem.scriptFunction->sourceId());
       }
 #endif
-      QSFunctionScopeClass *scopeDef = mem.scriptFunction->scopeDefinition();
+      //QSFunctionScopeClass *scopeDef = mem.scriptFunction->scopeDefinition();
 
       //      qDebug("Calling function:  " + scopeDef->identifier());
       //      qDebug("Enclosing Class:  " + scopeDef->enclosingClass()->identifier());
@@ -972,6 +982,8 @@ void QSSharedClass::ref(QSObject *o) const
 void QSSharedClass::deref(QSObject *o) const
 {
 #ifndef QS_LEAK
+  if (o->shVal()->deleted())
+    return;
   o->shVal()->deref();
   if (o->shVal()->count == 0) {
     env()->removeShared(o->shVal());
@@ -1406,7 +1418,7 @@ QSMemberMap QSBlockScopeClass::members(const QSObject *obj) const
   QSMemberMap encMap = enclosingClass()->members(obj);
   QSMemberMap::ConstIterator it = encMap.begin();
   while (it != encMap.end()) {
-    newMap[ it.key()] = it.data();
+    newMap[it.key()] = it.data();
     it++;
   }
   return newMap;
@@ -1726,7 +1738,8 @@ void QSAbstractBaseClass::replace(QSClassClass *newBase)
   // We no longer serve any purpose, so we disappear...
   env()->unregisterClass(this);
   clear();
-  delete this;
+  if (this)
+    delete this;
 };
 
 QSInstanceData::QSInstanceData(int count, const QSObject &def)

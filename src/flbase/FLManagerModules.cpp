@@ -65,7 +65,7 @@ FLManagerModules::~ FLManagerModules()
 void FLManagerModules::loadAllIdModules()
 {
   if (!db_->dbAux())
-    return ;
+    return;
 
   if (!listAllIdModules_)
     listAllIdModules_ = new QStringList();
@@ -100,7 +100,7 @@ void FLManagerModules::loadAllIdModules()
 void FLManagerModules::loadIdAreas()
 {
   if (!db_->dbAux())
-    return ;
+    return;
 
   if (!listIdAreas_)
     listIdAreas_ = new QStringList();
@@ -118,7 +118,7 @@ void FLManagerModules::loadIdAreas()
 void FLManagerModules::loadKeyFiles()
 {
   if (!dictKeyFiles) {
-    dictKeyFiles = new QDict < QString >(277);
+    dictKeyFiles = new QDict < QString >(571);
     dictKeyFiles->setAutoDelete(true);
   } else
     dictKeyFiles->clear();
@@ -131,26 +131,18 @@ void FLManagerModules::loadKeyFiles()
 
   QSqlQuery q(QString::null, db_->dbAux());
   q.setForwardOnly(true);
-#ifndef QSDEBUGGER
-  q.exec("SELECT nombre,sha,idmodulo,binario FROM flfiles");
-#else
   q.exec("SELECT nombre,sha,idmodulo FROM flfiles");
-#endif
   QString name;
   while (q.next()) {
     name = q.value(0).toString();
     dictKeyFiles->replace(name, new QString(q.value(1).toString()));
     dictModFiles->replace(name.upper(), new QString(q.value(2).toString()));
-#ifndef QSDEBUGGER
-    if (name.endsWith(".qs") && !q.isNull(3))
-      FLMemCache::insert(name, byteCodeToStr(q.value(3).toByteArray()));
-#endif
   }
 }
 
 void FLManagerModules::init()
 {
-  rootDir_    = AQ_DATA + QString::fromLatin1("/") ;
+  rootDir_    = AQ_DATA + QString::fromLatin1("/");
   scriptsDir_ = AQ_DATA + QString::fromLatin1("/scripts/");
   tablesDir_  = AQ_DATA + QString::fromLatin1("/tables/");
   formsDir_   = AQ_DATA + QString::fromLatin1("/forms/");
@@ -179,14 +171,25 @@ void FLManagerModules::init()
                   curSet.first();
 
   if (checkVer) {
+    QString driverName(db_->driverName());
     modVer = curSet.valueBuffer("valor").toString();
+    if (!modVer.isEmpty() && modVer[0] != '#') {
+      if (driverName == "FLsqlite") {
+        if (!db_->dbAux()->recordInfo("flfiles").contains("binario"))
+          modVer = QString::null;
+      } else {
+        QSqlQuery qryFil("select * from flfiles limit 1", db_->dbAux());
+        if (!db_->dbAux()->recordInfo(qryFil).contains("binario"))
+          modVer = QString::null;
+      }
+    }
     if (modVer.isEmpty()) {
       modVer = '@';
     } else if (modVer[0] == '#') {
       tmpTMD = db_->manager()->metadata("flfiles");
       if (db_->regenTable("flfiles", tmpTMD)) {
         modVer = QString::null;
-      } else if (db_->driverName() != "FLQPSQL7") {
+      } else if (driverName != "FLQPSQL7") {
         QString xmlNew(contentCached("flfiles.mtd"));
         QString xmlOld(xmlNew);
         db_->manager()->alterTable(xmlOld.replace("255", "300"), xmlNew);
@@ -202,7 +205,8 @@ void FLManagerModules::init()
     AQ_DISKCACHE_CLR();
     QSqlQuery qry(QString::null, db_->dbAux());
     qry.exec("DROP TABLE flserial CASCADE");
-    qry.exec("DROP TABLE flvar CASCADE");
+    // ###
+    //qry.exec("DROP TABLE flvar CASCADE");
     modVer = AQ_VERSION;
   }
   if (curSet.isValid())
@@ -250,13 +254,6 @@ void FLManagerModules::init()
 
 void FLManagerModules::finish()
 {
-  writeState();
-
-  if (dictKeyFiles) {
-    delete dictKeyFiles;
-    dictKeyFiles = 0;
-  }
-
   if (listAllIdModules_) {
     delete listAllIdModules_;
     listAllIdModules_ = 0;
@@ -282,7 +279,12 @@ void FLManagerModules::finish()
     staticBdInfo_ = 0;
   }
 
-  FLMemCache::clear();
+  if (dictKeyFiles) {
+    writeState();
+    delete dictKeyFiles;
+    dictKeyFiles = 0;
+    FLMemCache::clear();
+  }
 }
 
 void FLManagerModules::staticLoaderSetup()
@@ -297,7 +299,7 @@ QString FLManagerModules::contentStatic(const QString &n)
   if (!str_ret.isEmpty()) {
     QString sha(FLUtil::sha1(str_ret));
     QString *s = 0;
-    if (dictKeyFiles && (s = (*dictKeyFiles)[ n ]) && *s == sha) {
+    if (dictKeyFiles && (s = dictKeyFiles->find(n)) && *s == sha) {
       return QString::null;
     } else if (dictKeyFiles && n.endsWith(".qs")) {
       dictKeyFiles->replace(n, new QString(sha));
@@ -360,23 +362,22 @@ QString FLManagerModules::content(const QString &n)
     return retFS;
 
   if (notSysTable) {
+    QString formatVal(db_->manager()->formatAssignValue("nombre", QVariant::String, n, true));
     QSqlQuery q(QString::null, db_->dbAux());
     q.setForwardOnly(true);
-    q.exec(QString::fromLatin1("SELECT contenido,sha FROM flfiles WHERE upper(nombre)='") +
-           n.upper() + QString::fromLatin1("'"));
+    q.exec(QString::fromLatin1("SELECT contenido,sha FROM flfiles WHERE ") + formatVal);
     if (q.next()) {
       QString ret = q.value(0).toString();
       if (q.value(1).toString().isEmpty()) {
         FLSqlCursor cursor("flfiles", true, db_->dbAux());
-        cursor.select(QString::fromLatin1("upper(nombre)='") +
-                      n.upper() + QString::fromLatin1("'"));
+        cursor.select(formatVal);
 
         if (cursor.lastError().type() != QSqlError::None) {
-          QString msg("<p><img source=\"remove.png\" align=\"right\"><b><u>SQL ERROR</u></b><br><br>" +
-                      QString(cursor.lastError().driverText()) + "<br>" +
-                      QString(cursor.lastError().databaseText()) + "</p>");
-          msg.replace("\n", "<br>");
-          aqApp->popupWarn(msg);
+          //          QString msg("<p><img source=\"remove.png\" align=\"right\"><b><u>SQL ERROR</u></b><br><br>" +
+          //                      QString(cursor.lastError().driverText()) + "<br>" +
+          //                      QString(cursor.lastError().databaseText()) + "</p>");
+          //          msg.replace("\n", "<br>");
+          //          aqApp->popupWarn(msg);
           return QString::null;
         }
 
@@ -429,11 +430,35 @@ QString FLManagerModules::byteCodeToStr(const QByteArray &byteCode) const
 }
 
 #ifndef QSDEBUGGER
-QString FLManagerModules::contentCode(const QString &n) const
+QByteArray FLManagerModules::contentCodeFromBd(const QString &n, bool *isNull)
 {
-  QString *sc = FLMemCache::find(n);
-  if (sc) 
-    return *sc;
+  if (isNull)
+    *isNull = false;
+  QString formatVal(db_->manager()->formatAssignValue("nombre", QVariant::String, n, true));
+  QSqlQuery q(QString::null, db_->dbAux());
+  q.setForwardOnly(true);
+  if (!q.exec(QString::fromLatin1("SELECT binario FROM flfiles WHERE ") + formatVal))
+    return QByteArray();
+  if (!q.next())
+    return QByteArray();
+  if (q.isNull(0)) {
+    if (isNull)
+      *isNull = true;
+    return QByteArray();
+  }
+  return q.value(0).toByteArray();
+}
+
+QString FLManagerModules::contentCode(const QString &n)
+{
+  QString sr;
+  bool notSysTable = db_->dbAux() && n.left(3) != "sys" && !db_->manager()->isSystemTable(n);
+  if (notSysTable && staticBdInfo_ && staticBdInfo_->enabled_) {
+    sr = contentStatic(n);
+    if (!sr.isEmpty())
+      return sr;
+  }
+
   QByteArray byteCode;
   if (n == "sys.qs" ||
       n == "aqapplication.qs" ||
@@ -444,32 +469,53 @@ QString FLManagerModules::contentCode(const QString &n) const
     QDataStream dt(&f);
     dt >> byteCode;
   } else {
-    QSqlQuery q(QString::null, db_->dbAux());
-    q.setForwardOnly(true);
-    if (!q.exec(
-          QString::fromLatin1("SELECT binario FROM flfiles WHERE upper(nombre)='") +
-          n.upper() + QString::fromLatin1("'")
-        )
-       )
-      return QString::null;
-    if (!q.next())
-      return QString::null;
-    if (q.isNull(0))
+    bool isNull = false;
+#ifndef AQ_NEBULA_BUILD
+    QString *s = dictKeyFiles ? dictKeyFiles->find(n) : 0;
+    QString key(s ? *s : shaOfFile(n));
+
+    if (!key.isEmpty()) {
+      if (!AQ_DISKCACHE_FIND(key, byteCode)) {
+        byteCode = contentCodeFromBd(n, &isNull);
+        if (!isNull && !byteCode.isEmpty())
+          AQ_DISKCACHE_INS(key, byteCode);
+      }
+    } else
+#endif
+      byteCode = contentCodeFromBd(n, &isNull);
+    if (isNull)
       return contentCode("sys.qs");
-    byteCode = q.value(0).toByteArray();
   }
-  QString sr(byteCodeToStr(byteCode));
-  FLMemCache::insert(n, sr);
+
+  sr = byteCodeToStr(byteCode);
   return sr;
 }
 #else
 QString FLManagerModules::contentCode(const QString &n)
 {
   if (n == "sys.qs" || n == "plus_sys.qs")
-    return contentCached(n);
+    return content(n);
   QString s(contentCached(n));
-  if (!s.startsWith("var form"))
+  if (!s.left(45).lower().contains("var form"))
     s.prepend("var form = this;\n");
+
+#if 0
+  QRegExp rx;
+  rx.setPattern("ctx\\s*:\\s*Object\\s*");
+  s.replace(rx, "ctx");
+  rx.setPattern("\\)\\s*:\\s*(FL\\w+|Object\\w*|String\\w*|Date\\w*|Number\\w*|Boolean\\w*|Array\\w*)");
+  s.replace(rx, ")");
+  rx.setPattern(":\\s*(FL\\w+|Object\\w*|String\\w*|Date\\w*|Number\\w*|Boolean\\w*|Array\\w*)\\s*\\=");
+  s.replace(rx, "=");
+  rx.setPattern("[\n\r]{3,}");
+  s.replace(rx, "\n");
+  //rx.setMinimal(true);
+  //rx.setPattern("class\\s+(\\w+)\\s+extends\\s+\\1([\\s\n]*\\{.*\\}[\\s\n]*\\})");
+  //scode.replace(rx, "/* ¡¡ ERROR !! : LA CLASE HEREDA DE ELLA MISMA."
+  //               "\nCODIGO INHABILITADO AUTOMÁTICAMENTE POR AbanQ :\n\n"
+  //               "class \\1 extends \\1 \\2\n\n ¡¡ FIN ERROR !! */");
+#endif
+
   return s;
 }
 #endif
@@ -492,7 +538,9 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
     return QString::null;
 
   QString str_ret;
-  bool notSysTable = db_->dbAux() && n.left(3) != "sys" && !db_->manager()->isSystemTable(n);
+#ifndef AQ_NEBULA_BUILD
+  bool notSysTable = (db_->dbAux() && n.left(3) != "sys" &&
+                      !db_->manager()->isSystemTable(n));
 
   if (notSysTable && staticBdInfo_ && staticBdInfo_->enabled_) {
     str_ret = contentStatic(n);
@@ -505,12 +553,15 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
 
   if (notSysTable) {
     if (dictKeyFiles)
-      s = (*dictKeyFiles)[ n ];
+      s = dictKeyFiles->find(n);
     if (s) {
       key = *s;
       if (shaKey)
         *shaKey = key;
     } else {
+      s = FLMemCache::find(n);
+      if (s)
+        return *s;
       key = shaOfFile(n);
       if (shaKey)
         *shaKey = key;
@@ -518,26 +569,20 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
   } else
     return content(n);
 
-  if (key.isEmpty())
-    return content(n);
+  if (key.isEmpty()) {
+    str_ret = content(n);
+    FLMemCache::insert(n, str_ret);
+    return str_ret;
+  }
 
-  if (!(s = FLMemCache::find(key))) {
-#ifndef AQ_NEBULA_BUILD
-    if (!AQ_DISKCACHE_FIND(key, str_ret)) {
-      str_ret = content(n);
-      if (!str_ret.isEmpty()) {
-        FLMemCache::insert(key, str_ret);
-        AQ_DISKCACHE_INS(key, str_ret);
-      }
-    } else
-      FLMemCache::insert(key, str_ret);
-#else
+  if (!AQ_DISKCACHE_FIND(key, str_ret)) {
     str_ret = content(n);
     if (!str_ret.isEmpty())
-      FLMemCache::insert(key, str_ret);
+      AQ_DISKCACHE_INS(key, str_ret);
+  }
+#else
+  str_ret = content(n);
 #endif
-  } else
-    return *s;
 
   return str_ret;
 }
@@ -545,13 +590,13 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
 void FLManagerModules::setContent(const QString &n, const QString &idM, const QString &content)
 {
   if (!db_->dbAux())
-    return ;
+    return;
+
+  QString formatVal(db_->manager()->formatAssignValue("nombre", QVariant::String, n, true));
+  QString formatVal2(db_->manager()->formatAssignValue("idmodulo", QVariant::String, idM, true));
 
   FLSqlCursor cursor("flfiles", true, db_->dbAux());
-
-  cursor.select(QString::fromLatin1("upper(nombre)= '") + n.upper() +
-                QString::fromLatin1("' AND upper(idmodulo)='") +
-                idM.upper() + QString::fromLatin1("'"));
+  cursor.select(formatVal + QString::fromLatin1(" AND ") + formatVal2);
 
   if (cursor.first()) {
     cursor.setModeAccess(FLSqlCursor::EDIT);
@@ -571,10 +616,10 @@ void FLManagerModules::setContent(const QString &n, const QString &idM, const QS
 QString FLManagerModules::shaOfFile(const QString &n)
 {
   if (db_->dbAux() && n.left(3) != "sys" && !db_->manager()->isSystemTable(n)) {
+    QString formatVal(db_->manager()->formatAssignValue("nombre", QVariant::String, n, true));
     QSqlQuery q(QString::null, db_->dbAux());
     q.setForwardOnly(true);
-    q.exec(QString::fromLatin1("SELECT sha FROM flfiles WHERE upper(nombre)='") +
-           n.upper() + QString::fromLatin1("'"));
+    q.exec(QString::fromLatin1("SELECT sha FROM flfiles WHERE ") + formatVal);
     if (q.next())
       return q.value(0).toString();
     return QString::null;
@@ -620,7 +665,7 @@ void FLManagerModules::setActiveIdModule(const QString &id)
   if (id.isEmpty() || !dictInfoMods) {
     activeIdArea_ = QString::null;
     activeIdModule_ = QString::null;
-    return ;
+    return;
   }
 
   FLInfoMod *iM = (*dictInfoMods)[ id.upper()];
@@ -786,11 +831,11 @@ QString FLManagerModules::shaGlobal()
   q.setForwardOnly(true);
   q.exec("SELECT sha FROM flserial");
   if (q.lastError().type() != QSqlError::None) {
-    QString msg("<p><img source=\"remove.png\" align=\"right\"><b><u>SQL ERROR</u></b><br><br>" +
-                QString(q.lastError().driverText()) + "<br>" +
-                QString(q.lastError().databaseText()) + "</p>");
-    msg.replace("\n", "<br>");
-    aqApp->popupWarn(msg);
+    //    QString msg("<p><img source=\"remove.png\" align=\"right\"><b><u>SQL ERROR</u></b><br><br>" +
+    //                QString(q.lastError().driverText()) + "<br>" +
+    //                QString(q.lastError().databaseText()) + "</p>");
+    //    msg.replace("\n", "<br>");
+    //    aqApp->popupWarn(msg);
     return "error";
   }
   if (q.next())

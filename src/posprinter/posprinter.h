@@ -32,7 +32,7 @@ email                : mail@infosial.com
 extern "C" int lpr_main(int, char **);
 #endif
 
-class FL_EXPORT FLPosPrinter : public QPaintDevice
+class FLPosPrinter : public QPaintDevice
 {
 
 public:
@@ -48,7 +48,7 @@ public:
 
   virtual void setPaperWidth(PaperWidth);
 
-  const QString &printerName() const {
+  QString printerName() const {
     return printerName_;
   }
 
@@ -74,12 +74,20 @@ protected:
 
 private:
 
+  void parsePrinterName();
+
   PaperWidth paperWidth_;
-  QFile *file;
-  QMap< int, char >   * strBuffer;
-  QMap< int, QString > * escBuffer;
+  QMap< int, char > *strBuffer;
+  QMap< int, QString > *escBuffer;
   int idxBuffer;
-  QString printerName_;
+  QString fileName_;
+  static QString printerName_;
+  static QString server_;
+  static QString queueName_;
+#if defined(Q_OS_WIN32)
+  static bool useLPT_;
+  static QString nameLPT_;
+#endif
 };
 
 #endif

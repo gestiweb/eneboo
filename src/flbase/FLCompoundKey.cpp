@@ -28,6 +28,12 @@ FLCompoundKey::FLCompoundKey()
   fieldList_ = new FLTableMetaData::FLFieldMetaDataList;
 }
 
+FLCompoundKey::FLCompoundKey(const FLCompoundKey *other)
+{
+  fieldList_ = new FLTableMetaData::FLFieldMetaDataList;
+  copy(other);
+}
+
 FLCompoundKey::~FLCompoundKey()
 {
   delete fieldList_;
@@ -41,4 +47,11 @@ void FLCompoundKey::addFieldMD(const FLFieldMetaData *f)
 bool FLCompoundKey::hasField(const QString &fN) const
 {
   return fieldList_->find(fN.lower());
+}
+
+void FLCompoundKey::copy(const FLCompoundKey *other)
+{
+  if (other == this)
+    return;
+  *fieldList_ = *other->fieldList_;
 }

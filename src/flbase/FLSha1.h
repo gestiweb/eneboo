@@ -25,6 +25,8 @@
 
 #include <qglobal.h>
 
+#include "AQGlobal.h"
+
 // If you're compiling big endian, just comment out the following line
 #define SHA1_LITTLE_ENDIAN
 
@@ -33,7 +35,7 @@ typedef union {
   Q_UINT32 l[ 16 ];
 } SHA1_WORKSPACE_BLOCK;
 
-class FL_EXPORT FLSha1
+class AQ_EXPORT FLSha1
 {
 public:
   // Two different formats for ReportHash(...)

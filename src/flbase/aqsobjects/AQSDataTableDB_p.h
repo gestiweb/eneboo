@@ -40,6 +40,8 @@ public slots:
   void setPrimaryKeyChecked(const QVariant &, bool);
   void setShowAllPixmaps(bool);
   void setFunctionGetColor(const QString &);
+  int indexOf(uint) const;
+  QString fieldName(int) const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -115,6 +117,14 @@ inline void AQSDataTableDB::setShowAllPixmaps(bool arg0)
 inline void AQSDataTableDB::setFunctionGetColor(const QString &arg0)
 {
   AQ_CALL_VOID(setFunctionGetColor(arg0));
+}
+inline int AQSDataTableDB::indexOf(uint arg0) const
+{
+  AQ_CALL_RET_V(indexOf(arg0), int);
+}
+inline QString AQSDataTableDB::fieldName(int arg0) const
+{
+  AQ_CALL_RET_V(fieldName(arg0), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

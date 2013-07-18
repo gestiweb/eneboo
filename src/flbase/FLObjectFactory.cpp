@@ -449,6 +449,11 @@ void FLSqlCursorInterface::connects() const
           this, SIGNAL(autoCommit()));
   connect(obj_, SIGNAL(bufferCommited()),
           this, SIGNAL(bufferCommited()));
+  connect(obj_, SIGNAL(connectionChanged()),
+          this, SIGNAL(connectionChanged()));
+  connect(obj_, SIGNAL(commited()),
+          this, SIGNAL(commited()));
+
 }
 
 void FLFormDBInterface::connects() const
@@ -514,6 +519,8 @@ void FLTableDBInterface::connects() const
           this, SIGNAL(insertOnlyChanged(bool)));
   connect(obj_, SIGNAL(currentChanged()),
           this, SIGNAL(currentChanged()));
+  connect(obj_, SIGNAL(refreshed()),
+          this, SIGNAL(refreshed()));
   FLDataTable *dt = obj_->tableRecords();
   if (dt) {
     disconnect(dt, SIGNAL(primaryKeyToggled(const QVariant &, bool)),
@@ -663,7 +670,10 @@ QString FLUtilInterface::fieldNameToAlias(const QString &fN, const QString &tN, 
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return fN;
-  return mtd->fieldNameToAlias(fN);
+  QString ret(mtd->fieldNameToAlias(fN));
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 QString FLUtilInterface::tableNameToAlias(const QString &tN, const QString &connName) const
@@ -673,7 +683,10 @@ QString FLUtilInterface::tableNameToAlias(const QString &tN, const QString &conn
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return QString::null;
-  return mtd->alias();
+  QString ret(mtd->alias());
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 QString FLUtilInterface::fieldAliasToName(const QString &aN, const QString &tN, const QString &connName) const
@@ -683,7 +696,10 @@ QString FLUtilInterface::fieldAliasToName(const QString &aN, const QString &tN, 
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return aN;
-  return mtd->fieldAliasToName(aN);
+  QString ret(mtd->fieldAliasToName(aN));
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 int FLUtilInterface::fieldType(const QString &fN, const QString &tN, const QString &connName) const
@@ -693,7 +709,10 @@ int FLUtilInterface::fieldType(const QString &fN, const QString &tN, const QStri
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return QVariant::Invalid;
-  return mtd->fieldType(fN);
+  int ret = mtd->fieldType(fN);
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 int FLUtilInterface::fieldLength(const QString &fN, const QString &tN, const QString &connName) const
@@ -703,7 +722,10 @@ int FLUtilInterface::fieldLength(const QString &fN, const QString &tN, const QSt
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return 0;
-  return mtd->fieldLength(fN);
+  int ret = mtd->fieldLength(fN);
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 bool FLUtilInterface::fieldAllowNull(const QString &fN, const QString &tN, const QString &connName) const
@@ -713,7 +735,10 @@ bool FLUtilInterface::fieldAllowNull(const QString &fN, const QString &tN, const
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return false;
-  return mtd->fieldAllowNull(fN);
+  bool ret = mtd->fieldAllowNull(fN);
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 bool FLUtilInterface::fieldIsPrimaryKey(const QString &fN, const QString &tN, const QString &connName) const
@@ -723,7 +748,10 @@ bool FLUtilInterface::fieldIsPrimaryKey(const QString &fN, const QString &tN, co
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return false;
-  return mtd->fieldIsPrimaryKey(fN);
+  bool ret = mtd->fieldIsPrimaryKey(fN);
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 bool FLUtilInterface::fieldIsCompoundKey(const QString &fN, const QString &tN, const QString &connName) const
@@ -733,7 +761,11 @@ bool FLUtilInterface::fieldIsCompoundKey(const QString &fN, const QString &tN, c
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return false;
-  return mtd->field(fN)->isCompoundKey();
+  FLFieldMetaData *field = mtd->field(fN);
+  bool ret = (field && field->isCompoundKey());
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 QVariant FLUtilInterface::fieldDefaultValue(const QString &fN, const QString &tN, const QString &connName) const
@@ -743,7 +775,13 @@ QVariant FLUtilInterface::fieldDefaultValue(const QString &fN, const QString &tN
   FLTableMetaData *mtd = FLSqlConnections::database(connName)->manager()->metadata(tN);
   if (!mtd)
     return QVariant();
-  return mtd->field(fN)->defaultValue();
+  FLFieldMetaData *field = mtd->field(fN);
+  if (!field)
+    return QVariant();
+  QVariant ret(field->defaultValue());
+  if (!mtd->inCache())
+    delete mtd;
+  return ret;
 }
 
 QString FLUtilInterface::formatValue(int t, const QVariant &v, const bool upper, const QString &connName) const
@@ -764,6 +802,8 @@ void FLSmtpClientInterface::connects() const
           this, SIGNAL(sendTotalSteps(int)));
   connect(obj_, SIGNAL(sendStepNumber(int)),
           this, SIGNAL(sendStepNumber(int)));
+  connect(obj_, SIGNAL(statusChanged(const QString &, int)),
+          this, SIGNAL(statusChanged(const QString &, int)));
 }
 
 FLObjectFactory::FLObjectFactory() :

@@ -91,21 +91,23 @@ rm -f      src/qt/lib/qt-mt.pc
 rm -f      src/qt/lib/qt.pc
 rm -f      src/qt/config.status
 rm -f      src/qsa/configure2/configure2
-rm -f	     src/qt/src/tools/qconfig.cpp
+rm -f	   src/qt/src/tools/qconfig.cpp
 
 rm -f      src/qt/config.tests/unix/largefile/largefiletest
 rm -f      src/qt/config.tests/unix/endian/endiantest
 rm -f      src/qt/config.tests/unix/ptrsize/ptrsizetest
-rm -f	     src/qt/config.tests/unix/ipv6/ipv6test
+rm -f	   src/qt/config.tests/unix/ipv6/ipv6test
 
 rm -f      src/qt/config.tests/unix/largefile/largefiletest.exe
 rm -f      src/qt/config.tests/unix/endian/endiantest.exe
 rm -f      src/qt/config.tests/unix/ptrsize/ptrsizetest.exe
-rm -f	     src/qt/config.tests/unix/ipv6/ipv6test.exe
+rm -f	   src/qt/config.tests/unix/ipv6/ipv6test.exe
 
-rm -f	     src/qt/mkspecs/default
+rm -f      src/qt/mkspecs/default
+rm -f      src/qt/mkspecs/win32-g++-cross/qmake.conf
+rm -f      src/qt/mkspecs/win32-g++-cross/qtcrtentrypoint.cpp
 
-rm -f	     src/qt/tools/designer/app/hoard.pri
+rm -f	   src/qt/tools/designer/app/hoard.pri
 
 find . -name "abanq-build" -exec rm -vfR \{\} \;
 find . -name "*~" -exec rm -vf \{\} \;
@@ -150,6 +152,7 @@ rm -vfR       src/qt/plugins/styles
 rm -vfR       src/qt/plugins/accessible
 rm -vfR       src/qt/plugins/imageformats
 rm -vfR       src/qt/plugins/sqldrivers
+rm -vfR       src/qt/plugins/gfxdrivers
 rm -vfR       src/qt/include/qconfig.h.n
 rm -vfR       src/qt/include/qmodules.h.n
 rm -vfR       src/qt/include/qmake

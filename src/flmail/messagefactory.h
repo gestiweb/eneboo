@@ -69,10 +69,12 @@
 #include <qcache.h>
 #include <qstring.h>
 
+#include "aqmailglobal.h"
+
 class MessageDevice;
 class IndexClass;
 
-class MessageFactory
+class AQMAIL_EXPORT MessageFactory
 {
 public:
     static MessageFactory *thisInstance();

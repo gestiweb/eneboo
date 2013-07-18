@@ -8,6 +8,10 @@
 
 #include "mreportobject.h"
 
+#ifdef FL_DEBUG
+long MReportObject::countRefReportObject = 0;
+#endif
+
 /** Constructor */
 MReportObject::MReportObject() :
   QObject()
@@ -30,6 +34,10 @@ MReportObject::MReportObject() :
   sectionIndex = -1;
   transparent = false;
   objectId = 0;
+
+#ifdef FL_DEBUG
+  ++countRefReportObject;
+#endif
 }
 
 /** Copy constructor */
@@ -37,6 +45,10 @@ MReportObject::MReportObject(const MReportObject &mReportObject)
 {
   /*: QObject((QObject &) mReportObject) */
   copy(&mReportObject);
+
+#ifdef FL_DEBUG
+  ++countRefReportObject;
+#endif
 }
 
 /** Assignment operator */
@@ -57,6 +69,10 @@ MReportObject MReportObject::operator=(const MReportObject &mReportObject)
 /** Destructor */
 MReportObject::~MReportObject()
 {
+#ifdef FL_DEBUG
+  --countRefReportObject;
+  qWarning("MReportObject::countRefReportObject %d", countRefReportObject);
+#endif
 }
 
 /** Draws the object to the specified painter & x/y offsets */
@@ -155,4 +171,9 @@ void MReportObject::copy(const MReportObject *mReportObject)
   sectionIndex = mReportObject->sectionIndex;
   transparent = mReportObject->transparent;
   objectId = mReportObject->objectId;
+}
+
+int MReportObject::RTTI() const
+{
+  return MReportObject::Invalid;
 }

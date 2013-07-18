@@ -37,7 +37,7 @@ email                : mail@infosial.com
 #include "FLFieldMetaData.h"
 
 #ifdef FL_DEBUG
-FL_EXPORT long FLSqlQuery::countRefQuery = 0;
+AQ_EXPORT long FLSqlQuery::countRefQuery = 0;
 #endif
 
 FLSqlQueryPrivate::FLSqlQueryPrivate() :
@@ -49,7 +49,16 @@ FLSqlQueryPrivate::~FLSqlQueryPrivate()
 {
   delete parameterDict_;
   delete groupDict_;
-  delete fieldMetaDataList_;
+  if (fieldMetaDataList_) {
+    FLFieldMetaData *field;
+    QDictIterator<FLFieldMetaData> it(*fieldMetaDataList_);
+    while ((field = it.current()) != 0) {
+      ++it;
+      if (field->deref())
+        delete field;
+    }
+    delete fieldMetaDataList_;
+  }
 }
 
 FLSqlQuery::FLSqlQuery(QObject *parent, const QString &connectionName)
@@ -93,8 +102,11 @@ void FLSqlQuery::setSelect(const QString &s, const QString &sep)
     field = (*it).section('.', 1, 1);
     if (field == "*") {
       FLTableMetaData *mtd = d->db_->manager()->metadata(table, true);
-      if (mtd)
+      if (mtd) {
         d->fieldList_ += QStringList::split(',', mtd->fieldList(true));
+        if (!mtd->inCache())
+          delete mtd;
+      }
     } else
       d->fieldList_.append(*it);
   }
@@ -104,9 +116,10 @@ void FLSqlQuery::setSelect(const QString &s, const QString &sep)
 
 QString FLSqlQuery::sql()
 {
-  for (QStringList::Iterator it = d->tablesList_.begin(); it != d->tablesList_.end(); ++it)
+  for (QStringList::Iterator it = d->tablesList_.begin(); it != d->tablesList_.end(); ++it) {
     if (!d->db_->manager()->existsTable(*it) && !d->db_->manager()->createTable(*it))
       return false;
+  }
 
   QString res;
   if (d->from_.isEmpty())
@@ -233,14 +246,15 @@ QVariant FLSqlQuery::value(int i, bool raw) const
 {
   if (!isValid() && i >= 0)
     return QVariant();
-  QVariant v = QSqlQuery_value(i);
-  if (!raw  && v.type() == QVariant::String) {
+  QVariant v(QSqlQuery_value(i));
+  QVariant::Type type = v.type();
+  if (!raw  && type == QVariant::String) {
     if (!v.isNull()) {
       QVariant vLarge(d->db_->manager()->fetchLargeValue(v.toString()));
       if (vLarge.isValid())
         return vLarge;
     }
-  } else if (v.type() == QVariant::ULongLong)
+  } else if (type == QVariant::ULongLong || type == QVariant::LongLong)
     return v.toDouble();
   return v;
 }
@@ -291,7 +305,13 @@ FLTableMetaData::FLFieldMetaDataList *FLSqlQuery::fieldMetaDataList()
       FLTableMetaData *mtd = d->db_->manager()->metadata(table, true);
       if (!mtd)
         continue;
-      d->fieldMetaDataList_->insert(field.lower(), mtd->field(field));
+      FLFieldMetaData *fd = mtd->field(field);
+      if (fd) {
+        fd->ref();
+        d->fieldMetaDataList_->insert(field.lower(), fd);
+      }
+      if (!mtd->inCache())
+        delete mtd;
     }
   }
   return d->fieldMetaDataList_;

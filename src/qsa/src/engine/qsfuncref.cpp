@@ -65,7 +65,7 @@ QSObject QSFuncRefClass::construct(const QSList &args) const
 
   QSFunctionScopeClass *scope =
     new QSFunctionScopeClass(env()->objectClass());
-  QSFunctionBodyNode *bodyNode = QSProgramNode::last();
+  QSFunctionBodyNode *bodyNode = QSProgramNode::nodeProgLast();
   bodyNode->setScopeDefinition(scope);
   scope->setFunctionBodyNode(bodyNode);
   QSMember mem(bodyNode);
@@ -196,7 +196,7 @@ QSMember QSFuncRefClass::refMember(const QSObject &ref)
   if (ref.isFunction()) {
     return ((QSReferenceData *) ref.shVal())->member;
   }
-  qWarning("QSFuncRefClass::refMember() - not a reference");
+  qWarning("QSFuncRefClass::refMember() - not a reference " + ref.toString());
   return QSMember();
 }
 
@@ -205,7 +205,7 @@ QSObject QSFuncRefClass::refBase(const QSObject &ref)
   if (ref.isFunction()) {
     return ((QSReferenceData *) ref.shVal())->base;
   }
-  qWarning("QSFuncRefClass::refBase() - not a reference");
+  qWarning("QSFuncRefClass::refBase() - not a reference " + ref.toString());
   return ref.env()->createUndefined();
 }
 
@@ -214,7 +214,7 @@ ScopeChain QSFuncRefClass::refScope(const QSObject &ref)
   if (ref.isFunction()) {
     return ((QSReferenceData *) ref.shVal())->context;
   }
-  qWarning("QSFuncRefClass::refScope() - not a reference");
+  qWarning("QSFuncRefClass::refScope() - not a reference " + ref.toString());
   return ScopeChain();
 }
 

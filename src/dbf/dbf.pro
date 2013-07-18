@@ -24,14 +24,14 @@ SOURCES += an_string.c \
            sql.c \
            codepages.c \
            dbf.c \
-           endian.c
+           dbf_endian.c
 
 HEADERS += an_string.h \
            codepages.h \
            congraph.h \
            csv.h \
            dbf.h \
-           endian.h \
+           dbf_endian.h \
            iodbf.h \
            sql.h \
            statistic.h \

@@ -74,6 +74,11 @@ public:
   void setCaption(const QString &c);
 
   /**
+  Establece la descripción
+  */
+  void setDescription(const QString &d);
+
+  /**
   Obtiene el nombre de la accion
   */
   QString name() const;
@@ -97,6 +102,11 @@ public:
   Obtiene el texto de la barra de título del formulario
   */
   QString caption() const;
+
+  /**
+  Obtiene la descripcion
+  */
+  QString description() const;
 
   /**
   Obtiene el nombre del formulario mestro
@@ -144,6 +154,11 @@ private:
   Texto para la barra de título del formulario maestro
   */
   QString caption_;
+
+  /**
+  Descripción
+  */
+  QString description_;
 };
 
 inline void FLAction::setName(const QString &n)
@@ -181,6 +196,11 @@ inline void FLAction::setCaption(const QString &c)
   caption_ = c;
 }
 
+inline void FLAction::setDescription(const QString &d)
+{
+  description_ = d;
+}
+
 inline QString FLAction::name() const
 {
   return name_;
@@ -204,6 +224,11 @@ inline QString FLAction::table() const
 inline QString FLAction::caption() const
 {
   return caption_;
+}
+
+inline QString FLAction::description() const
+{
+  return description_;
 }
 
 inline QString FLAction::form() const

@@ -133,8 +133,13 @@ used. otherwise they look different under win and x11... no problem.
 //#define DEBUG_QPAINTER
 
 /* needed for dynamic loading ... */
+#ifndef _WIN64
 static BOOL ( WINAPI * qtAlphaBlend ) (
     HDC, int, int, int, int, HDC, int, int, int, int, BLENDFUNCTION ) = NULL;
+#else
+typedef BOOL (WINAPI *alphaBlendFunc)(HDC, int, int, int, int, HDC, int, int, int, int, BLENDFUNCTION);
+static alphaBlendFunc qtAlphaBlend = NULL;
+#endif
 
 /* some defines for shorter lines in drawPixmap  */
 #define QT_RGB_0 RGB( Qt::color0.red(),Qt::color0.green(), Qt::color0.blue() )
@@ -334,7 +339,11 @@ void QPainter::initialize()
 #ifdef DEBUG_QPAINTER
     qDebug( "QPainter::initialize()" );
 #endif
+#ifndef _WIN64
     ( DWORD& ) qtAlphaBlend = ( DWORD ) QLibrary::resolve( "msimg32.dll", "AlphaBlend" );
+#else
+    qtAlphaBlend = ( alphaBlendFunc ) QLibrary::resolve( "msimg32.dll", "AlphaBlend" );
+#endif
 }
 
 /*!

@@ -1256,7 +1256,7 @@ void QNetworkOperation::free()
 
 void QNetworkOperation::deleteMe()
 {
-    delete this;
+    if (this) delete this;
 }
 
 #endif

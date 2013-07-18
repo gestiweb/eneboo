@@ -69,7 +69,7 @@
 #include <messagedevice.h>
 #include <mailfolder.h>
 
-MessageFactory *MessageFactory::_instance = 0;
+AQMAIL_EXPORT MessageFactory *MessageFactory::_instance = 0;
 
 MessageFactory *MessageFactory::thisInstance()
 {

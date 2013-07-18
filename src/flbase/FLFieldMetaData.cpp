@@ -19,16 +19,21 @@
 #include "FLFieldMetaData.h"
 #include "FLRelationMetaData.h"
 
+#ifdef FL_DEBUG
+AQ_EXPORT long FLFieldMetaData::count_ = 0;
+#endif
+
 FLFieldMetaDataPrivate::FLFieldMetaDataPrivate(const QString &n, const QString &a, bool aN,
                                                bool iPK, int t, int l, bool c, bool v, bool ed,
                                                int pI, int pD, bool iNX, bool uNI, bool coun,
                                                const QVariant &defValue, bool oT,
                                                const QString &rX, bool vG, bool gen, bool iCK) :
-  name_(n.lower()), alias_(a), allowNull_((!c) ? aN : true), isPrimaryKey_(iPK), type_(t),
+  fieldName_(n.lower()), alias_(a), allowNull_((!c) ? aN : true), isPrimaryKey_(iPK), type_(t),
   length_(l), calculated_(c), visible_(v), editable_(ed), partInteger_(pI), partDecimal_(pD),
   isIndex_(iNX), isUnique_(uNI), contador_(coun), relationList_(0), relationM1_(0),
   associatedField_(0), defaultValue_(defValue), outTransaction_(oT), regExpValidator_(rX),
-  visibleGrid_(vG), generated_(gen), isCompoundKey_(iCK), hasOptionsList_(false), mtd_(0)
+  visibleGrid_(vG), generated_(gen), isCompoundKey_(iCK), hasOptionsList_(false), mtd_(0),
+  fullyCalculated_(false), trimmed_(false)
 {
   if (l < 0)
     length_ = 0;
@@ -47,107 +52,89 @@ FLFieldMetaDataPrivate::FLFieldMetaDataPrivate(const QString &n, const QString &
     partDecimal_ = 0;
 }
 
+FLFieldMetaDataPrivate::FLFieldMetaDataPrivate()
+  : relationList_(0), relationM1_(0),
+    associatedField_(0), mtd_(0)
+{
+}
+
 FLFieldMetaDataPrivate::~FLFieldMetaDataPrivate()
 {
-  if (relationList_) {
-    relationList_->clear();
-    delete relationList_;
-  }
-
-  if (relationM1_)
+  clearRelationList();
+  if (relationM1_ && relationM1_->deref()) {
     delete relationM1_;
+    relationM1_ = 0;
+  }
+}
 
-  optionsList_.clear();
+void FLFieldMetaDataPrivate::clearRelationList()
+{
+  if (!relationList_)
+    return;
+  FLRelationMetaData *r;
+  QPtrListIterator<FLRelationMetaData> it(*relationList_);
+  while ((r = it.current()) != 0) {
+    ++it;
+    relationList_->remove(r);
+    if (r->deref())
+      delete r;
+  }
+  delete relationList_;
+  relationList_ = 0;
 }
 
 FLFieldMetaData::FLFieldMetaData(const QString &n, const QString &a, bool aN, bool iPK, int t,
                                  int l, bool c, bool v, bool ed, int pI, int pD, bool iNX,
                                  bool uNI, bool coun, const QVariant &defValue, bool oT,
-                                 const QString &rX, bool vG, bool gen, bool iCK)
+                                 const QString &rX, bool vG, bool gen, bool iCK) : QShared()
 {
-
+#ifdef FL_DEBUG
+  ++count_;
+#endif
   d = new FLFieldMetaDataPrivate(n, a, aN, iPK, t, l, c, v, ed, pI, pD, iNX, uNI, coun, defValue,
                                  oT, rX, vG, gen, iCK);
 }
 
+FLFieldMetaData::FLFieldMetaData(const FLFieldMetaData *other)
+{
+#ifdef FL_DEBUG
+  ++count_;
+#endif
+  d =  new FLFieldMetaDataPrivate;
+  copy(other);
+}
+
 FLFieldMetaData::~FLFieldMetaData()
 {
+#ifdef FL_DEBUG
+  --count_;
+#endif
   delete d;
 }
 
 void FLFieldMetaData::setName(const QString &n)
 {
-  d->name_ = n;
+  d->fieldName_ = n;
 }
 
 void FLFieldMetaData::addRelationMD(FLRelationMetaData *r)
 {
-  if (r->cardinality() == FLRelationMetaData::RELATION_M1 && d->relationM1_) {
+  bool isRelM1 = r->cardinality() == FLRelationMetaData::RELATION_M1;
+  if (isRelM1 && d->relationM1_) {
 #ifdef FL_DEBUG
     qWarning
     ("FLFieldMetaData: Se ha intentado crear más de una relación muchos a uno para el mismo campo");
 #endif
     return;
   }
-
-  r->setField(d->name_);
-  if (r->cardinality() == FLRelationMetaData::RELATION_M1) {
-    if (d->relationM1_)
-      delete d->relationM1_;
+  r->setField(d->fieldName_);
+  if (isRelM1) {
     d->relationM1_ = r;
     return;
   }
-
   if (!d->relationList_)
     d->relationList_ = new FLRelationMetaDataList;
-
-  d->relationList_->setAutoDelete(true);
   d->relationList_->append(r);
-}
-
-void FLFieldMetaData::setRelationList(FLRelationMetaDataList *rl)
-{
-  if (!rl)
-    return;
-
-  rl->setAutoDelete(true);
-
-  if (rl->isEmpty())
-    return;
-
-  if (d->relationList_) {
-    d->relationList_->clear();
-    delete d->relationList_;
-  }
-
-  if (d->relationM1_) {
-    delete d->relationM1_;
-    d->relationM1_ = 0;
-  }
-
-  FLRelationMetaData *relation;
-
-  for (relation = rl->first(); relation; relation = rl->next()) {
-    if (relation->cardinality() == FLRelationMetaData::RELATION_M1 && d->relationM1_) {
-#ifdef FL_DEBUG
-      qWarning("FLFieldMetaData: Se ha intentado crear más de una relación muchos a uno para el mismo campo");
-#endif
-
-      continue;
-    }
-
-    relation->setField(d->name_);
-    if (relation->cardinality() == FLRelationMetaData::RELATION_M1) {
-      d->relationM1_ = new FLRelationMetaData(relation->foreignTable(), relation->foreignField(),
-                                              relation->cardinality(), relation->deleteCascade(),
-                                              relation->updateCascade(), relation->checkIn());
-      d->relationM1_->setField(relation->field());
-      rl->remove(relation);
-      break;
-    }
-  }
-
-  d->relationList_ = rl;
 }
 
 void FLFieldMetaData::setOptionsList(const QString &ol)
@@ -205,4 +192,60 @@ QVariant::Type FLFieldMetaData::flDecodeType(int fltype)
       break;
   }
   return type;
+}
+
+void FLFieldMetaData::copy(const FLFieldMetaData *other)
+{
+  if (other == this)
+    return;
+  FLFieldMetaDataPrivate *od = other->d;
+
+  if (od->relationM1_) {
+    //d->relationM1_ = new FLRelationMetaData(od->relationM1_);
+    od->relationM1_->ref();
+    d->relationM1_ = od->relationM1_;
+  }
+
+  d->clearRelationList();
+
+  if (od->relationList_) {
+    FLRelationMetaData *r;
+    QPtrListIterator<FLRelationMetaData> it(*od->relationList_);
+    while ((r = it.current()) != 0) {
+      ++it;
+      if (!d->relationList_)
+        d->relationList_ = new FLRelationMetaDataList;
+      //d->relationList_->append(new FLRelationMetaData(r));
+      r->ref();
+      d->relationList_->append(r);
+    }
+  }
+
+  d->fieldName_ = od->fieldName_;
+  d->alias_ = od->alias_;
+  d->allowNull_ = od->allowNull_;
+  d->isPrimaryKey_ = od->isPrimaryKey_;
+  d->type_ = od->type_;
+  d->length_ = od->length_;
+  d->calculated_ = od->calculated_;
+  d->fullyCalculated_ = od->fullyCalculated_;
+  d->trimmed_ = od->trimmed_;
+  d->visible_ = od->visible_;
+  d->editable_ = od->editable_;
+  d->partInteger_ = od->partInteger_;
+  d->partDecimal_ = od->partDecimal_;
+  d->isIndex_ = od->isIndex_;
+  d->isUnique_ = od->isUnique_;
+  d->contador_ = od->contador_;
+  d->associatedField_ = od->associatedField_;
+  d->associatedFieldName_ = od->associatedFieldName_;
+  d->associatedFieldFilterTo_ = od->associatedFieldFilterTo_;
+  d->defaultValue_ = od->defaultValue_;
+  d->optionsList_ = od->optionsList_;
+  d->outTransaction_ = od->outTransaction_;
+  d->regExpValidator_ = od->regExpValidator_;
+  d->visibleGrid_ = od->visibleGrid_;
+  d->generated_ = od->generated_;
+  d->isCompoundKey_ = od->isCompoundKey_;
+  d->hasOptionsList_ = od->hasOptionsList_;
 }

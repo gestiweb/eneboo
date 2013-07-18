@@ -134,6 +134,10 @@ public slots:
     return wb_;
   }
 
+  QObject *self() const {
+    return o_;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   bool editorsModified() const;

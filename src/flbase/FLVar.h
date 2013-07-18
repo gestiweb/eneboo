@@ -29,7 +29,7 @@ de variables globales de aplicación desde los sctipts
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLVar
+class AQ_EXPORT FLVar
 {
 
 public:

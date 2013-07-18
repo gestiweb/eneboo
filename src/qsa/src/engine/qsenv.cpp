@@ -437,18 +437,24 @@ void QSEnv::clearException()
 
 QSObject QSEnv::getValueDirect(int index, int level)
 {
+  if (!scopeChain || level >= scopeChain->size())
+    return QSObject();
   QSObject &sclvl = *(scopeChain->at(level));
   return *(((QSInstanceData *) sclvl.shVal())->value(index));
 }
 
 void QSEnv::setValueDirect(int index, int level, const QSObject &val)
 {
+  if (!scopeChain || level >= scopeChain->size())
+    return;
   QSObject &sclvl = *(scopeChain->at(level));
   ((QSInstanceData *) sclvl.shVal())->setValue(index, val);
 }
 
 QSObject QSEnv::scopeObjectAt(int level) const
 {
+  if (!scopeChain || level >= scopeChain->size())
+    return QSObject();
   return *(scopeChain->at(level));
 }
 

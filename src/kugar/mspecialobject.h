@@ -90,6 +90,11 @@ public:
   */
   void setDateFormat(int f);
 
+  /**
+  Run-time type information
+  */
+  virtual int RTTI() const;
+
 private:
 
   /**

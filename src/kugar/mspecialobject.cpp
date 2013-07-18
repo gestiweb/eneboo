@@ -81,3 +81,8 @@ void MSpecialObject::copy(const MSpecialObject *mSpecialObject)
   // Copy the fields's data type and format
   type = mSpecialObject->type;
 }
+
+int MSpecialObject::RTTI() const
+{
+  return MReportObject::Special;
+}

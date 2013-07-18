@@ -72,12 +72,12 @@
 #include <messagedescriptor.h>
 
 /** Int Values List.*/
-typedef QValueList<int> IVList;
+typedef AQMAIL_EXPORT QValueList<int> IVList;
 
 class IndexClass;
 class MimePart;
 
-class MessageDevice
+class AQMAIL_EXPORT MessageDevice
 {
 public:
     MessageDevice(IndexClass *);

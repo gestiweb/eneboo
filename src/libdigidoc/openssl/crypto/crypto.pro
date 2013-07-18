@@ -6,13 +6,14 @@ else {
 }
 
 TEMPLATE = lib
-CONFIG += warn_off plugin
+CONFIG += warn_off
+!mac:CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {
 	CONFIG += dll
 	DLLDESTDIR = $$PREFIX/bin
-	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm -lgdi32 -lws2_32
+	LIBS = -L$$PREFIX/lib -lpthreadAQ -lm -lgdi32 -lws2_32
 }
 
 DESTDIR = $$PREFIX/lib
@@ -20,6 +21,8 @@ DESTDIR = $$PREFIX/lib
 DEFINES += NO_WINDOWS_BRAINDEATH OPENSSL_NO_STATIC_ENGINE
 unix:DEFINES += OPENSSL_SYS_UNIX
 win32:DEFINES += OPENSSL_SYS_WIN32
+mac:DEFINES += _REENTRANT
+DEFINES += NOCRYPT OPENSSL_NO_ASM OPENSSL_NO_INLINE_ASM
 
 INCLUDEPATH = $$ROOT/src/libdigidoc/openssl $$ROOT/src/libdigidoc/openssl/ssl \
               $$ROOT/src/libdigidoc/openssl/include $$ROOT/src/libdigidoc/openssl/crypto
@@ -27,7 +30,7 @@ QMAKE_LIBS_X11SM =
 
 TARGET = crypto
 
-VERSION = 0.9.8
+VERSION = $$AQSSLVERSION
 
 DEPENDPATH += aes \
               asn1 \
@@ -743,3 +746,5 @@ SOURCES += cpt_err.c \
            x509v3/v3_utl.c \
            x509v3/v3err.c
 
+mac:QMAKE_CFLAGS += -fno-common
+mac:QMAKE_CXXFLAGS += -fno-common

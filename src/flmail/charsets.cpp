@@ -43,7 +43,7 @@
 
 #define CHARSETS_COUNT    32
 
-CharSets* CharSets::instance = 0;
+AQMAIL_EXPORT CharSets* CharSets::instance = 0;
 
 static const char * const charsetsStr[CHARSETS_COUNT] = {
     "unicode",

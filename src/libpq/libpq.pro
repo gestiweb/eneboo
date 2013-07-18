@@ -12,6 +12,7 @@ CONFIG -= qt x11
 
 win32 {
         CONFIG += dll
+        DEFINES += _DLL
         DLLDESTDIR = $$PREFIX/bin
 }
 
@@ -22,7 +23,7 @@ unix:INCLUDEPATH = . $$ROOT/src/libpq/include
 win32:INCLUDEPATH = . $$ROOT/src/pthreads $$ROOT/src/libpq/include $$ROOT/src/libpq/include/port/win32
 
 unix:!mac:LIBS += -lcrypt -lresolv -lnsl
-win32:LIBS += -L$$PREFIX/lib -lpthreadGCE2 -lshfolder -lws2_32 -lm
+win32:LIBS += -L$$PREFIX/lib -lpthreadAQ -lshfolder -lws2_32 -lm
 
 win32:RC_FILES = libpq.rc
 

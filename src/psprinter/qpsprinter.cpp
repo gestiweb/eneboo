@@ -5926,7 +5926,12 @@ void QPSPrinterPrivate::flushPage(bool last)
   if (buffer &&
   //         ( last || pagesInBuffer++ > -1 ||
     //           ( pagesInBuffer > 4 && buffer->size() > 262144 ) ) )
-    (last || buffer->size() > 2000000)) {
+#ifdef Q_WS_QWS
+    (last || buffer->size() > 2000000) // embedded is usually limited in memory
+#else
+    (last || buffer->size() > 50000000)
+#endif
+  ) {
     //        qDebug("emiting header at page %d", pageCount );
     emitHeader(last);
   }
@@ -6028,8 +6033,8 @@ bool QPSPrinter::cmd(int c, QPainter *paint, QPDevCmdParam *p)
     d->fontsUsed = QString::fromLatin1("");
 
 #if defined(Q_OS_WIN32) || defined(Q_OS_MACX)
-    QPaintDeviceMetrics m( QApplication::desktop() );
-    d->scale = 72. / ( ( float ) m.logicalDpiY() );
+    QPaintDeviceMetrics m(QApplication::desktop());
+    d->scale = 72. / (( float )m.logicalDpiY());
 #else
     QPaintDeviceMetrics m(d->printer);
     d->scale = 72. / ((float) m.logicalDpiY());

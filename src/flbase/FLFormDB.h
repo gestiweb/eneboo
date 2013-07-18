@@ -33,6 +33,7 @@
 class FLSqlCursor;
 class FLAction;
 class FLFormDBInterface;
+class QSScript;
 
 /**
 Representa un formulario que enlaza con una tabla.
@@ -53,11 +54,9 @@ componentes serán plugins, como FLFieldDB o FLTableDB.
 
 @author InfoSiAL S.L.
 */
-class FLFormDB: public QWidget
+class FLFormDB : public QWidget
 {
   Q_OBJECT
-
-  friend class FLFormDBInterface;
 
 public:
 
@@ -169,6 +168,23 @@ public:
   */
   void saveSnapShot(const QString &pathFile);
 
+  /**
+  Devuelve si se ha aceptado el formulario
+  */
+  bool accepted() {
+    return accepted_;
+  }
+
+  /**
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
+  */
+  virtual QString formClassName() const;
+
+  /**
+  Sólo para compatibilizar con FLFormSearchDB. Por defecto sólo llama QWidget::show
+  */
+  virtual QVariant exec(const QString & = QString::null);
+
 public slots:
 
   /**
@@ -179,7 +195,22 @@ public slots:
   /**
   Invoca a la función "init" del script "masterprocess" asociado al formulario
   */
-  virtual void initScript();
+  virtual bool initScript();
+
+  /**
+  Se activa al pulsar el boton aceptar
+  */
+  virtual void accept();
+
+  /**
+  Se activa al pulsar el botón cancelar
+  */
+  virtual void reject();
+
+  /**
+  Redefinida por conveniencia
+  */
+  virtual void show();
 
   /**
   Muestra el formulario sin llamar al script "init".
@@ -192,6 +223,16 @@ public slots:
   */
   void setMaximized();
 
+  /**
+  Muestra el script asociado al formulario en el Workbench para depurar
+  */
+  void debugScript();
+
+  /**
+  Devuelve el script asociado al formulario
+  */
+  virtual QSScript *script() const;
+
 private slots:
 
   void callInitScript();
@@ -201,7 +242,28 @@ protected:
   /**
   Inicialización
   */
-  void initForm();
+  virtual void initForm();
+
+  /**
+  Nombre interno del formulario
+  */
+  virtual QString formName() const;
+  virtual QString geoName() const;
+
+  /**
+  Une la interfaz de script al objeto del formulario
+  */
+  virtual void bindIface();
+
+  /**
+  Desune la interfaz de script al objeto del formulario
+  */
+  virtual void unbindIface();
+
+  /**
+  Indica si la interfaz de script está unida al objeto formulario
+  */
+  virtual bool isIfaceBind() const;
 
   /**
   Captura evento cerrar
@@ -217,6 +279,11 @@ protected:
   Captura evento ocultar
   */
   virtual void hideEvent(QHideEvent *h);
+
+  /**
+  Captura evento de entrar foco
+  */
+  virtual void focusInEvent(QFocusEvent *f);
 
   /**
   Inicializa componenentes del widget principal
@@ -250,7 +317,7 @@ protected:
   /**
   Acción asociada al formulario
   */
-  const FLAction *action_;
+  FLAction *action_;
 
   /**
   Identificador de ventana MDI.
@@ -289,6 +356,28 @@ protected:
   */
   QWidget *initFocusWidget_;
 
+  /**
+  Guarda el último objeto de formulario unido a la interfaz de script (con bindIface())
+  */
+  FLFormDB *oldFormObj;
+
+#ifdef QSDEBUGGER
+  /**
+  Boton Debug Script
+  */
+  QPushButton *pushButtonDebug;
+#endif
+
+  /**
+  Almacena que se aceptado, es decir NO se ha pulsado, botón cancelar
+  */
+  bool accepted_;
+
+  /**
+  Interface para scripts
+  */
+  QObject *iface;
+
 protected slots:
 
   /**
@@ -296,12 +385,11 @@ protected slots:
   */
   void emitFormReady();
 
-private:
-
   /**
-  Interface para scripts
+  Uso interno
   */
-  FLFormDBInterface *iface;
+  void oldFormObjDestroyed();
+  void cursorDestroyed(QObject *);
 
 signals:
 

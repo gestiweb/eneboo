@@ -26,7 +26,7 @@
 MReportViewer::MReportViewer(QWidget *parent, const char *name) :
   QWidget(parent, name), progress(0), totalSteps(0), printer(0),
   posprinter(0), numCopies_(1), printToPos_(false),
-  printerName_(QString::null), dpi_(300)
+  printerName_(QString::null), dpi_(300), colorMode_(PrintColor)
 {
 #if defined(Q_OS_WIN32) || defined(Q_OS_MACX)
   psprinter = 0;
@@ -195,8 +195,13 @@ bool MReportViewer::printGhostReport()
 
   QString outPsFile(AQ_DISKCACHE_DIRPATH + "/outprint.ps");
   QFile::remove(outPsFile);
-  if (!printReportToPS(outPsFile))
+  int backupNumCopies = numCopies_;
+  numCopies_ = 1;
+  if (!printReportToPS(outPsFile)) {
+    numCopies_ = backupNumCopies;
     return false;
+  }
+  numCopies_ = backupNumCopies;
 
   bool gsPrintOk = false;
   QProcess *procTemp = new QProcess();
@@ -210,6 +215,15 @@ bool MReportViewer::printGhostReport()
     proc->addArgument("gsprint");
     proc->addArgument("-color");
     proc->addArgument("-query");
+    proc->addArgument("-from");
+    proc->addArgument("1");
+    proc->addArgument("-to");
+    proc->addArgument(QString("%1").arg(cnt));
+    proc->addArgument("-copies");
+    proc->addArgument(QString("%1").arg(numCopies_));
+    //proc->addArgument("-q");
+    //proc->addArgument("-dBATCH");
+    //proc->addArgument("-dNOPAUSE");
     proc->addArgument(outPsFile);
   } else {
     QString setupPsFile(AQ_DISKCACHE_DIRPATH + "/setup.ps");
@@ -237,7 +251,7 @@ bool MReportViewer::printGhostReport()
       stream << "  (mswinpr2) finddevice" << "\n";
       stream << "  putdeviceprops" << "\n";
       stream << "setdevice" << "\n";
-      if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom) {
+      if ((QPrinter::PageSize) report->pageSize() == QPrinter::Custom) {
         QSize sz(report->pageDimensions());
         stream << QString("<< /PageSize [%1 %2] /ImagingBBox null >> setpagedevice")
                .arg(sz.width())
@@ -247,7 +261,7 @@ bool MReportViewer::printGhostReport()
       fileSetup.close();
     }
 
-    proc->addArgument("gswin32c");
+    proc->addArgument(aqApp->gsExecutable());
     proc->addArgument("-q");
     proc->addArgument("-dBATCH");
     proc->addArgument("-dNOPAUSE");
@@ -316,10 +330,19 @@ bool MReportViewer::printGhostReport()
     return false;
   }
 
-  while (proc->isRunning())
+  //QProgressDialog *pd = new QProgressDialog(tr("Enviando a impresora..."), QString::null, 10000,  this, tr("sendprintprogress"), true );
+  //int step = 0;
+  //QApplication::setOverrideCursor(Qt::WaitCursor);
+  while (proc->isRunning()) {
+    //pd->setProgress(step++);
     qApp->processEvents();
+    //if (step == 9999)
+    // step = 0;
+  }
+  //QApplication::restoreOverrideCursor();
 
   delete proc;
+  //delete pd;
 
   qApp->processEvents();
 
@@ -344,13 +367,13 @@ bool MReportViewer::printGhostReportToPS(const QString &outPsFile)
 
   psprinter = new PSPrinter(PSPrinter::HighResolution);
   psprinter->setPageSize((PSPrinter::PageSize) report->pageSize());
-  if ((PSPrinter::PageSize) report->pageSize() >= PSPrinter::Custom)
+  if ((PSPrinter::PageSize) report->pageSize() == PSPrinter::Custom)
     psprinter->setCustomPaperSize(report->pageDimensions());
   psprinter->setOrientation((PSPrinter::Orientation) report->pageOrientation());
   psprinter->setMinMax(1, cnt);
   psprinter->setFromTo(1, cnt);
   psprinter->setFullPage(true);
-  psprinter->setColorMode(PSPrinter::Color);
+  psprinter->setColorMode((PSPrinter::ColorMode) colorMode_);
   psprinter->setNumCopies(numCopies_);
   psprinter->setResolution(dpi_);
 
@@ -463,12 +486,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   if (report == 0)
     return false;
 
-#if defined(Q_OS_WIN32)
-  QString gs = "gswin32c";
-#else
-  QString gs = "gs";
-#endif
-
+  QString gs(aqApp->gsExecutable());
   bool gsOk = false;
   QProcess *procTemp = new QProcess();
   procTemp->addArgument(gs);
@@ -629,13 +647,13 @@ bool MReportViewer::printReportToPS(const QString &outPsFile)
   // Set the printer dialog
   printer = new QPrinter(QPrinter::HighResolution);
   printer->setPageSize((QPrinter::PageSize) report->pageSize());
-  if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom)
+  if ((QPrinter::PageSize) report->pageSize() == QPrinter::Custom)
     printer->setCustomPaperSize(report->pageDimensions());
   printer->setOrientation((QPrinter::Orientation) report->pageOrientation());
   printer->setMinMax(1, cnt);
   printer->setFromTo(1, cnt);
   printer->setFullPage(true);
-  printer->setColorMode(QPrinter::Color);
+  printer->setColorMode((QPrinter::ColorMode) colorMode_);
   printer->setNumCopies(numCopies_);
   printer->setOutputToFile(true);
   printer->setOutputFileName(outPsFile);
@@ -723,7 +741,7 @@ bool MReportViewer::printReport()
 #if defined(Q_OS_WIN32)
   bool gsOk = false;
   QProcess *procTemp = new QProcess();
-  procTemp->addArgument("gswin32c");
+  procTemp->addArgument(aqApp->gsExecutable());
   procTemp->addArgument("--version");
   gsOk = procTemp->start();
   delete procTemp;
@@ -754,13 +772,13 @@ bool MReportViewer::printReport()
   // Set the printer dialog
   printer = new QPrinter(QPrinter::HighResolution);
   printer->setPageSize((QPrinter::PageSize) report->pageSize());
-  if ((QPrinter::PageSize) report->pageSize() >= QPrinter::Custom)
+  if ((QPrinter::PageSize) report->pageSize() == QPrinter::Custom)
     printer->setCustomPaperSize(report->pageDimensions());
   printer->setOrientation((QPrinter::Orientation) report->pageOrientation());
   printer->setMinMax(1, cnt);
   printer->setFromTo(1, cnt);
   printer->setFullPage(true);
-  printer->setColorMode(QPrinter::Color);
+  printer->setColorMode((QPrinter::ColorMode) colorMode_);
   printer->setNumCopies(numCopies_);
   printer->setResolution(dpi_);
   if (!printerName_.isEmpty())
@@ -987,4 +1005,11 @@ void MReportViewer::setReportPages(MPageCollection *pgs)
   if (report && report->parent() == this)
     report->deleteLater();
   report = pgs;
+}
+
+void MReportViewer::exportToOds()
+{
+  if (!rptEngine || !report)
+    return;
+  rptEngine->exportToOds(report);
 }

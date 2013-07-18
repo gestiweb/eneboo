@@ -16,76 +16,178 @@ email                : mail@infosial.com
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
-#include "FLSqlDriver.h"
+#include <qmessagebox.h>
+#include <qsinterpreter.h>
 
-FLSqlDriver::FLSqlDriver( QObject * parent, const char *name ) : QSqlDriver( parent, name ), db_( 0 ) {}
+#include "FLSqlDriver.h"
+#include "FLSqlDatabase.h"
+
+extern QSInterpreter *globalAQSInterpreter;
+
+FLSqlDriver::FLSqlDriver(QObject *parent, const char *name) :
+  QSqlDriver(parent, name), db_(0) {}
 
 FLSqlDriver::~FLSqlDriver() {}
 
-QString FLSqlDriver::formatDatabaseName( const QString & name ) {
+QString FLSqlDriver::formatDatabaseName(const QString &name)
+{
   return name;
 }
 
-bool FLSqlDriver::tryConnect( const QString & db, const QString & user, const QString & password, const QString & host, int port ) {
+bool FLSqlDriver::tryConnect(const QString &db, const QString &user, const QString &password,
+                             const QString &host, int port)
+{
   return false;
 }
 
-QString FLSqlDriver::sqlCreateTable( FLTableMetaData * tmd ) {
+QString FLSqlDriver::sqlCreateTable(const FLTableMetaData *tmd)
+{
   return QString::null;
 }
 
-QString FLSqlDriver::formatValueLike( int t, const QVariant & v, const bool upper ) {
+QString FLSqlDriver::formatValueLike(int t, const QVariant &v, const bool upper)
+{
   return v.toString();
 }
 
-QString FLSqlDriver::formatValue( int t, const QVariant & v, const bool upper ) {
+QString FLSqlDriver::formatValue(int t, const QVariant &v, const bool upper)
+{
   return v.toString();
 }
 
-QVariant FLSqlDriver::nextSerialVal( const QString & table, const QString & field ) {
+QVariant FLSqlDriver::nextSerialVal(const QString &table, const QString &field)
+{
   return 0;
 }
 
-int FLSqlDriver::atFrom( FLSqlCursor * cur ) {
+int FLSqlDriver::atFrom(FLSqlCursor *cur)
+{
   return -99;
 }
 
-bool FLSqlDriver::alterTable( const QString & mtd1, const QString & mtd2, const QString & key ) {
+bool FLSqlDriver::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)
+{
   return false;
 }
 
-void FLSqlDriver::setFLSqlDatabase( FLSqlDatabase * db ) {
+void FLSqlDriver::setFLSqlDatabase(FLSqlDatabase *db)
+{
   db_ = db;
 }
 
-bool FLSqlDriver::canSavePoint() {
+FLSqlDatabase *FLSqlDriver::db() const
+{
+  return db_;
+}
+
+bool FLSqlDriver::canSavePoint()
+{
   return false;
 }
 
-bool FLSqlDriver::savePoint( const QString & ) {
+bool FLSqlDriver::savePoint(const QString &)
+{
   return false;
 }
 
-bool FLSqlDriver::releaseSavePoint( const QString & ) {
+bool FLSqlDriver::releaseSavePoint(const QString &)
+{
   return false;
 }
 
-bool FLSqlDriver::rollbackSavePoint( const QString & ) {
+bool FLSqlDriver::rollbackSavePoint(const QString &)
+{
   return false;
 }
 
-QStringList FLSqlDriver::locksStatus() {
+bool FLSqlDriver::canOverPartition()
+{
+  return false;
+}
+
+QStringList FLSqlDriver::locksStatus()
+{
   return QStringList();
 }
 
-QStringList FLSqlDriver::detectLocks() {
+QStringList FLSqlDriver::detectLocks()
+{
   return QStringList();
 }
 
-QStringList FLSqlDriver::detectRisksLocks( const QString & table, const QString & primaryKeyValue ) {
+QStringList FLSqlDriver::detectRisksLocks(const QString &table, const QString &primaryKeyValue)
+{
   return QStringList();
 }
 
-bool FLSqlDriver::regenTable( const QString & n, FLTableMetaData * tmd ) {
+bool FLSqlDriver::regenTable(const QString &n, FLTableMetaData *tmd)
+{
   return false;
+}
+
+QString FLSqlDriver::md5TuplesState() const
+{
+  return QString::null;
+}
+
+QString FLSqlDriver::md5TuplesStateTable(const QString &table) const
+{
+  return QString::null;
+}
+
+bool FLSqlDriver::mismatchedTable(const QString &table,
+                                  const FLTableMetaData *tmd) const
+{
+  return false;
+}
+
+bool FLSqlDriver::existsTable(const QString &n) const
+{
+  return tables("").contains(n);
+}
+
+void FLSqlDriver::msgBoxCritical(const QString &title, const QString &msg)
+{
+  if (db_ && !db_->interactiveGUI()) {
+    qWarning(title + QString::fromLatin1(" : ") + msg);
+  } else {
+    QMessageBox::critical(0, title, msg, QMessageBox::Ok, 0, 0);
+  }
+}
+
+void FLSqlDriver::setLastError(const QSqlError &e)
+{
+  if (e.type() != QSqlError::None) {
+    if (db_ && db_->qsaExceptions() && globalAQSInterpreter &&
+        globalAQSInterpreter->isRunning()) {
+      globalAQSInterpreter->throwError(e.driverText() + ":\n" +
+                                       e.databaseText());
+    } else {
+      qWarning(e.driverText() + ":\n" + e.databaseText());
+    }
+  }
+  QSqlDriver::setLastError(e);
+}
+
+FLSqlResult::FLSqlResult(const QSqlDriver *db) : QSqlResult(db)
+{
+}
+
+FLSqlResult::~FLSqlResult()
+{
+}
+
+void FLSqlResult::setLastError(const QSqlError &e)
+{
+  if (e.type() != QSqlError::None) {
+    FLSqlDriver *dr = ::qt_cast<FLSqlDriver *>(driver());
+    if (dr && dr->db() && dr->db()->qsaExceptions() &&
+        globalAQSInterpreter && globalAQSInterpreter->isRunning()) {
+      globalAQSInterpreter->throwError(e.driverText() + ":\n" +
+                                       e.databaseText());
+    } else {
+      qWarning(e.driverText() + ":\n" + e.databaseText());
+    }
+  }
+  QSqlResult::setLastError(e);
 }

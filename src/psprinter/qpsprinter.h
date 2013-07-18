@@ -62,7 +62,7 @@ email                : mail@infosial.com
 class QPSPrinterPrivate;
 class PSPrinter;
 
-class FL_EXPORT QPSPrinter : public QPaintDevice {
+class QPSPrinter : public QPaintDevice {
   private:
     QPSPrinter( PSPrinter *, int );
     QPSPrinter( PSPrinter *, QIODevice * );

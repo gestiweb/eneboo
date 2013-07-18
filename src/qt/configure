@@ -74,6 +74,11 @@ elif [ -f $relpath/src/kernel/qapplication_win.cpp ]; then
     PLATFORM_WIN=maybe
 fi
 
+### AbanQ deshabilita QWS siempre
+CFG_EMBEDDED=no
+PLATFORM_QWS=no
+PLATFORM_QNX=no
+### AbanQ deshabilita QWS siempre
 
 #-------------------------------------------------------------------------------
 # check commercial license
@@ -563,7 +568,7 @@ while [ "$#" -gt 0 ]; do
 	fi
 	;;
     x11)
-        if [ "$Edition" = "troll" ] && [ "$VAL" = "yes" ]; then
+        if [ "$Edition" = "free" ] && [ "$VAL" = "yes" ]; then
 	    if [ "$PLATFORM_MAC" = "yes" ]; then
 		PLATFORM_MAC=no
 	    elif [ "$PLATFORM_QWS" = "yes" ]; then
@@ -575,7 +580,28 @@ while [ "$#" -gt 0 ]; do
         fi
 	;;
     win32)
+        if [ "$Edition" = "free" ] && [ "$VAL" = "yes" ]; then
+	    if [ "$PLATFORM_MAC" = "yes" ]; then
+		PLATFORM_MAC=no
+	    elif [ "$PLATFORM_QWS" = "yes" ]; then
+		PLATFORM_QWS=no
+	    fi
 	    PLATFORM_WIN=yes
+	else
+	    UNKNOWN_OPT=yes
+        fi
+	;;
+     mac)
+        if [ "$Edition" = "free" ] && [ "$VAL" = "yes" ]; then
+	    if [ "$PLATFORM_WIN" = "yes" ]; then
+		PLATFORM_WIN=no
+	    elif [ "$PLATFORM_QWS" = "yes" ]; then
+		PLATFORM_QWS=no
+	    fi
+	    PLATFORM_MAC=yes
+	else
+	    UNKNOWN_OPT=yes
+        fi
 	;;
     profile)
 	if [ "$VAL" = "yes" ]; then
@@ -1745,6 +1771,7 @@ if [ "$PLATFORM_MAC" = "yes" ]; then
 	CFG_TABLET=yes
     fi
 fi
+
 
 # x11
 if [ "$PLATFORM_X11" = "yes" ]; then

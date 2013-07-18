@@ -382,7 +382,11 @@ extern "C" void * MYCDECL CUSTOM_RECALLOC (void * p, size_t num, size_t sz)
 
 char * CUSTOM_GETENV(const char * str) {
   char buf[32767];
+#ifndef AQ_WIN64
   int len = GetEnvironmentVariable (str, buf, 32767);
+#else
+  int len = GetEnvironmentVariable ((const WCHAR *)str, (const WCHAR *)buf, 32767);
+#endif
   if (len == 0) {
     return NULL;
   } else {
@@ -405,7 +409,11 @@ int CUSTOM_PUTENV(char * str) {
     char buf[255];
     sprintf (buf, "setting %s to %s\n", first, second);
     printf (buf);
+#ifndef AQ_WIN64
     SetEnvironmentVariable (first, second);
+#else
+    SetEnvironmentVariable ((const WCHAR *)first, (const WCHAR *)second);
+#endif
     return 0;
   }
   return -1;

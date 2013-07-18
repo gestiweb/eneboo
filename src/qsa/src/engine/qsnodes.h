@@ -39,6 +39,15 @@
 #include <qstring.h>
 #include <qptrlist.h>
 
+// ### AbanQ
+#define AQ_ENABLE_LOOKUPINFO
+#ifdef QSDEBUGGER
+#define AQ_ENABLE_NODELIST
+#else
+#define AQ_ENABLE_PERSISTENT_NODES
+#endif
+// ### AbanQ
+
 class QSObject;
 class QSCheckData;
 class RegExp;
@@ -46,6 +55,19 @@ class QSSourceElementsNode;
 class QSProgramNode;
 class QSTypeNode;
 class QSLookupInfo;
+
+// ### AbanQ Optimization
+class QSBooleanNode;
+class QSThisNode;
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+extern QUICKCORE_EXPORT QSThisNode *perThisNode;
+extern QUICKCORE_EXPORT QSBooleanNode *perTrueNode;
+extern QUICKCORE_EXPORT QSBooleanNode *perFalseNode;
+#endif
+extern QUICKCORE_EXPORT QSThisNode *newThisNode();
+extern QUICKCORE_EXPORT QSBooleanNode *newTrueNode();
+extern QUICKCORE_EXPORT QSBooleanNode *newFalseNode();
+// ### AbanQ Optimization
 
 enum Operator {
   OpEqual,
@@ -88,15 +110,17 @@ public:
   virtual QSObject evaluate(QSEnv *);
   virtual QSObject rhs(QSEnv *) const = 0;
   virtual QSReference lhs(QSEnv *);
-  int lineNo() const {
-    return line;
+  int nodeLineNo() const {
+    return nodeLine_;
   }
-  static QSNode *firstNode() {
-    return first;
+#ifdef AQ_ENABLE_NODELIST
+  static QSNode *nodeFirstNode() {
+    return nodeFirst_;
   }
-  static void setFirstNode(QSNode *n) {
-    first = n;
+  static void setNodeFirstNode(QSNode *n) {
+    nodeFirst_ = n;
   }
+#endif
   virtual void check(QSCheckData *) = 0;
 #ifdef QSDEBUGGER
   static bool setBreakpoint(QSNode *firstNode, int id, int line, bool set);
@@ -119,10 +143,12 @@ private:
   // disallow assignment and copy-construction
   QSNode(const QSNode &);
   QSNode &operator=(const QSNode &);
-  int line;
-  static QSNode *first;
+  int nodeLine_;
+#ifdef AQ_ENABLE_NODELIST
+  static QSNode *nodeFirst_;
 public:
-  QSNode *next, *prev;
+  QSNode *nodeNext_, *nodePrev_;
+#endif
 
 #ifdef QSNODES_ALLOC_DEBUG
   static uint qsNodeCount;
@@ -154,11 +180,12 @@ public:
   void check(QSCheckData *) = 0;
   void checkIfGlobalAllowed(QSCheckData *);
   QSObject errorCompletion();
-  void pushLabel(const QString &id) {
-    ls.push(id);
-  }
-protected:
-  LabelStack ls;
+  // ### AbanQ
+  //void pushLabel(const QString &id) {
+  //  ls.push(id);
+  //}
+  //protected:
+  //LabelStack ls;
 private:
   QSObject evaluate(QSEnv *env) {
     return env->createUndefined();
@@ -201,6 +228,14 @@ public:
 class QSBooleanNode : public QSNode
 {
 public:
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+  ~QSBooleanNode() {
+    if (perTrueNode == this)
+      perTrueNode = 0;
+    else if (perFalseNode == this)
+      perFalseNode = 0;
+  }
+#endif
   QSBooleanNode(bool v) : value(v) { }
   QSObject rhs(QSEnv *) const;
   virtual void check(QSCheckData *);
@@ -221,9 +256,7 @@ private:
 class QSStringNode : public QSNode
 {
 public:
-  QSStringNode(const QString &v) {
-    value = v;
-  }
+  QSStringNode(const QString &v) : value(v) { }
   QSObject rhs(QSEnv *) const;
   virtual void check(QSCheckData *);
 private:
@@ -244,6 +277,12 @@ private:
 class QSThisNode : public QSNode
 {
 public:
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+  ~QSThisNode() {
+    if (perThisNode == this)
+      perThisNode = 0;
+  }
+#endif
   QSObject rhs(QSEnv *) const;
   virtual void check(QSCheckData *);
 };
@@ -251,15 +290,21 @@ public:
 class QSResolveNode : public QSNode
 {
 public:
-  QSResolveNode(const QString &s) : ident(s), info(0) { }
+#ifdef AQ_ENABLE_LOOKUPINFO
+  QSResolveNode(const QString &s) : ident(s), info_(0) { }
   ~QSResolveNode();
+#else
+  QSResolveNode(const QString &s) : ident(s) { }
+#endif
   QSObject rhs(QSEnv *) const;
   QSReference lhs(QSEnv *);
   void assign(const QSObject &val) const;
   virtual void check(QSCheckData *);
 private:
   QString ident;
-  QSLookupInfo *info;
+#ifdef AQ_ENABLE_LOOKUPINFO
+  QSLookupInfo *info_;
+#endif
 };
 
 class QSGroupNode : public QSNode
@@ -348,16 +393,24 @@ private:
   QSNode *name, *assign, *list;
 };
 
-class QSPropertyNode : public QSNode
+class QSPropertyStrNode : public QSNode
 {
 public:
-  QSPropertyNode(double d) : numeric(d) { }
-  QSPropertyNode(const QString &s) : str(s) { }
+  QSPropertyStrNode(const QString &s) : str(s) {}
+  QSObject rhs(QSEnv *) const;
+  virtual void check(QSCheckData *);
+private:
+  QString str;
+};
+
+class QSPropertyNumNode : public QSNode
+{
+public:
+  QSPropertyNumNode(double d) : numeric(d) {}
   QSObject rhs(QSEnv *) const;
   virtual void check(QSCheckData *);
 private:
   double numeric;
-  QString str;
 };
 
 class QSAccessorNode1 : public QSNode
@@ -746,13 +799,13 @@ private:
 class QSScopeNode : public QSStatementNode
 {
 public:
-  QSScopeNode() : scope(0) {}
+  QSScopeNode() : scope_(0) {}
   virtual void check(QSCheckData *);
   virtual QSObject execute(QSEnv *);
   virtual void checkStatement(QSCheckData *) = 0;
   virtual QSObject executeStatement(QSEnv *) = 0;
 protected:
-  QSBlockScopeClass *scope;
+  QSBlockScopeClass *scope_;
 };
 
 class QSBlockNode : public QSScopeNode
@@ -866,23 +919,35 @@ private:
 class QSContinueNode : public QSStatementNode
 {
 public:
-  QSContinueNode() { }
   QSContinueNode(const QString &i) : ident(i) { }
   QSObject execute(QSEnv *);
   void check(QSCheckData *);
 private:
   QString ident;
 };
+class QSContinueVoidNode : public QSStatementNode
+{
+public:
+  QSContinueVoidNode() { }
+  QSObject execute(QSEnv *);
+  void check(QSCheckData *);
+};
 
 class QSBreakNode : public QSStatementNode
 {
 public:
-  QSBreakNode() { }
   QSBreakNode(const QString &i) : ident(i) { }
   QSObject execute(QSEnv *);
   void check(QSCheckData *);
 private:
   QString ident;
+};
+class QSBreakVoidNode : public QSStatementNode
+{
+public:
+  QSBreakVoidNode() { }
+  QSObject execute(QSEnv *);
+  void check(QSCheckData *);
 };
 
 class QSReturnNode : public QSStatementNode
@@ -895,6 +960,13 @@ public:
   void ref();
 private:
   QSNode *value;
+};
+class QSReturnVoidNode : public QSStatementNode
+{
+public:
+  QSReturnVoidNode() { }
+  QSObject execute(QSEnv *);
+  void check(QSCheckData *);
 };
 
 class QSWithNode : public QSScopeNode
@@ -1105,7 +1177,7 @@ protected:
   QSFunctionScopeClass *scopeDef;
   int idx;
 private:
-  static int count;
+  static int count_;
 };
 
 class QSFuncDeclNode : public QSStatementNode
@@ -1148,8 +1220,6 @@ private:
   QSFunctionBodyNode *body;
 };
 
-class QSClassDefNode;
-
 class QSSourceElementNode : public QSStatementNode
 {
 public:
@@ -1191,11 +1261,11 @@ public:
   ~QSProgramNode();
   void check(QSCheckData *);
   void deleteGlobalStatements();
-  static QSProgramNode *last() {
-    return prog;
+  static QSProgramNode *nodeProgLast() {
+    return nodeProg_;
   }
 private:
-  static QSProgramNode *prog;
+  static QSProgramNode *nodeProg_;
 };
 
 class QSClassDefNode : public QSStatementNode
@@ -1345,6 +1415,7 @@ private:
 /*!
   Utility class for use with resolvenode's by index lookup.
 */
+#ifdef AQ_ENABLE_LOOKUPINFO
 class QSLookupInfo
 {
 public:
@@ -1353,6 +1424,7 @@ public:
   int level;
   QSMember member;
 };
+#endif
 
 class QSNodeList : public QPtrList<QSNode>
 {

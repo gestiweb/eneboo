@@ -53,7 +53,17 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL2(FieldMetaData, FieldMD);
   AQ_REG_COMPAT_FL2(TableMetaData, TableMD);
   AQ_REG_COMPAT_FL2(DataTable, DataTableDB);
+  AQ_REG_COMPAT_FL(LineEdit);
+  AQ_REG_COMPAT_FL(DateEdit);
+  AQ_REG_COMPAT_FL(SpinBox);
+  AQ_REG_COMPAT_FL(Table);
   //### Remove in AbanQ v3
+
+  // From wrap internal Qt classes
+#define AQ_REG_INTERNAL_QT(QClass,Class) \
+  registerWrapper(AQ_QUOTEME(Q##QClass), AQ_QUOTEME(Q##Class))
+
+  AQ_REG_INTERNAL_QT(TableHeader, Header);
 }
 
 AQSWrapperFactory::~AQSWrapperFactory()
@@ -129,7 +139,23 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   AQ_CRE_COMPAT_FL2(FieldMetaData, FieldMD);
   AQ_CRE_COMPAT_FL2_OBJ(TableMetaData, TableMD);
   AQ_CRE_COMPAT_FL2_OBJ(DataTable, DataTableDB);
+  AQ_CRE_COMPAT_FL_OBJ(LineEdit);
+  AQ_CRE_COMPAT_FL_OBJ(DateEdit);
+  AQ_CRE_COMPAT_FL_OBJ(SpinBox);
+  AQ_CRE_COMPAT_FL_OBJ(Table);
   //### Remove in AbanQ v3
+
+  // From wrap internal Qt classes
+#define AQ_CRE_INTERNAL_QT_OBJ(QClass,Class) \
+  if (className == AQ_QUOTEME(Q##QClass)) { \
+    QObject *o = static_cast<QObject *>(ptr); \
+    if (qstrcmp(o->className(), AQ_QUOTEME(Q##QClass)) != 0) return o; \
+    AQS##Class *qo = new AQS##Class(o); \
+    qo->setWrap(); \
+    return qo; \
+  }
+
+  AQ_CRE_INTERNAL_QT_OBJ(TableHeader, Header);
 
   return 0;
 }
@@ -261,6 +287,12 @@ extern "C" {
   int xsltprocMemory(const char *xsltStr, int sizeXslt,
                      const char *xmlStr, int sizeXml,
                      char **out, int *len);
+  int xsltprocMemoryFile(const char *xsltStr, int sizeXslt,
+                         const char *filename,
+                         char **out, int *len);
+  int xsltprocFile(const char *xsltStr, int sizeXslt,
+                   const char *filename,
+                   const char *output);
 }
 
 int AQS::xsltproc(const QStringList &args) const
@@ -281,6 +313,16 @@ int AQS::xsltproc(const QStringList &args) const
   return ret;
 }
 
+int AQS::xsltproc(QByteArray *xslt, const QString &fileName,
+                  const QString &output) const
+{
+  int ret;
+  ret = xsltprocFile((const char *)xslt->data(), xslt->size(),
+                     (const char *)fileName,
+                     (const char *)output);
+  return ret;
+}
+
 QByteArray AQS::xsltproc(QByteArray *xslt, QByteArray *xml) const
 {
   int len;
@@ -294,4 +336,29 @@ QByteArray AQS::xsltproc(QByteArray *xslt, QByteArray *xml) const
     delete out;
   }
   return ret;
+}
+
+QByteArray AQS::xsltproc(QByteArray *xslt, const QString &fileName) const
+{
+  int len;
+  char *out = NULL;
+  xsltprocMemoryFile((const char *)xslt->data(), xslt->size(),
+                     (const char *)fileName,
+                     &out, &len);
+  QByteArray ret;
+  if (out != NULL) {
+    ret.duplicate(out, len);
+    delete out;
+  }
+  return ret;
+}
+
+void AQS::setTabOrder(QWidget *first, QWidget *second)
+{
+  QWidget::setTabOrder(first, second);
+}
+
+void AQS::setTabOrder(AQSWidget *first, AQSWidget *second)
+{
+  QWidget::setTabOrder((QWidget *)first, (QWidget *)second);
 }

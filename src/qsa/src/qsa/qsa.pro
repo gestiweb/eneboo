@@ -12,6 +12,8 @@ shared:CONFIG += qt dll
 TARGET 		= qsa
 VERSION  	= 1.1.5
 
+INCLUDEPATH += $$ROOT/src/flbase
+
 isEmpty(QSA_INSTALL_PREFIX) {
   QSA_BUILD_PREFIX=$$(QTDIR)
 } else {

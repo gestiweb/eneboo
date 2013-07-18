@@ -21,11 +21,13 @@
 
 #include "odf-gen/sheet.h"
 
+extern QString encodeAttrODS(const QString &);
+
 class AQOdsSheet : public Sheet
 {
 public:
   AQOdsSheet(AQOdsSpreadSheet &spreadsheet, const QString &name)
-    : Sheet(spreadsheet, name) {}
+    : Sheet(spreadsheet, (const char *)encodeAttrODS(name).utf8()) {}
 };
 
 #endif /* AQODSSHEET_H_ */

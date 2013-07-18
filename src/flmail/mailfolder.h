@@ -53,10 +53,12 @@
 #include <qmap.h>
 #include <qdatetime.h>
 
+#include "aqmailglobal.h"
+
 class MessageDevice;
 class IndexClass;
 
-class MailFolder
+class AQMAIL_EXPORT MailFolder
 {
     /** The index class used for building the folder index.*/
     friend class IndexClass;

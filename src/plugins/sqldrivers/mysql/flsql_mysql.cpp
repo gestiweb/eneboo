@@ -110,6 +110,22 @@ bool QMYSQLOpenExtension::open(const QString &db,
   return driver->open(db, user, password, host, port, connOpts);
 }
 
+class QMYSQLCacheInfoPrivate
+{
+public:
+  QMYSQLCacheInfoPrivate()
+    : mngInitCount(0) {}
+
+  void clear() {
+    cache.clear();
+    cacheIdx.clear();
+  }
+
+  int mngInitCount;
+  QMap<QString, QSqlRecordInfo> cache;
+  QMap<QString, QSqlIndex> cacheIdx;
+};
+
 class QMYSQLDriverPrivate
 {
 public:
@@ -118,13 +134,15 @@ public:
       mysqlSerial(0),
       tc(QTextCodec::codecForLocale()),
       idConn(0),
-      activeCreateIndex(false) {}
+      activeCreateIndex(false),
+      forceChapuza(false) {}
   MYSQL *mysql;
   MYSQL *mysqlSerial;
   QTextCodec *tc;
   unsigned long idConn;
   bool activeCreateIndex;
   bool noInnoDB;
+  bool forceChapuza;
 };
 
 static inline QString toUnicode(QTextCodec *tc, const char *str)
@@ -571,7 +589,8 @@ bool QMYSQLResult::reset(const QString &query)
   QString q(query.stripWhiteSpace());
   q.replace("'true'", "'1'");
   q.replace("'false'", "'0'");
-  q.replace("=;", "= NULL;");
+  // ###
+  //q.replace("=;", "= NULL;");
   while (q.endsWith(";"))
     q.truncate(q.length() - 1);
   if (q.upper().endsWith("NOWAIT"))
@@ -683,25 +702,25 @@ static bool qMySqlInitHandledByUser = false;
 static void qLibraryInit()
 {
 #ifndef Q_NO_MYSQL_EMBEDDED
-# if MYSQL_VERSION_ID >= 40000
+# if (MYSQL_VERSION_ID >= 40000)
   if (qMySqlInitHandledByUser || qMySqlConnectionCount > 1)
     return;
 
-# if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || MYSQL_VERSION_ID >= 50003
-  if (mysql_library_init(0, 0, 0)) {
+# if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || (MYSQL_VERSION_ID >= 50003)
+  if (mysql_library_init(0, 0, 0))
 # else
-  if (mysql_server_init(0, 0, 0)) {
+  if (mysql_server_init(0, 0, 0))
 # endif
     qWarning("QMYSQLDriver::qServerInit: unable to start server.");
-  }
 # endif // MYSQL_VERSION_ID
 #endif // Q_NO_MYSQL_EMBEDDED
 }
 
-static void qLibraryEnd() {
+static void qLibraryEnd()
+{
 #ifndef Q_NO_MYSQL_EMBEDDED
-# if MYSQL_VERSION_ID > 40000
-#  if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || MYSQL_VERSION_ID >= 50003
+# if (MYSQL_VERSION_ID > 40000)
+#  if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || (MYSQL_VERSION_ID >= 50003)
   mysql_library_end();
 #  else
   mysql_server_end();
@@ -710,14 +729,16 @@ static void qLibraryEnd() {
 #endif
 }
 
-static bool setTransactionReadCommited(MYSQL * mysql) {
+static bool setTransactionReadCommited(MYSQL *mysql)
+{
   if (mysql_query(mysql, "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"))
     return false;
   return true;
 }
 
-QMYSQLDriver::QMYSQLDriver(QObject * parent, const char * name)
-  : FLSqlDriver(parent, name ? name : QMYSQL_DRIVER_NAME) {
+QMYSQLDriver::QMYSQLDriver(QObject *parent, const char *name)
+  : FLSqlDriver(parent, name ? name : QMYSQL_DRIVER_NAME)
+{
   init();
   qLibraryInit();
 }
@@ -726,8 +747,9 @@ QMYSQLDriver::QMYSQLDriver(QObject * parent, const char * name)
     Create a driver instance with an already open connection handle.
 */
 
-QMYSQLDriver::QMYSQLDriver(MYSQL * con, QObject * parent, const char * name)
-  : FLSqlDriver(parent, name ? name : QMYSQL_DRIVER_NAME) {
+QMYSQLDriver::QMYSQLDriver(MYSQL *con, QObject *parent, const char *name)
+  : FLSqlDriver(parent, name ? name : QMYSQL_DRIVER_NAME)
+{
   init();
   if (con) {
     d->mysql = (MYSQL *) con;
@@ -741,26 +763,31 @@ QMYSQLDriver::QMYSQLDriver(MYSQL * con, QObject * parent, const char * name)
   }
 }
 
-void QMYSQLDriver::init() {
-  qSqlOpenExtDict() ->insert(this, new QMYSQLOpenExtension(this));
+void QMYSQLDriver::init()
+{
+  qSqlOpenExtDict()->insert(this, new QMYSQLOpenExtension(this));
   d = new QMYSQLDriverPrivate();
+  cInfo = new QMYSQLCacheInfoPrivate();
   d->noInnoDB = (QString(QObject::name()) == "FLQMYSQL4_NO_INNODB");
   d->mysql = 0;
   qMySqlConnectionCount++;
 }
 
-QMYSQLDriver::~QMYSQLDriver() {
+QMYSQLDriver::~QMYSQLDriver()
+{
   qMySqlConnectionCount--;
   if (qMySqlConnectionCount == 0 && !qMySqlInitHandledByUser)
     qLibraryEnd();
   delete d;
-  if (!qSqlOpenExtDict() ->isEmpty()) {
-    QSqlOpenExtension *ext = qSqlOpenExtDict() ->take(this);
+  delete cInfo;
+  if (!qSqlOpenExtDict()->isEmpty()) {
+    QSqlOpenExtension *ext = qSqlOpenExtDict()->take(this);
     delete ext;
   }
 }
 
-bool QMYSQLDriver::hasFeature(DriverFeature f) const {
+bool QMYSQLDriver::hasFeature(DriverFeature f) const
+{
   switch (f) {
     case Transactions:
       if (d->noInnoDB)
@@ -788,20 +815,14 @@ bool QMYSQLDriver::open(const QString &,
                         const QString &,
                         const QString &,
                         const QString &,
-                        int) {
+                        int)
+{
   qWarning("QMYSQLDriver::open(): This version of open() is no longer supported.");
   return false;
 }
 
-bool QMYSQLDriver::open(const QString & db,
-                        const QString & user,
-                        const QString & password,
-                        const QString & host,
-                        int port,
-                        const QString & connOpts) {
-  if (isOpen())
-    close();
-
+static inline unsigned int parseOptionFlags(const QString &connOpts)
+{
   unsigned int optionFlags = 0;
 
   QStringList raw = QStringList::split(';', connOpts);
@@ -844,8 +865,24 @@ bool QMYSQLDriver::open(const QString & db,
       qWarning("QMYSQLDriver::open: Unknown connect option '%s'", (*it).latin1());
   }
 
+  return optionFlags;
+}
+
+bool QMYSQLDriver::open(const QString &db,
+                        const QString &user,
+                        const QString &password,
+                        const QString &host,
+                        int port,
+                        const QString &connOpts)
+{
+  if (isOpen())
+    close();
+
+  unsigned int optionFlags = parseOptionFlags(connOpts);
+
   if (!(d->mysql = mysql_init((MYSQL *) 0))) {
-    setLastError(qMakeError(QApplication::tr("No se puede conectar a la base de datos"), QSqlError::Connection, d));
+    setLastError(qMakeError(QApplication::tr("No se puede conectar a la base de datos"),
+                            QSqlError::Connection, d));
     mysql_close(d->mysql);
     setOpenError(true);
     return false;
@@ -905,7 +942,8 @@ bool QMYSQLDriver::open(const QString & db,
   return true;
 }
 
-void QMYSQLDriver::close() {
+void QMYSQLDriver::close()
+{
   if (isOpen()) {
     mysql_close(d->mysql);
 #ifndef FL_QUICK_CLIENT
@@ -919,11 +957,13 @@ void QMYSQLDriver::close() {
   }
 }
 
-QSqlQuery QMYSQLDriver::createQuery() const {
+QSqlQuery QMYSQLDriver::createQuery() const
+{
   return QSqlQuery(new QMYSQLResult(this));
 }
 
-QStringList QMYSQLDriver::tables(const QString & typeName) const {
+QStringList QMYSQLDriver::tables(const QString &typeName) const
+{
   QStringList tl;
   if (!isOpen())
     return tl;
@@ -945,7 +985,8 @@ QStringList QMYSQLDriver::tables(const QString & typeName) const {
   return tl;
 }
 
-QSqlIndex QMYSQLDriver::primaryIndex2(const QString & tablename) const {
+QSqlIndex QMYSQLDriver::primaryIndex2(const QString &tablename) const
+{
   QSqlIndex idx;
   if (!isOpen())
     return idx;
@@ -964,7 +1005,18 @@ QSqlIndex QMYSQLDriver::primaryIndex2(const QString & tablename) const {
   return idx;
 }
 
-QSqlIndex QMYSQLDriver::primaryIndex(const QString & tablename) const {
+QSqlIndex QMYSQLDriver::primaryIndex(const QString &tablename) const
+{
+  FLManager *mng = db_->manager();
+  if (mng->initCount() == cInfo->mngInitCount) {
+    QMap<QString, QSqlIndex>::const_iterator it(cInfo->cacheIdx.find(tablename));
+    if (it != cInfo->cacheIdx.end())
+      return *it;
+  } else {
+    cInfo->mngInitCount = mng->initCount();
+    cInfo->clear();
+  }
+
   QSqlIndex idx(tablename);
   if (!isOpen())
     return idx;
@@ -979,17 +1031,19 @@ QSqlIndex QMYSQLDriver::primaryIndex(const QString & tablename) const {
     return primaryIndex2(tablename);
   }
   docElem = doc.documentElement();
-  FLTableMetaData *mtd = db_->manager()->metadata(&docElem, true);
+  FLTableMetaData *mtd = mng->metadata(&docElem, true);
   if (!mtd)
     return primaryIndex2(tablename);
   idx.append(QSqlField(mtd->primaryKey(), FLFieldMetaData::flDecodeType(mtd->fieldType(mtd->primaryKey()))));
   idx.setName(tablename.lower() + "_pkey");
 
   delete mtd;
+  cInfo->cacheIdx.replace(tablename, idx);
   return idx;
 }
 
-QSqlRecord QMYSQLDriver::record2(const QString & tablename) const {
+QSqlRecord QMYSQLDriver::record2(const QString &tablename) const
+{
   QSqlRecord fil;
   if (!isOpen())
     return fil;
@@ -1006,7 +1060,23 @@ QSqlRecord QMYSQLDriver::record2(const QString & tablename) const {
   return fil;
 }
 
-QSqlRecord QMYSQLDriver::record(const QString & tablename) const {
+QSqlRecord QMYSQLDriver::record(const FLTableMetaData *mtd) const
+{
+  QSqlRecord fil;
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+
+  if (!fl || fl->isEmpty())
+    return record2(mtd->name());
+
+  QStringList fieldsNames = QStringList::split(",", mtd->fieldsNames());
+  for (QStringList::Iterator it = fieldsNames.begin(); it != fieldsNames.end(); ++it)
+    fil.append(QSqlField((*it), FLFieldMetaData::flDecodeType(mtd->fieldType((*it)))));
+
+  return fil;
+}
+
+QSqlRecord QMYSQLDriver::record(const QString &tablename) const
+{
   QSqlRecord fil;
   if (!isOpen())
     return fil;
@@ -1024,7 +1094,7 @@ QSqlRecord QMYSQLDriver::record(const QString & tablename) const {
   if (!mtd)
     return record2(tablename);
 
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return record2(tablename);
@@ -1043,7 +1113,8 @@ QSqlRecord QMYSQLDriver::record(const QString & tablename) const {
   return fil;
 }
 
-QSqlRecord QMYSQLDriver::record(const QSqlQuery & query) const {
+QSqlRecord QMYSQLDriver::record(const QSqlQuery &query) const
+{
   QSqlRecord fil;
   if (!isOpen())
     return fil;
@@ -1065,7 +1136,8 @@ QSqlRecord QMYSQLDriver::record(const QSqlQuery & query) const {
   return fil;
 }
 
-QSqlRecordInfo QMYSQLDriver::recordInfo2(const QString & tablename) const {
+QSqlRecordInfo QMYSQLDriver::recordInfo2(const QString &tablename) const
+{
   QSqlRecordInfo info;
   if (!isOpen())
     return info;
@@ -1087,7 +1159,18 @@ QSqlRecordInfo QMYSQLDriver::recordInfo2(const QString & tablename) const {
   return info;
 }
 
-QSqlRecordInfo QMYSQLDriver::recordInfo(const QString & tablename) const {
+QSqlRecordInfo QMYSQLDriver::recordInfo(const QString &tablename) const
+{
+  FLManager *mng = db_->manager();
+  if (mng->initCount() == cInfo->mngInitCount) {
+    QMap<QString, QSqlRecordInfo>::const_iterator it(cInfo->cache.find(tablename));
+    if (it != cInfo->cache.end())
+      return *it;
+  } else {
+    cInfo->clear();
+    cInfo->mngInitCount = mng->initCount();
+  }
+
   QSqlRecordInfo info;
   if (!isOpen())
     return info;
@@ -1102,10 +1185,10 @@ QSqlRecordInfo QMYSQLDriver::recordInfo(const QString & tablename) const {
     return recordInfo2(tablename);
   }
   docElem = doc.documentElement();
-  FLTableMetaData *mtd = db_->manager()->metadata(&docElem, true);
+  FLTableMetaData *mtd = mng->metadata(&docElem, true);
   if (!mtd)
     return recordInfo2(tablename);
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return recordInfo2(tablename);
@@ -1118,9 +1201,12 @@ QSqlRecordInfo QMYSQLDriver::recordInfo(const QString & tablename) const {
   QStringList fieldsNames = QStringList::split(",", mtd->fieldsNames());
   for (QStringList::Iterator it = fieldsNames.begin(); it != fieldsNames.end(); ++it) {
     FLFieldMetaData *field = mtd->field((*it));
-    info.append(QSqlFieldInfo(field->name(), FLFieldMetaData::flDecodeType(field->type())));
+    info.append(QSqlFieldInfo(field->name(),
+                              FLFieldMetaData::flDecodeType(field->type()),
+                              !field->allowNull(),
+                              field->length(), field->partDecimal(), field->defaultValue()));
 #ifndef FL_QUICK_CLIENT
-    if (field->relationM1() || field->isPrimaryKey())
+    if (field->relationM1() || field->isPrimaryKey() || field->isCompoundKey())
       createIndex(field->name(), tablename);
     else if (field->type() == QVariant::Date)
       createIndex(field->name(), tablename);
@@ -1128,10 +1214,12 @@ QSqlRecordInfo QMYSQLDriver::recordInfo(const QString & tablename) const {
   }
 
   delete mtd;
+  cInfo->cache.replace(tablename, info);
   return info;
 }
 
-QSqlRecordInfo QMYSQLDriver::recordInfo(const QSqlQuery & query) const {
+QSqlRecordInfo QMYSQLDriver::recordInfo(const QSqlQuery &query) const
+{
   QSqlRecordInfo info;
   if (!isOpen())
     return info;
@@ -1142,7 +1230,15 @@ QSqlRecordInfo QMYSQLDriver::recordInfo(const QSqlQuery & query) const {
       for (;;) {
         MYSQL_FIELD *field = mysql_fetch_field(p->result);
         if (field) {
-          info.append(QSqlFieldInfo(toUnicode(d->tc, field->name),
+          QString name(toUnicode(d->tc, field->name));
+          // ###
+          if (!info.find(name).name().isEmpty()) {
+            QString tableName(toUnicode(d->tc, field->table));
+            if (!tableName.isEmpty())
+              name.prepend(tableName + QString::fromLatin1("."));
+          }
+          // ###
+          info.append(QSqlFieldInfo(name,
                                     qDecodeMYSQLType(field),
                                     IS_NOT_NULL(field->flags),
                                     (int) field->length,
@@ -1159,11 +1255,13 @@ QSqlRecordInfo QMYSQLDriver::recordInfo(const QSqlQuery & query) const {
   return info;
 }
 
-MYSQL *QMYSQLDriver::mysql() {
+MYSQL *QMYSQLDriver::mysql()
+{
   return d->mysql;
 }
 
-bool QMYSQLDriver::beginTransaction() {
+bool QMYSQLDriver::beginTransaction()
+{
 #ifndef CLIENT_TRANSACTIONS
   return false;
 #endif
@@ -1182,7 +1280,8 @@ bool QMYSQLDriver::beginTransaction() {
   return true;
 }
 
-bool QMYSQLDriver::commitTransaction() {
+bool QMYSQLDriver::commitTransaction()
+{
 #ifndef CLIENT_TRANSACTIONS
   return false;
 #endif
@@ -1201,7 +1300,8 @@ bool QMYSQLDriver::commitTransaction() {
   return true;
 }
 
-bool QMYSQLDriver::rollbackTransaction() {
+bool QMYSQLDriver::rollbackTransaction()
+{
 #ifndef CLIENT_TRANSACTIONS
   return false;
 #endif
@@ -1220,7 +1320,8 @@ bool QMYSQLDriver::rollbackTransaction() {
   return true;
 }
 
-QString QMYSQLDriver::formatValue(const QSqlField * field, bool trimStrings) const {
+QString QMYSQLDriver::formatValue(const QSqlField *field, bool trimStrings) const
+{
   QString r;
   if (field->isNull()) {
     r = nullText();
@@ -1250,7 +1351,9 @@ QString QMYSQLDriver::formatValue(const QSqlField * field, bool trimStrings) con
   return r;
 }
 
-bool QMYSQLDriver::existsDatabase(const QString & db, const QString & user, const QString & password, const QString & host, int port) {
+bool QMYSQLDriver::existsDatabase(const QString &db, const QString &user, const QString &password,
+                                  const QString &host, int port)
+{
   MYSQL *conn;
   if (!(conn = mysql_init((MYSQL *) 0))) {
     setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable to connect", QString(mysql_error(conn)), QSqlError::Connection, mysql_errno(conn)));
@@ -1260,7 +1363,8 @@ bool QMYSQLDriver::existsDatabase(const QString & db, const QString & user, cons
   }
   uint protocol = MYSQL_PROTOCOL_TCP;
   mysql_options(conn, MYSQL_OPT_PROTOCOL, (const char *) & protocol);
-  if (mysql_real_connect(conn, host, user, password, QString(""), port, NULL, 0)) {
+  if (mysql_real_connect(conn, host, user, password, QString(""), port,
+                         NULL, parseOptionFlags(db_->connectOptions()))) {
     MYSQL_RES *dbs = mysql_list_dbs(conn, NULL);
     MYSQL_ROW row;
     int i = 0, found = false;
@@ -1288,52 +1392,65 @@ bool QMYSQLDriver::existsDatabase(const QString & db, const QString & user, cons
   }
 }
 
-bool QMYSQLDriver::tryConnect(const QString & db, const QString & user, const QString & password, const QString & host, int port) {
+bool QMYSQLDriver::tryConnect(const QString &db, const QString &user, const QString &password,
+                              const QString &host, int port)
+{
   bool newDatabase = !existsDatabase(db, user, password, host, port);
   if (newDatabase) {
     if (isOpenError()) {
-      QMessageBox::critical(0, tr("Conexión fallida"), tr("No se pudo conectar al servidor."), QMessageBox::Ok, 0, 0);
-      QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
-                            QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"), tr("No se pudo conectar al servidor."));
+      msgBoxCritical(tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
+                     QString(lastError().databaseText().utf8()));
       return false;
     }
-    int res = QMessageBox::question(0, tr("Crear base de datos"), tr("La base de datos %1 no existe. ¿Quiere crearla?").arg(db),
-                                    QMessageBox::Yes, QMessageBox::No);
-    if (res == QMessageBox::Yes) {
-      MYSQL *conn;
-      if (!(conn = mysql_init((MYSQL *) 0))) {
-        setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable to connect", QString(mysql_error(conn)), QSqlError::Connection, mysql_errno(conn)));
-        mysql_close(conn);
-        setOpenError(true);
-        return false;
-      }
-      uint protocol = MYSQL_PROTOCOL_TCP;
-      mysql_options(conn, MYSQL_OPT_PROTOCOL, (const char *) & protocol);
-      if (mysql_real_connect(conn, host, user, password, QString(""), port, NULL, 0)) {
-        if (mysql_query(conn, "CREATE DATABASE IF NOT EXISTS " + db + " DEFAULT CHARACTER SET = utf8  COLLATE = utf8_bin")) {
-          setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable create database", QString(mysql_error(conn)), QSqlError::Statement, mysql_errno(conn)));
+    if (db_->interactiveGUI()) {
+      int res = QMessageBox::question(0, tr("Crear base de datos"),
+                                      tr("La base de datos %1 no existe. ¿Quiere crearla?").arg(db),
+                                      QMessageBox::Yes, QMessageBox::No);
+      if (res == QMessageBox::Yes) {
+        MYSQL *conn;
+        if (!(conn = mysql_init((MYSQL *) 0))) {
+          setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable to connect", QString(mysql_error(conn)),
+                                 QSqlError::Connection, mysql_errno(conn)));
           mysql_close(conn);
+          setOpenError(true);
+          return false;
+        }
+        uint protocol = MYSQL_PROTOCOL_TCP;
+        mysql_options(conn, MYSQL_OPT_PROTOCOL, (const char *) & protocol);
+        if (mysql_real_connect(conn, host, user, password, QString(""), port,
+                               NULL, parseOptionFlags(db_->connectOptions()))) {
+          if (mysql_query(conn, "CREATE DATABASE IF NOT EXISTS " + db +
+                          " DEFAULT CHARACTER SET = utf8  COLLATE = utf8_bin")) {
+            setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable create database", QString(mysql_error(conn)),
+                                   QSqlError::Statement, mysql_errno(conn)));
+            mysql_close(conn);
+            QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
+                                  QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
+            return false;
+          }
+          mysql_close(conn);
+          setOpenError(false);
+        } else {
+          setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable to connect", QString(mysql_error(conn)),
+                                 QSqlError::Connection, mysql_errno(conn)));
+          mysql_close(conn);
+          setOpenError(true);
           QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
                                 QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
           return false;
         }
-        mysql_close(conn);
-        setOpenError(false);
-      } else {
-        setLastError(QSqlError(QMYSQL_DRIVER_NAME ": Unable to connect", QString(mysql_error(conn)), QSqlError::Connection, mysql_errno(conn)));
-        mysql_close(conn);
-        setOpenError(true);
-        QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
-                              QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
-        return false;
       }
     }
   }
 
-  if (!open(db, user, password, host, port, "CLIENT_COMPRESS")) {
-    QMessageBox::critical(0, tr("Conexión fallida"), tr("No se pudo conectar con la base de datos %1.").arg(db), QMessageBox::Ok, 0, 0);
-    QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
-                          QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
+  QString connOpts("CLIENT_COMPRESS");
+  if (!db_->connectOptions().isEmpty())
+    connOpts.append(';' + db_->connectOptions());
+  if (!open(db, user, password, host, port, connOpts)) {
+    msgBoxCritical(tr("Conexión fallida"), tr("No se pudo conectar con la base de datos %1.").arg(db));
+    msgBoxCritical(tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
+                   QString(lastError().databaseText().utf8()));
     close();
     setOpenError(true);
     return false;
@@ -1350,15 +1467,16 @@ bool QMYSQLDriver::tryConnect(const QString & db, const QString & user, const QS
     if (q.value(1).toString().upper() != "YES") {
       q.exec("SHOW VARIABLES LIKE 'version'");
       q.next();
-      QMessageBox::warning(0, tr("Conexión fallida"),
-                           tr("La versión MySQL %1 de la base de datos a la que se\nintenta conectar no soporta tablas del tipo InnoDB.").
-                           arg(q.value(1).toString()),
-                           QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"),
+                     tr("La versión MySQL %1 de la base de datos a la que se\nintenta conectar no soporta tablas del tipo InnoDB.").
+                     arg(q.value(1).toString()));
       close();
       setOpenError(true);
       return false;
     }
   }
+
+  d->forceChapuza = tables("").contains("forzarchapuzasqlnoformal");
 
   q.exec("SHOW VARIABLES LIKE 'version'");
   q.next();
@@ -1369,10 +1487,9 @@ bool QMYSQLDriver::tryConnect(const QString & db, const QString & user, const QS
     int vMaj = rx.cap(1).toInt();
     int vMin = rx.cap(2).toInt();
     if (vMaj < 4) {
-      QMessageBox::critical(0, tr("Conexión fallida"),
-                            tr("La versión MySQL %1 no está soportada por este controlador.\n\n"
-                               "La versiones soportada son MySQL mayor o igual a 4.x.").arg(val),
-                            QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"),
+                     tr("La versión MySQL %1 no está soportada por este controlador.\n\n"
+                        "La versiones soportada son MySQL mayor o igual a 4.x.").arg(val));
       close();
       setOpenError(true);
       return false;
@@ -1388,7 +1505,8 @@ bool QMYSQLDriver::tryConnect(const QString & db, const QString & user, const QS
   return true;
 }
 
-QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
+QString QMYSQLDriver::sqlCreateTable(const FLTableMetaData *tmd)
+{
 #ifndef FL_QUICK_CLIENT
   if (!tmd)
     return QString::null;
@@ -1397,7 +1515,7 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
   QString sql = "CREATE TABLE " + tmd->name() + " (";
 
   FLFieldMetaData *field;
-  FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
 
   unsigned int unlocks = 0;
   QDictIterator<FLFieldMetaData> it(*fieldList);
@@ -1408,8 +1526,8 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
   }
   if (unlocks > 1) {
 #ifdef FL_DEBUG
-    qWarning("FLManager : " + QApplication::tr("No se ha podido crear la tabla ") + tmd->name());
-    qWarning("FLManager : " + QApplication::tr("Hay más de un campo tipo unlock. Solo puede haber uno."));
+    qWarning("QMYSQLDriver : " + QApplication::tr("No se ha podido crear la tabla ") + tmd->name());
+    qWarning("QMYSQLDriver : " + QApplication::tr("Hay más de un campo tipo unlock. Solo puede haber uno."));
 #endif
 
     return QString::null;
@@ -1435,7 +1553,9 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
         break;
 
       case QVariant::Double:
-        sql += " DECIMAL(" + QString::number(field->partInteger() + field->partDecimal() + 5) + "," + QString::number(field->partDecimal() + 5) + ")";
+        sql += " DECIMAL(" +
+               QString::number(field->partInteger() + field->partDecimal() + 5) + "," +
+               QString::number(field->partDecimal() + 5) + ")";
 
         break;
 
@@ -1474,7 +1594,7 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
         primaryKey = field->name();
       } else {
 #ifdef FL_DEBUG
-        qWarning(QApplication::tr("FLManager : Tabla -> " + tmd->name() +
+        qWarning(QApplication::tr("FLManager : Tabla-> " + tmd->name() +
                                   ". Se ha intentado poner una segunda clave primaria para el campo %1, pero el campo %2 ya es clave primaria."
                                   "Sólo puede existir una clave primaria en FLTableMetaData, use FLCompoundKey para crear claves compuestas.").
                  arg(field->name(), primaryKey));
@@ -1496,7 +1616,10 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
 
   QString engine(d->noInnoDB ? ") ENGINE=MyISAM" : ") ENGINE=INNODB");
   sql += engine;
-  sql += " DEFAULT CHARACTER SET = utf8  COLLATE = utf8_bin";
+  if (!d->forceChapuza)
+    sql += " DEFAULT CHARACTER SET = utf8  COLLATE = utf8_bin";
+  else
+    sql += " DEFAULT CHARACTER SET = utf8";
 
   qWarning("NOTICE: CREATE TABLE (" + tmd->name() + engine);
 
@@ -1507,7 +1630,8 @@ QString QMYSQLDriver::sqlCreateTable(FLTableMetaData * tmd) {
   return QString::null;
 }
 
-QString QMYSQLDriver::formatValueLike(int t, const QVariant & v, const bool upper) {
+QString QMYSQLDriver::formatValueLike(int t, const QVariant &v, const bool upper)
+{
   QString res("IS NULL");
 
   switch (t) {
@@ -1543,7 +1667,8 @@ QString QMYSQLDriver::formatValueLike(int t, const QVariant & v, const bool uppe
   return res;
 }
 
-QString QMYSQLDriver::formatValue(int t, const QVariant & v, const bool upper) {
+QString QMYSQLDriver::formatValue(int t, const QVariant &v, const bool upper)
+{
   QString res;
 
   switch (FLFieldMetaData::flDecodeType(t)) {
@@ -1588,7 +1713,8 @@ QString QMYSQLDriver::formatValue(int t, const QVariant & v, const bool upper) {
   return res;
 }
 
-QVariant QMYSQLDriver::nextSerialVal(const QString & table, const QString & field) {
+QVariant QMYSQLDriver::nextSerialVal(const QString &table, const QString &field)
+{
 #ifndef CLIENT_TRANSACTIONS
   return QVariant();
 #endif
@@ -1696,8 +1822,10 @@ QVariant QMYSQLDriver::nextSerialVal(const QString & table, const QString & fiel
   return ret;
 }
 
-int QMYSQLDriver::atFrom(FLSqlCursor * cur) {
-#ifndef FL_QUICK_CLIENT
+int QMYSQLDriver::atFrom(FLSqlCursor *cur)
+{
+#if 0
+  //#ifndef FL_QUICK_CLIENT
   if (cur && cur->metadata() && !cur->metadata()->isQuery() && cur->sort().count() > 1) {
     d->activeCreateIndex = true;
     createIndex(cur->sort().toStringList().join(",").replace(" ASC", "").replace(" DESC", ""), cur->metadata()->name());
@@ -1707,11 +1835,28 @@ int QMYSQLDriver::atFrom(FLSqlCursor * cur) {
   return -99;
 }
 
-bool QMYSQLDriver::alterTable(const QString & mtd1, const QString & mtd2, const QString & key) {
+bool QMYSQLDriver::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)
+{
   return alterTable2(mtd1, mtd2, key);
 }
 
-bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const QString & key, bool force) {
+static inline bool hasCheckColumn(FLTableMetaData *mtd)
+{
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = mtd->fieldList();
+  if (!fieldList)
+    return false;
+  FLFieldMetaData *field = 0;
+  QDictIterator<FLFieldMetaData> it(*fieldList);
+  while ((field = it.current()) != 0) {
+    if (field->isCheck() || field->name().endsWith("_check_column"))
+      return true;
+    ++it;
+  }
+  return false;
+}
+
+bool QMYSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QString &key, bool force)
+{
 #ifndef FL_QUICK_CLIENT
   FLTableMetaData *oldMTD = 0;
   FLTableMetaData *newMTD = 0;
@@ -1731,6 +1876,9 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
   if (oldMTD && oldMTD->isQuery())
     return true;
 
+  if (oldMTD && hasCheckColumn(oldMTD))
+    return false;
+
   if (!FLUtil::domDocumentSetContent(doc, mtd2)) {
 #ifdef FL_DEBUG
     qWarning("FLManager::alterTable : " + QApplication::tr("Error al cargar los metadatos."));
@@ -1741,6 +1889,9 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
     docElem = doc.documentElement();
     newMTD = db_->manager()->metadata(&docElem, true);
   }
+
+  if (newMTD && hasCheckColumn(newMTD))
+    return false;
 
   if (!oldMTD)
     oldMTD = newMTD;
@@ -1802,7 +1953,7 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
     return false;
   }
 
-  FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
   FLFieldMetaData *oldField = 0;
 
   if (!fieldList) {
@@ -1814,6 +1965,16 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
     if (newMTD)
       delete newMTD;
     return false;
+  }
+
+  QStringList fieldsNamesOld;
+  if (!force) {
+    QDictIterator<FLFieldMetaData> it(*fieldList);
+    while ((oldField = it.current()) != 0) {
+      ++it;
+      if (newMTD->field(oldField->name()))
+        fieldsNamesOld.append(oldField->name());
+    }
   }
 
   QString renameOld = oldMTD->name().left(6) + "alteredtable" + QDateTime::currentDateTime().toString("ddhhssz");
@@ -1871,7 +2032,7 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
     return false;
   }
 
-  db_->dbAux() ->transaction();
+  db_->dbAux()->transaction();
 
   if (!force && !key.isEmpty() && key.length() == 40) {
     QSqlCursor c("flfiles", true, db_->dbAux());
@@ -1888,123 +2049,145 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
     }
   }
 
-  QSqlCursor oldCursor(renameOld, true, db_->dbAux());
-  oldCursor.setMode(QSqlCursor::ReadOnly);
-  oldCursor.setForwardOnly(true);
-  oldCursor.select();
-  int totalSteps = oldCursor.size();
-  QProgressDialog progress(QApplication::tr("Reestructurando registros para %1...").arg(newMTD->alias()), 0, totalSteps, qApp->focusWidget(), 0, true);
-  progress.setCaption(QApplication::tr("Tabla modificada"));
-
-  int step = 0;
-  QSqlRecord *newBuffer;
-  FLFieldMetaData *newField = 0;
-  QPtrList<QSqlRecord> listRecords;
-  listRecords.setAutoDelete(true);
-  QSqlRecord newBufferInfo(recordInfo2(newMTD->name()).toRecord());
-  QPtrVector<FLFieldMetaData> vectorFields(fieldList->count() * 2);
-  QMap<int, QVariant> defValues;
-  QVariant v;
-
-  QDictIterator<FLFieldMetaData> it2(*fieldList);
-  while ((newField = it2.current()) != 0) {
-    ++it2;
-    oldField = oldMTD->field(newField->name());
-    if (!oldField || !oldCursor.field(oldField->name())) {
-      if (!oldField)
-        oldField = newField;
-      if (newField->type() != FLFieldMetaData::Serial) {
-        v = newField->defaultValue();
-        v.cast(FLFieldMetaData::flDecodeType(newField->type()));
-        defValues.insert(step, v);
-      }
+  bool ok = false;
+  if (!force && !fieldsNamesOld.isEmpty()) {
+    QString sel(fieldsNamesOld.join(","));
+    QString inSql("INSERT INTO " + newMTD->name() + "(" + sel + ")" +
+                  " SELECT " + sel + " FROM " + renameOld);
+    qWarning(inSql);
+    ok = q.exec(inSql);
+    if (!ok) {
+      db_->dbAux()->rollback();
+      if ((oldMTD != newMTD) && oldMTD)
+        delete oldMTD;
+      if (newMTD)
+        delete newMTD;
+      return alterTable2(mtd1, mtd2, key, true);
     }
-    vectorFields.insert(step++, newField);
-    vectorFields.insert(step++, oldField);
   }
 
-  step = 0;
-  bool ok = true;
-  while (oldCursor.next()) {
-    newBuffer = new QSqlRecord(newBufferInfo);
+  if (!ok) {
+    QSqlCursor oldCursor(renameOld, true, db_->dbAux());
+    oldCursor.setMode(QSqlCursor::ReadOnly);
+    oldCursor.setForwardOnly(true);
+    oldCursor.select();
+    int totalSteps = oldCursor.size();
+    QProgressDialog progress(QApplication::tr("Reestructurando registros para %1...").arg(newMTD->alias()), 0,
+                             totalSteps, qApp->focusWidget(), 0, true);
+    progress.setCaption(QApplication::tr("Tabla modificada"));
 
-    for (uint i = 0; i < vectorFields.size();) {
-      if (defValues.contains(i)) {
-        v = defValues[i];
-        newField = vectorFields[i++];
-        oldField = vectorFields[i++];
-      } else {
-        newField = vectorFields[i++];
-        oldField = vectorFields[i++];
-        v = oldCursor.value(newField->name());
-        if ((!oldField->allowNull() || !newField->allowNull()) &&
-            (v.isNull() || !v.isValid()) && newField->type() != FLFieldMetaData::Serial) {
-          QVariant defVal(newField->defaultValue());
-          if (!defVal.isNull() && defVal.isValid())
-            v = defVal;
-        }
-        if (v.isValid() && !v.isNull() && !v.cast(newBuffer->value(newField->name()).type())) {
-#ifdef FL_DEBUG
-          qWarning("FLManager::alterTable : " +
-                   QApplication::tr("Los tipos del campo %1 no son compatibles. Se introducirá un valor nulo.")
-                   .arg(newField->name()));
-#endif
-        }
-      }
+    int step = 0;
+    QSqlRecord *newBuffer;
+    FLFieldMetaData *newField = 0;
+    QPtrList<QSqlRecord> listRecords;
+    listRecords.setAutoDelete(true);
+    QSqlRecord newBufferInfo(recordInfo2(newMTD->name()).toRecord());
+    QPtrVector<FLFieldMetaData> vectorFields(fieldList->count() * 2);
+    QMap<int, QVariant> defValues;
+    QVariant v;
 
-      if (!v.isNull() && newField->type() == QVariant::String && newField->length() > 0)
-        v = v.toString().left(newField->length());
-
-      if ((!oldField->allowNull() || !newField->allowNull()) && (v.isNull() || !v.isValid())) {
-        switch (oldField->type()) {
-          case FLFieldMetaData::Serial:
-            v = nextSerialVal(newMTD->name(), newField->name()).toUInt();
-            break;
-          case QVariant::Int:
-          case QVariant::UInt:
-          case QVariant::Bool:
-          case FLFieldMetaData::Unlock:
-            v =  int(0);
-            break;
-          case QVariant::Double:
-            v = double(0.0);
-            break;
-          case QVariant::Time:
-            v = QTime::currentTime();
-            break;
-          case QVariant::Date:
-            v = QDate::currentDate();
-            break;
-          default:
-            v = QString("NULL").left(newField->length());
-            break;
+    QDictIterator<FLFieldMetaData> it2(*fieldList);
+    while ((newField = it2.current()) != 0) {
+      ++it2;
+      oldField = oldMTD->field(newField->name());
+      if (!oldField || !oldCursor.field(oldField->name())) {
+        if (!oldField)
+          oldField = newField;
+        if (newField->type() != FLFieldMetaData::Serial) {
+          v = newField->defaultValue();
+          v.cast(FLFieldMetaData::flDecodeType(newField->type()));
+          defValues.insert(step, v);
         }
       }
-      newBuffer->setValue(newField->name(), v);
+      vectorFields.insert(step++, newField);
+      vectorFields.insert(step++, oldField);
     }
 
-    listRecords.append(newBuffer);
-    if (listRecords.count() >= LIMIT_RESULT) {
-      step += LIMIT_RESULT;
-      progress.setProgress(step);
+    step = 0;
+    ok = true;
+    while (oldCursor.next()) {
+      newBuffer = new QSqlRecord(newBufferInfo);
 
-      if (!insertMulti(newMTD->name(), &listRecords)) {
-        ok = false;
-        listRecords.clear();
-        break;
+      for (uint i = 0; i < vectorFields.size();) {
+        if (defValues.contains(i)) {
+          v = defValues[i];
+          newField = vectorFields[i++];
+          oldField = vectorFields[i++];
+        } else {
+          newField = vectorFields[i++];
+          oldField = vectorFields[i++];
+          v = oldCursor.value(newField->name());
+          if ((!oldField->allowNull() || !newField->allowNull()) &&
+              (v.isNull() || !v.isValid()) && newField->type() != FLFieldMetaData::Serial) {
+            QVariant defVal(newField->defaultValue());
+            if (!defVal.isNull() && defVal.isValid())
+              v = defVal;
+          }
+          if (v.isValid() && !v.isNull() && !v.cast(newBuffer->value(newField->name()).type())) {
+#ifdef FL_DEBUG
+            qWarning("FLManager::alterTable : " +
+                     QApplication::tr("Los tipos del campo %1 no son compatibles. Se introducirá un valor nulo.")
+                     .arg(newField->name()));
+#endif
+          }
+        }
+
+        if (!v.isNull() && newField->type() == QVariant::String && newField->length() > 0)
+          v = v.toString().left(newField->length());
+
+        if ((!oldField->allowNull() || !newField->allowNull()) && (v.isNull() || !v.isValid())) {
+          switch (oldField->type()) {
+            case FLFieldMetaData::Serial:
+              v = nextSerialVal(newMTD->name(), newField->name()).toUInt();
+              break;
+            case QVariant::Int:
+            case QVariant::UInt:
+            case QVariant::Bool:
+            case FLFieldMetaData::Unlock:
+              v =  int(0);
+              break;
+            case QVariant::Double:
+              v = double(0.0);
+              break;
+            case QVariant::Time:
+              v = QTime::currentTime();
+              break;
+            case QVariant::Date:
+              v = QDate::currentDate();
+              break;
+            default:
+              v = QString("NULL").left(newField->length());
+              break;
+          }
+        }
+        newBuffer->setValue(newField->name(), v);
       }
+
+      listRecords.append(newBuffer);
+      if (listRecords.count() >= LIMIT_RESULT) {
+        step += LIMIT_RESULT;
+        progress.setProgress(step);
+
+        if (!insertMulti(newMTD->name(), &listRecords)) {
+          ok = false;
+          listRecords.clear();
+          break;
+        }
+        listRecords.clear();
+      }
+    }
+
+    if (listRecords.count() > 0) {
+      if (!insertMulti(newMTD->name(), &listRecords))
+        ok = false;
       listRecords.clear();
     }
-  }
 
-  if (listRecords.count() > 0) {
-    if (!insertMulti(newMTD->name(), &listRecords))
-      ok = false;
-    listRecords.clear();
+    progress.setProgress(totalSteps);
   }
 
   if (ok) {
-    db_->dbAux() ->commit();
+    db_->dbAux()->commit();
 #if 0
     //#ifndef FL_QUICK_CLIENT
     if (dictIndexes) {
@@ -2023,15 +2206,11 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
 
     if (force)
       q.exec("DROP TABLE " + renameOld + " CASCADE");
-
-    progress.setProgress(totalSteps);
   } else {
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
 
     q.exec("DROP TABLE " + oldMTD->name() + " CASCADE");
     q.exec("ALTER TABLE " + renameOld + " RENAME TO " + oldMTD->name());
-
-    progress.setProgress(totalSteps);
 
     if ((oldMTD != newMTD) && oldMTD)
       delete oldMTD;
@@ -2045,12 +2224,14 @@ bool QMYSQLDriver::alterTable2(const QString & mtd1, const QString & mtd2, const
   if (newMTD)
     delete newMTD;
 
+  return true;
 #else
   return true;
 #endif //FL_QUICK_CLIENT
 }
 
-int QMYSQLDriver::insertMulti(const QString & tablename, QPtrList<QSqlRecord> * records) {
+int QMYSQLDriver::insertMulti(const QString &tablename, QPtrList<QSqlRecord> * records)
+{
   QSqlRecord *editBuffer = records->at(0);
   int k = editBuffer->count();
   if (k == 0)
@@ -2102,9 +2283,9 @@ int QMYSQLDriver::insertMulti(const QString & tablename, QPtrList<QSqlRecord> * 
 
   QSqlQuery qry(QString::null, db_->dbAux());
   if (!qry.exec(str) || qry.lastError().type() != QSqlError::None) {
-    QMessageBox::critical(0, "Error",
-                          QString(qry.lastError().driverText().utf8()) + "\n" +
-                          QString(qry.lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
+    msgBoxCritical(tr("Error"),
+                   QString(qry.lastError().driverText().utf8()) + "\n" +
+                   QString(qry.lastError().databaseText().utf8()));
     return 0;
   }
 
@@ -2112,14 +2293,15 @@ int QMYSQLDriver::insertMulti(const QString & tablename, QPtrList<QSqlRecord> * 
 }
 
 #ifndef FL_QUICK_CLIENT
-void QMYSQLDriver::createIndex(const QString & fieldName, const QString & tableName) const {
+void QMYSQLDriver::createIndex(const QString &fieldName, const QString &tableName) const
+{
   if (!d->activeCreateIndex || !isOpen() || fieldName.isEmpty() || tableName.isEmpty())
     return;
 
   if (tableName.contains("alteredtable"))
     return;
 
-  QStringList listTables = tables("");
+  QStringList listTables(tables(""));
 
   if (!listTables.contains(tableName))
     return;
@@ -2155,11 +2337,13 @@ void QMYSQLDriver::createIndex(const QString & fieldName, const QString & tableN
 }
 #endif
 
-bool QMYSQLDriver::canSavePoint() {
+bool QMYSQLDriver::canSavePoint()
+{
   return !d->noInnoDB;
 }
 
-bool QMYSQLDriver::savePoint(const QString & n) {
+bool QMYSQLDriver::savePoint(const QString &n)
+{
   if (!isOpen()) {
 #ifdef QT_CHECK_RANGE
     qWarning("QMYSQLDriver::savePoint: Database not open");
@@ -2177,11 +2361,13 @@ bool QMYSQLDriver::savePoint(const QString & n) {
   return true;
 }
 
-bool QMYSQLDriver::releaseSavePoint(const QString & n) {
+bool QMYSQLDriver::releaseSavePoint(const QString &n)
+{
   return true;
 }
 
-bool QMYSQLDriver::rollbackSavePoint(const QString & n) {
+bool QMYSQLDriver::rollbackSavePoint(const QString &n)
+{
   if (!isOpen()) {
 #ifdef QT_CHECK_RANGE
     qWarning("QMYSQLDriver::rollbackSavePoint: Database not open");
@@ -2199,7 +2385,63 @@ bool QMYSQLDriver::rollbackSavePoint(const QString & n) {
   return true;
 }
 
-void QMYSQLDriver::Mr_Proper() {
+static inline bool notEqualsFields(QSqlField *fieldBd,
+                                   QSqlField *fieldMtd,
+                                   const QSqlFieldInfo &fieldInfoBd,
+                                   const QSqlFieldInfo &fieldInfoMtd)
+{
+  if (!fieldBd)
+    return true;
+  if (!fieldMtd)
+    return false;
+
+  if (!fieldBd->value().canCast(FLFieldMetaData::flDecodeType(fieldMtd->type()))) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= type " +
+             QString::number(FLFieldMetaData::flDecodeType(fieldMtd->type())) + " " +
+             QString::number(fieldBd->type()));
+#endif
+    return true;
+  }
+
+  if (fieldBd->isNull() != fieldMtd->isNull()) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= null " + QString::number(fieldMtd->isNull()) + " " +
+             QString::number(fieldBd->isNull()));
+#endif
+    return true;
+  }
+
+  if (fieldBd->isReadOnly() != fieldMtd->isReadOnly()) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= readOnly " + QString::number(fieldMtd->isReadOnly()) + " " +
+             QString::number(fieldBd->isReadOnly()));
+#endif
+    return true;
+  }
+
+  if (fieldInfoBd.typeID() == FIELD_TYPE_STRING) {
+    int lenBd = fieldInfoBd.length();
+    int lenMtd = fieldInfoMtd.length();
+    if (lenBd > 0 && lenMtd > 0  &&
+        lenBd != lenMtd && (lenBd / 3) != lenMtd) {
+#ifdef FL_DEBUG
+      qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+      qWarning("!= length " + QString::number(lenMtd) + " " +
+               QString::number(lenBd));
+#endif
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void QMYSQLDriver::Mr_Proper()
+{
 #if 0
   QString mproperMsg(tr("Este proceso puede tener una larga duración, dependiendo\n"
                         "del tamaño de la base de datos.\n"
@@ -2230,7 +2472,7 @@ void QMYSQLDriver::Mr_Proper() {
   FLUtil::createProgressDialog(tr("Borrando backups"), listOldBks.size() + qry.size() + 2);
   while (qry.next()) {
     item = qry.value(0).toString();
-    FLUtil::setLabelText(tr("Borrando regisro %1").arg(item));
+    FLUtil::setLabelText(tr("Borrando registro %1").arg(item));
     qry2.exec("delete from flfiles where nombre = '" + item + "'");
 #ifdef FL_DEBUG
     qWarning("delete from flfiles where nombre = '" + item + "'");
@@ -2282,63 +2524,21 @@ void QMYSQLDriver::Mr_Proper() {
     item = qry.value(0).toString();
     FLUtil::setLabelText(tr("Comprobando tabla %1").arg(item));
 
-    qry2.exec("alter table " + item + " convert to character set utf8 collate utf8_bin");
+    if (!d->forceChapuza)
+      qry2.exec("alter table " + item + " convert to character set utf8 collate utf8_bin");
 
-    //       qry2.exec( "check table " + item + " changed medium" );
-    // #ifdef FL_DEBUG
-    //       qWarning( "check table " + item + " changed medium" );
-    // #endif
-
-    QSqlRecord recMtd = record(item);
-    QSqlRecord recBd = record2(item);
-    QSqlField *fieldMtd = 0;
-    QSqlField *fieldBd = 0;
-    bool mustAlter = false;
-    for (int i = 0; i < recMtd.count(); ++i) {
-      fieldMtd = recMtd.field(i);
-      fieldBd = recBd.field(fieldMtd->name());
-      if (fieldBd) {
-        if (!fieldBd->value().canCast(FLFieldMetaData::flDecodeType(fieldMtd->type())) ||
-            fieldBd->isNull() != fieldMtd->isNull() || fieldBd->isReadOnly() != fieldMtd->isReadOnly()) {
-#ifdef FL_DEBUG
-          qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
-          qWarning("!= type " + QString::number(FLFieldMetaData::flDecodeType(fieldMtd->type())) +
-                   " " + QString::number(fieldBd->type()));
-          qWarning("!= null " + QString::number(fieldMtd->isNull()) + " " + QString::number(fieldBd->isNull()));
-          qWarning("!= readOnly " + QString::number(fieldMtd->isReadOnly()) + " " + QString::number(fieldBd->isReadOnly()));
-#endif
-          mustAlter = true;
-          break;
-        }
-      } else {
-#ifdef FL_DEBUG
-        qWarning("No fieldBd " +  fieldMtd->name());
-#endif
-        mustAlter = true;
-        break;
-      }
-    }
-
-#if 0
-    for (int i = 0; i < recBd.count(); ++i) {
-      fieldBd = recBd.field(i);
-      fieldMtd = recMtd.field(fieldBd->name());
-      if (!fieldMtd) {
-#ifdef FL_DEBUG
-        qWarning("No fieldMtd " +  fieldBd->name());
-#endif
-        mustAlter = true;
-        break;
-      }
-    }
-#endif
-
+    bool mustAlter = mismatchedTable(item, item);
     if (mustAlter) {
-#ifdef FL_DEBUG
-      qWarning("mustAlter " + item);
-#endif
-      QString conte = db_->managerModules()->content(item + ".mtd");
-      alterTable2(conte, conte, QString::null, true);
+      QString conte(db_->managerModules()->content(item + ".mtd"));
+      if (!conte.isEmpty()) {
+        QString msg(QApplication::tr(
+                      "La estructura de los metadatos de la tabla '%1' y su "
+                      "estructura interna en la base de datos no coinciden. "
+                      "Intentando regenerarla."
+                    ));
+        qWarning(msg.arg(item));
+        alterTable2(conte, conte, QString::null, true);
+      }
     }
 
     FLUtil::setProgress(++steps);
@@ -2358,7 +2558,8 @@ void QMYSQLDriver::Mr_Proper() {
   QSqlQuery sqlQuery(QString::null, db_->dbAux());
   sqlQuery.setForwardOnly(true);
 
-  if (sqlQuery.exec("SELECT tabla FROM flmetadata")) {
+  if (sqlQuery.exec("show tables")) {
+    cInfo->clear();
     FLUtil::setTotalSteps(qry.size());
     while (sqlQuery.next()) {
       item = sqlQuery.value(0).toString();
@@ -2366,7 +2567,7 @@ void QMYSQLDriver::Mr_Proper() {
       FLUtil::setLabelText(tr("Creando índices para %1").arg(item));
 
       FLTableMetaData *mtd = db_->manager()->metadata(item);
-      FLTableMetaData::FLFieldMetaDataList *fl;
+      const FLTableMetaData::FLFieldMetaDataList *fl;
       if (!mtd || !(fl = mtd->fieldList()))
         continue;
       QDictIterator<FLFieldMetaData> it(*fl);
@@ -2377,7 +2578,7 @@ void QMYSQLDriver::Mr_Proper() {
         QSqlCursor cur(item, true, db_->dbAux());
         cur.setForwardOnly(true);
         QSqlRecord *buf;
-        cur.select();
+        cur.select((*it)->name() + QString::fromLatin1(" not like 'RK@%'"));
         while (cur.next()) {
           v = cur.value((*it)->name()).toString();
           if (v.isEmpty())
@@ -2418,6 +2619,47 @@ void QMYSQLDriver::Mr_Proper() {
   FLUtil::destroyProgressDialog();
 }
 
-QMYSQLDriver::MySQLVersion QMYSQLDriver::version() const {
+QMYSQLDriver::MySQLVersion QMYSQLDriver::version() const
+{
   return version_;
+}
+
+bool QMYSQLDriver::mismatchedTable(const QString &table,
+                                   const FLTableMetaData *tmd) const
+{
+  return mismatchedTable(table, tmd->name());
+}
+
+bool QMYSQLDriver::mismatchedTable(const QString &table1,
+                                   const QString &table2) const
+{
+  FLTableMetaData *mtd = db_->manager()->metadata(table2, true);
+  if (!mtd)
+    return false;
+
+  QSqlRecordInfo recInfoMtd = recordInfo(table2);
+  QSqlRecordInfo recInfoBd = recordInfo2(table1);
+  QSqlRecord recMtd = recInfoMtd.toRecord();
+  QSqlRecord recBd = recInfoBd.toRecord();
+  QSqlField *fieldMtd = 0;
+  QSqlField *fieldBd = 0;
+  bool mismatch = false;
+
+  for (int i = 0; i < recMtd.count(); ++i) {
+    fieldMtd = recMtd.field(i);
+    fieldBd = recBd.field(fieldMtd->name());
+    if (fieldBd) {
+      if (notEqualsFields(fieldBd, fieldMtd,
+                          recInfoBd.find(fieldMtd->name()),
+                          recInfoMtd.find(fieldMtd->name()))) {
+        mismatch = true;
+        break;
+      }
+    } else {
+      mismatch = true;
+      break;
+    }
+  }
+
+  return mismatch;
 }

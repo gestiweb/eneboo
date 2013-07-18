@@ -500,5 +500,9 @@
         <slot>setEnabled(bool)</slot>
     </connection>
 </connections>
+<includes>
+    <include location="global" impldecl="in declaration">AQGlobal.h</include>
+</includes>
+<exportmacro>AQ_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

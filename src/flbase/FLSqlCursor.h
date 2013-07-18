@@ -32,6 +32,11 @@ email                : mail@infosial.com
 #include <qdict.h>
 #include <qvaluestack.h>
 #include <qlabel.h>
+#include <qguardedptr.h>
+
+#include "AQGlobal.h"
+
+//#define AQ_MD5_CHECK
 
 class FLTableMetaData;
 class FLRelationMetaData;
@@ -40,6 +45,105 @@ class FLSqlSavePoint;
 class FLSqlDatabase;
 class FLSqlCursor;
 class FLAccessControl;
+
+struct AQBoolFlagState {
+  AQBoolFlagState() :
+    modifier_(0), prevValue_(false), prev_(0), next_(0) {
+#ifdef FL_DEBUG
+    ++count_;
+#endif
+  }
+#ifdef FL_DEBUG
+  ~AQBoolFlagState() {
+#ifdef FL_DEBUG
+    --count_;
+#endif
+  }
+  void dumpDebug() const {
+    qWarning("%p <- (%p : [%p, %d]) -> %p", prev_, this, modifier_, prevValue_, next_);
+  }
+  static long count_;
+#endif
+  void *modifier_;
+  bool prevValue_;
+  AQBoolFlagState *prev_;
+  AQBoolFlagState *next_;
+};
+
+struct AQBoolFlagStateList {
+  AQBoolFlagStateList() :
+    cur_(0) {}
+  ~AQBoolFlagStateList() {
+    clear();
+  }
+#ifdef FL_DEBUG
+  void dumpDebug() const {
+    AQBoolFlagState *it = cur_;
+    qWarning("current %p", it);
+    while (it) {
+      it->dumpDebug();
+      it = it->prev_;
+    }
+    qWarning("AQBoolFlagState count %d", AQBoolFlagState::count_);
+  }
+#endif
+  void clear() {
+    while (cur_) {
+      AQBoolFlagState *pv = cur_->prev_;
+      delete cur_;
+      cur_ = pv;
+    }
+  }
+  bool isEmpty() const {
+    return (cur_ == 0);
+  }
+  AQBoolFlagState *find(void *m) const {
+    AQBoolFlagState *it = cur_;
+    while (it && it->modifier_ != m)
+      it = it->prev_;
+    return it;
+  }
+  void append(AQBoolFlagState *i) {
+    if (!cur_) {
+      cur_ = i;
+      cur_->next_ = 0;
+      cur_->prev_ = 0;
+      return;
+    }
+    cur_->next_ = i;
+    i->prev_ = cur_;
+    cur_ = i;
+    cur_->next_ = 0;
+  }
+  void erase(AQBoolFlagState *i, bool del = true) {
+    if (!cur_)
+      return;
+    if (cur_ == i) {
+      if (cur_->prev_) {
+        cur_ = cur_->prev_;
+        cur_->next_ = 0;
+      } else
+        cur_ = 0;
+    } else {
+      if (i->next_)
+        i->next_->prev_ = i->prev_;
+      if (i->prev_)
+        i->prev_->next_ = i->next_;
+    }
+    if (!del) {
+      i->next_ = 0;
+      i->prev_ = 0;
+    } else
+      delete i;
+  }
+  void pushOnTop(AQBoolFlagState *i) {
+    if (cur_ == i)
+      return;
+    erase(i, false);
+    append(i);
+  }
+  AQBoolFlagState *cur_;
+};
 
 class FLSqlCursorPrivate
 {
@@ -66,7 +170,7 @@ public:
   /**
   Metadatos de la tabla asociada al cursor.
   */
-  FLTableMetaData *metadata_;
+  QGuardedPtr<FLTableMetaData> metadata_;
 
   /**
   Mantiene el modo de acceso actual del cursor, ver FLSqlCursor::Mode.
@@ -81,21 +185,23 @@ public:
   /**
   Relación que determina como se relaciona con el cursor relacionado.
   */
-  FLRelationMetaData *relation;
+  FLRelationMetaData *relation_;
 
   /**
   Esta bandera cuando es TRUE indica que se abra el formulario de edición de regitros en
   modo edición, y cuando es FALSE se consulta la bandera FLSqlCursor::browse. Por defecto esta
   bandera está a TRUE
   */
-  bool edition;
+  bool edition_;
+  AQBoolFlagStateList *editionStates_;
 
   /**
   Esta bandera cuando es TRUE y la bandera FLSqlCuror::edition es FALSE, indica que se
   abra el formulario de edición de registro en modo visualización, y cuando es FALSE no hace
   nada. Por defecto esta bandera está a TRUE
   */
-  bool browse;
+  bool browse_;
+  AQBoolFlagStateList *browseStates_;
 
   /**
   Filtro principal para el cursor.
@@ -109,7 +215,7 @@ public:
   Accion asociada al cursor, esta accion pasa a ser propiedad de FLSqlCursor, que será el
   encargado de destruirla
   */
-  const FLAction *action_;
+  FLAction *action_;
 
   /**
   Cuando esta propiedad es TRUE siempre se pregunta al usuario si quiere cancelar
@@ -139,7 +245,7 @@ public:
   /**
   Crónometro interno
   */
-  QTimer *timer;
+  QTimer *timer_;
 
   /**
   Cuando el cursor proviene de una consulta indica si ya se han agregado al mismo
@@ -163,16 +269,9 @@ public:
   FLSqlDatabase *db_;
 
   /**
-  Mapa de últimas posiciones de registros utilizando el valor de la clave primaria. Sus valores se actualizan
-  cada vez que se consulta la posición de un registro con FLSqlCursor::atFrom(). El mapa se reinicializa cada vez
-  que se actualiza el cursor.
-  */
-  QMap < QString, int > mapPosByPK;
-
-  /**
   Pila de los niveles de transacción que han sido iniciados por este cursor
   */
-  QValueStack < int > transactionsOpened;
+  QValueStack<int> transactionsOpened_;
 
   /**
   Filtro persistente para incluir en el cursor los registros recientemente insertados aunque estos no
@@ -186,6 +285,11 @@ public:
   Cursor propietario
   */
   FLSqlCursor *cursor_;
+
+  /**
+  Nombre del cursor
+  */
+  QString curName_;
 
   /**
   Auxiliares para la comprobacion de riesgos de bloqueos
@@ -213,8 +317,20 @@ public:
   QStringList fieldsNamesUnlock_;
   int idAc_, idAcos_, idCond_;
   QString id_;
+
+  /** Uso interno */
   bool isQuery_;
   bool isSysTable_;
+  QMap<QString, QVariant> mapCalcFields_;
+  bool rawValues_;
+
+  void msgBoxWarning(const QString &text,
+                     bool throwException = true, bool gui = true);
+
+#ifdef AQ_MD5_CHECK
+  bool needUpdate();
+  QString md5Tuples_;
+#endif
 };
 
 /**
@@ -246,7 +362,7 @@ a cabo cuando se envía el contenido del buffer de nuevo al cursor, con FLSqlCurs
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlCursor: public QObject, public QSqlCursor
+class AQ_EXPORT FLSqlCursor: public QObject, public QSqlCursor
 {
 
   Q_OBJECT
@@ -336,7 +452,7 @@ public:
 
   @return  Objeto FLAction
   */
-  const FLAction *action() const {
+  FLAction *action() const {
     return d->action_;
   }
 
@@ -345,7 +461,7 @@ public:
 
   @param a Objeto FLAction
   */
-  void setAction(const FLAction *a) {
+  void setAction(FLAction *a) {
     d->action_ = a;
   }
 
@@ -353,8 +469,9 @@ public:
   Establece el filtro principal del cursor.
 
   @param f Cadena con el filtro, corresponde con una clausura WHERE
+  @param doRefresh Si TRUE tambien refresca el cursor
   */
-  void setMainFilter(const QString &f);
+  void setMainFilter(const QString &f, bool doRefresh = true);
 
   /**
   Establece el modo de acceso para el cursor.
@@ -365,6 +482,13 @@ public:
   void setModeAccess(const int m) {
     d->modeAccess_ = m;
   }
+
+  /**
+  Devuelve el nombre de la conexión que el cursor usa
+
+  @return Nombre de la conexión
+  */
+  QString connectionName() const;
 
   /**
   Establece el valor de un campo del buffer de forma atómica y fuera de transacción.
@@ -407,13 +531,16 @@ public:
 
   @param b TRUE o FALSE
   */
-  void setEdition(bool b);
+  void setEdition(bool b, void *m = 0);
+  void restoreEditionFlag(void *m);
+
   /**
   Establece el valor de FLSqlCursor::browse.
 
   @param b TRUE o FALSE
   */
-  void setBrowse(bool b);
+  void setBrowse(bool b, void *m = 0);
+  void restoreBrowseFlag(void *m);
 
   /**
   Establece el contexto de ejecución de scripts
@@ -452,7 +579,7 @@ public:
 
   @return TRUE si hay una transaccion en curso, FALSE en caso contrario
   */
-  static bool inTransaction();
+  bool inTransaction();
 
   /**
   Inicia un nuevo nivel de transacción.
@@ -524,6 +651,9 @@ public:
   void setActivatedCheckIntegrity(bool a) {
     d->activatedCheckIntegrity_ = a;
   }
+  bool activatedCheckIntegrity() const {
+    return d->activatedCheckIntegrity_;
+  }
 
   /**
   Activa o desactiva las acciones a realizar antes y después de un commit
@@ -532,6 +662,9 @@ public:
   */
   void setActivatedCommitActions(bool a) {
     d->activatedCommitActions_ = a;
+  }
+  bool activatedCommitActions() const {
+    return d->activatedCommitActions_;
   }
 
   /**
@@ -563,7 +696,7 @@ public:
     return d->cursorRelation_;
   }
   FLRelationMetaData *relation() const {
-    return d->relation;
+    return d->relation_;
   }
 
   /**
@@ -683,6 +816,23 @@ public:
   FLSqlDatabase *db() const {
     return d->db_;
   }
+
+  /**
+  Para obtener el nombre del cursor (generalmente el nombre de la tabla)
+  */
+  QString curName() const {
+    return d->curName_;
+  }
+
+  /**
+  Para obtener el filtro por defecto en campos asociados
+
+  @param  fieldName Nombre del campo que tiene campos asociados.
+                    Debe ser el nombre de un campo de este cursor.
+  @param  tableMD   Metadatos a utilizar como tabla foránea.
+                    Si es cero usa la tabla foránea definida por la relación M1 de 'fieldName'
+  */
+  QString filterAssoc(const QString &fieldName, FLTableMetaData *tableMD = 0);
 
 protected:
 
@@ -895,7 +1045,7 @@ public slots:
   /**
   @return El nivel actual de anidamiento de transacciones, 0 no hay transaccion
   */
-  static int transactionLevel();
+  int transactionLevel();
 
   /**
   @return La lista con los niveles de las transacciones que ha iniciado este cursor y continuan abiertas
@@ -985,7 +1135,15 @@ public slots:
   */
   QStringList concurrencyFields();
 
+  /**
+  Cambia el cursor a otra conexión de base de datos
+  */
+  void changeConnection(const QString &connName);
+
 private:
+
+  friend class FLDataTable;
+  friend class FLSqlDatabase;
 
   /**
   Privado
@@ -993,24 +1151,10 @@ private:
   FLSqlCursorPrivate *d;
 
   /**
-  Indica el nivel de anidamiento de transacciones, 0 no hay transaccion
+  Código de inicialización común para los constructores
   */
-  static int transaction_;
-
-  /**
-  Pila de puntos de salvaguarda
-  */
-  static QPtrStack < FLSqlSavePoint > * stackSavePoints;
-
-  /**
-  Cola de puntos de salvaguarda
-  */
-  static QPtrQueue < FLSqlSavePoint > * queueSavePoints;
-
-  /**
-  Punto actual de salvaguarda
-  */
-  static FLSqlSavePoint *currentSavePoint;
+  void init(const QString &name, bool autopopulate,
+            FLSqlCursor *cR, FLRelationMetaData *r);
 
   /**
   Si el cursor viene de una consulta, realiza el proceso de agregar la defición
@@ -1026,9 +1170,11 @@ private:
   void setNotGenerateds();
 
   /**
-  Inicializa el mapa de posiciones de registros, ver FLSqlCursor::mapPosByPK.
+  Uso interno
   */
-  void clearMapPosByPK();
+  void setExtraFieldAttributes();
+  void clearMapCalcFields();
+  QVariant valueBufferRaw(const QString &fN);
 
 signals:
 
@@ -1064,9 +1210,20 @@ signals:
   void autoCommit();
 
   /**
-  Indica que se ha realizado un commit
+  Indica que se ha realizado un commitBuffer
   */
   void bufferCommited();
+
+  /**
+  Indica que se ha cambiado la conexión de base de datos del cursor. Ver changeConnection
+  */
+  void connectionChanged();
+
+  /**
+  Indica que se ha realizado un commit
+  */
+  void commited();
+
 
 private slots:
 

@@ -61,6 +61,7 @@ public:
   QSAEditor *editor;
   QSAEditorInterface *eIface;
   QWidget *editorWidget;
+  QDateTime lastModificationTime;
 
   uint isUpdater : 1;
   uint modified : 1;
@@ -580,7 +581,8 @@ bool QSEditor::setScript(QSScript *script)
 
 void QSEditor::scriptDestroyed()
 {
-  delete this;
+  if (this)
+    delete this;
 }
 
 void QSEditor::scriptChanged()
@@ -593,8 +595,18 @@ void QSEditor::scriptChanged()
 void QSEditor::modifyEditor()
 {
   d->modified = TRUE;
+  d->lastModificationTime = QDateTime::currentDateTime();
 }
 
+QDateTime QSEditor::lastModificationTime() const
+{
+  return d->lastModificationTime;
+}
+
+void QSEditor::setLastModificationTime(const QDateTime &t)
+{
+  d->lastModificationTime = t;
+}
 
 /*!
   Sets the interpreter that this editor will do completion for to \a interpreter

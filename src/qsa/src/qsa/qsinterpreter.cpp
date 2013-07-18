@@ -63,7 +63,8 @@ public:
     project(0),
     interpreter(0),
     errorMode(QSInterpreter::Notify),
-    timeoutInterval(-1) {
+    timeoutInterval(-1),
+    interactiveGUI_(true) {
   }
 
   ~QSInterpreterPrivate() {
@@ -77,6 +78,11 @@ public:
   QPtrList<QSObjectFactory> objectFactories;
   QPtrList<QSWrapperFactory> wrapperFactories;
   int timeoutInterval;
+
+  // ### AbanQ
+  /** Indica si el intérprete puede interactuar con el GUI, por defecto activado */
+  bool interactiveGUI_;
+  // ### AbanQ
 };
 
 QuickInterpreter *get_quick_interpreter(QSInterpreter *ip)
@@ -1011,7 +1017,9 @@ void QSInterpreter::parseError()
   int line = d->interpreter->errorLines().first();
   runtimeError(msg, script, line);
 #else
-  runtimeError(d->interpreter->errorMessages().first(), QString::null,
+  QSScript *scr = d->project->script(d->interpreter->objError_);
+  QString scrName(scr ? scr->baseFileName() : QString::null);
+  runtimeError(d->interpreter->errorMessages().first(), scrName,
                d->interpreter->errorLines().first());
 #endif
 }
@@ -1030,7 +1038,9 @@ void QSInterpreter::runtimeError()
                d->interpreter->nameOfSourceId(d->interpreter->debuggerEngine()->sourceId()),
                l);
 #else
-  runtimeError(d->interpreter->errorMessages().first(), QString::null,
+  QSScript *scr = d->project->script(d->interpreter->objError_);
+  QString scrName(scr ? scr->baseFileName() : QString::null);
+  runtimeError(d->interpreter->errorMessages().first(), scrName,
                d->interpreter->errorLines().first());
 #endif
 }
@@ -1058,11 +1068,14 @@ void QSInterpreter::runtimeError(const QString &message,
       qDebug("Error in script: '%s', line: %d\n  %s\n",
              scriptName.latin1(), lineNumber, message.latin1());
     } else {
-      QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),
-                            QString::fromLatin1("The following error occurred in "
-                                                "line <b>%1</b> of  <b>%2</b> while executing "
-                                                "the script:<pre><font color=red>%3</font></pre>")
-                            .arg(lineNumber).arg(scriptName).arg(message));
+      QString errorMsg(QString::fromLatin1("The following error occurred in "
+                                           "line <b>%1</b> of  <b>%2</b> while executing "
+                                           "the script:<pre><font color=red>%3</font></pre>")
+                       .arg(lineNumber).arg(scriptName).arg(message));
+      if (d->interactiveGUI_)
+        QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"), errorMsg);
+      else
+        qWarning(errorMsg);
     }
   }
 #else
@@ -1070,12 +1083,15 @@ void QSInterpreter::runtimeError(const QString &message,
                         "using is too old or is not signed and certified by InfoSiAL. In this case you<br/>"
                         "can not run normally  AbanQ. You  can get an updated and certified version of<br/>"
                         "AbanQ from http://www.infosial.com"));
-  QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),
-                        QString::fromLatin1("The following error occurred in "
-                                            "line <b>%1</b> of  <b>%2</b> while executing "
-                                            "the script:<pre><font color=red>%3</font></pre>"
-                                            "<pre><b>%4</b></pre>")
-                        .arg(lineNumber).arg(scriptName).arg(message).arg(warnNoCert));
+  QString errorMsg(QString::fromLatin1("The following error occurred in "
+                                       "line <b>%1</b> of  <b>%2</b> while executing "
+                                       "the script:<pre><font color=red>%3</font></pre>"
+                                       "<pre><b>%4</b></pre>")
+                   .arg(lineNumber).arg(scriptName).arg(message).arg(warnNoCert));
+  if (d->interactiveGUI_)
+    QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"), errorMsg);
+  else
+    qWarning(errorMsg);
 #endif
 }
 
@@ -1341,6 +1357,18 @@ void QSInterpreter::stopExecution()
 {
   throwError(QString::fromLatin1("Execution terminated"));
 }
+
+// ### AbanQ
+bool QSInterpreter::interactiveGUI() const
+{
+  return d->interactiveGUI_;
+}
+
+void QSInterpreter::setInteractiveGUI(bool on)
+{
+  d->interactiveGUI_ = on;
+}
+// ### AbanQ
 
 
 /*!

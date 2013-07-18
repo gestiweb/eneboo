@@ -19,14 +19,20 @@ email                : mail@infosial.com
 #include "posprinter.h"
 #include "FLDiskCache.h"
 
-static const int paperWidths[FLPosPrinter::NPaperWidth+1] = { 57, 69, 76 };
+AQ_EXPORT QString FLPosPrinter::printerName_;
+AQ_EXPORT QString FLPosPrinter::server_;
+AQ_EXPORT QString FLPosPrinter::queueName_;
+#if defined(Q_OS_WIN32)
+AQ_EXPORT bool FLPosPrinter::useLPT_ = false;
+AQ_EXPORT QString FLPosPrinter::nameLPT_ = "LPT1";
+#endif
+
+static const int paperWidths[FLPosPrinter::NPaperWidth + 1] = { 57, 69, 76 };
 
 FLPosPrinter::FLPosPrinter() :
-    QPaintDevice(QInternal::Printer | QInternal::ExternalDevice),
-    file(0), strBuffer(0), escBuffer(0), idxBuffer(0),
-    printerName_(QString::null)
+  QPaintDevice(QInternal::Printer | QInternal::ExternalDevice),
+  paperWidth_(P76MM), strBuffer(0), escBuffer(0), idxBuffer(0)
 {
-  paperWidth_ = P76MM;
 }
 
 FLPosPrinter::~FLPosPrinter()
@@ -39,20 +45,8 @@ void FLPosPrinter::setPaperWidth(PaperWidth newPaperWidth)
   paperWidth_ = newPaperWidth;
 }
 
-void FLPosPrinter::setPrinterName(const QString &pName)
-{
-  printerName_ = pName;
-}
-
 void FLPosPrinter::cleanup()
 {
-  if (file) {
-    file->close();
-    file->remove();
-    delete file;
-    file = 0;
-  }
-
   if (strBuffer) {
     strBuffer->clear();
     delete strBuffer;
@@ -113,8 +107,13 @@ void FLPosPrinter::send(const QString &str, const int col, const int row)
   if (str.left(4) == "ESC:") {
     sendEsc(str, col, row);
   } else {
-    for (int i = 0; i < str.length(); i++)
-      sendStr(str.ascii()[i], col + i, row);
+    if (col >= 0) {
+      for (int i = 0; i < str.length(); i++)
+        sendStr(str.ascii()[i], col + i, row);
+    } else {
+      for (int i = 0; i < str.length(); i++)
+        sendStr(str.ascii()[i]);
+    }
   }
 }
 
@@ -122,7 +121,6 @@ bool FLPosPrinter::cmd(int c, QPainter *paint, QPDevCmdParam *p)
 {
   if (c == PdcBegin) {
     cleanup();
-    initFile();
     initStrBuffer();
     initEscBuffer();
     sendEsc("ESC:1B,40,1B,52,07,1B,74,10");
@@ -220,13 +218,9 @@ int FLPosPrinter::paperWidthToCols()
 
 void FLPosPrinter::initFile()
 {
-  QString fileName(AQ_DISKCACHE_DIRPATH + "/outposprinter.tmp");
-  QFile::remove(fileName);
-  if (!file) {
-    file = new QFile(fileName);
-    file->open(IO_Raw | IO_WriteOnly);
-  }
-  file->reset();
+  fileName_ = AQ_DISKCACHE_DIRPATH + "/outposprinter_" +
+              QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+              ".tmp";
 }
 
 void FLPosPrinter::initStrBuffer()
@@ -243,4 +237,11 @@ void FLPosPrinter::initEscBuffer()
     escBuffer = new QMap< int, QString >();
   else
     escBuffer->clear();
+}
+
+void FLPosPrinter::parsePrinterName()
+{
+  int posdots = printerName_.find(":");
+  server_ = printerName_.left(posdots);
+  queueName_ = printerName_.right(printerName_.length() - posdots - 1);
 }

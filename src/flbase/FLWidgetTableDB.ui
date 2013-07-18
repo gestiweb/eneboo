@@ -610,6 +610,9 @@
     <slot access="protected">activeTabFilter( bool )</slot>
     <slot>exportToOds()</slot>
 </slots>
-<exportmacro>FL_EXPORT</exportmacro>
+<includes>
+    <include location="global" impldecl="in declaration">AQGlobal.h</include>
+</includes>
+<exportmacro>AQ_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

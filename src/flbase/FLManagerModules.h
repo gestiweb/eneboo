@@ -18,6 +18,8 @@
 #ifndef FLMANAGERMODULES_H
 #define FLMANAGERMODULES_H
 
+#include "AQGlobal.h"
+
 class FLAction;
 class FLInfoMod;
 class FLSqlDatabase;
@@ -44,7 +46,7 @@ de AbanQ.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLManagerModules
+class AQ_EXPORT FLManagerModules
 {
 
   friend class FLSqlDatabase;
@@ -103,7 +105,8 @@ public:
   */
   QString byteCodeToStr(const QByteArray &byteCode) const;
 #ifndef QSDEBUGGER
-  QString contentCode(const QString &n) const;
+  QByteArray contentCodeFromBd(const QString &n, bool *isNull = 0);
+  QString contentCode(const QString &n);
 #else
   QString contentCode(const QString &n);
 #endif

@@ -21,6 +21,8 @@
 
 #include <qstring.h>
 
+#include "AQGlobal.h"
+
 class FLRelationMetaDataPrivate;
 
 /**
@@ -66,7 +68,7 @@ Ejemplo:Si tenemos ALMACENES <-M----1> PAISES, tenemos que especificar
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLRelationMetaData
+class AQ_EXPORT FLRelationMetaData : public QShared
 {
 
 public:
@@ -78,6 +80,10 @@ public:
     /** Muchos a uno */
     RELATION_M1 = 1
   };
+
+#ifdef FL_DEBUG
+  static long count_;
+#endif
 
   /**
   constructor
@@ -91,6 +97,7 @@ public:
   */
   FLRelationMetaData(const QString &fT, const QString &fF, int rC,
                      bool dC = false, bool uC = false, bool cI = true);
+  FLRelationMetaData(const FLRelationMetaData *other);
 
   /**
   destructor
@@ -150,7 +157,7 @@ public:
   /**
   Obtiene si se deben aplicar la reglas de integridad sobre la relación
   */
-  bool checkIn();
+  bool checkIn() const;
 
 private:
 
@@ -158,6 +165,8 @@ private:
   Privado
   */
   FLRelationMetaDataPrivate *d;
+
+  void copy(const FLRelationMetaData *other);
 };
 
 class FLRelationMetaDataPrivate
@@ -166,6 +175,8 @@ public:
 
   FLRelationMetaDataPrivate(const QString &fT, const QString &fF, int rC,
                             bool dC, bool uC, bool cI);
+
+  FLRelationMetaDataPrivate() {}
 
   /**
   Nombre del campo a relacionar
@@ -238,7 +249,7 @@ inline bool FLRelationMetaData::updateCascade() const
   return (d->updateCascade_ && d->cardinality_ == RELATION_M1);
 }
 
-inline bool FLRelationMetaData::checkIn()
+inline bool FLRelationMetaData::checkIn() const
 {
   return d->checkIn_;
 }

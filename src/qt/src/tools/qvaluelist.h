@@ -47,6 +47,7 @@
 #ifndef QT_NO_STL
 #include <iterator>
 #include <list>
+#include <cstddef>
 #endif
 
 //#define QT_CHECK_VALUELIST_RANGE
@@ -231,7 +232,7 @@ public:
 
     void derefAndDelete() // ### hack to get around hp-cc brain damage
     {
-	if ( deref() )
+	if ( this && deref() )
 	    delete this;
     }
 
@@ -438,7 +439,7 @@ public:
 	qCopy( l.begin(), l.end(), std::back_inserter( *this ) );
     }
 #endif
-    ~QValueList() { sh->derefAndDelete(); }
+    ~QValueList() { if (sh) sh->derefAndDelete(); }
 
     QValueList<T>& operator= ( const QValueList<T>& l )
     {

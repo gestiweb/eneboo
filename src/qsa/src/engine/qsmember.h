@@ -170,8 +170,8 @@ public:
   }
 
   // ### AbanQ
-  void setSuper(QSMember *super);
-  QSMember *super() const {
+  void setSuper(const QSMember *super);
+  const QSMember *super() const {
     return super_;
   }
 
@@ -193,7 +193,7 @@ private:
   QString str;
 
   // ### AbanQ
-  QSMember *super_;
+  const QSMember *super_;
 
   void copy(const QSMember &other) {
     typ = other.typ;

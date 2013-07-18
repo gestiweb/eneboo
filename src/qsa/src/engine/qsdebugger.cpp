@@ -103,9 +103,15 @@ bool Debugger::validBreakpoint(const QString &code, int line)
 
   QSEngine e;
   if (e.checkSyntax(code, QSEngine::CheckNormal, false)) {
-    return QSNode::setBreakpoint(QSNode::firstNode(),
+#ifdef AQ_ENABLE_NODELIST
+    return QSNode::setBreakpoint(QSNode::nodeFirstNode(),
                                  e.rep->sourceId(),
                                  line, true);
+#else
+    return QSNode::setBreakpoint(QSProgramNode::nodeProgLast(),
+                                 e.rep->sourceId(),
+                                 line, true);
+#endif
   }
   return false;
 }

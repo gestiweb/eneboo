@@ -454,14 +454,17 @@ int PSPrinter::metric(int m) const
   int val;
   PageSize s = pageSize();
 #if defined(QT_CHECK_RANGE)
-  Q_ASSERT((uint)s <= (uint)NPageSize);
+  Q_ASSERT((uint)s <= (uint)CustomOld);
 #endif
   switch (m) {
     case QPaintDeviceMetrics::PdmWidth:
-      if (s == PSPrinter::Custom)
+      if (s == PSPrinter::Custom) {
         val = orient == Portrait ? customPaperSize_.width() : customPaperSize_.height();
-      else
+      } else {
+        if (s > PSPrinter::Custom)
+          s = PSPrinter::Custom;
         val = orient == Portrait ? paperSizes[s].width : paperSizes[s].height;
+      }
       if (res != 72)
         val = (val * res + 36) / 72;
       if (!fullPage()) {
@@ -472,10 +475,13 @@ int PSPrinter::metric(int m) const
       }
       break;
     case QPaintDeviceMetrics::PdmHeight:
-      if (s == PSPrinter::Custom)
+      if (s == PSPrinter::Custom) {
         val = orient == Portrait ? customPaperSize_.height() : customPaperSize_.width();
-      else
+      } else {
+        if (s > PSPrinter::Custom)
+          s = PSPrinter::Custom;
         val = orient == Portrait ? paperSizes[s].height : paperSizes[s].width;
+      }
       if (res != 72)
         val = (val * res + 36) / 72;
       if (!fullPage()) {
@@ -654,23 +660,20 @@ void PSPrinter::setOrientation(Orientation orientation)
 {
   orient = orientation;
 #if defined(Q_WS_WIN)
-
   reinit();
 #endif
 }
 
 void PSPrinter::setPageSize(PageSize newPageSize)
 {
-  if (newPageSize > NPageSize) {
+  if (newPageSize > CustomOld) {
 #if defined(QT_CHECK_STATE)
     qWarning("PSPrinter::SetPageSize: illegal page size %d", newPageSize);
 #endif
-
-    return ;
+    return;
   }
   page_size = newPageSize;
 #if defined(Q_WS_WIN)
-
   reinit();
 #endif
 }
@@ -679,7 +682,6 @@ void PSPrinter::setPageOrder(PageOrder newPageOrder)
 {
   page_order = newPageOrder;
 #if defined(Q_WS_WIN)
-
   reinit();
 #endif
 }

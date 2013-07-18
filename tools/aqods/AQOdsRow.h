@@ -19,87 +19,15 @@
 #ifndef AQODSROW_H_
 #define AQODSROW_H_
 
+#include <qregexp.h>
+
 #include "odf-gen/row.h"
 
 #include "AQOdsStyle.h"
 #include "AQOdsChart.h"
 #include "AQOdsImage.h"
 
-static inline bool isXmlChar(const QChar &c)
-{
-  // Characters in this range must be accepted by XML parsers.
-  // Consequently characters outside of this range need to be escaped.
-
-  ushort uc = c.unicode();
-
-  return uc == 0x9
-         || uc == 0xA
-         || uc == 0xD
-         || 0x20 <= uc && uc <= 0xD7FF
-         || 0xE000 <= uc && uc <= 0xFFFD;
-}
-
-// ### AbanQ
-// to do compliant with the standar XML 1.0
-// 2.11 End-of-Line Handling and 3.3.3 Attribute-Value Normalization
-// see below encodeAttr
-static inline bool isEndOfLineChar(const QChar &c)
-{
-  ushort uc = c.unicode();
-
-  return uc == 0x9
-         || uc == 0xA
-         || uc == 0xD;
-}
-// ### AbanQ
-
-static inline QString encodeAttr(const QString &str)
-{
-  QString tmp(str);
-  uint len = tmp.length();
-  uint i = 0;
-  while (i < len) {
-    if (tmp[(int)i] == '<') {
-      tmp.replace(i, 1, "&lt;");
-      len += 3;
-      i += 4;
-    } else if (tmp[(int)i] == '"') {
-      tmp.replace(i, 1, "&quot;");
-      len += 5;
-      i += 6;
-    } else if (tmp[(int)i] == '&') {
-      tmp.replace(i, 1, "&amp;");
-      len += 4;
-      i += 5;
-    } else if (tmp[(int)i] == '>' && i >= 2 && tmp[(int)i - 1] == ']' && tmp[(int)i - 2] == ']') {
-      tmp.replace(i, 1, "&gt;");
-      len += 3;
-      i += 4;
-    }
-    // ### AbanQ
-    // to do compliant with the standar XML 1.0
-    // 2.11 End-of-Line Handling and 3.3.3 Attribute-Value Normalization
-    else if (isEndOfLineChar(tmp[(int)i])) {
-      QString repl = "&#x" + QString::number(tmp[(int)i].unicode(), 16) + ';';
-      tmp.replace(i, 1, repl);
-      len += repl.length() - 1;
-      i += repl.length();
-    }
-    // ### AbanQ
-    else if (!isXmlChar(tmp[(int)i])) {
-      QString repl = "&#x" + QString::number(tmp[(int)i].unicode(), 16) + ';';
-      qWarning("AQOdsRow: not saving invalid character %s, the document will not be well-formed", repl.latin1());
-      repl = "?";
-      tmp.replace(i, 1, repl);
-      len += repl.length() - 1;
-      i += repl.length();
-    } else {
-      ++i;
-    }
-  }
-
-  return tmp;
-}
+extern QString encodeAttrODS(const QString &);
 
 class AQOdsRow : public Row
 {
@@ -128,7 +56,7 @@ public:
   AQOdsRow &opIn(const QString &value,
                  uint column_span = 0,
                  uint row_span = 0) {
-    add_cell((const char *) encodeAttr(value), column_span, row_span);
+    add_cell((const char *)encodeAttrODS(formatURLs(value)).utf8(), column_span, row_span);
     return *this;
   }
 
@@ -152,6 +80,20 @@ public:
   AQOdsRow &addFgColor(const AQOdsColor &color) {
     add_fgcolor(color);
     return *this;
+  }
+
+  AQOdsRow &setFixedPrecision(uint p) {
+    set_fixed_precision(p);
+    return *this;
+  }
+
+private:
+  QString formatURLs(const QString &v) const {
+    if (v.find("http://") == -1)
+      return v;
+    QRegExp rx("((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9\\.\\-]+|(?:www\\.|[\\-;:&=\\+\\$,\\w]+@)[A-Za-z0-9\\.\\-]+)((?:\\/[\\+~%\\/\\.\\w\\-]*)?\\??(?:[\\-\\+=&;%@\\.\\w]*)#?(?:[\\.\\!\\/\\\\\\w]*))?)");
+    QString theUrl(v);
+    return theUrl.replace(rx, "__HREF1__='\\1'__HREF2__\\1__HREF3__");
   }
 };
 

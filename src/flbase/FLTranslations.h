@@ -29,10 +29,12 @@ email                : mail@infosial.com
 
 #include <errno.h>
 
+#include "AQGlobal.h"
+
 class MetaTranslatorMessage;
 class MetaTranslator;
 
-class FL_EXPORT FLTranslations
+class AQ_EXPORT FLTranslations
 {
 
 public:

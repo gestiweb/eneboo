@@ -28,6 +28,12 @@ class AQSTableMD : public AQSObject
 
   AQ_DECLARE_AQS_AQOBJECT(TableMD, Object);
 
+protected:
+  void specializedInternalFinish() {
+    if (!wrap_ && o_ && !o_->inCache())
+      delete o_;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   QString name() const;

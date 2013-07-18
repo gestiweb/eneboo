@@ -20,6 +20,7 @@ email                : mail@infosial.com
 #include "FLSqlCursor.h"
 #include "FLTableMetaData.h"
 #include "FLFieldMetaData.h"
+#include "FLRelationMetaData.h"
 #include "FLUtil.h"
 #include "FLApplication.h"
 #include "FLSqlQuery.h"
@@ -64,8 +65,6 @@ void FLCheckBox::drawButton(QPainter *p)
 
     p->drawLineSegments(a);
   }
-
-  drawButtonLabel(p);
 }
 
 bool FLCheckBox::hitButton(const QPoint &pos) const
@@ -77,22 +76,30 @@ FLDataTable::FLDataTable(QWidget *parent, const char *name, bool popup)
   : QDataTable(parent, name),
     rowSelected(-1), colSelected(-1), cursor_(0), readonly_(false),
     editonly_(false), insertonly_(false), persistentFilter_(QString::null),
-    refreshing_(false), popup_(popup), showAllPixmaps_(false)
+    refreshing_(false), popup_(popup), showAllPixmaps_(false),
+    changingNumRows_(false), onlyTable_(false), paintFieldMtd_(0),
+    timerViewRepaint_(0)
 {
   if (!name)
     setName("FLDataTable");
-  bu_.setColor(qApp->palette().color(QPalette::Active, QColorGroup::Midlight));
-  bu_.setStyle(SolidPattern);
-  ok = QPixmap::fromMimeSource("unlock.png");
-  no = QPixmap::fromMimeSource("lock.png");
+  pixOk_ = QPixmap::fromMimeSource("unlock.png");
+  pixNo_ = QPixmap::fromMimeSource("lock.png");
 }
 
-FLDataTable::~FLDataTable() {}
+FLDataTable::~FLDataTable()
+{
+  if (timerViewRepaint_)
+    timerViewRepaint_->stop();
+  if (cursor_ && !cursor_->aqWasDeleted()) {
+    cursor_->restoreEditionFlag(this);
+    cursor_->restoreBrowseFlag(this);
+  }
+}
 
 void FLDataTable::selectRow(int r, int c)
 {
-  if (!cursor_ || !cursor_->metadata())
-    return ;
+  if (!cursor_ || cursor_->aqWasDeleted() || !cursor_->metadata())
+    return;
 
   if (r < 0) {
     if (cursor_->isValid()) {
@@ -108,16 +115,15 @@ void FLDataTable::selectRow(int r, int c)
   }
 
   QObject *snd = const_cast<QObject *>(sender());
-  if (!snd || (snd && !snd ->isA("FLSqlCursor"))) {
+  if (!snd || (snd && !snd->isA("FLSqlCursor"))) {
     QWidget *sndw = ::qt_cast<QWidget *>(snd);
     if (sndw) {
-      if (!sndw->hasFocus() || !sndw->isVisible()) {
+      if (refreshing_ || !sndw->hasFocus() || !sndw->isVisible()) {
         setCurrentCell(rowSelected, colSelected);
-        return ;
+        return;
       }
     }
-    if (numRows() != cursor_->size())
-      setNumRows(cursor_->size());
+    syncNumRows();
     cursor_->seek(rowSelected);
   }
   setCurrentCell(rowSelected, colSelected);
@@ -135,68 +141,33 @@ void FLDataTable::setFLSqlCursor(FLSqlCursor *c)
       disconnect(cursor_, SIGNAL(currentChanged(int)), this, SLOT(selectRow(int)));
       if (!popup_)
         disconnect(cursor_, SIGNAL(cursorUpdated()), this, SLOT(refresh()));
+      disconnect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
     }
 
+    bool curChg = false;
+    if (cursor_ && cursor_ != c) {
+      cursor_->restoreEditionFlag(this);
+      cursor_->restoreBrowseFlag(this);
+      curChg = true;
+    }
     cursor_ = c;
     if (cursor_) {
+      if (curChg) {
+        setFLReadOnly(readonly_);
+        setEditOnly(editonly_);
+        setInsertOnly(insertonly_);
+        setOnlyTable(onlyTable_);
+      }
       disconnect(cursor_, SIGNAL(currentChanged(int)), this, SLOT(selectRow(int)));
       if (!popup_)
         disconnect(cursor_, SIGNAL(cursorUpdated()), this, SLOT(refresh()));
       connect(cursor_, SIGNAL(currentChanged(int)), this, SLOT(selectRow(int)));
       if (!popup_)
         connect(cursor_, SIGNAL(cursorUpdated()), this, SLOT(refresh()));
+      connect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
     }
 
     QDataTable::setSqlCursor(static_cast<QSqlCursor *>(c), true, false);
-  }
-}
-
-void FLDataTable::paintCell(QPainter *p, int row, int col, const QRect &cr,
-                            bool selected, const QColorGroup &cg)
-{
-  QTable::paintCell(p, row, col, cr, selected, cg);
-
-  FLTableMetaData *tMD;
-  if (!cursor_ || !(tMD = cursor_->metadata()))
-    return ;
-
-  QSqlField *field = cursor_->field(indexOf(col));
-  QString fName(field->name());
-  int type = tMD->fieldType(fName);
-  if (!showAllPixmaps_ && type == QVariant::Pixmap && row != rowSelected)
-    return ;
-
-  p->setPen(selected ? cg.highlightedText() : cg.text());
-
-  lastTextPainted = QString::null;
-  if (cursor_->QSqlCursor::seek(row)) {
-    if (!selected && (row % 2))
-      p->fillRect(0, 0, cr.width() - 1, cr.height() - 1, bu_);
-    paintField(p, field, cr, selected);
-  } else
-    return;
-
-  cursor_->QSqlCursor::seek(rowSelected);
-
-  if (widthCols_.contains(fName)) {
-    int wH = widthCols_[ fName ];
-    if (wH > 0 && wH != columnWidth(col))
-      QTable::setColumnWidth(col, wH);
-    if (wH > 0)
-      return;
-  }
-
-  int wC = columnWidth(col);
-  int wH = fontMetrics().width(tMD->fieldNameToAlias(fName) +
-                               QString::fromLatin1("W"));
-  if (wH < wC)
-    wH = wC;
-  wC = fontMetrics().width(lastTextPainted) + fontMetrics().maxWidth();
-  if (wC > wH) {
-    QTable::setColumnWidth(col, wC);
-#if defined(Q_OS_MACX) || defined(Q_OS_WIN32)
-    QTable::repaintContents();
-#endif
   }
 }
 
@@ -252,30 +223,84 @@ static inline Qt::PenStyle nametoPenStyle(const QString &style)
   return Qt::SolidLine;
 }
 
-void FLDataTable::paintField(QPainter *p, const QSqlField *field,
-                             const QRect &cr, bool selected)
+static inline bool setNewBrushStyle(QBrush &brush, Qt::BrushStyle st)
 {
-  if (!field)
-    return;
+  if (st != brush.style()) {
+    brush.setStyle(st);
+    return true;
+  }
+  return false;
+}
 
-  FLTableMetaData *tMD = cursor_->metadata();
-  FLFieldMetaData *fieldTMD = tMD->field(field->name());
-  if (!fieldTMD)
-    return;
+static inline bool setNewPenStyle(QPen &pen, Qt::PenStyle st)
+{
+  if (st != pen.style()) {
+    pen.setStyle(st);
+    return true;
+  }
+  return false;
+}
+
+static inline bool setNewBrushColor(QBrush &brush, const QColor &c)
+{
+  if (c != brush.color()) {
+    brush.setColor(c);
+    return true;
+  }
+  return false;
+}
+
+static inline bool setNewPenColor(QPen &pen, const QColor &c)
+{
+  if (c != pen.color()) {
+    pen.setColor(c);
+    return true;
+  }
+  return false;
+}
+
+bool FLDataTable::getCellStyle(QBrush &brush, QPen &pen,
+                               QSqlField *field, FLFieldMetaData *fieldTMD,
+                               int row, bool selected, const QColorGroup &cg)
+{
+  if (brush.style() == Qt::NoBrush)
+    brush.setStyle(Qt::SolidPattern);
+  //if (pen.style() == Qt::NoPen)
+  //  pen.setStyle(Qt::SolidLine);
 
   if (!fieldTMD->visible()) {
-    QBrush bu(gray, DiagCrossPattern);
-    p->fillRect(0, 0, cr.width() - 1, cr.height() - 1, bu);
-    return;
+    brush.setColor(Qt::gray);
+    brush.setStyle(Qt::DiagCrossPattern);
+    return true;
   }
 
-  QString bgColorName;
-  QString fgColorName;
-  QString brushStyle;
-  QString penStyle;
+  bool initNewBrush = false;
+
+  if (!selected) {
+    if ((row % 2))
+      initNewBrush = setNewBrushColor(brush, cg.brush(QColorGroup::Midlight).color());
+    else
+      setNewBrushColor(brush, cg.brush(QColorGroup::Base).color());
+    setNewPenColor(pen, cg.text());
+  } else {
+    if (focusStyle() == QTable::SpreadSheet)
+      initNewBrush = setNewBrushColor(brush, cg.brush(QColorGroup::Highlight).color());
+    else
+      setNewBrushColor(brush, cg.brush(QColorGroup::Highlight).color());
+    setNewPenColor(pen, cg.highlightedText());
+  }
+
+  bool newBrush = false;
+  bool newBrushStyle = false;
+  bool newPen = false;
+  bool newPenStyle = false;
   int type = fieldTMD->type();
 
-  if (!functionGetColor_.isEmpty()) {
+  if (!functionGetColor_.isEmpty() && cursor_->modeAccess() == FLSqlCursor::BROWSE) {
+    QString bgColorName;
+    QString fgColorName;
+    QString brushStyle;
+    QString penStyle;
     QSArgumentList arglist;
     QSArgument ret;
 
@@ -284,7 +309,10 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
     arglist.append(QSArgument(FLSqlCursorInterface::sqlCursorInterface(cursor_)));
     arglist.append(QSArgument(selected));
     arglist.append(QSArgument(type));
+    bool bakrv = cursor_->d->rawValues_;
+    cursor_->d->rawValues_ = true;
     ret = aqApp->call(functionGetColor_, arglist, 0);
+    cursor_->d->rawValues_ = bakrv;
 
     if (ret.type() == QSArgument::Variant && ret.variant().type() == QVariant::List) {
       QValueList<QVariant> list(ret.variant().toList());
@@ -302,37 +330,201 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
           }
         }
 
-        QBrush bu(p->brush());
         if (!bgColorName.isEmpty()) {
           QColor bgColor(bgColorName);
           if (bgColor.isValid())
-            bu.setColor(bgColor);
-          else
-            bgColorName = QString::null;
+            newBrush = setNewBrushColor(brush, bgColor);
         }
         if (!brushStyle.isEmpty())
-          bu.setStyle(nametoBrushStyle(brushStyle));
+          newBrushStyle = setNewBrushStyle(brush, nametoBrushStyle(brushStyle));
 
-        QPen pen(p->pen());
         if (!fgColorName.isEmpty()) {
           QColor fgColor(fgColorName);
           if (fgColor.isValid())
-            pen.setColor(fgColor);
-          else
-            fgColorName = QString::null;
+            newPen = setNewPenColor(pen, fgColor);
         }
         if (!penStyle.isEmpty())
-          pen.setStyle(nametoPenStyle(penStyle));
-
-        if (!bgColorName.isEmpty() || !brushStyle.isEmpty()) {
-          p->setBrush(bu);
-          p->fillRect(0, 0, cr.width() - 1, cr.height() - 1, bu);
-        }
-        if (!fgColorName.isEmpty() || !penStyle.isEmpty())
-          p->setPen(pen);
+          newPenStyle = setNewPenStyle(pen, nametoPenStyle(penStyle));
       }
     }
   }
+
+  if (field->isNull() && type != QVariant::Bool)
+    return initNewBrush || newBrush || newBrushStyle;
+
+  switch (type) {
+    case QVariant::Double: {
+      if (!newPen) {
+        double fValue = field->value().toDouble();
+        if (fValue < 0.0)
+          setNewPenColor(pen, Qt::red);
+      }
+    }
+    break;
+
+    case QVariant::Int: {
+      if (!newPen) {
+        double fValue = field->value().toInt();
+        if (fValue < 0)
+          setNewPenColor(pen, Qt::red);
+      }
+    }
+    break;
+
+    case QVariant::Bool: {
+      if (!newBrush) {
+        newBrush = setNewBrushColor(brush,
+                                    field->value().toBool() ? Qt::green : Qt::red);
+      }
+      if (!newBrushStyle) {
+        newBrushStyle = setNewBrushStyle(brush,
+                                         selected ? Qt::Dense4Pattern : Qt::SolidPattern);
+      }
+      if (!newPen && !selected)
+        setNewPenColor(pen, Qt::darkBlue);
+    }
+    break;
+  }
+
+  return initNewBrush || newBrush || newBrushStyle;
+}
+
+void FLDataTable::paintCell(QPainter *p, int row, int col, const QRect &cr,
+                            bool selected, const QColorGroup &cg)
+{
+  FLTableMetaData *tMD;
+  if (!cursor_ || cursor_->aqWasDeleted() || !(tMD = cursor_->metadata()))
+    return;
+  QSqlField *field = cursor_->field(indexOf(col));
+  QString fName(field->name());
+  FLFieldMetaData *fieldTMD = paintFieldMtd(fName, tMD);
+  if (!fieldTMD)
+    return;
+
+  int type = fieldTMD->type();
+
+  if (!showAllPixmaps_ && type == QVariant::Pixmap && row != rowSelected) {
+    QTable::paintCell(p, row, col, cr, selected, cg);
+    return;
+  }
+
+  if (row != cursor_->QSqlCursor::at() || !cursor_->isValid()) {
+    if (!cursor_->QSqlCursor::seek(row)) {
+#ifdef FL_DEBUG
+      qWarning(tr("FLDataTable::paintCell() : Posición no válida %1 %2").arg(row).arg(tMD->name()));
+#endif
+      return;
+    }
+  }
+
+  if (fieldTMD->isCheck()) {
+    if (showGrid()) {
+      int x2 = cr.width() - 1;
+      int y2 = cr.height() - 1;
+      QPen pen(p->pen());
+      int gridColor = style().styleHint(QStyle::SH_Table_GridLineColor, this);
+      if (gridColor != -1) {
+        const QPalette &pal = palette();
+        if (cg != colorGroup()
+            && cg != pal.disabled()
+            && cg != pal.inactive())
+          p->setPen(cg.mid());
+        else
+          p->setPen((QRgb)gridColor);
+      } else {
+        p->setPen(cg.mid());
+      }
+      p->drawLine(x2, 0, x2, y2);
+      p->drawLine(0, y2, x2, y2);
+      p->setPen(pen);
+    }
+    paintField(p, field, cr, selected);
+    return;
+  }
+
+  QBrush bB(p->brush());
+  QPen bP(p->pen());
+  QBrush stBru(bB);
+  QPen stPen(bP);
+
+  bool newBrush = getCellStyle(stBru, stPen, field, fieldTMD, row, selected, cg);
+
+  p->setBrush(stBru);
+  p->setPen(stPen);
+
+  if (newBrush) {
+    if (stBru.style() != Qt::SolidPattern) {
+      p->fillRect(0, 0, cr.width() - 1, cr.height() - 1,
+                  selected ? cg.brush(QColorGroup::Highlight) : cg.brush(QColorGroup::Base));
+    }
+    QColorGroup cgAux(cg);
+    cgAux.setBrush(QColorGroup::Base, stBru);
+    cgAux.setBrush(QColorGroup::Highlight, stBru);
+    QTable::paintCell(p, row, col, cr, selected, cgAux);
+  } else
+    QTable::paintCell(p, row, col, cr, selected, cg);
+
+  lastTextPainted_ = QString::null;
+  paintField(p, field, cr, selected);
+  p->setBrush(bB);
+  p->setPen(bP);
+
+  if (!widthCols_.isEmpty()) {
+    QMap<QString, int>::const_iterator it(widthCols_.find(fName));
+    if (it != widthCols_.end()) {
+      int wH = (*it);
+      if (wH == -1)
+        return;
+      if (wH > 0 && wH != columnWidth(col)) {
+        QTable::setColumnWidth(col, wH);
+        if (col == 0 && popup_) {
+          QWidget *pw = parentWidget();
+          if (pw && pw->width() < wH) {
+            resize(wH, pw->height());
+            pw->resize(wH, pw->height());
+          }
+        }
+        delayedViewportRepaint();
+        widthCols_.replace(fName, -1);
+      }
+      if (wH > 0)
+        return;
+    }
+  }
+
+  if (!fieldTMD->visible())
+    return;
+
+  int wC = columnWidth(col);
+  int wH = fontMetrics().width(fieldTMD->alias() + QString::fromLatin1("W"));
+  if (wH < wC)
+    wH = wC;
+  wC = fontMetrics().width(lastTextPainted_) + fontMetrics().maxWidth();
+  if (wC > wH) {
+    QTable::setColumnWidth(col, wC);
+    if (col == 0 && popup_) {
+      QWidget *pw = parentWidget();
+      if (pw && pw->width() < wC) {
+        resize(wC, pw->height());
+        pw->resize(wC, pw->height());
+      }
+    }
+    delayedViewportRepaint();
+  }
+}
+
+void FLDataTable::paintField(QPainter *p, const QSqlField *field,
+                             const QRect &cr, bool selected)
+{
+  if (!field)
+    return;
+
+  FLTableMetaData *tMD = cursor_->metadata();
+  FLFieldMetaData *fieldTMD = paintFieldMtd(field->name(), tMD);
+  if (!fieldTMD || !fieldTMD->visible())
+    return;
+
+  int type = fieldTMD->type();
 
   if (field->isNull() && type != QVariant::Bool)
     return;
@@ -342,11 +534,6 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
   switch (type) {
     case QVariant::Double: {
       double fValue = field->value().toDouble();
-      if (fValue < 0.0 && fgColorName.isEmpty()) {
-        QPen pen(p->pen());
-        pen.setColor(red);
-        p->setPen(pen);
-      }
       text = aqApp->localeSystem().toString(fValue, 'f', fieldTMD->partDecimal());
       p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
                   Qt::AlignRight | Qt::AlignVCenter, text);
@@ -354,12 +541,13 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
     break;
 
     case FLFieldMetaData::Unlock: {
-      if (field->value().toBool())
-        p->drawPixmap((cr.width() - ok.width()) / 2, 2, ok,
+      if (field->value().toBool()) {
+        p->drawPixmap((cr.width() - pixOk_.width()) / 2, 2, pixOk_,
                       0, 0, cr.width() - 4, cr.height() - 4);
-      else
-        p->drawPixmap((cr.width() - no.width()) / 2, 2, no,
+      } else {
+        p->drawPixmap((cr.width() - pixNo_.width()) / 2, 2, pixNo_,
                       0, 0, cr.width() - 4, cr.height() - 4);
+      }
     }
     break;
 
@@ -382,11 +570,6 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
 
     case QVariant::Int: {
       int fValue = field->value().toInt();
-      if (fValue < 0 && fgColorName.isEmpty()) {
-        QPen pen(p->pen());
-        pen.setColor(red);
-        p->setPen(pen);
-      }
       text = aqApp->localeSystem().toString(fValue);
       p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
                   Qt::AlignRight | Qt::AlignVCenter, text);
@@ -403,7 +586,7 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
     case QVariant::Pixmap: {
       QCString cs = cursor_->db()->manager()->fetchLargeValue(field->value().toString()).toCString();
       if (cs.isEmpty())
-        return ;
+        return;
 
       QPixmap pix;
 
@@ -416,6 +599,11 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
                       cr.height() - 4);
     }
     break;
+
+    case QVariant::ByteArray:
+      p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
+                  Qt::AlignAuto | Qt::AlignTop, QString::fromLatin1("ByteArray"));
+      break;
 
     case QVariant::Date: {
       QDate d = field->value().toDate();
@@ -439,8 +627,6 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
       text = field->value().toString();
       p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
                   Qt::AlignAuto | Qt::AlignTop, text.left(255) + "...");
-      //p->drawText( 2, 2, cr.width() - 4, cr.height() - 4,
-      //             Qt::AlignAuto | Qt::AlignTop, text );
       break;
 
     case QVariant::Bool: {
@@ -459,26 +645,6 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
         }
         connect(chk, SIGNAL(toggled(bool)), this, SLOT(setChecked(bool)));
       } else {
-        if (field->value().toBool()) {
-          QBrush bu(p->brush());
-          if (bgColorName.isEmpty())
-            bu.setColor(green);
-          if (brushStyle.isEmpty())
-            bu.setStyle(selected ? Dense4Pattern : SolidPattern);
-          p->fillRect(0, 0, cr.width() - 1, cr.height() - 1, bu);
-        } else {
-          QBrush bu(p->brush());
-          if (bgColorName.isEmpty())
-            bu.setColor(red);
-          if (brushStyle.isEmpty())
-            bu.setStyle(selected ? Dense4Pattern : SolidPattern);
-          p->fillRect(0, 0, cr.width() - 1, cr.height() - 1, bu);
-        }
-        if (!selected && fgColorName.isEmpty()) {
-          QPen pen(p->pen());
-          pen.setColor(darkBlue);
-          p->setPen(pen);
-        }
         text = field->value().toBool() ? tr("Sí") : tr("No");
         p->drawText(2, 2, cr.width() - 4, cr.height() - 4,
                     fieldAlignment(field), text);
@@ -486,7 +652,7 @@ void FLDataTable::paintField(QPainter *p, const QSqlField *field,
     }
     break;
   }
-  lastTextPainted = text;
+  lastTextPainted_ = text;
 }
 
 bool FLDataTable::eventFilter(QObject *o, QEvent *e)
@@ -497,72 +663,94 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
     case QEvent::KeyPress: {
       QKeyEvent *ke = static_cast<QKeyEvent *>(e);
 
-      if (ke->key() == Key_Escape && popup_ && parentWidget()) {
+      if (ke->key() == Qt::Key_Escape && popup_ && parentWidget()) {
         parentWidget()->hide();
         return true;
       }
 
-      if (ke->key() == Key_Insert)
+      if (ke->key() == Qt::Key_Insert)
         return true;
 
-      if (ke->key() == Key_F2)
+      if (ke->key() == Qt::Key_F2)
         return true;
 
-      if (ke->key() == Key_Up && r == 0)
+      if (ke->key() == Qt::Key_Up && r == 0)
         return true;
 
-      if (ke->key() == Key_Left && c == 0)
+      if (ke->key() == Qt::Key_Left && c == 0)
         return true;
 
-      if (ke->key() == Key_Down && r == nr - 1)
+      if (ke->key() == Qt::Key_Down && r == nr - 1)
         return true;
 
-      if (ke->key() == Key_Right && c == nc - 1)
+      if (ke->key() == Qt::Key_Right && c == nc - 1)
         return true;
 
-      if ((ke->key() == Key_Enter || ke->key() == Key_Return) && r > -1) {
+      if ((ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return) && r > -1) {
         emit recordChoosed();
         return true;
       }
 
-      if (ke->key() == Key_A && !popup_)
-        if (cursor_ && !readonly_ && !editonly_) {
+      if (ke->key() == Qt::Key_Space) {
+        FLCheckBox *chk = ::qt_cast<FLCheckBox *>(cellWidget(r, c));
+        if (chk)
+          chk->animateClick();
+      }
+
+      if (ke->key() == Qt::Key_A && !popup_) {
+        if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
           cursor_->insertRecord();
           return true;
         } else
           return false;
+      }
 
-      if (ke->key() == Key_C && !popup_)
-        if (cursor_ && !readonly_ && !editonly_) {
+      if (ke->key() == Qt::Key_C && !popup_) {
+        if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
           cursor_->copyRecord();
           return true;
         } else
           return false;
+      }
 
-      if (ke->key() == Key_M && !popup_)
+      if (ke->key() == Qt::Key_M && !popup_) {
         if (insertonly_)
           return false;
-        else if (cursor_ && !readonly_) {
+        else if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !onlyTable_) {
           cursor_->editRecord();
           return true;
         } else
           return false;
+      }
 
-      if (ke->key() == Key_E || ke->key() == Key_Delete && !popup_)
+      if ((ke->key() == Qt::Key_E || ke->key() == Qt::Key_Delete) && !popup_) {
         if (insertonly_)
           return false;
-        else if (cursor_ && !readonly_ && !editonly_) {
+        else if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
           cursor_->deleteRecord();
           return true;
         } else
           return false;
+      }
 
-      if (ke->key() == Key_V && !popup_)
-        if (cursor_) {
+      if (ke->key() == Qt::Key_V && !popup_) {
+        if (cursor_ && !cursor_->aqWasDeleted() && !onlyTable_) {
           cursor_->browseRecord();
           return true;
         }
+      }
+
       return false;
+    }
+    break;
+
+    case QEvent::Paint: {
+      if (o == this && cursor_ && !cursor_->aqWasDeleted() && !persistentFilter_.isEmpty() &&
+          !cursor_->curFilter().contains(persistentFilter_)) {
+        cursor_->setFilter(persistentFilter_);
+        refresh();
+        return true;
+      }
     }
     break;
   }
@@ -572,19 +760,88 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
 void FLDataTable::contentsContextMenuEvent(QContextMenuEvent *e)
 {
   QTable::contentsContextMenuEvent(e);
+
+  if (!cursor_ || cursor_->aqWasDeleted() || !cursor_->isValid() || !cursor_->metadata())
+    return;
+
+  FLTableMetaData *mtd = cursor_->metadata();
+  QString priKey(mtd->primaryKey());
+
+  FLFieldMetaData *field = mtd->field(priKey);
+  if (!field)
+    return;
+
+  const FLFieldMetaData::FLRelationMetaDataList *relList = field->relationList();
+  if (!relList)
+    return;
+
+  FLSqlDatabase *db = cursor_->db();
+  QVariant priKeyVal(cursor_->valueBuffer(priKey));
+  QGuardedPtr<QPopupMenu> popup = new QPopupMenu(this);
+
+  FLRelationMetaData *rel;
+  QPtrListIterator<FLRelationMetaData> it(*relList);
+  while ((rel = it.current()) != 0) {
+    ++it;
+    QGuardedPtr<QPopupMenu> subPopup = 0;
+    FLSqlCursor *cur = new FLSqlCursor(rel->foreignTable(), true,
+                                       db->connectionName(), 0, 0, popup);
+    if (cur->metadata()) {
+      mtd = cur->metadata();
+      field = mtd->field(rel->foreignField());
+      if (!field)
+        continue;
+
+      subPopup = new QPopupMenu(popup);
+
+      QVBox *frame = new QVBox(popup, 0, WType_Popup);
+      frame->setFrameStyle(QFrame::PopupPanel | QFrame::Raised);
+      frame->setLineWidth(1);
+
+      FLDataTable *dt = new FLDataTable(frame, 0, true);
+      dt->setFLSqlCursor(cur);
+
+      QString filter(db->manager()->formatAssignValue(field, priKeyVal, false));
+      cur->setFilter(filter);
+      dt->setFilter(filter);
+      dt->QDataTable::refresh();
+
+      QHeader *horizHeader = dt->horizontalHeader();
+      for (int i = 0; i < dt->numCols(); ++i) {
+        field = mtd->field(mtd->fieldAliasToName(horizHeader->label(i)));
+        if (!field)
+          continue;
+        if (!field->visibleGrid())
+          dt->hideColumn(i);
+      }
+      for (int i = 0; i < dt->numCols(); ++i) {
+        field = mtd->field(mtd->fieldAliasToName(horizHeader->label(i)));
+        if (!field)
+          continue;
+        horizHeader->setLabel(i, field->alias());
+      }
+
+      subPopup->insertItem(frame);
+      popup->insertItem(mtd->alias(), subPopup);
+    }
+  }
+
+  popup->exec(e->globalPos());
+  delete popup;
+  e->accept();
 }
 
 void FLDataTable::contentsMouseDoubleClickEvent(QMouseEvent *e)
 {
   if (e->button() != LeftButton)
-    return ;
+    return;
 
   int tmpRow = rowAt(e->pos().y());
   int tmpCol = columnAt(e->pos().x());
   QTableItem *itm = item(tmpRow, tmpCol);
 
   if (itm && !itm->isEnabled())
-    return ;
+    return;
 
   emit doubleClicked(tmpRow, tmpCol, e->button(), e->pos());
   emit recordChoosed();
@@ -594,7 +851,7 @@ void FLDataTable::refresh()
 {
   if (popup_)
     QDataTable::refresh();
-  if (!refreshing_ && cursor_  && cursor_->metadata()) {
+  if (!refreshing_ && cursor_  && !cursor_->aqWasDeleted() && cursor_->metadata()) {
     refreshing_ = true;
     cursor_->setFilter(persistentFilter_);
     FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
@@ -614,15 +871,15 @@ void FLDataTable::refresh()
 
 void FLDataTable::setFocus()
 {
-  if (!cursor_)
-    return ;
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return;
   if (!hasFocus()) {
     setPaletteBackgroundColor(qApp->palette().color(QPalette::Active, QColorGroup::Base));
 #ifndef FL_QUICK_CLIENT
     QDataTable::refresh();
 #endif
-  } else if (numRows() != cursor_->size())
-    setNumRows(cursor_->size());
+  } else
+    syncNumRows();
   QWidget::setFocus();
 }
 
@@ -639,23 +896,34 @@ void FLDataTable::focusOutEvent(QFocusEvent *)
 
 void FLDataTable::setFLReadOnly(const bool mode)
 {
-  if (!cursor_)
-    return ;
-  cursor_->setEdition(!mode);
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return;
+  cursor_->setEdition(!mode, this);
   readonly_ = mode;
 }
 
 void FLDataTable::setEditOnly(const bool mode)
 {
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return;
   editonly_ = mode;
 }
 
 void FLDataTable::setInsertOnly(const bool mode)
 {
-  if (!cursor_)
-    return ;
-  cursor_->setEdition(!mode);
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return;
+  cursor_->setEdition(!mode, this);
   insertonly_ = mode;
+}
+
+void FLDataTable::setOnlyTable(bool on)
+{
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return;
+  cursor_->setEdition(!on, this);
+  cursor_->setBrowse(!on, this);
+  onlyTable_ = on;
 }
 
 void FLDataTable::ensureRowSelectedVisible()
@@ -677,7 +945,7 @@ void FLDataTable::setChecked(bool on)
 {
   FLCheckBox *chk = ::qt_cast<FLCheckBox *>(sender());
 
-  if (!chk || !cursor_ || !cursor_->metadata())
+  if (!chk || !cursor_ || cursor_->aqWasDeleted() || !cursor_->metadata())
     return;
 
   int curAt = cursor_->at();
@@ -732,4 +1000,81 @@ void FLDataTable::handleError(const QSqlError &)
 int FLDataTable::indexOf(uint i) const
 {
   return QDataTable::indexOf(i);
+}
+
+QString FLDataTable::fieldName(int col) const
+{
+  if (!cursor_ || cursor_->aqWasDeleted())
+    return QString::null;
+  QSqlField *field = cursor_->field(indexOf(col));
+  if (!field)
+    return QString::null;
+  return field->name();
+}
+
+void FLDataTable::syncNumRows()
+{
+  if (changingNumRows_)
+    return;
+  if (numRows() != cursor_->size()) {
+    changingNumRows_ = true;
+    setNumRows(cursor_->size());
+    changingNumRows_ = false;
+  }
+}
+
+void FLDataTable::drawContents(QPainter *p, int cx, int cy, int cw, int ch)
+{
+  if (!cursor_ || cursor_->aqWasDeleted()) {
+    QDataTable::drawContents(p, cx, cy, cw, ch);
+    return;
+  }
+
+  int curRow = rowSelected;
+  QDataTable::drawContents(p, cx, cy, cw, ch);
+
+  if (!persistentFilter_.isEmpty() && !cursor_->curFilter().contains(persistentFilter_)) {
+    cursor_->setFilter(persistentFilter_);
+    refresh();
+    return;
+  }
+
+  rowSelected = curRow;
+  cursor_->QSqlCursor::seek(rowSelected);
+}
+
+FLFieldMetaData *FLDataTable::paintFieldMtd(const QString &f, FLTableMetaData *t)
+{
+  if (paintFieldMtd_ && paintFieldName_ == f)
+    return paintFieldMtd_;
+  paintFieldName_ = f;
+  paintFieldMtd_ = t->field(f);
+  return paintFieldMtd_;
+}
+
+void FLDataTable::delayedViewportRepaint()
+{
+  if (!timerViewRepaint_) {
+    timerViewRepaint_ = new QTimer(this);
+    connect(timerViewRepaint_, SIGNAL(timeout()), this, SLOT(repaintViewportSlot()));
+  }
+  if (!timerViewRepaint_->isActive()) {
+    setUpdatesEnabled(false);
+    timerViewRepaint_->start(50, true);
+  }
+}
+
+void FLDataTable::repaintViewportSlot()
+{
+  QWidget *vw = viewport();
+  setUpdatesEnabled(true);
+  if (vw && !vw->aqWasDeleted())
+    vw->repaint(false);
+}
+
+void FLDataTable::cursorDestroyed(QObject *obj)
+{
+  if (!obj || obj != cursor_)
+    return;
+  cursor_ = 0;
 }

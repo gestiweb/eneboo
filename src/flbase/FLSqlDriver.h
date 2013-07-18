@@ -20,6 +20,9 @@
 #define FLSQLDRIVER_H
 
 #include <qsqldriver.h>
+#include <qsqlresult.h>
+
+#include "AQGlobal.h"
 
 class FLTableMetaData;
 class FLSqlCursor;
@@ -35,8 +38,8 @@ Esta clase no debería utilizarse directamente, se recomienda utilizar FLSqlDatab
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlDriver : public QSqlDriver {
-
+class AQ_EXPORT FLSqlDriver : public QSqlDriver
+{
   Q_OBJECT
 
 public:
@@ -44,7 +47,7 @@ public:
   /**
   constructor
   */
-  FLSqlDriver( QObject * parent = 0, const char * name = 0 );
+  FLSqlDriver(QObject *parent = 0, const char *name = 0);
 
   /**
   destructor
@@ -57,7 +60,7 @@ public:
   @param name Nombre de la base de datos
   @return Cadena con el nombre debidamente formateado
   */
-  virtual QString formatDatabaseName( const QString & name );
+  virtual QString formatDatabaseName(const QString &name);
 
   /**
   Intentar realizar una conexión a una base de datos.
@@ -71,7 +74,8 @@ public:
   @param port  Puerto TCP de conexión
   @return True si la conexión tuvo éxito, false en caso contrario
   */
-  virtual bool tryConnect( const QString & db, const QString & user = QString::null, const QString & password = QString::null, const QString & host = QString::null, int port = -1 );
+  virtual bool tryConnect(const QString &db, const QString &user = QString::null, const QString &password = QString::null,
+                          const QString &host = QString::null, int port = -1);
 
   /**
   Sentencia SQL específica de la base de datos que soporta el controlador, necesaria para crear
@@ -80,26 +84,28 @@ public:
   @param tmd Metadatos con la descripción de la tabla que se desea crear
   @return Sentencia SQL debidamente formateada para el tipo de base de datos soportada por el controlador
   */
-  virtual QString sqlCreateTable( FLTableMetaData * tmd );
+  virtual QString sqlCreateTable(const FLTableMetaData *tmd);
 
   /** Ver FLSqlDatabase::formatValueLike() */
-  virtual QString formatValueLike( int t, const QVariant & v, const bool upper = false );
+  virtual QString formatValueLike(int t, const QVariant &v, const bool upper = false);
   /** Ver FLSqlDatabase::formatValue() */
-  virtual QString formatValue( int t, const QVariant & v, const bool upper = false );
+  virtual QString formatValue(int t, const QVariant &v, const bool upper = false);
   /** Ver FLSqlDatabase::nextSerialVal() */
-  virtual QVariant nextSerialVal( const QString & table, const QString & field );
+  virtual QVariant nextSerialVal(const QString &table, const QString &field);
   /** Ver FLSqlDatabase::atFrom() */
-  virtual int atFrom( FLSqlCursor * cur );
+  virtual int atFrom(FLSqlCursor *cur);
   /** Ver FLSqlDatabase::alterTable() */
-  virtual bool alterTable( const QString & mtd1, const QString & mtd2, const QString & key = QString::null );
+  virtual bool alterTable(const QString &mtd1, const QString &mtd2, const QString &key = QString::null);
   /** Ver FLSqlDatabase::canSavePoint() */
   virtual bool canSavePoint();
   /** Ver FLSqlDatabase::savePoint() */
-  virtual bool savePoint( const QString & n );
+  virtual bool savePoint(const QString &n);
   /** Ver FLSqlDatabase::releaseSavePoint() */
-  virtual bool releaseSavePoint( const QString & n );
+  virtual bool releaseSavePoint(const QString &n);
   /** Ver FLSqlDatabase::rollbackSavePoint() */
-  virtual bool rollbackSavePoint( const QString & n );
+  virtual bool rollbackSavePoint(const QString &n);
+  /** Ver FLSqlDatabase::canOverPartition() */
+  virtual bool canOverPartition();
   /** Ver FLSqlDatabase::Mr_Proper() */
   virtual void Mr_Proper() {}
   /** Ver FLSqlDatabase::locksStatus() */
@@ -107,19 +113,45 @@ public:
   /** Ver FLSqlDatabase::detectLocks() */
   virtual QStringList detectLocks();
   /** Ver FLSqlDatabase::detectRisksLocks() */
-  virtual QStringList detectRisksLocks( const QString & table = QString::null,
-                                        const QString & primaryKeyValue = QString::null );
+  virtual QStringList detectRisksLocks(const QString &table = QString::null,
+                                       const QString &primaryKeyValue = QString::null);
   /** Ver FLSqlDatabase::regenTable() */
-  virtual bool regenTable( const QString & n, FLTableMetaData * tmd );
+  virtual bool regenTable(const QString &n, FLTableMetaData *tmd);
+  /** Ver FLSqlDatabase::md5TuplesState() */
+  virtual QString md5TuplesState() const;
+  /** Ver FLSqlDatabase::md5TuplesStateTable() */
+  virtual QString md5TuplesStateTable(const QString &table) const;
+  /** Ver FLSqlDatabase::mismatchedTable() */
+  virtual bool mismatchedTable(const QString &table,
+                               const FLTableMetaData *tmd) const;
+  /** Ver FLSqlDatabase::existsTable() */
+  virtual bool existsTable(const QString &n) const;
 
   /**
   Informa al driver de la base de datos que lo utiliza
   */
-  void setFLSqlDatabase( FLSqlDatabase * db );
+  void setFLSqlDatabase(FLSqlDatabase *db);
+
+  FLSqlDatabase *db() const;
 
 protected:
 
-  FLSqlDatabase * db_;
+  void msgBoxCritical(const QString &title, const QString &msg);
+
+  virtual void setLastError(const QSqlError &e);
+
+  FLSqlDatabase *db_;
+};
+
+class AQ_EXPORT FLSqlResult : public QSqlResult
+{
+public:
+  virtual ~FLSqlResult();
+
+protected:
+  FLSqlResult(const QSqlDriver *db);
+
+  virtual void setLastError(const QSqlError &e);
 };
 
 #endif

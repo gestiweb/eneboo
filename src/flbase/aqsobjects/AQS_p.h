@@ -41,6 +41,8 @@
 #include <quuid.h>
 #include <qsobjectfactory.h>
 #include <qswrapperfactory.h>
+#include <qcursor.h>
+#include <qapplication.h>
 
 #ifdef AQ_DEBUG
 #define AQS_IF_DEBUG(T) T
@@ -55,6 +57,8 @@ class AQSColor;
 class AQSImage;
 class AQSPixmap;
 class AQSUrlInfo;
+class AQSWidget;
+class AQSEvent;
 
 extern AQS *globalAQS;
 extern QSInterpreter *globalAQSInterpreter;
@@ -78,6 +82,7 @@ class AQS : public QObject
   Q_PROPERTY(int MetaButton READ MetaButton)
   Q_PROPERTY(int KeyButtonMask READ KeyButtonMask)
   Q_PROPERTY(int Horizontal READ Horizontal)
+  Q_PROPERTY(int Vertical READ Vertical)
   Q_PROPERTY(int AlignAuto READ AlignAuto)
   Q_PROPERTY(int AlignLeft READ AlignLeft)
   Q_PROPERTY(int AlignRight READ AlignRight)
@@ -612,6 +617,13 @@ class AQS : public QObject
   Q_ENUMS(ZipStatus ZipCompressionPolicy)
   Q_ENUMS(OdsStyleFlags)
   Q_ENUMS(ClassFlags FunctionFlags)
+  Q_ENUMS(SmtpClientState SmtpAuthMethod SmtpConnectionType)
+  Q_ENUMS(EditEchoMode)
+  Q_ENUMS(FieldDBAutoCompMode)
+  Q_ENUMS(DataTableRefresh)
+  Q_ENUMS(ScrollBarMode)
+  Q_ENUMS(SortOrder)
+  Q_ENUMS(TableEditType EditMode SelectionMode FocusStyle)
 
 public:
 
@@ -730,7 +742,7 @@ public:
   enum PageSize {
     A4, B5, Letter, Legal, Executive, A0, A1, A2, A3,
     A5, A6, A7, A8, A9, B0, B1, B10, B2, B3, B4, B6, B7, B8, B9,
-    C5E, Comm10E, DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom
+    C5E, Comm10E, DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom, CustomOld = 31
   };
   enum PageOrder {
     FirstPageFirst, LastPageFirst
@@ -1086,6 +1098,101 @@ public:
     IncludeMemberFunctions = 2
   };
 
+  enum SmtpClientState {
+    SmtpInit,
+    SmtpMail,
+    SmtpRcpt,
+    SmtpData,
+    SmtpBody,
+    SmtpQuit,
+    SmtpClose,
+    SmtpError,
+    SmtpConnecting,
+    SmtpConnected,
+    SmtpMxDnsError,
+    SmtpSendOk,
+    SmtpSocketError,
+    SmtpComposing,
+    SmtpAttach,
+    SmtpAttachError,
+    SmtpServerError,
+    SmtpClientError,
+    SmtpStartTTLS,
+    SmtpWaitingForSTARTTLS,
+    SmtpSendAuthPlain,
+    SmtpSendAuthLogin,
+    SmtpWaitingForAuthPlain,
+    SmtpWaitingForAuthLogin,
+    SmtpWaitingForUser,
+    SmtpWaitingForPass
+  };
+
+  enum SmtpAuthMethod {
+    SmtpNoAuth,
+    SmtpAuthPlain,
+    SmtpAuthLogin
+  };
+
+  enum SmtpConnectionType {
+    SmtpTcpConnection,
+    SmtpSslConnection,
+    SmtpTlsConnection
+  };
+
+  enum EditEchoMode {
+    EditNormal,
+    EditNoEcho,
+    EditPassword
+  };
+
+  enum FieldDBAutoCompMode {
+    NeverAuto = 0,
+    OnDemandF4,
+    AlwaysAuto
+  };
+
+  enum DataTableRefresh {
+    RefreshData = 1,
+    RefreshColumns = 2,
+    RefreshAll = 3
+  };
+
+  enum ScrollBarMode {
+    ScrollBarAuto,
+    ScrollBarAlwaysOff,
+    ScrollBarAlwaysOn
+  };
+
+  enum SortOrder {
+    Ascending,
+    Descending
+  };
+
+  enum TableEditType {
+    TableNever,
+    TableOnTyping,
+    TableWhenCurrent,
+    TableAlways
+  };
+
+  enum EditMode {
+    NotEditing,
+    Editing,
+    Replacing
+  };
+
+  enum SelectionMode {
+    Single,
+    Multi,
+    SingleRow,
+    MultiRow,
+    NoSelection
+  };
+
+  enum FocusStyle {
+    FollowStyle,
+    SpreadSheet
+  };
 
   AQS() : QObject(0, "aqs_namespace"), objectsCount_(0) {
     AQS_IF_DEBUG(printf("Global AQS Namespace created\n"));
@@ -1127,6 +1234,9 @@ public:
   }
   int Horizontal() const {
     return 0;
+  }
+  int Vertical() const {
+    return 1;
   }
   int AlignAuto() const {
     return 0x0000;
@@ -2876,7 +2986,47 @@ public slots:
   QString sha1(QByteArray *ba) const;
 
   int xsltproc(const QStringList &args) const;
+  int xsltproc(QByteArray *xslt, const QString &fileName,
+               const QString &output) const;
   QByteArray xsltproc(QByteArray *xslt, QByteArray *xml) const;
+  QByteArray xsltproc(QByteArray *xslt, const QString &fileName) const;
+
+  void setTabOrder(QWidget *first, QWidget *second);
+  void setTabOrder(AQSWidget *first, AQSWidget *second);
+
+  void Application_setOverrideCursor(int shape, bool replace = false) {
+    QApplication::setOverrideCursor(QCursor(shape), replace);
+  }
+  void Application_restoreOverrideCursor() {
+    QApplication::restoreOverrideCursor();
+  }
+  QCursor *Application_overrideCursor() {
+    QApplication::overrideCursor();
+  }
+  void Application_postEvent(QObject *receiver, QEvent *event) {
+    QApplication::postEvent(receiver, event);
+  }
+  void Application_postEvent(QObject *receiver, AQSEvent *event);
+  void Application_sendEvent(QObject *receiver, QEvent *event) {
+    QApplication::sendEvent(receiver, event);
+  }
+  void Application_sendEvent(QObject *receiver, AQSEvent *event);
+
+  QPoint Cursor_pos() {
+    return QCursor::pos();
+  }
+  void Cursor_setPos(int x, int y) {
+    QCursor::setPos(x, y);
+  }
+  void Cursor_setPos(const QPoint &p) {
+    QCursor::setPos(p);
+  }
+  void Cursor_initialize() {
+    QCursor::initialize();
+  }
+  void Cursor_cleanup() {
+    QCursor::cleanup();
+  }
 
 private:
 
@@ -2959,8 +3109,12 @@ static inline QString argsSignature(const QSArgumentList &args)
     if (arg.type() == QSArgument::QObjectPtr || arg.type() == QSArgument::VoidPointer) {
       QString typeName(arg.typeName());
       if (typeName.startsWith("AQS")) {
-        if (globalAQSFactory->instanceDescriptors()[typeName].isEmpty())
-          typeName = QString::fromLatin1("AQ") + typeName.mid(3);
+        QString typeNameAux(QString::fromLatin1("Q") + typeName.mid(3));
+        if (globalAQSWrapper->wrapperDescriptors()[typeNameAux].isEmpty() &&
+            globalAQSFactory->instanceDescriptors()[typeName].isEmpty()) {
+          typeNameAux = QString::fromLatin1("AQ") + typeName.mid(3);
+        }
+        typeName = typeNameAux;
       }
       ret.append(typeName);
       ret.append("*");

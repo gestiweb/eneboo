@@ -46,213 +46,259 @@
 #include "qrect.h"
 #include "qwidget.h"
 
+#if defined(_WIN64) && defined(Q_WS_WIN)
+#  if defined(Q_CC_MINGW)
+#    define QT_ENSURE_STACK_ALIGNED_FOR_SSE __attribute__ ((force_align_arg_pointer))
+#  else
+#    define QT_ENSURE_STACK_ALIGNED_FOR_SSE
+#  endif
+#  define QT_WIN_CALLBACK CALLBACK QT_ENSURE_STACK_ALIGNED_FOR_SSE
+#endif
 
 class QDesktopWidgetPrivate
 {
 public:
-    QDesktopWidgetPrivate();
-    ~QDesktopWidgetPrivate();
+  QDesktopWidgetPrivate();
+  ~QDesktopWidgetPrivate();
 
-    void clear();
-    void init();
-    void addScreen( HMONITOR hMonitor );
+  void clear();
+  void init();
+  void addScreen(HMONITOR hMonitor);
 
-    QValueList<QRect> rcMon;
-    QValueList<QRect> rcWork;
+  QValueList<QRect> rcMon;
+  QValueList<QRect> rcWork;
 
-    int defaultScreen;
-    int screenCount;
+  int defaultScreen;
+  int screenCount;
 private:
-    // GetMonitorInfo
-    BOOL ( WINAPI * qt_GMI ) ( HMONITOR, LPMONITORINFO );
+#ifndef _WIN64
+  // GetMonitorInfo
+  BOOL (WINAPI *qt_GMI)(HMONITOR, LPMONITORINFO);
+#else
+  typedef BOOL (WINAPI *InfoFunc)(HMONITOR, MONITORINFO *);
+  typedef BOOL (QT_WIN_CALLBACK *EnumProc)(HMONITOR, HDC, LPRECT, LPARAM);
+  typedef BOOL (WINAPI *EnumFunc)(HDC, LPCRECT, EnumProc, LPARAM);
+
+  InfoFunc qt_GMI;
+#endif
 };
 
 QDesktopWidgetPrivate::QDesktopWidgetPrivate()
-        : defaultScreen( 0 ), screenCount( 1 ), qt_GMI ( NULL )
+  : defaultScreen(0), screenCount(1), qt_GMI(NULL)
 {
-    init();
+  init();
 }
 
 QDesktopWidgetPrivate::~QDesktopWidgetPrivate()
 {
-    clear();
+  clear();
 }
 
-void QDesktopWidgetPrivate::addScreen( HMONITOR hMonitor )
+void QDesktopWidgetPrivate::addScreen(HMONITOR hMonitor)
 {
-    MONITORINFO mi;
-    RECT *lpRC;
-	QRect r;
+  MONITORINFO mi;
+  RECT *lpRC;
+  QRect r;
 
-    memset( &mi, 0, sizeof ( MONITORINFO ) );
-    mi.cbSize = sizeof( MONITORINFO );
-    
-	if ( !qt_GMI( hMonitor, &mi ) ) {
-		rcMon.append( r );
-		rcWork.append( r );
-		return;
-	}
-	lpRC = &mi.rcMonitor;
-	r = QRect ( QPoint ( lpRC->left, lpRC->top ), QPoint( lpRC->right - 1, lpRC->bottom - 1 ) );
-	rcMon.append( r );
-	lpRC = &mi.rcWork;
-	r = QRect ( QPoint ( lpRC->left, lpRC->top ), QPoint( lpRC->right - 1, lpRC->bottom - 1 ) );
-	rcWork.append( r );
+  memset(&mi, 0, sizeof(MONITORINFO));
+  mi.cbSize = sizeof(MONITORINFO);
 
-    if ( mi.dwFlags & 0x00000001 ) //MONITORINFOF_PRIMARY
-        defaultScreen = screenCount;
+  if (!qt_GMI(hMonitor, &mi)) {
+    rcMon.append(r);
+    rcWork.append(r);
+    return;
+  }
+  lpRC = &mi.rcMonitor;
+  r = QRect(QPoint(lpRC->left, lpRC->top), QPoint(lpRC->right - 1, lpRC->bottom - 1));
+  rcMon.append(r);
+  lpRC = &mi.rcWork;
+  r = QRect(QPoint(lpRC->left, lpRC->top), QPoint(lpRC->right - 1, lpRC->bottom - 1));
+  rcWork.append(r);
 
-    screenCount++;
+  if (mi.dwFlags & 0x00000001)   //MONITORINFOF_PRIMARY
+    defaultScreen = screenCount;
+
+  screenCount++;
 }
 
-BOOL CALLBACK MonitorEnumProc( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprc, LPARAM dwData )
+#ifndef _WIN64
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprc, LPARAM dwData)
+#else
+BOOL QT_WIN_CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprc, LPARAM dwData)
+#endif
 {
-    QDesktopWidgetPrivate * lpDW = ( QDesktopWidgetPrivate* ) dwData;
+  QDesktopWidgetPrivate *lpDW = (QDesktopWidgetPrivate *) dwData;
 
-    lpDW->addScreen( hMonitor );
-    return TRUE;
+  lpDW->addScreen(hMonitor);
+  return TRUE;
 }
 
 void QDesktopWidgetPrivate::clear()
 {
-    uint i;
-	rcMon.clear();
-	rcWork.clear();
+  uint i;
+  rcMon.clear();
+  rcWork.clear();
 }
 
 void QDesktopWidgetPrivate::init()
 {
-    screenCount = 0;
-    // EnumDisplayMonitors
-    BOOL ( WINAPI * qt_EDM ) ( HDC, LPCRECT, MONITORENUMPROC, LPARAM );
+  screenCount = 0;
 
-    clear();
+#ifndef _WIN64
+  // EnumDisplayMonitors
+  BOOL (WINAPI * qt_EDM)(HDC, LPCRECT, MONITORENUMPROC, LPARAM);
 
-    /* Only available in Win98 and up */
-    QLibrary lib( "user32.dll" );
+  clear();
 
-    ( DWORD& ) qt_EDM = ( DWORD ) lib.resolve( "EnumDisplayMonitors" );
-	if ( !qt_GMI ) {
-		QT_WA (
-	        ( DWORD& ) qt_GMI = ( DWORD ) lib.resolve( "GetMonitorInfoA" );
-			,
-	        ( DWORD& ) qt_GMI = ( DWORD ) lib.resolve( "GetMonitorInfoW" );
-		)
-	}
+  /* Only available in Win98 and up */
+  QLibrary lib("user32.dll");
 
-    if ( qt_EDM && qt_GMI ) {
-        qt_EDM( NULL, NULL, MonitorEnumProc, ( LPARAM ) this );
-    } else {
-        // Win95
-        RECT rc;
-        GetWindowRect( GetDesktopWindow(), &rc );
-        QRect r = QRect ( QPoint ( rc.left, rc.top ), QPoint( rc.right, rc.bottom ) );
-        rcMon.append( r );
-        rcWork.append( r );
-    }
+  (DWORD &) qt_EDM = (DWORD) lib.resolve("EnumDisplayMonitors");
+  if (!qt_GMI) {
+    QT_WA(
+      (DWORD &) qt_GMI = (DWORD) lib.resolve("GetMonitorInfoA");
+      ,
+      (DWORD &) qt_GMI = (DWORD) lib.resolve("GetMonitorInfoW");
+    )
+  }
+
+  if (qt_EDM && qt_GMI) {
+    qt_EDM(NULL, NULL, MonitorEnumProc, (LPARAM) this);
+  } else {
+    // Win95
+    RECT rc;
+    GetWindowRect(GetDesktopWindow(), &rc);
+    QRect r = QRect(QPoint(rc.left, rc.top), QPoint(rc.right, rc.bottom));
+    rcMon.append(r);
+    rcWork.append(r);
+  }
+#else
+  EnumFunc qt_EDM;
+
+  clear();
+
+  QLibrary user32Lib("user32.dll");
+  if (user32Lib.load()) {
+    qt_EDM = (EnumFunc)user32Lib.resolve("EnumDisplayMonitors");
+    if (qt_GMI)
+      qt_GMI = (InfoFunc)user32Lib.resolve("GetMonitorInfoW");
+  }
+
+  if (!qt_EDM || !qt_GMI) {
+    // Win95
+    RECT rc;
+    GetWindowRect(GetDesktopWindow(), &rc);
+    QRect r = QRect(QPoint(rc.left, rc.top), QPoint(rc.right, rc.bottom));
+    rcMon.append(r);
+    rcWork.append(r);
+    return;
+  }
+  qt_EDM(NULL, NULL, MonitorEnumProc, (LPARAM) this);
+  qt_EDM = 0;
+#endif
 }
 
 // the QDesktopWidget itself will be created on the default screen
 // as qt_x11_create_desktop_on_screen defaults to -1
 QDesktopWidget::QDesktopWidget()
-        : QWidget( 0, "desktop", WType_Desktop )
+  : QWidget(0, "desktop", WType_Desktop)
 {
-    d = new QDesktopWidgetPrivate;
+  d = new QDesktopWidgetPrivate;
 }
 
 QDesktopWidget::~QDesktopWidget()
 {
-    delete d;
+  delete d;
 }
 
 bool QDesktopWidget::isVirtualDesktop() const
 {
-    return true;
+  return true;
 }
 
 int QDesktopWidget::primaryScreen() const
 {
-    return d->defaultScreen;
+  return d->defaultScreen;
 }
 
 int QDesktopWidget::numScreens() const
 {
-    return d->screenCount;
+  return d->screenCount;
 }
 
-QWidget *QDesktopWidget::screen( int screen )
+QWidget *QDesktopWidget::screen(int screen)
 {
-    return this;
+  return this;
 }
 
-const QRect& QDesktopWidget::availableGeometry( int screen ) const
+const QRect &QDesktopWidget::availableGeometry(int screen) const
 {
-    if ( ( screen < 0 ) || ( screen >= d->screenCount ) )
-        screen = d->defaultScreen;
-    return d->rcWork[ screen ];
+  if ((screen < 0) || (screen >= d->screenCount))
+    screen = d->defaultScreen;
+  return d->rcWork[ screen ];
 }
 
-const QRect& QDesktopWidget::screenGeometry( int screen ) const
+const QRect &QDesktopWidget::screenGeometry(int screen) const
 {
-    if ( ( screen < 0 ) || ( screen >= d->screenCount ) )
-        screen = d->defaultScreen;
-	return d->rcMon[ screen ];
+  if ((screen < 0) || (screen >= d->screenCount))
+    screen = d->defaultScreen;
+  return d->rcMon[ screen ];
 }
 
-int QDesktopWidget::screenNumber( QWidget *widget ) const
+int QDesktopWidget::screenNumber(QWidget *widget) const
 {
-    int maxSize = -1;
-    int maxScreen = -1;
+  int maxSize = -1;
+  int maxScreen = -1;
 
-    if ( !widget )
-        return d->defaultScreen;
+  if (!widget)
+    return d->defaultScreen;
 
-    QRect frame = widget->frameGeometry();
-    if ( !widget->isTopLevel() )
-        frame.moveTopLeft( widget->mapToGlobal( QPoint( 0, 0 ) ) );
+  QRect frame = widget->frameGeometry();
+  if (!widget->isTopLevel())
+    frame.moveTopLeft(widget->mapToGlobal(QPoint(0, 0)));
 
-    for ( int i = 0; i < d->screenCount; ++i ) {
-        QRect sect = d->rcMon[ i ].intersect( frame );
-        int size = sect.width() * sect.height();
-        if ( size > maxSize && sect.width() > 0 && sect.height() > 0 ) {
-            maxSize = size;
-            maxScreen = i;
-        }
+  for (int i = 0; i < d->screenCount; ++i) {
+    QRect sect = d->rcMon[ i ].intersect(frame);
+    int size = sect.width() * sect.height();
+    if (size > maxSize && sect.width() > 0 && sect.height() > 0) {
+      maxSize = size;
+      maxScreen = i;
     }
-    return maxScreen;
+  }
+  return maxScreen;
 }
 
-int QDesktopWidget::screenNumber( const QPoint &point ) const
+int QDesktopWidget::screenNumber(const QPoint &point) const
 {
-    for ( int i = 0; i < d->screenCount; ++i ) {
-        if ( d->rcMon[ i ].contains( point ) )
-            return i;
-    }
-    return -1;
+  for (int i = 0; i < d->screenCount; ++i) {
+    if (d->rcMon[ i ].contains(point))
+      return i;
+  }
+  return -1;
 }
 
-void QDesktopWidget::resizeEvent( QResizeEvent *ev )
+void QDesktopWidget::resizeEvent(QResizeEvent *ev)
 {
-	int oldscreencount = d->screenCount;
-    QValueList<QRect> oldrects = d->rcMon;
-    QValueList<QRect> oldworkrects = d->rcWork;
+  int oldscreencount = d->screenCount;
+  QValueList<QRect> oldrects = d->rcMon;
+  QValueList<QRect> oldworkrects = d->rcWork;
 
-	d->init();
-    QWidget::resizeEvent( ev );
+  d->init();
+  QWidget::resizeEvent(ev);
 
-	for ( int i = 0; i < QMIN(oldscreencount, d->screenCount); ++i ) {
-        QRect oldrect = oldrects[ i ];
-        QRect newrect = d->rcMon[ i ];
-        if (oldrect != newrect)
-            emit resized( i );
-    }
+  for (int i = 0; i < QMIN(oldscreencount, d->screenCount); ++i) {
+    QRect oldrect = oldrects[ i ];
+    QRect newrect = d->rcMon[ i ];
+    if (oldrect != newrect)
+      emit resized(i);
+  }
 
 #ifndef Q_OS_TEMP
-    for ( int j = 0; j < QMIN(oldscreencount, d->screenCount); ++j ) {
-        QRect oldrect = oldworkrects[ j ];
-        QRect newrect = d->rcWork[ j ];
-        if ( oldrect != newrect )
-            emit workAreaResized( j );
-    }
+  for (int j = 0; j < QMIN(oldscreencount, d->screenCount); ++j) {
+    QRect oldrect = oldworkrects[ j ];
+    QRect newrect = d->rcWork[ j ];
+    if (oldrect != newrect)
+      emit workAreaResized(j);
+  }
 #endif
 }

@@ -101,15 +101,20 @@ void FLConnectDBDialog::tryConnect()
     error_ = true;
     delete db;
     this->accept();
-    return ;
+    return;
   }
 
+  QString connOpts;
+  if (db->driverName() == "FLQPSQL7")
+    connOpts = "connect_timeout=30";
   if (!db->connectDB(comboBoxNameDB->currentText(), lineEditUser->text(),
-                     lineEditPassword->text(), lineEditHost->text(), lineEditPort->text().toInt())) {
+                     lineEditPassword->text(), lineEditHost->text(),
+                     lineEditPort->text().toInt(),
+                     QString::fromLatin1("default"), connOpts)) {
     error_ = true;
     delete db;
     this->accept();
-    return ;
+    return;
   }
 
   FLSettings::writeEntry("DBA/rememberPasswd", rememberPasswd_);
@@ -324,7 +329,7 @@ void FLConnectDBDialog::paintEvent(QPaintEvent *pe)
     QFont font8(qApp->font().family(), 8);
 #endif
     font8.setBold(true);
-    QString copyright("Copyright (C) 2003-2012 by InfoSiAL S.L.");
+    QString copyright("Copyright (C) 2003-2013 by InfoSiAL S.L.");
     int lineWidth = QFontMetrics(font8).width(copyright);
     int lineHeight = QFontMetrics(font8).height();
     p.setFont(font8);

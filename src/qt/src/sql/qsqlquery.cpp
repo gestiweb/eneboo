@@ -348,9 +348,9 @@ bool QSqlQuery::exec ( const QString& query )
     d->sqlResult->setLastError( QSqlError() );
     d->sqlResult->setAt( QSql::BeforeFirst );
     if ( !driver() ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::exec: no driver" );
-#endif
+//#endif
 	return FALSE;
     }
     if ( d->count > 1 )
@@ -358,15 +358,15 @@ bool QSqlQuery::exec ( const QString& query )
     d->sqlResult->setQuery( query.stripWhiteSpace() );
     d->executedQuery = d->sqlResult->lastQuery();
     if ( !driver()->isOpen() || driver()->isOpenError() ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::exec: database not open" );
-#endif
+//#endif
 	return FALSE;
     }
     if ( query.isNull() || query.length() == 0 ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::exec: empty query" );
-#endif
+//#endif
 	return FALSE;
     }
 #ifdef QT_DEBUG_SQL
@@ -398,9 +398,9 @@ QVariant QSqlQuery::value( int i ) const
     if ( isActive() && isValid() && ( i > QSql::BeforeFirst ) ) {
 	return d->sqlResult->data( i );
     } else {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning( "QSqlQuery::value: not positioned on a valid record" );
-#endif
+//#endif
     }
     return QVariant();
 }
@@ -539,9 +539,9 @@ bool QSqlQuery::seek( int i, bool relative )
     }
     // let drivers optimize
     if ( isForwardOnly() && actualIdx < at() ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::seek: cannot seek backwards in a forward only query" );
-#endif
+//#endif
 	afterSeek();
 	return FALSE;
     }
@@ -656,9 +656,9 @@ bool QSqlQuery::prev()
     if ( !isSelect() || !isActive() )
 	return FALSE;
     if ( isForwardOnly() ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::seek: cannot seek backwards in a forward only query" );
-#endif
+//#endif
 	return FALSE;
     }
 
@@ -700,9 +700,9 @@ bool QSqlQuery::first()
     if ( !isSelect() || !isActive() )
 	return FALSE;
     if ( isForwardOnly() && at() > QSql::BeforeFirst ) {
-#ifdef QT_CHECK_RANGE
+//#ifdef QT_CHECK_RANGE
 	qWarning("QSqlQuery::seek: cannot seek backwards in a forward only query" );
-#endif
+//#endif
 	return FALSE;
     }
     beforeSeek();

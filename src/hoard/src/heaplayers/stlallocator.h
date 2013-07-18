@@ -32,6 +32,7 @@
 #include <cstdlib>
 
 #include <memory> // STL
+#include <cstddef>
 
 using namespace std;
 

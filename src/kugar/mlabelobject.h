@@ -233,6 +233,11 @@ public:
   */
   virtual int calcHeight(FLStylePainter *p) const;
 
+  /**
+  Run-time type information
+  */
+  virtual int RTTI() const;
+
 private:
 
   /**

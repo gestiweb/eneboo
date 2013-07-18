@@ -23,10 +23,12 @@
 #include <qdatetime.h>
 #include <qrect.h>
 
+#include "aqadvglobal.h"
+
 class QToolButton;
 class VDateTable;
 
-class VDatePopup: public QFrame {
+class AQADV_EXPORT VDatePopup: public QFrame {
 	Q_OBJECT
 
 public:

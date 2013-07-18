@@ -22,12 +22,14 @@
 #include <qstring.h>
 #include <qvariant.h>
 
+#include "AQGlobal.h"
+
 /**
 Representa objetos que encapsulan parámetros de una consulta  o un filtro
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLParameterQuery {
+class AQ_EXPORT FLParameterQuery {
 
 public:
 

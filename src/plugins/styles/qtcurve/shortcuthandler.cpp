@@ -27,8 +27,8 @@
 #include <qstyle.h>
 
 ShortcutHandler::ShortcutHandler(QObject *parent)
-               : QObject(parent)
-               , itsAltDown(false)
+  : QObject(parent)
+  , itsAltDown(false)
 {
 }
 
@@ -38,146 +38,135 @@ ShortcutHandler::~ShortcutHandler()
 
 bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
 {
-    if(widget && !widget->isEnabled())
-        return false;
-
-    if(::qt_cast<const QPopupMenu *>(widget))
-        return itsOpenMenus.count() && itsOpenMenus.last()==widget;
-//     {
-//         const QWidget *w=widget;
-//         
-//         while(w)
-//         {
-//             if(itsSeenAlt.contains((QWidget *)w))
-//                 return true;
-//             w=w->parentWidget();
-//         }
-//     }
-    else
-        return itsOpenMenus.isEmpty() &&  itsSeenAlt.contains((QWidget *)(widget->topLevelWidget()));
+  if (widget && !widget->isEnabled())
     return false;
+
+  if (::qt_cast<const QPopupMenu *>(widget))
+    return itsOpenMenus.count() && itsOpenMenus.last() == widget;
+  //     {
+  //         const QWidget *w=widget;
+  //
+  //         while(w)
+  //         {
+  //             if(itsSeenAlt.contains((QWidget *)w))
+  //                 return true;
+  //             w=w->parentWidget();
+  //         }
+  //     }
+  else
+    return itsOpenMenus.isEmpty() &&  itsSeenAlt.contains((QWidget *)(widget->topLevelWidget()));
+  return false;
 }
 
 bool ShortcutHandler::showShortcut(const QWidget *widget) const
 {
-    return itsAltDown && hasSeenAlt(widget);
+  return itsAltDown && hasSeenAlt(widget);
 }
 
 void ShortcutHandler::widgetDestroyed(QObject *o)
 {
-    itsUpdated.remove(static_cast<QWidget *>(o));
-    itsOpenMenus.remove(static_cast<QWidget *>(o));
+  itsUpdated.remove(static_cast<QWidget *>(o));
+  itsOpenMenus.remove(static_cast<QWidget *>(o));
 }
 
 void ShortcutHandler::updateWidget(QWidget *w)
 {
-    if(!itsUpdated.contains(w))
-    {
-        connect(w, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
-        itsUpdated.append(w);
-        w->repaint(TRUE);
-    }
+  if (!itsUpdated.contains(w)) {
+    connect(w, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+    itsUpdated.append(w);
+    w->repaint(TRUE);
+  }
 }
 
 void ShortcutHandler::setSeenAlt(QWidget *w)
 {
-    if(!itsSeenAlt.contains(w))
-        itsSeenAlt.append(w);
+  if (!itsSeenAlt.contains(w))
+    itsSeenAlt.append(w);
 }
 
 bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
 {
-    if (!o->isWidgetType())
-        return QObject::eventFilter(o, e);
-
-    QWidget *widget = ::qt_cast<QWidget*>(o);
-    switch(e->type()) 
-    {
-        case QEvent::KeyPress:
-            if (Key_Alt==((QKeyEvent*)e)->key())
-            {
-                itsAltDown = true;
-
-                if(::qt_cast<QPopupMenu *>(widget))
-                {
-                    setSeenAlt(widget);
-                    updateWidget(widget);
-                    if(widget->parentWidget() && widget->parentWidget()->topLevelWidget())
-                        itsSeenAlt.append(widget->parentWidget()->topLevelWidget());
-                }
-                else
-                {
-                    widget = widget->topLevelWidget();
-                    setSeenAlt(widget);
-
-                    // Alt has been pressed - find all widgets that care
-                    QObjectList *l = widget->queryList("QWidget");
-                    QObjectListIt it( *l );
-                    QWidget *w;
-                    while ((w = (QWidget *)it.current()) != 0)
-                    {
-                        ++it;
-                        if (!(w->isTopLevel() || !w->isVisible())) // || w->style().styleHint(QStyle::SH_UnderlineAccelerator, w)))
-                            updateWidget(w);
-                    }
-                    delete l;
-                }
-            }
-            break;
-        case QEvent::WindowDeactivate:
-        case QEvent::KeyRelease:
-            if (QEvent::WindowDeactivate==e->type() || Key_Alt==static_cast<QKeyEvent*>(e)->key())
-            {
-                itsAltDown = false;
-                QValueList<QWidget *>::const_iterator it(itsUpdated.begin()),
-                                                      end(itsUpdated.end());
-                                           
-                for (; it!=end; ++it)
-                    (*it)->repaint(TRUE);
-                if(!itsUpdated.contains(widget))
-                    widget->repaint(TRUE);
-                itsSeenAlt.clear();
-                itsUpdated.clear();
-            }
-            break;
-        case QEvent::Show:
-            if(::qt_cast<QPopupMenu *>(widget))
-            {
-                QWidget *prev=itsOpenMenus.count() ? itsOpenMenus.last() : 0L;
-                itsOpenMenus.append(widget);
-                if(itsAltDown && prev)
-                    prev->repaint(TRUE);
-                connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
-            }
-            break;
-        case QEvent::Hide:
-            if(::qt_cast<QPopupMenu *>(widget))
-            {
-                itsSeenAlt.remove(widget);
-                itsUpdated.remove(widget);
-                itsOpenMenus.remove(widget);
-                if(itsAltDown)
-                {
-                    if(itsOpenMenus.count())
-                        itsOpenMenus.last()->repaint(TRUE);
-                    else if(widget->parentWidget() && widget->parentWidget()->topLevelWidget())
-                        widget->parentWidget()->topLevelWidget()->repaint(TRUE);
-                }
-            }
-            break;
-        case QEvent::Close:
-            // Reset widget when closing
-            itsSeenAlt.remove(widget);
-            itsUpdated.remove(widget);
-            itsSeenAlt.remove(widget->topLevelWidget());
-            itsOpenMenus.remove(widget);
-            if(itsAltDown && itsOpenMenus.count())
-                itsOpenMenus.last()->repaint(TRUE);
-            break;
-        default:
-            break;
-    }
+  if (!o->isWidgetType())
     return QObject::eventFilter(o, e);
+
+  QWidget *widget = ::qt_cast<QWidget *>(o);
+  switch (e->type()) {
+    case QEvent::KeyPress:
+      if (Key_Alt == ((QKeyEvent *)e)->key()) {
+        itsAltDown = true;
+
+        if (::qt_cast<QPopupMenu *>(widget)) {
+          setSeenAlt(widget);
+          updateWidget(widget);
+          if (widget->parentWidget() && widget->parentWidget()->topLevelWidget())
+            itsSeenAlt.append(widget->parentWidget()->topLevelWidget());
+        } else {
+          widget = widget->topLevelWidget();
+          setSeenAlt(widget);
+
+          // Alt has been pressed - find all widgets that care
+          QObjectList *l = widget->queryList("QWidget");
+          QObjectListIt it(*l);
+          QWidget *w;
+          while ((w = (QWidget *)it.current()) != 0) {
+            ++it;
+            if (!(w->isTopLevel() || !w->isVisible())) // || w->style().styleHint(QStyle::SH_UnderlineAccelerator, w)))
+              updateWidget(w);
+          }
+          delete l;
+        }
+      }
+      break;
+    case QEvent::WindowDeactivate:
+    case QEvent::KeyRelease:
+      if (QEvent::WindowDeactivate == e->type() || Key_Alt == static_cast<QKeyEvent *>(e)->key()) {
+        itsAltDown = false;
+        QValueList<QWidget *>::const_iterator it(itsUpdated.begin()),
+                   end(itsUpdated.end());
+
+        for (; it != end; ++it)
+          (*it)->repaint(TRUE);
+        if (!itsUpdated.contains(widget))
+          widget->repaint(TRUE);
+        itsSeenAlt.clear();
+        itsUpdated.clear();
+      }
+      break;
+    case QEvent::Show:
+      if (::qt_cast<QPopupMenu *>(widget)) {
+        QWidget *prev = itsOpenMenus.count() ? itsOpenMenus.last() : 0L;
+        itsOpenMenus.append(widget);
+        if (itsAltDown && prev)
+          prev->repaint(TRUE);
+        connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+      }
+      break;
+    case QEvent::Hide:
+      if (::qt_cast<QPopupMenu *>(widget)) {
+        itsSeenAlt.remove(widget);
+        itsUpdated.remove(widget);
+        itsOpenMenus.remove(widget);
+        if (itsAltDown) {
+          if (itsOpenMenus.count())
+            itsOpenMenus.last()->repaint(TRUE);
+          else if (widget->parentWidget() && widget->parentWidget()->topLevelWidget())
+            widget->parentWidget()->topLevelWidget()->repaint(TRUE);
+        }
+      }
+      break;
+    case QEvent::Close:
+      // Reset widget when closing
+      itsSeenAlt.remove(widget);
+      itsUpdated.remove(widget);
+      itsSeenAlt.remove(widget->topLevelWidget());
+      itsOpenMenus.remove(widget);
+      if (itsAltDown && itsOpenMenus.count())
+        itsOpenMenus.last()->repaint(TRUE);
+      break;
+    default:
+      break;
+  }
+  return QObject::eventFilter(o, e);
 }
 
 //#include "shortcuthandler.moc"

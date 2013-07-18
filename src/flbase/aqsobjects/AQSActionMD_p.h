@@ -43,11 +43,13 @@ public slots:
   void setForm(const QString &);
   void setFormRecord(const QString &);
   void setCaption(const QString &);
+  void setDescription(const QString &);
   QString name() const;
   QString scriptFormRecord() const;
   QString scriptForm() const;
   QString table() const;
   QString caption() const;
+  QString description() const;
   QString form() const;
   QString formRecord() const;
 
@@ -99,6 +101,10 @@ inline void AQSActionMD::setCaption(const QString &arg0)
 {
   AQ_CALL_VOID(setCaption(arg0));
 }
+inline void AQSActionMD::setDescription(const QString &arg0)
+{
+  AQ_CALL_VOID(setDescription(arg0));
+}
 inline QString AQSActionMD::name() const
 {
   AQ_CALL_RET_V(name(), QString);
@@ -118,6 +124,10 @@ inline QString AQSActionMD::table() const
 inline QString AQSActionMD::caption() const
 {
   AQ_CALL_RET_V(caption(), QString);
+}
+inline QString AQSActionMD::description() const
+{
+  AQ_CALL_RET_V(description(), QString);
 }
 inline QString AQSActionMD::form() const
 {

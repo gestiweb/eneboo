@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+# Need to change fontmanager so that fontfactories decide what to do
+# with the filename, then the "|" notation below can work.
+
+%weight = (
+    "black" => 87,
+    "bold" => 75,
+    "book" => 50,
+    "demi" => 63,
+    "demibold" => 63,
+    "light" => 25,
+    "medium" => 50,
+    "regular" => 50,
+    "0" => 50,
+    "" => 50
+);
+
+file: for $file (@ARGV) {
+    open F, $file;
+    undef $family;
+    line: while (<F>) {
+	chomp;
+	$_ = lc($_);
+	if ( /^font\s+/ ) {
+	    s/ /_/g;
+	    if ( ($foundry,$family,$weight,$slant,$_,$_,$_,$pt,$_,$_,$_,$_,$registry,$encoding)
+		= /^font_+-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([^-]*)/ ) {
+	    } elsif ( /^font_/ ) {
+		print STDERR "$file does not use XLFD\n";
+		next file;
+	    }
+	    last line;
+	}
+    }
+    close F;
+    if ($family) {
+	$e = "$registry-$encoding";
+	$f="$family-$slant-$weight-$pt";
+	if ( $file{"$f-$e"} ) {
+	    print STDERR "Ignoring duplicate $file, keeping ",$file{"$f-$e"},"\n";
+	} else {
+	    $encodings{$f} .= " " if defined $encodings{$f};
+	    $encodings{$f} .= $e;
+	    $file{"$f-$e"} = $file;
+	}
+    }
+}
+
+for $f ( sort keys %encodings ) {
+    undef %e;
+    @files = ();
+    for $e ( split / /, $encodings{$f} ) {
+	$e{$e}++;
+	@files = ( @files, $file{"$f-$e"} );
+    }
+    ($family,$slant,$weight,$pt) = split "-",$f;
+    $flags = "u";
+    if ( $#files ) {
+	# Not implemented in kernel yet
+	#$files = join("|",@files);
+	undef $files;
+    } else {
+	$files = $files[0];
+    }
+    print lc($family)," $files BDF ",($slant eq "r" ? "n" : "y"),
+	" ",$weight{$weight}," $pt $flags\n";
+}

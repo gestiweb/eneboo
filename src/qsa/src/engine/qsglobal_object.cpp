@@ -93,7 +93,7 @@ static QSObject qsEval(QSEnv *env)
 #endif
                                );
       int parseError = qsyyparse();
-      progNode = QSProgramNode::last();
+      progNode = QSProgramNode::nodeProgLast();
 
       if (parseError || QSLexer::lexer()->lexerState() == QSLexer::Bad)
         return env->throwError(SyntaxError);

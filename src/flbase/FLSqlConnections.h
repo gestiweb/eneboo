@@ -19,6 +19,10 @@
 #ifndef FLSQLCONNECTIONS_H
 #define FLSQLCONNECTIONS_H
 
+#include <qdict.h>
+
+#include "AQGlobal.h"
+
 class FLSqlConnectionsPrivate;
 class FLSqlDatabase;
 
@@ -33,7 +37,7 @@ La conexión por defecto tendrá el nombre "default".
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlConnections
+class AQ_EXPORT FLSqlConnections
 {
 public:
   /**
@@ -49,10 +53,15 @@ public:
   @param host  Nombre o dirección del servidor de la base de datos
   @param port  Puerto TCP de conexion
   @param connectionName Nombre de la conexion
+  @param connectOptions Contiene opciones auxiliares de conexión a la base de datos.
+                        El formato de la cadena de opciones es una lista separada por punto y coma
+                        de nombres de opción o la opción = valor. Las opciones dependen del uso del
+                        driver de base de datos.
   @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
   */
   static bool addDatabase(const QString &driverAlias, const QString &nameDB, const QString &user,
-                          const QString &password, const QString &host, int port, const QString &connectionName);
+                          const QString &password, const QString &host, int port,
+                          const QString &connectionName, const QString &connectOptions = QString::null);
 
   /**
   Sobrecargada por conveniencia
@@ -87,6 +96,11 @@ public:
   Finalizar todas las conexiones
   */
   static void finish();
+
+  /**
+  @return Diccionario con las bases de datos abiertas
+  */
+  static QDict<FLSqlDatabase> *dictDatabases();
 
 private:
 

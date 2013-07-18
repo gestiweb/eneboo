@@ -49,6 +49,7 @@
 #ifndef QT_NO_STL
 #include <iterator>
 #include <map>
+#include <cstddef>
 #endif
 
 //#define QT_CHECK_MAP_RANGE

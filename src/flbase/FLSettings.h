@@ -19,7 +19,9 @@
 #ifndef FLSETTINGS_H_
 #define FLSETTINGS_H_
 
-class FLSettings
+#include "AQGlobal.h"
+
+class AQ_EXPORT FLSettings
 {
 public:
   static QStringList readListEntry(const QString &key, bool *retOk = 0);

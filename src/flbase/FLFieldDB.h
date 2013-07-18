@@ -47,6 +47,8 @@
 
 #include "FLWidgetFieldDB.h"
 
+#include "AQGlobal.h"
+
 class FLSqlCursor;
 class VDatePopup;
 class FLPixmapView;
@@ -89,7 +91,7 @@ abre la tabla divisas donde podemos escoger el valor oportuno.
 
 @author InfoSiAL S.L.
 */
-class FLFieldDB: public FLWidgetFieldDB
+class AQ_EXPORT FLFieldDB: public FLWidgetFieldDB
 {
   Q_OBJECT
 
@@ -101,7 +103,11 @@ class FLFieldDB: public FLWidgetFieldDB
   Q_PROPERTY(QString actionName READ actionName WRITE setActionName)
   Q_PROPERTY(bool showAlias READ showAlias WRITE setShowAlias)
   Q_PROPERTY(bool showEditor READ showEditor WRITE setShowEditor)
-  Q_PROPERTY(int textFormat READ textFormat WRITE setTextFormat)
+  Q_PROPERTY(TextFormat textFormat READ textFormat WRITE setTextFormat)
+  Q_PROPERTY(int echoMode READ echoMode WRITE setEchoMode)
+  Q_PROPERTY(AutoCompMode autoCompletionMode READ autoCompletionMode WRITE setAutoCompletionMode)
+
+  Q_ENUMS(AutoCompMode)
 
   friend class FLFieldDBInterface;
   friend class FLFormDB;
@@ -109,6 +115,12 @@ class FLFieldDB: public FLWidgetFieldDB
   friend class FLFormSearchDB;
 
 public:
+
+  enum AutoCompMode {
+    NeverAuto = 0,
+    OnDemandF4,
+    AlwaysAuto
+  };
 
   /**
   constructor
@@ -223,12 +235,24 @@ public:
 
   @param f Formato del campo
   */
-  void setTextFormat(const int &f);
+  void setTextFormat(int f);
 
   /**
   @return El formato del texto
   */
   int textFormat() const;
+
+  /**
+  Establece el modo de "echo"
+
+  @param m Modo (Normal, NoEcho, Password)
+  */
+  void setEchoMode(int m);
+
+  /**
+  @return El mode de "echo" (Normal, NoEcho, Password)
+  */
+  int echoMode() const;
 
   /**
   Establece el valor contenido en elcampo.
@@ -303,6 +327,16 @@ public:
   Establece el número de decimales
   */
   void setPartDecimal(int d);
+
+  /**
+  Para asistente de completado automático.
+  */
+  void setAutoCompletionMode(AutoCompMode m) {
+    autoCompMode_ = m;
+  }
+  AutoCompMode autoCompletionMode() const {
+    return autoCompMode_;
+  }
 
 protected slots:
 
@@ -470,6 +504,11 @@ public slots:
   Emite la señal activatedAccel( int )
   */
   void emitActivatedAccel(int id);
+
+  /**
+  Redefinida por conveniencia
+  */
+  virtual void setEnabled(bool);
 
 protected:
 
@@ -649,12 +688,19 @@ private:
   QVBox *autoComFrame_;
   QString autoComFieldName_;
   QString autoComFieldRelation_;
+  AutoCompMode autoCompMode_;
+  QTimer *timerAutoComp_;
 
   /**
   Auxiliares para poder repetir llamada a setMapValue y refrescar filtros
   */
   FLFieldDB *fieldMapValue_;
   QString mapValue_;
+
+  /**
+  El formato del texto
+  */
+  Qt::TextFormat textFormat_;
 
 signals:
 
@@ -727,6 +773,7 @@ public:
 
   int type;
   int partDecimal;
+  bool autoSelect;
 
 public slots:
   virtual void setText(const QString &);
@@ -777,7 +824,7 @@ public:
 
   FLSpinBox(QWidget *parent = 0, const char *name = 0) :
     QSpinBox(parent, name) {
-    editor() ->setAlignment(Qt::AlignRight);
+    editor()->setAlignment(Qt::AlignRight);
   }
 };
 
@@ -791,6 +838,45 @@ public:
 protected:
 
   void fix();
+};
+
+// Uso interno
+class AQTextEditBar : public QWidget
+{
+  Q_OBJECT
+
+public:
+
+  AQTextEditBar(QWidget *parent = 0, const char *name = 0, QLabel *lb = 0);
+
+  void doConnections(QTextEdit *e);
+
+private slots:
+
+  void textBold();
+  void textItalic();
+  void textUnderline();
+  void textColor();
+  void textFamily(const QString &f);
+  void textSize(const QString &p);
+
+  void fontChanged(const QFont &f);
+  void colorChanged(const QColor &c);
+
+private:
+
+  QHBoxLayout *layout_;
+
+  QLabel *lb_;
+
+  QPushButton *pbBold_;
+  QPushButton *pbItal_;
+  QPushButton *pbUnde_;
+  QPushButton *pbColor_;
+  QComboBox *comboFont_;
+  QComboBox *comboSize_;
+
+  QTextEdit *ted_;
 };
 
 #endif

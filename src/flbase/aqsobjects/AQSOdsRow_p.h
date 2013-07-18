@@ -54,6 +54,7 @@ public slots:
   AQOdsRow *addBgColor(AQSOdsColor *);
   AQOdsRow *addFgColor(AQOdsColor *);
   AQOdsRow *addFgColor(AQSOdsColor *);
+  AQOdsRow *setFixedPrecision(uint);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -130,6 +131,10 @@ inline AQOdsRow *AQSOdsRow::addFgColor(AQOdsColor *arg0)
 inline AQOdsRow *AQSOdsRow::addFgColor(AQSOdsColor *arg0)
 {
   AQ_CALL_RET_PTR(addFgColor(*arg0), AQOdsRow);
+}
+inline AQOdsRow *AQSOdsRow::setFixedPrecision(uint arg0)
+{
+  AQ_CALL_RET_PTR(setFixedPrecision(arg0), AQOdsRow);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

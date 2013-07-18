@@ -76,7 +76,7 @@
 
 class HeaderClass;
 
-class MessageClass
+class AQMAIL_EXPORT MessageClass
 {
 public:
     // constructors

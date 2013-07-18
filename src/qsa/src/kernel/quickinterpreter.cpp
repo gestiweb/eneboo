@@ -293,9 +293,26 @@ static QSObject qsDisconnect(QSEnv *env)
   if (recIfaces) {
     sendObj->removeEventHandler(sig, recIfaces->at(0), sl.left(sl.find('(')));
   } else {
-    QSObject base = QSFuncRefClass::refBase(arg2);
-    QSMember member = QSFuncRefClass::refMember(arg2);
-    sendObj->removeEventHandler(sig, 0, member.name(), base);
+    // ###
+    QSObject base;
+    QString name;
+    if (arg2.isFunction()) {
+      base = QSFuncRefClass::refBase(arg2);
+      name = QSFuncRefClass::refMember(arg2).name();
+    } else {
+      base = arg2;
+      if (base.isPrimitive())
+        return env->createUndefined();
+      name = env->arg(3).toString();
+      if (name.endsWith(QString::fromLatin1("()")))
+        name.truncate(name.length() - 2);
+    }
+    sendObj->removeEventHandler(sig, 0, name, base);
+    // ###
+
+    //QSObject base = QSFuncRefClass::refBase(arg2);
+    //QSMember member = QSFuncRefClass::refMember(arg2);
+    //sendObj->removeEventHandler(sig, 0, member.name(), base);
   }
 
   return env->createUndefined();
@@ -327,6 +344,8 @@ QuickInterpreter::~QuickInterpreter()
   delete toplevel;
 #ifdef QSDEBUGGER
   delete debugger;
+#else
+  objError_ = 0;
 #endif
   Q_ASSERT(wrapperShared->isEmpty());
   delete wrapperShared;
@@ -627,11 +646,15 @@ QSArgument QuickInterpreter::execute(QObject *obj, const QString &c,
   if (obj)
     env()->setThisValue(oldThis);
 
-  if (hadError())
+  if (hadError()) {
+#ifndef QSDEBUGGER
+    objError_ =  obj;
+#endif
     if (errorType() == QSErrParseError)
       emit parseError();
     else
       emit runtimeError();
+  }
 
   // Make sure we dereference the engines return value to avoid pooling
   QSArgument a = convertToArgument(returnValue());
@@ -647,8 +670,9 @@ QSArgument QuickInterpreter::call(QSObject ctx, const QString &func,
 
   QSEngine::call(&ctx, func, args);
 
-  if (hadError())
+  if (hadError()) {
     emit runtimeError();
+  }
 
   // Make sure we dereference the engines return value to avoid pooling
   QSArgument a = convertToArgument(returnValue());
@@ -668,8 +692,12 @@ QSArgument QuickInterpreter::call(QObject *ctx, const QString &func,
 
   QSEngine::call(&t, func, args);
 
-  if (hadError())
+  if (hadError()) {
+#ifndef QSDEBUGGER
+    objError_ =  ctx;
+#endif
     emit runtimeError();
+  }
 
   // Make sure we dereference the engines return value to avoid pooling
   QSArgument a = convertToArgument(returnValue());

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VER="2.4"
+VER="2.5"
 
 OPT_PREFIX=""
 OPT_QMAKESPEC=""
@@ -9,6 +9,8 @@ OPT_SQLLOG=no
 OPT_HOARD=yes
 OPT_QWT=yes
 OPT_DIGIDOC=yes
+OPT_WIN64=no
+OPT_QWS=no
 OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 QT_DEBUG="-release -DQT_NO_CHECK"
@@ -50,6 +52,14 @@ for a in "$@"; do
     -no-digidoc)
       OPT_DIGIDOC=no
     ;;
+    -win64)
+      OPT_WIN64=yes
+    ;;
+    -qws)
+      OPT_QWS=yes
+      OPT_QMAKESPEC="qws/linux-generic-g++"
+      export QMAKESPEC=$OPT_QMAKESPEC
+    ;;
     -prefix|-platform)
       VAR=`echo $a | sed "s,^-\(.*\),\1,"`
       shift
@@ -90,7 +100,9 @@ if [ "$OPT_MULTICORE" == "yes" ]; then
 fi
   
 if [ "$BUILD_MACX" == "no" ]; then
-  QT_DEBUG="$QT_DEBUG -DQT_NO_COMPAT"
+  if [ "$OPT_QWS" = "no" ]; then
+    QT_DEBUG="$QT_DEBUG -DQT_NO_COMPAT"
+  fi
   ln -s libmysql_std src/libmysql
 else
   ln -s libmysql_macosx src/libmysql
@@ -110,7 +122,7 @@ if [ "$OPT_QMAKESPEC" == "" ]; then
 fi
 
 echo -e "\nUtilidad de compilación e instalación de AbanQ $VERSION"
-echo -e "(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
+echo -e "(C) 2003-2013 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   export CC=${CROSS}gcc
@@ -130,7 +142,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   BUILD_KEY="$VER-Build-mingw32-4.2"
   CMD_MAKE="make -k -j $PROCESSORS "
 else
-  MAKE_INSTALL="install"
+MAKE_INSTALL="install"
 fi
 
 if [ "$OPT_PREFIX" == "" ]
@@ -158,6 +170,15 @@ PREFIX=$DIRINST
 echo -e "Directorio de instalación : $PREFIX\n"
 
 echo -e "Estableciendo configuración...\n"
+
+cd $BASEDIR/src/libdigidoc/openssl/crypto
+rm -f opensslconf.h
+if [ "$OPT_QMAKESPEC" == "linux-g++-64" ]; then
+  ln -s opensslconf.h.64 opensslconf.h
+else
+  ln -s opensslconf.h.32 opensslconf.h
+fi
+cd $BASEDIR
 
 rm -f $HOME/.qmake.cache
 
@@ -189,11 +210,19 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cp -fv qconfig/qconfig.h src/qt/include
   cp -fv qconfig/qmodules.h src/qt/include
   cd $QTDIR
+  if [ "$OPT_WIN64" = "yes" ]
+  then
+    cp -fv mkspecs/win32-g++-cross/qmake.conf-w64 mkspecs/win32-g++-cross/qmake.conf
+    cp -fv mkspecs/win32-g++-cross/qtcrtentrypoint.cpp-w64 mkspecs/win32-g++-cross/qtcrtentrypoint.cpp
+  else
+    cp -fv mkspecs/win32-g++-cross/qmake.conf-w32 mkspecs/win32-g++-cross/qmake.conf
+    cp -fv mkspecs/win32-g++-cross/qtcrtentrypoint.cpp-w32 mkspecs/win32-g++-cross/qtcrtentrypoint.cpp
+  fi
   ./configure --win32 -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
               -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
               -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
 else
-  cp -vf Makefile.qt Makefile
+cp -vf Makefile.qt Makefile
   if [ "$BUILD_MACX" == "yes" ]; then
     mkdir -p $DIRINST/lib
     if [ "$OPT_QMAKESPEC" == "macx-g++" ]; then
@@ -207,9 +236,15 @@ else
     fi
   else
     export ORIGIN=\\\$\$ORIGIN
-    ./configure -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl \
-                -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
-                -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+    if [ "$OPT_QWS" = "no" ]; then
+      ./configure --x11 -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl \
+                  -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
+                  -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+    else
+      ./configure -depths 8,16,32 -qvfb -qt-gfx-vnc -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl \
+            -no-pch -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups \
+            -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+    fi
   fi
 fi
 
@@ -252,7 +287,7 @@ if [ "$AQ_CIN" == "" ]; then
 fi
 
 if [ "$AQ_PACK_VER" == "" ]; then
-    AQ_PACK_VER="(qstrlen(V) > 0 && qstrcmp(AQPACKAGER_VERSION, V) == 0)"
+  AQ_PACK_VER="(qstrlen(V) > 0 && qstrcmp(AQPACKAGER_VERSION, V) == 0)"
 fi
 
 if [ "$AQ_ENC_KEY" == "" ]; then
@@ -272,6 +307,7 @@ cat > AQConfig.h <<EOF
 #define AQCONFIG_H_
 
 #include "qplatformdefs.h"
+#include "AQGlobal.h"
 
 #define AQ_DIRAPP                   AQConfig::aqDirApp
 #define AQ_PREFIX                   AQ_DIRAPP
@@ -284,13 +320,13 @@ cat > AQConfig.h <<EOF
 #define AQ_VERSION                  "$VERSION"
 #define AQ_CIN(C)                   $AQ_CIN
 #define AQPACKAGER_VERSION_CHECK(V) $AQ_PACK_VER
-#define AQ_ENC_KEY                  $AQ_ENC_KEY
-#define AQ_ENC_KEYVI                $AQ_ENC_KEYVI
+#define AQ_ENC_KEY	            $AQ_ENC_KEY
+#define AQ_ENC_KEYVI		    $AQ_ENC_KEYVI
 
 class QApplication;
 class FLApplication;
 
-class AQConfig
+class AQ_EXPORT AQConfig
 {
 public:
   static QString aqDirApp;
@@ -299,9 +335,8 @@ public:
   static QString aqLib;
   static QString aqBin;
   static QString aqUsrHome;
-      
+        
 private:
-
   static void init(QApplication *);
   friend class FLApplication;
 };
@@ -319,12 +354,12 @@ cat > AQConfig.cpp <<EOF
 
 #include "AQConfig.h"
 
-QString AQConfig::aqDirApp;
-QString AQConfig::aqKeyBase;
-QString AQConfig::aqData;
-QString AQConfig::aqLib;
-QString AQConfig::aqBin;
-QString AQConfig::aqUsrHome;
+AQ_EXPORT QString AQConfig::aqDirApp;
+AQ_EXPORT QString AQConfig::aqKeyBase;
+AQ_EXPORT QString AQConfig::aqData;
+AQ_EXPORT QString AQConfig::aqLib;
+AQ_EXPORT QString AQConfig::aqBin;
+AQ_EXPORT QString AQConfig::aqUsrHome;
 
 void AQConfig::init(QApplication *aqApp)
 {
@@ -344,10 +379,13 @@ EOF
 echo "include(./includes.pri)" > settings.pro
 echo "PREFIX = $PREFIX" >> settings.pro
 echo "ROOT = $BASEDIR" >> settings.pro
-echo "DEFINES *= FL_EXPORT=" >> settings.pro
 echo "INCLUDEPATH *= $PREFIX/include" >> settings.pro
 echo "INCLUDEPATH *= $BASEDIR/src/qt/src/tmp" >> settings.pro
 echo "CONFIG += warn_off" >> settings.pro
+echo "AQSSLVERSION = 0.9.8" >> settings.pro
+echo "DEFINES *= AQSTRSSLVERSION=\\\"098\\\"" >> settings.pro
+#echo "DEFINES *= AQ_NO_PRINT_FUN" >> settings.pro
+#echo "DEFINES *= AQ_NO_DEBUG_FUN" >> settings.pro
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   if [ "$OPT_DEBUG" == "yes" ];then
@@ -386,6 +424,12 @@ if [ "$OPT_DIGIDOC" = "yes" ]
 then
   echo "CONFIG *= enable_digidoc" >> settings.pro
   echo "DEFINES *= FL_DIGIDOC" >> settings.pro
+fi
+
+if [ "$OPT_WIN64" = "yes" ]
+then
+  echo "CONFIG *= enable_win64" >> settings.pro
+  echo "DEFINES *= AQ_WIN64" >> settings.pro
 fi
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
@@ -457,12 +501,11 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
   $QTDIR/bin/qmake CONFIG+="shared"
   rm -fr $BASEDIR/src/qt/LICENSE
 else
-  ./configure
+./configure
 fi
 $CMD_MAKE
-make -s $MAKE_INSTALL
 $CMD_MAKE
-make -s $MAKE_INSTALL
+$CMD_MAKE
 $CMD_MAKE
 make -s $MAKE_INSTALL
 
@@ -498,13 +541,19 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
 else
   make uicables || exit 1
 fi
+
 cd $BASEDIR
 $CMD_MAKE
-make -s $MAKE_INSTALL
 $CMD_MAKE
-make -s $MAKE_INSTALL
+$CMD_MAKE
+$CMD_MAKE
 $CMD_MAKE || exit 1
 make -s $MAKE_INSTALL
+
+cd $BASEDIR/src/libdigidoc/openssl/crypto
+rm -f opensslconf.h
+ln -s opensslconf.h.32 opensslconf.h
+cd $BASEDIR
 
 if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
@@ -546,7 +595,7 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	  ${CROSS}install_name_tool -change libxsltproc.1.dylib @executable_path/../../../../lib/libxsltproc.1.dylib $i
 	done
 fi
-if [ "$OPT_QMAKESPEC" == "win32-g++-cross" ]; then
+if [ "$OPT_DEBUG" = "no" -a "$OPT_QMAKESPEC" == "win32-g++-cross" ]; then
   ${CROSS}strip --strip-unneeded $PREFIX/bin/* 2> /dev/null
   ${CROSS}strip --strip-unneeded $PREFIX/lib/* 2> /dev/null
   ${CROSS}strip --strip-unneeded $PREFIX/plugins/designer/* 2> /dev/null
@@ -575,6 +624,10 @@ cp -f ./src/*.xml $PREFIX/share/abanq 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/abanq 2> /dev/null
 cp -f ./packages/*.abanq $PREFIX/share/abanq/packages 2> /dev/null
 
-echo -e "\nAbanQ $VERSION\n(C) 2003-2012 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
+if [ "$OPT_QWS" != "no" ]; then
+  cp -fr ./src/qt/lib/fonts $PREFIX/lib/ 2> /dev/null
+fi
+
+echo -e "\nAbanQ $VERSION\n(C) 2003-2013 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
 echo -e "Compilación terminada.\n"
 

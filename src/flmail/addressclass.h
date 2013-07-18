@@ -69,7 +69,9 @@
 #include <qcstring.h>
 #include <qtextstream.h>
 
-class FL_EXPORT AddressClass
+#include "aqmailglobal.h"
+
+class AQMAIL_EXPORT AddressClass
 {
     friend QTextStream& operator<<(QTextStream &, AddressClass &);
 public:

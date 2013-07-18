@@ -4,12 +4,17 @@ TEMPLATE = lib
 CONFIG += warn_off \
     create_prl \
     link_prl \
-    qt
+    qt 
 !mac:CONFIG += plugin
 unix:CONFIG += x11
 win32 { 
-    CONFIG += dll
+    CONFIG += dll shared
     DLLDESTDIR = $$PREFIX/bin
+}
+shared {
+	win32:DEFINES	+= AQ_DLL
+} else {
+	win32:DEFINES += AQ_NO_DLL
 }
 DESTDIR = $$PREFIX/lib
 TARGET = flbase
@@ -51,8 +56,10 @@ enable_qwt:LIBS += -lqwt
 enable_digidoc:LIBS += -llibdigidoc \
     -lcrypto
 enable_digidoc:mac:LIBS += -lssl -lxml2
+enable_digidoc:enable_win64:DEFINES += NOCRYPT OPENSSL_NO_ASM
+
 load(qsa)
-VERSION = 2.4
+VERSION = 2.5
 include(../serialport/serialport.pri)
 SOURCES += AQApplication.cpp \
     $$ROOT/AQConfig.cpp \
@@ -108,7 +115,8 @@ SOURCES += AQApplication.cpp \
     FLModulesStaticLoader_p.cpp \
     FLSettings.cpp
 SOURCES += FLDigiDoc.cpp
-HEADERS += AQApplication.h \
+HEADERS += AQGlobal.h \
+    AQApplication.h \
     FLAbout.h \
     FLAction.h \
     FLApplication_p.h \
@@ -218,7 +226,15 @@ IMAGES += images/infosial.png \
     images/check_x_on.png \
     images/export.png \
     images/import.png \
-    images/fileexport.png
+    images/fileexport.png \
+    images/spreadsheet.png \
+    images/folder_update.png \
+    images/consola.png \
+    images/fileclose.png \
+    images/font-bold.png \
+    images/font-italic.png \
+    images/font-underline.png
+    
 include(aqsobjects/aqsobjects.pri)
 include(../../tools/qsac/qsac.pri)
 include(../../tools/packager/packager.pri)

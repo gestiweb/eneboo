@@ -32,12 +32,16 @@
 #include "mreportdetail.h"
 #include "mpagecollection.h"
 
+class AQPointKey;
+class AQPaintItem;
+typedef QMap<AQPointKey, AQPaintItem> AQPaintItemMap;
+
 /**
 Kugar report engine
 
 @author Mutiny Bay Software
 */
-class FL_EXPORT MReportEngine: public QObject
+class MReportEngine: public QObject
 {
   Q_OBJECT
 
@@ -54,7 +58,7 @@ public:
     A4, B5, Letter, Legal, Executive,
     A0, A1, A2, A3, A5, A6, A7, A8, A9, B0, B1,
     B10, B2, B3, B4, B6, B7, B8, B9, C5E, Comm10E,
-    DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom
+    DLE, Folio, Ledger, Tabloid, Custom, NPageSize = Custom, CustomOld = 31
   };
 
   // Si cambias este Enum hazlo tambien en mreportviewer.h
@@ -77,19 +81,18 @@ public:
   bool setReportTemplate(QIODevice *);
   bool setReportTemplate(QDomNode &);
 
+  void exportToOds(MPageCollection *pages);
+
   MPageCollection *renderReport(int initRow = 0, int initCol = 0,
                                 MPageCollection *pages = 0,
                                 uint flags = MReportEngine::Display);
-
 public slots:
 
   int getRenderSteps() {
     return records.length() / 2;
   }
 
-  QString csvData() const {
-    return csvData_;
-  }
+  QString csvData();
 
   float relDpi() const {
     return relDpi_;
@@ -273,11 +276,6 @@ protected:
   Cancel rendering flag
   */
   bool cancelRender;
-
-  /**
-  Contains a csv version of the data
-  */
-  QString csvData_;
 
   /**
   The set of records being rendered.
@@ -482,6 +480,13 @@ protected:
   void setFieldValues(QDomNamedNodeMap *fields, int level,
                       MReportSection *detail, QDomNode *ptrRecord,
                       bool noTotal = false);
+
+  /**
+  Uso interno
+  */
+  void updateCsvData(int level, uint &currRecord, QString &csvData);
+  bool execPage(QPainter *painter, QDataStream &s, uint nrecords,
+                AQPaintItemMap &map);
 
   float relDpi_;
   float relCalcDpi_;

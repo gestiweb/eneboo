@@ -1012,6 +1012,9 @@ References
     <tabstop>cerrar</tabstop>
     <tabstop>TabWidget2</tabstop>
 </tabstops>
-<exportmacro>FL_EXPORT</exportmacro>
+<includes>
+    <include location="global" impldecl="in declaration">AQGlobal.h</include>
+</includes>
+<exportmacro>AQ_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

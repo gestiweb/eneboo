@@ -11,11 +11,16 @@ CONFIG += warn_off create_prl link_prl
 !mac:CONFIG += plugin
 
 win32 {
-	CONFIG += dll exceptions
+	CONFIG += dll exceptions shared
 	DLLDESTDIR = $$PREFIX/bin
 	DEFINES += OS_WIN=1
+	enable_win64:DEFINES += _OFF_T_DEFINED
 }
-
+shared {
+	win32:DEFINES	+= AQSQLITE_DLL
+} else {
+	win32:DEFINES += AQSQLITE_NO_DLL
+}
 unix {
 	CONFIG -= x11
 	DEFINES += OS_UNIX=1
@@ -64,7 +69,8 @@ SOURCES += attach.c \
            where.c \
            dataset.cpp qry_dat.cpp  sqlitedataset.cpp
 
-HEADERS += btree.h \
+HEADERS += aqsqliteglobal.h \
+           btree.h \
            config_sqlite.h \
            hash.h \
            opcodes.h \

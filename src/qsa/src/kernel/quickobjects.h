@@ -39,6 +39,7 @@
 #include "dlldefs.h"
 #include <qintdict.h>
 #include <qmap.h>
+#include <qguardedptr.h>
 
 #include <qsclass.h>
 #include <qstypes.h>
@@ -105,7 +106,7 @@ public:
   void invalidate();
 
 private:
-  QObject *qobj;
+  QGuardedPtr<QObject> qobj;
   QuickScriptEventMap *handler;
 };
 

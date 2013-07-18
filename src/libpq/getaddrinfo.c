@@ -337,8 +337,10 @@ gai_strerror(int errcode)
 			return "Not enough memory";
 #endif
 #ifdef EAI_NODATA
+#if (EAI_NODATA != EAI_NONAME)
 		case EAI_NODATA:
 			return "No host data of that type was found";
+#endif
 #endif
 #ifdef EAI_SERVICE
 		case EAI_SERVICE:

@@ -34,7 +34,6 @@ public slots:
   FLSqlQuery *query(const QString &, QObject* = 0);
   FLAction *action(const QString &);
   bool existsTable(const QString &, bool = true) const;
-  bool checkMetaData(const QString &);
   bool checkMetaData(const QString &, const QString &);
   bool checkMetaData(FLTableMetaData *, FLTableMetaData *);
   bool alterTable(const QString &);
@@ -80,10 +79,6 @@ inline FLAction *AQSManager::action(const QString &arg0)
 inline bool AQSManager::existsTable(const QString &arg0,  bool arg1) const
 {
   AQ_CALL_RET_V(existsTable(arg0, arg1), bool);
-}
-inline bool AQSManager::checkMetaData(const QString &arg0)
-{
-  AQ_CALL_RET_V(checkMetaData(arg0), bool);
 }
 inline bool AQSManager::checkMetaData(const QString &arg0,  const QString &arg1)
 {

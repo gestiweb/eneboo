@@ -70,7 +70,7 @@ void FLTranslations::lrelease(const QString &tsInputFile, const QString &qmOutpu
   QFile f(tsInputFile);
   if (!f.open(IO_ReadOnly)) {
     fprintf(stderr,
-            "lrelease error: Cannot open file '%s': %s\n", tsInputFile,
+            "lrelease error: Cannot open file '%s': %s\n", tsInputFile.latin1(),
             strerror(errno));
     return;
   }
@@ -107,7 +107,7 @@ void FLTranslations::lrelease(const QString &tsInputFile, const QString &qmOutpu
       fprintf(stderr,
               "lrelease warning: Met no 'TRANSLATIONS' entry in"
               " project file '%s'\n",
-              tsInputFile);
+              tsInputFile.latin1());
     QDir::setCurrent(oldDir);
   }
 

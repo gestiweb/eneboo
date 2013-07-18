@@ -1704,10 +1704,10 @@ void QWidget::erase( const QRegion& reg )
 #endif
 
     if ( backgroundMode() == NoBackground || isDesktop() || !isVisible() )
-        return ;
-    QRect rr( reg.boundingRect() );
+        return;
+        
 #ifdef DEBUG_QWIDGET
-
+    QRect rr( reg.boundingRect() );
     qDebug( "QWidget::erase:reg.boundingRect()=(%d, %d, %d, %d)", rr.x(), rr.y(), rr.width(), rr.height() );
 #endif
 
@@ -2175,8 +2175,13 @@ void QWidget::setWindowState( unsigned int newstate )
 }
 
 /* needed for dynamic loading ... */
+#ifndef _WIN64
 static BOOL ( WINAPI * qtSLWA ) (
     HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags ) = NULL;
+#else
+typedef BOOL (WINAPI *SLWAFunc)(HWND, COLORREF, BYTE, DWORD);
+static SLWAFunc qtSLWA = NULL;
+#endif
 
 /* see SIM-Icq -> plugins -> tansparent for original source */
 void QWidget::setWindowOpacity( double opacity )
@@ -2186,7 +2191,11 @@ void QWidget::setWindowOpacity( double opacity )
         return ;
     /* This is only supported on w2k and higher - so load it on runtime */
     if ( !qtSLWA )
+#ifndef _WIN64
         ( DWORD& ) qtSLWA = ( DWORD ) QLibrary::resolve( "user32.dll", "SetLayeredWindowAttributes" );
+#else
+        qtSLWA = ( SLWAFunc ) QLibrary::resolve( "user32.dll", "SetLayeredWindowAttributes" );
+#endif
 
     /* not found -> win9x ? */
     if ( !qtSLWA )

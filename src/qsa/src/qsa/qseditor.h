@@ -31,6 +31,7 @@
 
 #include <qsaglobal.h>
 #include <qwidget.h>
+#include <qdatetime.h>
 
 class QSAEditorInterface;
 class QTextEdit;
@@ -89,6 +90,9 @@ public:
 
   QTextEdit *textEdit() const;
   QSProject *project() const;
+
+  QDateTime lastModificationTime() const;
+  void setLastModificationTime(const QDateTime &t);
 
 signals:
   void textChanged();
