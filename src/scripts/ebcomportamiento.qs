@@ -23,8 +23,11 @@ function main() {
 	var w = this.w_;
 	var botonAceptar = w.child("pbnAceptar"); 
 	var botonCancelar = w.child("pbnCancelar");
+	var botonCambiarColor = w.child("pbnCO");
 	connect(botonAceptar , "clicked()", this, "guardar_clicked");
 	connect(botonCancelar , "clicked()", this, "cancelar_clicked");
+	connect(botonCambiarColor , "clicked()",this, "seleccionarColor_clicked");
+	
  	cargarConfiguracion();
  	w_.show();
 }
@@ -40,6 +43,9 @@ function cargarConfiguracion() {
 	w.child("cbSLInterface").checked = leerValorLocal("SLInterface");
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
+	w.child("leCO").hide();
+	w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
+	w.child("leCO").show();
 	
 
 }
@@ -49,7 +55,6 @@ function cargarConfiguracion() {
 function leerValorGlobal(valorName):String {
 	var util : FLUtil = new FLUtil();
 	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
-	debug ("el valor actual es " + valor);
 	return valor;
 }
 
@@ -58,12 +63,10 @@ function grabarValorGlobal(valorName,value) {
 	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
 	if (valor)
 		{
-		debug("Actualizando variable global " + value);
 		util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
 		}
 		else
 		{
-		debug("Creando nueva variable global");
 		util.sqlInsert("flsettings", "flkey,valor" , valorName + "," + value);
 		}
 
@@ -145,6 +148,7 @@ grabarValorLocal("SLConsola",w.child("cbSLConsola").checked);
 grabarValorLocal("SLInterface",w.child("cbSLInterface").checked);
 grabarValorLocal("ebCallFunction",w.child("leCallFunction").text);
 grabarValorLocal("maxPixImages",w.child("leMaxPixImages").text);
+grabarValorLocal("colorObligatorio",w.child("leCO").paletteBackgroundColor + "");
 
 w_.close();
 
@@ -154,3 +158,12 @@ function cancelar_clicked()
 {
 w_.close();
 }
+
+function seleccionarColor_clicked()
+	{
+	var w = this.w_;
+	const colorActual:QColor = w.child("leCO").paletteBackgroundColor;
+	w.child("leCO").hide();
+	w.child("leCO").paletteBackgroundColor = AQS.ColorDialog_getColor(colorActual);
+	w.child("leCO").show();
+	}

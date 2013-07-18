@@ -52,7 +52,7 @@
                                 <property name="name">
                                     <cstring>unnamed</cstring>
                                 </property>
-                                <widget class="QGroupBox" row="1" column="0">
+                                <widget class="QGroupBox" row="0" column="0">
                                     <property name="name">
                                         <cstring>gbFLTable_2</cstring>
                                     </property>
@@ -134,7 +134,7 @@
                                         </widget>
                                     </grid>
                                 </widget>
-                                <widget class="QGroupBox" row="2" column="0">
+                                <widget class="QGroupBox" row="1" column="0">
                                     <property name="name">
                                         <cstring>gbFLField_2</cstring>
                                     </property>
@@ -145,7 +145,7 @@
                                         <property name="name">
                                             <cstring>unnamed</cstring>
                                         </property>
-                                        <widget class="QLabel" row="0" column="0">
+                                        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
                                             <property name="name">
                                                 <cstring>textLabel1_3</cstring>
                                             </property>
@@ -153,11 +153,69 @@
                                                 <string>Resolución maxima de imágenes (default 600)</string>
                                             </property>
                                         </widget>
-                                        <widget class="QLineEdit" row="0" column="1">
+                                        <widget class="QLabel" row="1" column="0">
+                                            <property name="name">
+                                                <cstring>textLabel1_4</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Color de campos obligatorios</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit" row="0" column="2" rowspan="1" colspan="4">
                                             <property name="name">
                                                 <cstring>leMaxPixImages</cstring>
                                             </property>
                                         </widget>
+                                        <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                                            <property name="name">
+                                                <cstring>leCO</cstring>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton" row="1" column="4">
+                                            <property name="name">
+                                                <cstring>pbnCO</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Cam&amp;biar</string>
+                                            </property>
+                                            <property name="accel">
+                                                <string>Alt+B</string>
+                                            </property>
+                                        </widget>
+                                        <spacer row="1" column="3">
+                                            <property name="name">
+                                                <cstring>spacer7</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>41</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                        <spacer row="1" column="5">
+                                            <property name="name">
+                                                <cstring>spacer8_2</cstring>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                            <property name="sizeType">
+                                                <enum>Expanding</enum>
+                                            </property>
+                                            <property name="sizeHint">
+                                                <size>
+                                                    <width>71</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
                                     </grid>
                                 </widget>
                             </grid>
