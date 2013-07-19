@@ -466,7 +466,8 @@ typedef QPtrStack<QWMatrix> QWMatrixStack;
     \sa begin(), end()
 */
 
-QPainter::QPainter() {
+QPainter::QPainter()
+{
   init();
 }
 
@@ -509,9 +510,10 @@ QPainter::QPainter() {
     \sa begin(), end()
 */
 
-QPainter::QPainter( const QPaintDevice *pd, bool unclipped ) {
+QPainter::QPainter(const QPaintDevice *pd, bool unclipped)
+{
   init();
-  if ( begin( pd, unclipped ) )
+  if (begin(pd, unclipped))
     flags |= CtorBegin;
 }
 
@@ -526,10 +528,11 @@ QPainter::QPainter( const QPaintDevice *pd, bool unclipped ) {
     \sa begin()
 */
 
-QPainter::QPainter( const QPaintDevice *pd,
-                    const QWidget *copyAttributes, bool unclipped ) {
+QPainter::QPainter(const QPaintDevice *pd,
+                   const QWidget *copyAttributes, bool unclipped)
+{
   init();
-  if ( begin( pd, copyAttributes, unclipped ) )
+  if (begin(pd, copyAttributes, unclipped))
     flags |= CtorBegin;
 }
 
@@ -538,16 +541,17 @@ QPainter::QPainter( const QPaintDevice *pd,
     Destroys the painter.
 */
 
-QPainter::~QPainter() {
-  if ( isActive() )
+QPainter::~QPainter()
+{
+  if (isActive())
     end();
   else
     killPStack();
-  if ( tabarray )       // delete tab array
+  if (tabarray)         // delete tab array
     delete [] tabarray;
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( wm_stack )
-    delete( QWMatrixStack * )wm_stack;
+  if (wm_stack)
+    delete(QWMatrixStack *)wm_stack;
 #endif
   destroy();
 }
@@ -590,18 +594,19 @@ QPainter::~QPainter() {
     \sa end()
 */
 
-bool QPainter::begin( const QPaintDevice *pd, const QWidget *copyAttributes, bool unclipped ) {
-  if ( copyAttributes == 0 ) {
+bool QPainter::begin(const QPaintDevice *pd, const QWidget *copyAttributes, bool unclipped)
+{
+  if (copyAttributes == 0) {
 #if defined(QT_CHECK_NULL)
-    qWarning( "QPainter::begin: The widget to copy attributes from cannot "
-              "be null" );
+    qWarning("QPainter::begin: The widget to copy attributes from cannot "
+             "be null");
 #endif
     return FALSE;
   }
-  if ( begin( pd, unclipped ) ) {
-    setPen( copyAttributes->foregroundColor() );
-    setBackgroundColor( copyAttributes->backgroundColor() );
-    setFont( copyAttributes->font() );
+  if (begin(pd, unclipped)) {
+    setPen(copyAttributes->foregroundColor());
+    setBackgroundColor(copyAttributes->backgroundColor());
+    setFont(copyAttributes->font());
     return TRUE;
   }
   return FALSE;
@@ -613,11 +618,12 @@ bool QPainter::begin( const QPaintDevice *pd, const QWidget *copyAttributes, boo
   Sets or clears a pointer flag.
 */
 
-void QPainter::setf( uint b, bool v ) {
-  if ( v )
-    setf( b );
+void QPainter::setf(uint b, bool v)
+{
+  if (v)
+    setf(b);
   else
-    clearf( b );
+    clearf(b);
 }
 
 
@@ -663,7 +669,7 @@ struct QPState {        // painter state
   bool  clip;
   int   ts;
   int        *ta;
-  void* wm_stack;
+  void *wm_stack;
 };
 
 //TODO lose the worldmatrix stack
@@ -671,13 +677,14 @@ struct QPState {        // painter state
 typedef QPtrStack<QPState> QPStateStack;
 
 
-void QPainter::killPStack() {
+void QPainter::killPStack()
+{
 #if defined(QT_CHECK_STATE)
-  if ( ps_stack && !(( QPStateStack * )ps_stack )->isEmpty() )
-    qWarning( "QPainter::killPStack: non-empty save/restore stack when "
-              "end() was called" );
+  if (ps_stack && !((QPStateStack *)ps_stack)->isEmpty())
+    qWarning("QPainter::killPStack: non-empty save/restore stack when "
+             "end() was called");
 #endif
-  delete( QPStateStack * )ps_stack;
+  delete(QPStateStack *)ps_stack;
   ps_stack = 0;
 }
 
@@ -689,28 +696,29 @@ void QPainter::killPStack() {
     \sa restore()
 */
 // ### AbanQ
-void QPainter::save( const QString & id ) {
-  if ( testf( ExtDev ) ) {
-    if ( testf( DirtyFont ) )
+void QPainter::save(const QString &id)
+{
+  if (testf(ExtDev)) {
+    if (testf(DirtyFont))
       updateFont();
-    if ( testf( DirtyPen ) )
+    if (testf(DirtyPen))
       updatePen();
-    if ( testf( DirtyBrush ) )
+    if (testf(DirtyBrush))
       updateBrush();
-    QString id_( id );
+    QString id_(id);
     QPDevCmdParam param[1];
     param[0].str = &id_;
-    pdev->cmd( QPaintDevice::PdcSave, this, param );
+    pdev->cmd(QPaintDevice::PdcSave, this, param);
   }
-  QPStateStack *pss = ( QPStateStack * )ps_stack;
-  if ( pss == 0 ) {
+  QPStateStack *pss = (QPStateStack *)ps_stack;
+  if (pss == 0) {
     pss = new QPtrStack<QPState>;
-    Q_CHECK_PTR( pss );
-    pss->setAutoDelete( TRUE );
+    Q_CHECK_PTR(pss);
+    pss->setAutoDelete(TRUE);
     ps_stack = pss;
   }
   QPState *ps = new QPState;
-  Q_CHECK_PTR( ps );
+  Q_CHECK_PTR(ps);
   ps->font  = cfont;
   ps->pen   = cpen;
   ps->curPt = pos();
@@ -720,22 +728,22 @@ void QPainter::save( const QString & id ) {
   ps->rop   = rop;
   ps->bro   = bro;
 #ifndef QT_NO_TRANSFORMATIONS
-  ps->wr    = QRect( wx, wy, ww, wh );
-  ps->vr    = QRect( vx, vy, vw, vh );
+  ps->wr    = QRect(wx, wy, ww, wh);
+  ps->vr    = QRect(vx, vy, vw, vh);
   ps->wm    = wxmat;
-  ps->vxf   = testf( VxF );
-  ps->wxf   = testf( WxF );
+  ps->vxf   = testf(VxF);
+  ps->wxf   = testf(WxF);
 #else
   ps->xlatex = xlatex;
   ps->xlatey = xlatey;
 #endif
   ps->rgn   = crgn;
-  ps->clip  = testf( ClipOn );
+  ps->clip  = testf(ClipOn);
   ps->ts    = tabstops;
   ps->ta    = tabarray;
   ps->wm_stack = wm_stack;
   wm_stack = 0;
-  pss->push( ps );
+  pss->push(ps);
 }
 
 /*!
@@ -745,66 +753,67 @@ void QPainter::save( const QString & id ) {
     \sa save()
 */
 
-void QPainter::restore() {
-  if ( testf( ExtDev ) ) {
-    pdev->cmd( QPaintDevice::PdcRestore, this, 0 );
-    if ( pdev->devType() == QInternal::Picture )
+void QPainter::restore()
+{
+  if (testf(ExtDev)) {
+    pdev->cmd(QPaintDevice::PdcRestore, this, 0);
+    if (pdev->devType() == QInternal::Picture)
       block_ext = TRUE;
   }
-  QPStateStack *pss = ( QPStateStack * )ps_stack;
-  if ( pss == 0 || pss->isEmpty() ) {
+  QPStateStack *pss = (QPStateStack *)ps_stack;
+  if (pss == 0 || pss->isEmpty()) {
 #if defined(QT_CHECK_STATE)
-    qWarning( "QPainter::restore: Empty stack error" );
+    qWarning("QPainter::restore: Empty stack error");
 #endif
     return;
   }
   QPState *ps = pss->pop();
-  bool hardRestore = testf( VolatileDC );
+  bool hardRestore = testf(VolatileDC);
 
-  if ( ps->font != cfont || hardRestore )
-    setFont( ps->font );
-  if ( ps->pen != cpen || hardRestore )
-    setPen( ps->pen );
-  if ( ps->brush != cbrush || hardRestore )
-    setBrush( ps->brush );
-  if ( ps->bgc != bg_col || hardRestore )
-    setBackgroundColor( ps->bgc );
-  if ( ps->bgm != bg_mode || hardRestore )
-    setBackgroundMode(( BGMode )ps->bgm );
-  if ( ps->rop != rop || hardRestore )
-    setRasterOp(( RasterOp )ps->rop );
-  if ( ps->bro != bro || hardRestore )
-    setBrushOrigin( ps->bro );
+  if (ps->font != cfont || hardRestore)
+    setFont(ps->font);
+  if (ps->pen != cpen || hardRestore)
+    setPen(ps->pen);
+  if (ps->brush != cbrush || hardRestore)
+    setBrush(ps->brush);
+  if (ps->bgc != bg_col || hardRestore)
+    setBackgroundColor(ps->bgc);
+  if (ps->bgm != bg_mode || hardRestore)
+    setBackgroundMode((BGMode)ps->bgm);
+  if (ps->rop != rop || hardRestore)
+    setRasterOp((RasterOp)ps->rop);
+  if (ps->bro != bro || hardRestore)
+    setBrushOrigin(ps->bro);
 #ifndef QT_NO_TRANSFORMATIONS
-  QRect wr( wx, wy, ww, wh );
-  QRect vr( vx, vy, vw, vh );
-  if ( ps->wr != wr || hardRestore )
-    setWindow( ps->wr );
-  if ( ps->vr != vr || hardRestore )
-    setViewport( ps->vr );
-  if ( ps->wm != wxmat || hardRestore )
-    setWorldMatrix( ps->wm );
-  if ( ps->vxf != testf( VxF ) || hardRestore )
-    setViewXForm( ps->vxf );
-  if ( ps->wxf != testf( WxF ) || hardRestore )
-    setWorldXForm( ps->wxf );
+  QRect wr(wx, wy, ww, wh);
+  QRect vr(vx, vy, vw, vh);
+  if (ps->wr != wr || hardRestore)
+    setWindow(ps->wr);
+  if (ps->vr != vr || hardRestore)
+    setViewport(ps->vr);
+  if (ps->wm != wxmat || hardRestore)
+    setWorldMatrix(ps->wm);
+  if (ps->vxf != testf(VxF) || hardRestore)
+    setViewXForm(ps->vxf);
+  if (ps->wxf != testf(WxF) || hardRestore)
+    setWorldXForm(ps->wxf);
 #else
   xlatex = ps->xlatex;
   xlatey = ps->xlatey;
-  setf( VxF, xlatex || xlatey );
+  setf(VxF, xlatex || xlatey);
 #endif
-  if ( ps->curPt != pos() || hardRestore )
-    moveTo( ps->curPt );
-  if ( ps->rgn != crgn || hardRestore )
-    setClipRegion( ps->rgn );
-  if ( ps->clip != testf( ClipOn ) || hardRestore )
-    setClipping( ps->clip );
+  if (ps->curPt != pos() || hardRestore)
+    moveTo(ps->curPt);
+  if (ps->rgn != crgn || hardRestore)
+    setClipRegion(ps->rgn);
+  if (ps->clip != testf(ClipOn) || hardRestore)
+    setClipping(ps->clip);
   tabstops = ps->ts;
   tabarray = ps->ta;
 
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( wm_stack )
-    delete( QWMatrixStack * )wm_stack;
+  if (wm_stack)
+    delete(QWMatrixStack *)wm_stack;
   wm_stack = ps->wm_stack;
 #endif
   delete ps;
@@ -823,22 +832,23 @@ static QPaintDeviceDict *pdev_dict = 0;
     QPixmap::grabWindow() is an easier solution.
 */
 
-void QPainter::redirect( QPaintDevice *pdev, QPaintDevice *replacement ) {
-  if ( pdev_dict == 0 ) {
-    if ( replacement == 0 )
+void QPainter::redirect(QPaintDevice *pdev, QPaintDevice *replacement)
+{
+  if (pdev_dict == 0) {
+    if (replacement == 0)
       return;
     pdev_dict = new QPaintDeviceDict;
-    Q_CHECK_PTR( pdev_dict );
+    Q_CHECK_PTR(pdev_dict);
   }
 #if defined(QT_CHECK_NULL)
-  if ( pdev == 0 )
-    qWarning( "QPainter::redirect: The pdev argument cannot be 0" );
+  if (pdev == 0)
+    qWarning("QPainter::redirect: The pdev argument cannot be 0");
 #endif
-  if ( replacement ) {
-    pdev_dict->insert( pdev, replacement );
+  if (replacement) {
+    pdev_dict->insert(pdev, replacement);
   } else {
-    pdev_dict->remove( pdev );
-    if ( pdev_dict->count() == 0 ) {
+    pdev_dict->remove(pdev);
+    if (pdev_dict->count() == 0) {
       delete pdev_dict;
       pdev_dict = 0;
     }
@@ -849,8 +859,9 @@ void QPainter::redirect( QPaintDevice *pdev, QPaintDevice *replacement ) {
     \internal
     Returns the replacement for \a pdev, or 0 if there is no replacement.
 */
-QPaintDevice *QPainter::redirect( QPaintDevice *pdev ) {
-  return pdev_dict ? pdev_dict->find( pdev ) : 0;
+QPaintDevice *QPainter::redirect(QPaintDevice *pdev)
+{
+  return pdev_dict ? pdev_dict->find(pdev) : 0;
 }
 
 /*!
@@ -862,11 +873,12 @@ QPaintDevice *QPainter::redirect( QPaintDevice *pdev ) {
     \sa fontInfo(), isActive()
 */
 
-QFontMetrics QPainter::fontMetrics() const {
-  if ( pdev && pdev->devType() == QInternal::Picture )
-    return QFontMetrics( cfont );
+QFontMetrics QPainter::fontMetrics() const
+{
+  if (pdev && pdev->devType() == QInternal::Picture)
+    return QFontMetrics(cfont);
 
-  return QFontMetrics( this );
+  return QFontMetrics(this);
 }
 
 /*!
@@ -878,11 +890,12 @@ QFontMetrics QPainter::fontMetrics() const {
     \sa fontMetrics(), isActive()
 */
 
-QFontInfo QPainter::fontInfo() const {
-  if ( pdev && pdev->devType() == QInternal::Picture )
-    return QFontInfo( cfont );
+QFontInfo QPainter::fontInfo() const
+{
+  if (pdev && pdev->devType() == QInternal::Picture)
+    return QFontInfo(cfont);
 
-  return QFontInfo( this );
+  return QFontInfo(this);
 }
 
 
@@ -903,12 +916,13 @@ QFontInfo QPainter::fontInfo() const {
     \sa pen()
 */
 
-void QPainter::setPen( const QPen &pen ) {
+void QPainter::setPen(const QPen &pen)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setPen: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setPen: Will be reset by begin()");
 #endif
-  if ( cpen == pen )
+  if (cpen == pen)
     return;
   cpen = pen;
   updatePen();
@@ -923,15 +937,16 @@ void QPainter::setPen( const QPen &pen ) {
     \sa pen(), QPen
 */
 
-void QPainter::setPen( PenStyle style ) {
+void QPainter::setPen(PenStyle style)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setPen: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setPen: Will be reset by begin()");
 #endif
   QPen::QPenData *d = cpen.data;  // low level access
-  if ( d->style == style && d->linest == style && !d->width && d->color == Qt::black )
+  if (d->style == style && d->linest == style && !d->width && d->color == Qt::black)
     return;
-  if ( d->count != 1 ) {
+  if (d->count != 1) {
     cpen.detach();
     d = cpen.data;
   }
@@ -951,15 +966,16 @@ void QPainter::setPen( PenStyle style ) {
     \sa pen(), QPen
 */
 
-void QPainter::setPen( const QColor &color ) {
+void QPainter::setPen(const QColor &color)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setPen: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setPen: Will be reset by begin()");
 #endif
   QPen::QPenData *d = cpen.data;  // low level access
-  if ( d->color == color && !d->width && d->style == SolidLine && d->linest == SolidLine )
+  if (d->color == color && !d->width && d->style == SolidLine && d->linest == SolidLine)
     return;
-  if ( d->count != 1 ) {
+  if (d->count != 1) {
     cpen.detach();
     d = cpen.data;
   }
@@ -988,12 +1004,13 @@ void QPainter::setPen( const QColor &color ) {
     \sa brush()
 */
 
-void QPainter::setBrush( const QBrush &brush ) {
+void QPainter::setBrush(const QBrush &brush)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setBrush: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setBrush: Will be reset by begin()");
 #endif
-  if ( cbrush == brush )
+  if (cbrush == brush)
     return;
   cbrush = brush;
   updateBrush();
@@ -1006,21 +1023,22 @@ void QPainter::setBrush( const QBrush &brush ) {
     \sa brush(), QBrush
 */
 
-void QPainter::setBrush( BrushStyle style ) {
+void QPainter::setBrush(BrushStyle style)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setBrush: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setBrush: Will be reset by begin()");
 #endif
   QBrush::QBrushData *d = cbrush.data; // low level access
-  if ( d->style == style && d->color == Qt::black && !d->pixmap )
+  if (d->style == style && d->color == Qt::black && !d->pixmap)
     return;
-  if ( d->count != 1 ) {
+  if (d->count != 1) {
     cbrush.detach();
     d = cbrush.data;
   }
   d->style = style;
   d->color = Qt::black;
-  if ( d->pixmap ) {
+  if (d->pixmap) {
     delete d->pixmap;
     d->pixmap = 0;
   }
@@ -1036,21 +1054,22 @@ void QPainter::setBrush( BrushStyle style ) {
     \sa brush(), QBrush
 */
 
-void QPainter::setBrush( const QColor &color ) {
+void QPainter::setBrush(const QColor &color)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setBrush: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setBrush: Will be reset by begin()");
 #endif
   QBrush::QBrushData *d = cbrush.data; // low level access
-  if ( d->color == color && d->style == SolidPattern && !d->pixmap )
+  if (d->color == color && d->style == SolidPattern && !d->pixmap)
     return;
-  if ( d->count != 1 ) {
+  if (d->count != 1) {
     cbrush.detach();
     d = cbrush.data;
   }
   d->style = SolidPattern;
   d->color = color;
-  if ( d->pixmap ) {
+  if (d->pixmap) {
     delete d->pixmap;
     d->pixmap = 0;
   }
@@ -1113,16 +1132,17 @@ void QPainter::setBrush( const QColor &color ) {
     \sa tabStops(), setTabArray(), drawText(), fontMetrics()
 */
 
-void QPainter::setTabStops( int ts ) {
+void QPainter::setTabStops(int ts)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setTabStops: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setTabStops: Will be reset by begin()");
 #endif
   tabstops = ts;
-  if ( isActive() && testf( ExtDev ) ) {  // tell extended device
+  if (isActive() && testf(ExtDev)) {      // tell extended device
     QPDevCmdParam param[1];
     param[0].ival = ts;
-    pdev->cmd( QPaintDevice::PdcSetTabStops, this, param );
+    pdev->cmd(QPaintDevice::PdcSetTabStops, this, param);
   }
 }
 
@@ -1143,30 +1163,31 @@ void QPainter::setTabStops( int ts ) {
     \sa tabArray(), setTabStops(), drawText(), fontMetrics()
 */
 
-void QPainter::setTabArray( int *ta ) {
+void QPainter::setTabArray(int *ta)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setTabArray: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setTabArray: Will be reset by begin()");
 #endif
-  if ( ta != tabarray ) {
+  if (ta != tabarray) {
     tabarraylen = 0;
-    if ( tabarray )       // Avoid purify complaint
+    if (tabarray)         // Avoid purify complaint
       delete [] tabarray;     // delete old array
-    if ( ta ) {       // tabarray = copy of 'ta'
-      while ( ta[tabarraylen] )
+    if (ta) {         // tabarray = copy of 'ta'
+      while (ta[tabarraylen])
         tabarraylen++;
       tabarraylen++; // and 0 terminator
       tabarray = new int[tabarraylen];  // duplicate ta
-      memcpy( tabarray, ta, sizeof( int )*tabarraylen );
+      memcpy(tabarray, ta, sizeof(int)*tabarraylen);
     } else {
       tabarray = 0;
     }
   }
-  if ( isActive() && testf( ExtDev ) ) {  // tell extended device
+  if (isActive() && testf(ExtDev)) {      // tell extended device
     QPDevCmdParam param[2];
     param[0].ival = tabarraylen;
     param[1].ivec = tabarray;
-    pdev->cmd( QPaintDevice::PdcSetTabArray, this, param );
+    pdev->cmd(QPaintDevice::PdcSetTabArray, this, param);
   }
 }
 
@@ -1193,18 +1214,19 @@ void QPainter::setTabArray( int *ta ) {
     setWorldXForm(), xForm()
 */
 
-void QPainter::setViewXForm( bool enable ) {
+void QPainter::setViewXForm(bool enable)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setViewXForm: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setViewXForm: Will be reset by begin()");
 #endif
-  if ( !isActive() || enable == testf( VxF ) )
+  if (!isActive() || enable == testf(VxF))
     return;
-  setf( VxF, enable );
-  if ( testf( ExtDev ) ) {
+  setf(VxF, enable);
+  if (testf(ExtDev)) {
     QPDevCmdParam param[1];
     param[0].ival = enable;
-    pdev->cmd( QPaintDevice::PdcSetVXform, this, param );
+    pdev->cmd(QPaintDevice::PdcSetVXform, this, param);
   }
   updateXForm();
 }
@@ -1224,8 +1246,9 @@ void QPainter::setViewXForm( bool enable ) {
     \sa setWindow(), setViewXForm()
 */
 
-QRect QPainter::window() const {
-  return QRect( wx, wy, ww, wh );
+QRect QPainter::window() const
+{
+  return QRect(wx, wy, ww, wh);
 }
 
 /*!
@@ -1245,25 +1268,26 @@ QRect QPainter::window() const {
     setWorldXForm()
 */
 
-void QPainter::setWindow( int x, int y, int w, int h ) {
+void QPainter::setWindow(int x, int y, int w, int h)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setWindow: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setWindow: Will be reset by begin()");
 #endif
   wx = x;
   wy = y;
   ww = w;
   wh = h;
-  if ( testf( ExtDev ) ) {
-    QRect r( x, y, w, h );
+  if (testf(ExtDev)) {
+    QRect r(x, y, w, h);
     QPDevCmdParam param[1];
-    param[0].rect = ( QRect* ) & r;
-    pdev->cmd( QPaintDevice::PdcSetWindow, this, param );
+    param[0].rect = (QRect *) & r;
+    pdev->cmd(QPaintDevice::PdcSetWindow, this, param);
   }
-  if ( testf( VxF ) )
+  if (testf(VxF))
     updateXForm();
   else
-    setViewXForm( TRUE );
+    setViewXForm(TRUE);
 }
 
 /*!
@@ -1272,8 +1296,9 @@ void QPainter::setWindow( int x, int y, int w, int h ) {
     \sa setViewport(), setViewXForm()
 */
 
-QRect QPainter::viewport() const {  // get viewport
-  return QRect( vx, vy, vw, vh );
+QRect QPainter::viewport() const    // get viewport
+{
+  return QRect(vx, vy, vw, vh);
 }
 
 /*!
@@ -1293,25 +1318,26 @@ QRect QPainter::viewport() const {  // get viewport
     setWorldXForm(), xForm()
 */
 
-void QPainter::setViewport( int x, int y, int w, int h ) {
+void QPainter::setViewport(int x, int y, int w, int h)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setViewport: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setViewport: Will be reset by begin()");
 #endif
   vx = x;
   vy = y;
   vw = w;
   vh = h;
-  if ( testf( ExtDev ) ) {
-    QRect r( x, y, w, h );
+  if (testf(ExtDev)) {
+    QRect r(x, y, w, h);
     QPDevCmdParam param[1];
-    param[0].rect = ( QRect* ) & r;
-    pdev->cmd( QPaintDevice::PdcSetViewport, this, param );
+    param[0].rect = (QRect *) & r;
+    pdev->cmd(QPaintDevice::PdcSetViewport, this, param);
   }
-  if ( testf( VxF ) )
+  if (testf(VxF))
     updateXForm();
   else
-    setViewXForm( TRUE );
+    setViewXForm(TRUE);
 }
 
 
@@ -1324,18 +1350,19 @@ void QPainter::setViewport( int x, int y, int w, int h ) {
     xForm()
 */
 
-void QPainter::setWorldXForm( bool enable ) {
+void QPainter::setWorldXForm(bool enable)
+{
 #if defined(QT_CHECK_STATE)
-  if ( !isActive() )
-    qWarning( "QPainter::setWorldXForm: Will be reset by begin()" );
+  if (!isActive())
+    qWarning("QPainter::setWorldXForm: Will be reset by begin()");
 #endif
-  if ( !isActive() || enable == testf( WxF ) )
+  if (!isActive() || enable == testf(WxF))
     return;
-  setf( WxF, enable );
-  if ( testf( ExtDev )  && !block_ext ) {
+  setf(WxF, enable);
+  if (testf(ExtDev)  && !block_ext) {
     QPDevCmdParam param[1];
     param[0].ival = enable;
-    pdev->cmd( QPaintDevice::PdcSetWXform, this, param );
+    pdev->cmd(QPaintDevice::PdcSetWXform, this, param);
   }
   updateXForm();
 }
@@ -1355,7 +1382,8 @@ void QPainter::setWorldXForm( bool enable ) {
     \sa setWorldMatrix()
 */
 
-const QWMatrix &QPainter::worldMatrix() const {
+const QWMatrix &QPainter::worldMatrix() const
+{
   return wxmat;
 }
 
@@ -1408,30 +1436,31 @@ const QWMatrix &QPainter::worldMatrix() const {
     setViewXForm() xForm() QWMatrix
 */
 
-void QPainter::setWorldMatrix( const QWMatrix &m, bool combine ) {
-  if ( !isActive() ) {
+void QPainter::setWorldMatrix(const QWMatrix &m, bool combine)
+{
+  if (!isActive()) {
 #if defined(QT_CHECK_STATE)
-    qWarning( "QPainter::setWorldMatrix: Will be reset by begin()" );
+    qWarning("QPainter::setWorldMatrix: Will be reset by begin()");
 #endif
     return;
   }
-  if ( combine )
+  if (combine)
     wxmat = m * wxmat;      // combines
   else
     wxmat = m;        // set new matrix
   bool identity = wxmat.m11() == 1.0F && wxmat.m22() == 1.0F &&
                   wxmat.m12() == 0.0F && wxmat.m21() == 0.0F &&
                   wxmat.dx()  == 0.0F && wxmat.dy()  == 0.0F;
-  if ( testf( ExtDev ) && !block_ext ) {
+  if (testf(ExtDev) && !block_ext) {
     QPDevCmdParam param[2];
     param[0].matrix = &m;
     param[1].ival = combine;
-    pdev->cmd( QPaintDevice::PdcSetWMatrix, this, param );
+    pdev->cmd(QPaintDevice::PdcSetWMatrix, this, param);
   }
-  if ( identity && pdev->devType() != QInternal::Picture )
-    setWorldXForm( FALSE );
-  else if ( !testf( WxF ) )
-    setWorldXForm( TRUE );
+  if (identity && pdev->devType() != QInternal::Picture)
+    setWorldXForm(FALSE);
+  else if (!testf(WxF))
+    setWorldXForm(TRUE);
   else
     updateXForm();
 }
@@ -1441,16 +1470,17 @@ void QPainter::setWorldMatrix( const QWMatrix &m, bool combine ) {
   We recommend using save() instead.
 */
 
-void QPainter::saveWorldMatrix() {
-  QWMatrixStack *stack = ( QWMatrixStack * )wm_stack;
-  if ( stack == 0 ) {
+void QPainter::saveWorldMatrix()
+{
+  QWMatrixStack *stack = (QWMatrixStack *)wm_stack;
+  if (stack == 0) {
     stack  = new QPtrStack<QWMatrix>;
-    Q_CHECK_PTR( stack );
-    stack->setAutoDelete( TRUE );
+    Q_CHECK_PTR(stack);
+    stack->setAutoDelete(TRUE);
     wm_stack = stack;
   }
 
-  stack->push( new QWMatrix( wxmat ) );
+  stack->push(new QWMatrix(wxmat));
 
 }
 
@@ -1458,16 +1488,17 @@ void QPainter::saveWorldMatrix() {
   We recommend using restore() instead.
 */
 
-void QPainter::restoreWorldMatrix() {
-  QWMatrixStack *stack = ( QWMatrixStack * )wm_stack;
-  if ( stack == 0 || stack->isEmpty() ) {
+void QPainter::restoreWorldMatrix()
+{
+  QWMatrixStack *stack = (QWMatrixStack *)wm_stack;
+  if (stack == 0 || stack->isEmpty()) {
 #if defined(QT_CHECK_STATE)
-    qWarning( "QPainter::restoreWorldMatrix: Empty stack error" );
+    qWarning("QPainter::restoreWorldMatrix: Empty stack error");
 #endif
     return;
   }
-  QWMatrix* m = stack->pop();
-  setWorldMatrix( *m );
+  QWMatrix *m = stack->pop();
+  setWorldMatrix(*m);
   delete m;
 }
 
@@ -1493,15 +1524,16 @@ void QPainter::restoreWorldMatrix() {
     \sa scale(), shear(), rotate(), resetXForm(), setWorldMatrix(), xForm()
 */
 
-void QPainter::translate( double dx, double dy ) {
+void QPainter::translate(double dx, double dy)
+{
 #ifndef QT_NO_TRANSFORMATIONS
   QWMatrix m;
-  m.translate( dx, dy );
-  setWorldMatrix( m, TRUE );
+  m.translate(dx, dy);
+  setWorldMatrix(m, TRUE);
 #else
-  xlatex += ( int )dx;
-  xlatey += ( int )dy;
-  setf( VxF, xlatex || xlatey );
+  xlatex += (int)dx;
+  xlatey += (int)dy;
+  setf(VxF, xlatex || xlatey);
 #endif
 }
 
@@ -1514,10 +1546,11 @@ void QPainter::translate( double dx, double dy ) {
     xForm()
 */
 
-void QPainter::scale( double sx, double sy ) {
+void QPainter::scale(double sx, double sy)
+{
   QWMatrix m;
-  m.scale( sx, sy );
-  setWorldMatrix( m, TRUE );
+  m.scale(sx, sy);
+  setWorldMatrix(m, TRUE);
 }
 
 /*!
@@ -1527,10 +1560,11 @@ void QPainter::scale( double sx, double sy ) {
     xForm()
 */
 
-void QPainter::shear( double sh, double sv ) {
+void QPainter::shear(double sh, double sv)
+{
   QWMatrix m;
-  m.shear( sv, sh );
-  setWorldMatrix( m, TRUE );
+  m.shear(sv, sh);
+  setWorldMatrix(m, TRUE);
 }
 
 /*!
@@ -1540,10 +1574,11 @@ void QPainter::shear( double sh, double sv ) {
     xForm()
 */
 
-void QPainter::rotate( double a ) {
+void QPainter::rotate(double a)
+{
   QWMatrix m;
-  m.rotate( a );
-  setWorldMatrix( m, TRUE );
+  m.rotate(a);
+  setWorldMatrix(m, TRUE);
 }
 
 
@@ -1555,15 +1590,16 @@ void QPainter::rotate( double a ) {
     \sa worldMatrix(), viewport(), window()
 */
 
-void QPainter::resetXForm() {
-  if ( !isActive() )
+void QPainter::resetXForm()
+{
+  if (!isActive())
     return;
   wx = wy = vx = vy = 0;      // default view origins
-  ww = vw = pdev->metric( QPaintDeviceMetrics::PdmWidth );
-  wh = vh = pdev->metric( QPaintDeviceMetrics::PdmHeight );
+  ww = vw = pdev->metric(QPaintDeviceMetrics::PdmWidth);
+  wh = vh = pdev->metric(QPaintDeviceMetrics::PdmHeight);
   wxmat = QWMatrix();
-  setWorldXForm( FALSE );
-  setViewXForm( FALSE );
+  setWorldXForm(FALSE);
+  setViewXForm(FALSE);
 }
 
 /*!
@@ -1571,15 +1607,16 @@ void QPainter::resetXForm() {
   Updates an internal integer transformation matrix.
 */
 
-void QPainter::updateXForm() {
+void QPainter::updateXForm()
+{
   QWMatrix m;
-  if ( testf( VxF ) ) {
-    double scaleW = ( double )vw / ( double )ww;
-    double scaleH = ( double )vh / ( double )wh;
-    m.setMatrix( scaleW, 0,  0,  scaleH, vx - wx*scaleW, vy - wy*scaleH );
+  if (testf(VxF)) {
+    double scaleW = (double)vw / (double)ww;
+    double scaleH = (double)vh / (double)wh;
+    m.setMatrix(scaleW, 0,  0,  scaleH, vx - wx * scaleW, vy - wy * scaleH);
   }
-  if ( testf( WxF ) ) {
-    if ( testf( VxF ) )
+  if (testf(WxF)) {
+    if (testf(VxF))
       m = wxmat * m;
     else
       m = wxmat;
@@ -1588,20 +1625,20 @@ void QPainter::updateXForm() {
 
   txinv = FALSE;        // no inverted matrix
   txop  = TxNone;
-  if ( m12() == 0.0 && m21() == 0.0 && m11() >= 0.0 && m22() >= 0.0 ) {
-    if ( m11() == 1.0 && m22() == 1.0 ) {
-      if ( dx() != 0.0 || dy() != 0.0 )
+  if (m12() == 0.0 && m21() == 0.0 && m11() >= 0.0 && m22() >= 0.0) {
+    if (m11() == 1.0 && m22() == 1.0) {
+      if (dx() != 0.0 || dy() != 0.0)
         txop = TxTranslate;
     } else {
       txop = TxScale;
 #if defined(Q_WS_WIN)
-      setf( DirtyFont );
+      setf(DirtyFont);
 #endif
     }
   } else {
     txop = TxRotShear;
 #if defined(Q_WS_WIN)
-    setf( DirtyFont );
+    setf(DirtyFont);
 #endif
   }
 }
@@ -1612,32 +1649,34 @@ void QPainter::updateXForm() {
   Updates an internal integer inverse transformation matrix.
 */
 
-void QPainter::updateInvXForm() {
+void QPainter::updateInvXForm()
+{
 #if defined(QT_CHECK_STATE)
-  Q_ASSERT( txinv == FALSE );
+  Q_ASSERT(txinv == FALSE);
 #endif
   txinv = TRUE;       // creating inverted matrix
   bool invertible;
   QWMatrix m;
-  if ( testf( VxF ) ) {
-    m.translate( vx, vy );
-    m.scale( 1.0*vw / ww, 1.0*vh / wh );
-    m.translate( -wx, -wy );
+  if (testf(VxF)) {
+    m.translate(vx, vy);
+    m.scale(1.0 * vw / ww, 1.0 * vh / wh);
+    m.translate(-wx, -wy);
   }
-  if ( testf( WxF ) ) {
-    if ( testf( VxF ) )
+  if (testf(WxF)) {
+    if (testf(VxF))
       m = wxmat * m;
     else
       m = wxmat;
   }
-  ixmat = m.invert( &invertible );    // invert matrix
+  ixmat = m.invert(&invertible);      // invert matrix
 }
 
 #else
-void QPainter::resetXForm() {
+void QPainter::resetXForm()
+{
   xlatex = 0;
   xlatey = 0;
-  clearf( VxF );
+  clearf(VxF);
 }
 #endif // QT_NO_TRANSFORMATIONS
 
@@ -1649,51 +1688,52 @@ extern bool qt_old_transformations;
   Maps a point from logical coordinates to device coordinates.
 */
 
-void QPainter::map( int x, int y, int *rx, int *ry ) const {
+void QPainter::map(int x, int y, int *rx, int *ry) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( qt_old_transformations ) {
-    switch ( txop ) {
+  if (qt_old_transformations) {
+    switch (txop) {
       case TxNone:
         *rx = x;
         *ry = y;
         break;
       case TxTranslate:
         // #### "Why no rounding here?", Warwick asked of Haavard.
-        *rx = int( x + dx() );
-        *ry = int( y + dy() );
+        *rx = int(x + dx());
+        *ry = int(y + dy());
         break;
       case TxScale: {
-          double tx = m11() * x + dx();
-          double ty = m22() * y + dy();
-          *rx = tx >= 0 ? int( tx + 0.5 ) : int( tx - 0.5 );
-          *ry = ty >= 0 ? int( ty + 0.5 ) : int( ty - 0.5 );
-        }
-        break;
+        double tx = m11() * x + dx();
+        double ty = m22() * y + dy();
+        *rx = tx >= 0 ? int(tx + 0.5) : int(tx - 0.5);
+        *ry = ty >= 0 ? int(ty + 0.5) : int(ty - 0.5);
+      }
+      break;
       default: {
-          double tx = m11() * x + m21() * y + dx();
-          double ty = m12() * x + m22() * y + dy();
-          *rx = tx >= 0 ? int( tx + 0.5 ) : int( tx - 0.5 );
-          *ry = ty >= 0 ? int( ty + 0.5 ) : int( ty - 0.5 );
-        }
-        break;
+        double tx = m11() * x + m21() * y + dx();
+        double ty = m12() * x + m22() * y + dy();
+        *rx = tx >= 0 ? int(tx + 0.5) : int(tx - 0.5);
+        *ry = ty >= 0 ? int(ty + 0.5) : int(ty - 0.5);
+      }
+      break;
     }
   } else {
-    switch ( txop ) {
+    switch (txop) {
       case TxNone:
         *rx = x;
         *ry = y;
         break;
       case TxTranslate:
-        *rx = qRound( x + dx() );
-        *ry = qRound( y + dy() );
+        *rx = qRound(x + dx());
+        *ry = qRound(y + dy());
         break;
       case TxScale:
-        *rx = qRound( m11() * x + dx() );
-        *ry = qRound( m22() * y + dy() );
+        *rx = qRound(m11() * x + dx());
+        *ry = qRound(m22() * y + dy());
         break;
       default:
-        *rx = qRound( m11() * x + m21() * y + dx() );
-        *ry = qRound( m12() * x + m22() * y + dy() );
+        *rx = qRound(m11() * x + m21() * y + dx());
+        *ry = qRound(m12() * x + m22() * y + dy());
         break;
     }
   }
@@ -1709,11 +1749,12 @@ void QPainter::map( int x, int y, int *rx, int *ry ) const {
   This internal function does not handle rotation and/or shear.
 */
 
-void QPainter::map( int x, int y, int w, int h,
-                    int *rx, int *ry, int *rw, int *rh ) const {
+void QPainter::map(int x, int y, int w, int h,
+                   int *rx, int *ry, int *rw, int *rh) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( qt_old_transformations ) {
-    switch ( txop ) {
+  if (qt_old_transformations) {
+    switch (txop) {
       case TxNone:
         *rx = x;
         *ry = y;
@@ -1722,30 +1763,30 @@ void QPainter::map( int x, int y, int w, int h,
         break;
       case TxTranslate:
         // #### "Why no rounding here?", Warwick asked of Haavard.
-        *rx = int( x + dx() );
-        *ry = int( y + dy() );
+        *rx = int(x + dx());
+        *ry = int(y + dy());
         *rw = w;
         *rh = h;
         break;
       case TxScale: {
-          double tx1 = m11() * x + dx();
-          double ty1 = m22() * y + dy();
-          double tx2 = m11() * ( x + w - 1 ) + dx();
-          double ty2 = m22() * ( y + h - 1 ) + dy();
-          *rx = qRound( tx1 );
-          *ry = qRound( ty1 );
-          *rw = qRound( tx2 ) - *rx + 1;
-          *rh = qRound( ty2 ) - *ry + 1;
-        }
-        break;
+        double tx1 = m11() * x + dx();
+        double ty1 = m22() * y + dy();
+        double tx2 = m11() * (x + w - 1) + dx();
+        double ty2 = m22() * (y + h - 1) + dy();
+        *rx = qRound(tx1);
+        *ry = qRound(ty1);
+        *rw = qRound(tx2) - *rx + 1;
+        *rh = qRound(ty2) - *ry + 1;
+      }
+      break;
       default:
 #if defined(QT_CHECK_STATE)
-        qWarning( "QPainter::map: Internal error" );
+        qWarning("QPainter::map: Internal error");
 #endif
         break;
     }
   } else {
-    switch ( txop ) {
+    switch (txop) {
       case TxNone:
         *rx = x;
         *ry = y;
@@ -1753,20 +1794,20 @@ void QPainter::map( int x, int y, int w, int h,
         *rh = h;
         break;
       case TxTranslate:
-        *rx = qRound( x + dx() );
-        *ry = qRound( y + dy() );
+        *rx = qRound(x + dx());
+        *ry = qRound(y + dy());
         *rw = w;
         *rh = h;
         break;
       case TxScale:
-        *rx = qRound( m11() * x + dx() );
-        *ry = qRound( m22() * y + dy() );
-        *rw = qRound( m11() * w );
-        *rh = qRound( m22() * h );
+        *rx = qRound(m11() * x + dx());
+        *ry = qRound(m22() * y + dy());
+        *rw = qRound(m11() * w);
+        *rh = qRound(m22() * h);
         break;
       default:
 #if defined(QT_CHECK_STATE)
-        qWarning( "QPainter::map: Internal error" );
+        qWarning("QPainter::map: Internal error");
 #endif
         break;
     }
@@ -1784,20 +1825,21 @@ void QPainter::map( int x, int y, int w, int h,
   Maps a point from device coordinates to logical coordinates.
 */
 
-void QPainter::mapInv( int x, int y, int *rx, int *ry ) const {
+void QPainter::mapInv(int x, int y, int *rx, int *ry) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
 #if defined(QT_CHECK_STATE)
-  if ( !txinv )
-    qWarning( "QPainter::mapInv: Internal error" );
+  if (!txinv)
+    qWarning("QPainter::mapInv: Internal error");
 #endif
-  if ( qt_old_transformations ) {
+  if (qt_old_transformations) {
     double tx = im11() * x + im21() * y + idx();
     double ty = im12() * x + im22() * y + idy();
-    *rx = tx >= 0 ? int( tx + 0.5 ) : int( tx - 0.5 );
-    *ry = ty >= 0 ? int( ty + 0.5 ) : int( ty - 0.5 );
+    *rx = tx >= 0 ? int(tx + 0.5) : int(tx - 0.5);
+    *ry = ty >= 0 ? int(ty + 0.5) : int(ty - 0.5);
   } else {
-    *rx = qRound( im11() * x + im21() * y + idx() );
-    *ry = qRound( im12() * x + im22() * y + idy() );
+    *rx = qRound(im11() * x + im21() * y + idx());
+    *ry = qRound(im12() * x + im22() * y + idy());
   }
 #else
   *rx = x - xlatex;
@@ -1811,27 +1853,28 @@ void QPainter::mapInv( int x, int y, int *rx, int *ry ) const {
   Cannot handle rotation and/or shear.
 */
 
-void QPainter::mapInv( int x, int y, int w, int h,
-                       int *rx, int *ry, int *rw, int *rh ) const {
+void QPainter::mapInv(int x, int y, int w, int h,
+                      int *rx, int *ry, int *rw, int *rh) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
 #if defined(QT_CHECK_STATE)
-  if ( !txinv || txop == TxRotShear )
-    qWarning( "QPainter::mapInv: Internal error" );
+  if (!txinv || txop == TxRotShear)
+    qWarning("QPainter::mapInv: Internal error");
 #endif
-  if ( qt_old_transformations ) {
+  if (qt_old_transformations) {
     double tx = im11() * x + idx();
     double ty = im22() * y + idy();
     double tw = im11() * w;
     double th = im22() * h;
-    *rx = tx >= 0 ? int( tx + 0.5 ) : int( tx - 0.5 );
-    *ry = ty >= 0 ? int( ty + 0.5 ) : int( ty - 0.5 );
-    *rw = tw >= 0 ? int( tw + 0.5 ) : int( tw - 0.5 );
-    *rh = th >= 0 ? int( th + 0.5 ) : int( th - 0.5 );
+    *rx = tx >= 0 ? int(tx + 0.5) : int(tx - 0.5);
+    *ry = ty >= 0 ? int(ty + 0.5) : int(ty - 0.5);
+    *rw = tw >= 0 ? int(tw + 0.5) : int(tw - 0.5);
+    *rh = th >= 0 ? int(th + 0.5) : int(th - 0.5);
   } else {
-    *rx = qRound( im11() * x + idx() );
-    *ry = qRound( im22() * y + idy() );
-    *rw = qRound( im11() * w );
-    *rh = qRound( im22() * h );
+    *rx = qRound(im11() * x + idx());
+    *ry = qRound(im22() * y + idy());
+    *rw = qRound(im11() * w);
+    *rh = qRound(im22() * h);
   }
 #else
   *rx = x - xlatex;
@@ -1849,15 +1892,16 @@ void QPainter::mapInv( int x, int y, int w, int h,
     \sa xFormDev(), QWMatrix::map()
 */
 
-QPoint QPainter::xForm( const QPoint &pv ) const {
+QPoint QPainter::xForm(const QPoint &pv) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return pv;
   int x = pv.x(), y = pv.y();
-  map( x, y, &x, &y );
-  return QPoint( x, y );
+  map(x, y, &x, &y);
+  return QPoint(x, y);
 #else
-  return QPoint( pv.x() + xlatex, pv.y() + xlatey );
+  return QPoint(pv.x() + xlatex, pv.y() + xlatey);
 #endif
 }
 
@@ -1873,20 +1917,21 @@ QPoint QPainter::xForm( const QPoint &pv ) const {
     \sa xFormDev(), QWMatrix::map()
 */
 
-QRect QPainter::xForm( const QRect &rv ) const {
+QRect QPainter::xForm(const QRect &rv) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return rv;
-  if ( txop == TxRotShear ) {     // rotation/shear
-    return xmat.mapRect( rv );
+  if (txop == TxRotShear) {       // rotation/shear
+    return xmat.mapRect(rv);
   }
   // Just translation/scale
   int x, y, w, h;
-  rv.rect( &x, &y, &w, &h );
-  map( x, y, w, h, &x, &y, &w, &h );
-  return QRect( x, y, w, h );
+  rv.rect(&x, &y, &w, &h);
+  map(x, y, w, h, &x, &y, &w, &h);
+  return QRect(x, y, w, h);
 #else
-  return QRect( rv.x() + xlatex, rv.y() + xlatey, rv.width(), rv.height() );
+  return QRect(rv.x() + xlatex, rv.y() + xlatey, rv.width(), rv.height());
 #endif
 }
 
@@ -1899,14 +1944,15 @@ QRect QPainter::xForm( const QRect &rv ) const {
     \sa xFormDev(), QWMatrix::map()
 */
 
-QPointArray QPainter::xForm( const QPointArray &av ) const {
+QPointArray QPainter::xForm(const QPointArray &av) const
+{
   QPointArray a = av;
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop != TxNone ) {
+  if (txop != TxNone) {
     return xmat * av;
   }
 #else
-  a.translate( xlatex, xlatey );
+  a.translate(xlatex, xlatey);
 #endif
   return a;
 }
@@ -1934,15 +1980,16 @@ QPointArray QPainter::xForm( const QPointArray &av ) const {
     \sa xFormDev(), QWMatrix::map()
 */
 
-QPointArray QPainter::xForm( const QPointArray &av, int index,
-                             int npoints ) const {
+QPointArray QPainter::xForm(const QPointArray &av, int index,
+                            int npoints) const
+{
   int lastPoint = npoints < 0 ? av.size() : index + npoints;
-  QPointArray a( lastPoint - index );
-  memcpy( a.data(), av.data() + index, ( lastPoint - index )*sizeof( QPoint ) );
+  QPointArray a(lastPoint - index);
+  memcpy(a.data(), av.data() + index, (lastPoint - index)*sizeof(QPoint));
 #ifndef QT_NO_TRANSFORMATIONS
-  return xmat*a;
+  return xmat * a;
 #else
-  a.translate( xlatex, xlatey );
+  a.translate(xlatex, xlatey);
   return a;
 #endif
 }
@@ -1956,18 +2003,19 @@ QPointArray QPainter::xForm( const QPointArray &av, int index,
     \sa xForm(), QWMatrix::map()
 */
 
-QPoint QPainter::xFormDev( const QPoint &pd ) const {
+QPoint QPainter::xFormDev(const QPoint &pd) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return pd;
-  if ( !txinv ) {
-    QPainter *that = ( QPainter* )this; // mutable
+  if (!txinv) {
+    QPainter *that = (QPainter *)this;  // mutable
     that->updateInvXForm();
   }
 #endif
   int x = pd.x(), y = pd.y();
-  mapInv( x, y, &x, &y );
-  return QPoint( x, y );
+  mapInv(x, y, &x, &y);
+  return QPoint(x, y);
 }
 
 /*!
@@ -1980,23 +2028,24 @@ QPoint QPainter::xFormDev( const QPoint &pd ) const {
     \sa xForm(), QWMatrix::map()
 */
 
-QRect QPainter::xFormDev( const QRect &rd ) const {
+QRect QPainter::xFormDev(const QRect &rd) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return rd;
-  if ( !txinv ) {
-    QPainter *that = ( QPainter* )this; // mutable
+  if (!txinv) {
+    QPainter *that = (QPainter *)this;  // mutable
     that->updateInvXForm();
   }
-  if ( txop == TxRotShear ) {     // rotation/shear
-    return ixmat.mapRect( rd );
+  if (txop == TxRotShear) {       // rotation/shear
+    return ixmat.mapRect(rd);
   }
 #endif
   // Just translation/scale
   int x, y, w, h;
-  rd.rect( &x, &y, &w, &h );
-  mapInv( x, y, w, h, &x, &y, &w, &h );
-  return QRect( x, y, w, h );
+  rd.rect(&x, &y, &w, &h);
+  mapInv(x, y, w, h, &x, &y, &w, &h);
+  return QRect(x, y, w, h);
 }
 
 /*!
@@ -2008,12 +2057,13 @@ QRect QPainter::xFormDev( const QRect &rd ) const {
     \sa xForm(), QWMatrix::map()
 */
 
-QPointArray QPainter::xFormDev( const QPointArray &ad ) const {
+QPointArray QPainter::xFormDev(const QPointArray &ad) const
+{
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return ad;
-  if ( !txinv ) {
-    QPainter *that = ( QPainter* )this; // mutable
+  if (!txinv) {
+    QPainter *that = (QPainter *)this;  // mutable
     that->updateInvXForm();
   }
   return ixmat * ad;
@@ -2046,16 +2096,17 @@ QPointArray QPainter::xFormDev( const QPointArray &ad ) const {
     \sa xForm(), QWMatrix::map()
 */
 
-QPointArray QPainter::xFormDev( const QPointArray &ad, int index,
-                                int npoints ) const {
+QPointArray QPainter::xFormDev(const QPointArray &ad, int index,
+                               int npoints) const
+{
   int lastPoint = npoints < 0 ? ad.size() : index + npoints;
-  QPointArray a( lastPoint - index );
-  memcpy( a.data(), ad.data() + index, ( lastPoint - index )*sizeof( QPoint ) );
+  QPointArray a(lastPoint - index);
+  memcpy(a.data(), ad.data() + index, (lastPoint - index)*sizeof(QPoint));
 #ifndef QT_NO_TRANSFORMATIONS
-  if ( txop == TxNone )
+  if (txop == TxNone)
     return a;
-  if ( !txinv ) {
-    QPainter *that = ( QPainter* )this; // mutable
+  if (!txinv) {
+    QPainter *that = (QPainter *)this;  // mutable
     that->updateInvXForm();
   }
   return ixmat * a;
@@ -2076,14 +2127,15 @@ QPointArray QPainter::xFormDev( const QPointArray &ad, int index,
     \sa drawRect()
 */
 
-void QPainter::fillRect( int x, int y, int w, int h, const QBrush &brush ) {
+void QPainter::fillRect(int x, int y, int w, int h, const QBrush &brush)
+{
   QPen   oldPen   = pen();      // save pen
   QBrush oldBrush = this->brush();    // save brush
-  setPen( NoPen );
-  setBrush( brush );
-  drawRect( x, y, w, h );     // draw filled rect
-  setBrush( oldBrush );     // restore brush
-  setPen( oldPen );       // restore pen
+  setPen(NoPen);
+  setBrush(brush);
+  drawRect(x, y, w, h);       // draw filled rect
+  setBrush(oldBrush);       // restore brush
+  setPen(oldPen);         // restore pen
 }
 
 
@@ -2124,18 +2176,19 @@ void QPainter::fillRect( int x, int y, int w, int h, const QBrush &brush ) {
 
     \sa setClipRegion(), setClipRect(), setClipping() QPainter::CoordinateMode
 */
-QRegion QPainter::clipRegion( CoordinateMode m ) const {
+QRegion QPainter::clipRegion(CoordinateMode m) const
+{
   // ### FIXME in 4.0:
   // If the transformation mode is CoordPainter, we should transform the
   // clip region with painter transformations.
 
 #ifndef QT_NO_TRANSFORMATIONS
   QRegion r;
-  if ( m == CoordDevice ) {
+  if (m == CoordDevice) {
     r = crgn;
   } else {
-    if ( !txinv ) {
-      QPainter *that = ( QPainter* )this; // mutable
+    if (!txinv) {
+      QPainter *that = (QPainter *)this;  // mutable
       that->updateInvXForm();
     }
 
@@ -2210,8 +2263,9 @@ QRegion QPainter::clipRegion( CoordinateMode m ) const {
 
 #if !defined(Q_WS_X11) && !defined(Q_WS_QWS) && !defined(Q_WS_MAC)
 // The doc and X implementation of this functions is in qpainter_x11.cpp
-void QPainter::drawWinFocusRect( int, int, int, int,
-                                 bool, const QColor & ) {
+void QPainter::drawWinFocusRect(int, int, int, int,
+                                bool, const QColor &)
+{
   // do nothing, only called from X11 specific functions
 }
 #endif
@@ -2264,8 +2318,9 @@ void QPainter::drawWinFocusRect( int, int, int, int,
     Draws the pixmap \a pm with its origin at point \a p.
 */
 
-void QPainter::drawPixmap( const QPoint &p, const QPixmap &pm ) {
-  drawPixmap( p.x(), p.y(), pm, 0, 0, pm.width(), pm.height() );
+void QPainter::drawPixmap(const QPoint &p, const QPixmap &pm)
+{
+  drawPixmap(p.x(), p.y(), pm, 0, 0, pm.width(), pm.height());
 }
 
 #if !defined(QT_NO_IMAGE_SMOOTHSCALE) || !defined(QT_NO_PIXMAP_TRANSFORMATION)
@@ -2276,59 +2331,60 @@ void QPainter::drawPixmap( const QPoint &p, const QPixmap &pm ) {
     Draws the pixmap \a pm into the rectangle \a r. The pixmap is
     scaled to fit the rectangle, if image and rectangle size disagree.
 */
-void QPainter::drawPixmap( const QRect &r, const QPixmap &pm ) {
+void QPainter::drawPixmap(const QRect &r, const QPixmap &pm)
+{
   int rw = r.width();
   int rh = r.height();
   int iw = pm.width();
   int ih = pm.height();
-  if ( rw <= 0 || rh <= 0 || iw <= 0 || ih <= 0 )
+  if (rw <= 0 || rh <= 0 || iw <= 0 || ih <= 0)
     return;
-  bool scale = ( rw != iw || rh != ih );
-  float scaleX = ( float )rw / ( float )iw;
-  float scaleY = ( float )rh / ( float )ih;
-  bool smooth = ( scaleX < 1.5 || scaleY < 1.5 );
+  bool scale = (rw != iw || rh != ih);
+  float scaleX = (float)rw / (float)iw;
+  float scaleY = (float)rh / (float)ih;
+  bool smooth = (scaleX < 1.5 || scaleY < 1.5);
 
-  if ( testf( ExtDev ) ) {
+  if (testf(ExtDev)) {
     QPDevCmdParam param[2];
     param[0].rect = &r;
     param[1].pixmap = &pm;
 #if defined(Q_WS_WIN)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawPixmap, this, param ) || !hdc )
+    if (!pdev->cmd(QPaintDevice::PdcDrawPixmap, this, param) || !hdc)
       return;
 #elif defined(Q_WS_QWS)
-    pdev->cmd( QPaintDevice::PdcDrawPixmap, this, param );
+    pdev->cmd(QPaintDevice::PdcDrawPixmap, this, param);
     return;
 #elif defined(Q_WS_MAC)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawPixmap, this, param ) || !pdev->handle() )
+    if (!pdev->cmd(QPaintDevice::PdcDrawPixmap, this, param) || !pdev->handle())
       return;
 #else
-    if ( !pdev->cmd( QPaintDevice::PdcDrawPixmap, this, param ) || !hd )
+    if (!pdev->cmd(QPaintDevice::PdcDrawPixmap, this, param) || !hd)
       return;
 #endif
   }
 
   QPixmap pixmap = pm;
 
-  if ( scale ) {
+  if (scale) {
 #ifndef QT_NO_IMAGE_SMOOTHSCALE
 # ifndef QT_NO_PIXMAP_TRANSFORMATION
-    if ( smooth )
+    if (smooth)
 # endif
     {
       QImage i = pm.convertToImage();
-      pixmap = QPixmap( i.smoothScale( rw, rh ) );
+      pixmap = QPixmap(i.smoothScale(rw, rh));
     }
 # ifndef QT_NO_PIXMAP_TRANSFORMATION
     else
 # endif
 #endif
 #ifndef QT_NO_PIXMAP_TRANSFORMATION
-  {
-      pixmap = pm.xForm( QWMatrix( scaleX, 0, 0, scaleY, 0, 0 ) );
-  }
+    {
+      pixmap = pm.xForm(QWMatrix(scaleX, 0, 0, scaleY, 0, 0));
+    }
 #endif
-}
-drawPixmap( r.x(), r.y(), pixmap );
+  }
+  drawPixmap(r.x(), r.y(), pixmap);
 }
 
 #endif
@@ -2365,98 +2421,99 @@ drawPixmap( r.x(), r.y(), pixmap );
 
     \sa drawPixmap() QPixmap::convertFromImage()
 */
-void QPainter::drawImage( int x, int y, const QImage & image,
-                          int sx, int sy, int sw, int sh,
-                          int conversionFlags ) {
+void QPainter::drawImage(int x, int y, const QImage &image,
+                         int sx, int sy, int sw, int sh,
+                         int conversionFlags)
+{
 #ifdef Q_WS_QWS
   //### Hackish
 # ifndef QT_NO_TRANSFORMATIONS
-  if ( !image.isNull() && gfx &&
-       ( txop == TxNone || txop == TxTranslate ) && !testf( ExtDev ) )
+  if (!image.isNull() && gfx &&
+      (txop == TxNone || txop == TxTranslate) && !testf(ExtDev))
 # else
-  if ( !image.isNull() && gfx && !testf( ExtDev ) )
+  if (!image.isNull() && gfx && !testf(ExtDev))
 # endif
   {
-    if ( sw < 0 )
+    if (sw < 0)
       sw = image.width();
-    if ( sh < 0 )
+    if (sh < 0)
       sh = image.height();
 
-    QImage image2 = qt_screen->mapToDevice( image );
+    QImage image2 = qt_screen->mapToDevice(image);
 
     // This is a bit dubious
-    if ( image2.depth() == 1 ) {
-      image2.setNumColors( 2 );
-      image2.setColor( 0, qRgb( 255, 255, 255 ) );
-      image2.setColor( 1, qRgb( 0, 0, 0 ) );
+    if (image2.depth() == 1) {
+      image2.setNumColors(2);
+      image2.setColor(0, qRgb(255, 255, 255));
+      image2.setColor(1, qRgb(0, 0, 0));
     }
-    if ( image2.hasAlphaBuffer() )
-      gfx->setAlphaType( QGfx::InlineAlpha );
+    if (image2.hasAlphaBuffer())
+      gfx->setAlphaType(QGfx::InlineAlpha);
     else
-      gfx->setAlphaType( QGfx::IgnoreAlpha );
-    gfx->setSource( &image2 );
-    if ( testf( VxF | WxF ) ) {
-      map( x, y, &x, &y );
+      gfx->setAlphaType(QGfx::IgnoreAlpha);
+    gfx->setSource(&image2);
+    if (testf(VxF | WxF)) {
+      map(x, y, &x, &y);
     }
-    gfx->blt( x, y, sw, sh, sx, sy );
+    gfx->blt(x, y, sw, sh, sx, sy);
     return;
   }
 #endif
 
-  if ( !isActive() || image.isNull() )
+  if (!isActive() || image.isNull())
     return;
 
   // right/bottom
-  if ( sw < 0 )
+  if (sw < 0)
     sw = image.width()  - sx;
-  if ( sh < 0 )
+  if (sh < 0)
     sh = image.height() - sy;
 
   // Sanity-check clipping
-  if ( sx < 0 ) {
+  if (sx < 0) {
     x -= sx;
     sw += sx;
     sx = 0;
   }
-  if ( sw + sx > image.width() )
+  if (sw + sx > image.width())
     sw = image.width() - sx;
-  if ( sy < 0 ) {
+  if (sy < 0) {
     y -= sy;
     sh += sy;
     sy = 0;
   }
-  if ( sh + sy > image.height() )
+  if (sh + sy > image.height())
     sh = image.height() - sy;
 
-  if ( sw <= 0 || sh <= 0 )
+  if (sw <= 0 || sh <= 0)
     return;
 
-  bool all = image.rect().intersect( QRect( sx, sy, sw, sh ) ) == image.rect();
-  QImage subimage = all ? image : image.copy( sx, sy, sw, sh );
+  bool all = image.rect().intersect(QRect(sx, sy, sw, sh)) == image.rect();
+  QImage subimage = all ? image : image.copy(sx, sy, sw, sh);
 
-  if ( testf( ExtDev ) ) {
+  if (testf(ExtDev)) {
     QPDevCmdParam param[2];
-    QRect r( x, y, subimage.width(), subimage.height() );
+    QRect r(x, y, subimage.width(), subimage.height());
     param[0].rect = &r;
     param[1].image = &subimage;
 #if defined(Q_WS_WIN)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !hdc )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !hdc)
       return;
 #elif defined (Q_WS_QWS)
-    pdev->cmd( QPaintDevice::PdcDrawImage, this, param );
+    pdev->cmd(QPaintDevice::PdcDrawImage, this, param);
     return;
 #elif defined(Q_WS_MAC)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !pdev->handle() )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !pdev->handle())
       return;
 #else
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !hd )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !hd)
       return;
 #endif
   }
 
   QPixmap pm;
-  pm.convertFromImage( subimage, conversionFlags );
-  drawPixmap( x, y, pm );
+  pm.convertFromImage(subimage, conversionFlags);
+  drawPixmap(x, y, pm);
 }
 
 /*!
@@ -2470,9 +2527,10 @@ void QPainter::drawImage( int x, int y, const QImage & image,
 
     \sa Qt::ImageConversionFlags
 */
-void QPainter::drawImage( const QPoint & p, const QImage & i,
-                          int conversion_flags ) {
-  drawImage( p, i, i.rect(), conversion_flags );
+void QPainter::drawImage(const QPoint &p, const QImage &i,
+                         int conversion_flags)
+{
+  drawImage(p, i, i.rect(), conversion_flags);
 }
 
 #if !defined(QT_NO_IMAGE_TRANSFORMATION) || !defined(QT_NO_IMAGE_SMOOTHSCALE)
@@ -2484,69 +2542,71 @@ void QPainter::drawImage( const QPoint & p, const QImage & i,
     scaled to fit the rectangle if image and rectangle dimensions
     differ.
 */
-void QPainter::drawImage( const QRect &r, const QImage &i ) {
+void QPainter::drawImage(const QRect &r, const QImage &i)
+{
   int rw = r.width();
   int rh = r.height();
   int iw = i.width();
   int ih = i.height();
-  if ( rw <= 0 || rh <= 0 || iw <= 0 || ih <= 0 )
+  if (rw <= 0 || rh <= 0 || iw <= 0 || ih <= 0)
     return;
 
-  if ( testf( ExtDev ) ) {
+  if (testf(ExtDev)) {
     QPDevCmdParam param[2];
     param[0].rect = &r;
     param[1].image = &i;
 #if defined(Q_WS_WIN)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !hdc )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !hdc)
       return;
 #elif defined(Q_WS_QWS)
-    pdev->cmd( QPaintDevice::PdcDrawImage, this, param );
+    pdev->cmd(QPaintDevice::PdcDrawImage, this, param);
     return;
 #elif defined(Q_WS_MAC)
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !pdev->handle() )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !pdev->handle())
       return;
 #else
-    if ( !pdev->cmd( QPaintDevice::PdcDrawImage, this, param ) || !hd )
+    if (!pdev->cmd(QPaintDevice::PdcDrawImage, this, param) || !hd)
       return;
 #endif
   }
 
 
-  bool scale = ( rw != iw || rh != ih );
-  float scaleX = ( float )rw / ( float )iw;
-  float scaleY = ( float )rh / ( float )ih;
-  bool smooth = ( scaleX < 1.5 || scaleY < 1.5 );
+  bool scale = (rw != iw || rh != ih);
+  float scaleX = (float)rw / (float)iw;
+  float scaleY = (float)rh / (float)ih;
+  bool smooth = (scaleX < 1.5 || scaleY < 1.5);
 
   QImage img = scale
                ? (
 #if defined(QT_NO_IMAGE_TRANSFORMATION)
-                 i.smoothScale( rw, rh )
+                 i.smoothScale(rw, rh)
 #elif defined(QT_NO_IMAGE_SMOOTHSCALE)
-                 i.scale( rw, rh )
+                 i.scale(rw, rh)
 #else
-                 smooth ? i.smoothScale( rw, rh ) : i.scale( rw, rh )
+                 smooth ? i.smoothScale(rw, rh) : i.scale(rw, rh)
 #endif
                )
                : i;
 
-  drawImage( r.x(), r.y(), img );
+  drawImage(r.x(), r.y(), img);
 }
 
 #endif
 
 
-void bitBlt( QPaintDevice *dst, int dx, int dy,
-             const QImage *src, int sx, int sy, int sw, int sh,
-             int conversion_flags ) {
+void bitBlt(QPaintDevice *dst, int dx, int dy,
+            const QImage *src, int sx, int sy, int sw, int sh,
+            int conversion_flags)
+{
   QPixmap tmp;
-  if ( sx == 0 && sy == 0
-       && ( sw < 0 || sw == src->width() ) && ( sh < 0 || sh == src->height() ) ) {
-    tmp.convertFromImage( *src, conversion_flags );
+  if (sx == 0 && sy == 0
+      && (sw < 0 || sw == src->width()) && (sh < 0 || sh == src->height())) {
+    tmp.convertFromImage(*src, conversion_flags);
   } else {
-    tmp.convertFromImage( src->copy( sx, sy, sw, sh, conversion_flags ),
-                          conversion_flags );
+    tmp.convertFromImage(src->copy(sx, sy, sw, sh, conversion_flags),
+                         conversion_flags);
   }
-  bitBlt( dst, dx, dy, &tmp );
+  bitBlt(dst, dx, dy, &tmp);
 }
 
 
@@ -2659,18 +2719,20 @@ void bitBlt( QPaintDevice *dst, int dx, int dy,
     \internal
 */
 
-static inline void fix_neg_rect( int *x, int *y, int *w, int *h ) {
-  if ( *w < 0 ) {
+static inline void fix_neg_rect(int *x, int *y, int *w, int *h)
+{
+  if (*w < 0) {
     *w = -*w + 2;
     *x -= *w - 1;
   }
-  if ( *h < 0 ) {
+  if (*h < 0) {
     *h = -*h + 2;
     *y -= *h - 1;
   }
 }
-void QPainter::fix_neg_rect( int *x, int *y, int *w, int *h ) {
-  ::fix_neg_rect( x, y, w, h );
+void QPainter::fix_neg_rect(int *x, int *y, int *w, int *h)
+{
+  ::fix_neg_rect(x, y, w, h);
 }
 
 //
@@ -2709,79 +2771,84 @@ void QPainter::fix_neg_rect( int *x, int *y, int *w, int *h ) {
     \sa boundingRect()
 */
 
-void QPainter::drawText( const QRect &r, int tf,
-                         const QString& str, int len, QRect *brect,
-                         QTextParag **internal ) {
-  if ( !isActive() )
+void QPainter::drawText(const QRect &r, int tf,
+                        const QString &str, int len, QRect *brect,
+                        QTextParag **internal)
+{
+  if (!isActive())
     return;
-  if ( len < 0 )
+  if (len < 0)
     len = str.length();
-  if ( len == 0 )       // empty string
-    return;
+  // ### AbanQ
+  // Empty cells for mreportengine::exportToOds
+  //  if ( len == 0 )       // empty string
+  //    return;
+  // ### AbanQ
 
-  if ( testf( DirtyFont | ExtDev ) ) {
-    if ( testf( DirtyFont ) )
+  if (testf(DirtyFont | ExtDev)) {
+    if (testf(DirtyFont))
       updateFont();
-    if ( testf( ExtDev ) && ( tf & DontPrint ) == 0 ) {
+    if (testf(ExtDev) && (tf & DontPrint) == 0) {
       QPDevCmdParam param[3];
       QString newstr = str;
-      newstr.truncate( len );
+      newstr.truncate(len);
       param[0].rect = &r;
       param[1].ival = tf;
       param[2].str = &newstr;
-      if ( pdev->devType() != QInternal::Printer ) {
+      if (pdev->devType() != QInternal::Printer) {
 #if defined(Q_WS_WIN)
-        if ( !pdev->cmd( QPaintDevice::PdcDrawText2Formatted,
-                         this, param ) ||
-             !hdc )
+        if (!pdev->cmd(QPaintDevice::PdcDrawText2Formatted,
+                       this, param) ||
+            !hdc)
           return;     // QPrinter wants PdcDrawText2
 #elif defined(Q_WS_QWS)
-        pdev->cmd( QPaintDevice::PdcDrawText2Formatted, this, param );
+        pdev->cmd(QPaintDevice::PdcDrawText2Formatted, this, param);
         return;
 #elif defined(Q_WS_MAC)
-        if ( !pdev->cmd( QPaintDevice::PdcDrawText2Formatted, this, param ) ||
-             !pdev->handle() )
+        if (!pdev->cmd(QPaintDevice::PdcDrawText2Formatted, this, param) ||
+            !pdev->handle())
           return;     // QPrinter wants PdcDrawText2
 #else
-        if ( !pdev->cmd( QPaintDevice::PdcDrawText2Formatted,
-                         this, param ) ||
-             !hd )
+        if (!pdev->cmd(QPaintDevice::PdcDrawText2Formatted,
+                       this, param) ||
+            !hd)
           return;     // QPrinter wants PdcDrawText2
 #endif
       }
     }
   }
 
-  qt_format_text( font(), r, tf, str, len, brect,
-                  tabstops, tabarray, tabarraylen, internal, this );
+  qt_format_text(font(), r, tf, str, len, brect,
+                 tabstops, tabarray, tabarraylen, internal, this);
 }
 
 //#define QT_FORMAT_TEXT_DEBUG
 
 #define QChar_linesep QChar(0x2028U)
 
-void qt_format_text( const QFont& font, const QRect &_r,
-                     int tf, const QString& str, int len, QRect *brect,
-                     int tabstops, int* tabarray, int tabarraylen,
-                     QTextParag **, QPainter* painter ) {
+void qt_format_text(const QFont &font, const QRect &_r,
+                    int tf, const QString &str, int len, QRect *brect,
+                    int tabstops, int *tabarray, int tabarraylen,
+                    QTextParag **, QPainter *painter)
+{
   // we need to copy r here to protect against the case (&r == brect).
-  QRect r( _r );
+  QRect r(_r);
 
-  bool dontclip  = ( tf & Qt::DontClip )  == Qt::DontClip;
-  bool wordbreak  = ( tf & Qt::WordBreak )  == Qt::WordBreak;
-  bool singleline = ( tf & Qt::SingleLine ) == Qt::SingleLine;
-  bool showprefix = ( tf & Qt::ShowPrefix ) == Qt::ShowPrefix;
-  bool noaccel = ( tf & Qt::NoAccel ) == Qt::NoAccel;
+  bool dontclip  = (tf & Qt::DontClip)  == Qt::DontClip;
+  bool wordbreak  = (tf & Qt::WordBreak)  == Qt::WordBreak;
+  bool singleline = (tf & Qt::SingleLine) == Qt::SingleLine;
+  bool showprefix = (tf & Qt::ShowPrefix) == Qt::ShowPrefix;
+  bool noaccel = (tf & Qt::NoAccel) == Qt::NoAccel;
 
   bool isRightToLeft = str.isRightToLeft();
-  if (( tf & Qt::AlignHorizontal_Mask ) == Qt::AlignAuto )
+  if ((tf & Qt::AlignHorizontal_Mask) == Qt::AlignAuto)
     tf |= isRightToLeft ? Qt::AlignRight : Qt::AlignLeft;
 
-  bool expandtabs = (( tf & Qt::ExpandTabs ) &&
-                     ((( tf & Qt::AlignLeft ) && !isRightToLeft ) ||
-                      (( tf & Qt::AlignRight ) && isRightToLeft ) ) );
+  bool expandtabs = ((tf & Qt::ExpandTabs) &&
+                     (((tf & Qt::AlignLeft) && !isRightToLeft) ||
+                      ((tf & Qt::AlignRight) && isRightToLeft)));
 
-  if ( !painter )
+  if (!painter)
     tf |= Qt::DontPrint;
 
   int maxUnderlines = 0;
@@ -2789,53 +2856,53 @@ void qt_format_text( const QFont& font, const QRect &_r,
   int underlinePositionStack[32];
   int *underlinePositions = underlinePositionStack;
 
-  QFont fnt( painter ? ( painter->pfont ? *painter->pfont : painter->cfont ) : font );
-  QFontMetrics fm( fnt );
+  QFont fnt(painter ? (painter->pfont ? *painter->pfont : painter->cfont) : font);
+  QFontMetrics fm(fnt);
 
   QString text = str;
   // str.setLength() always does a deep copy, so the replacement
   // code below is safe.
-  text.setLength( len );
+  text.setLength(len);
   // compatible behaviour to the old implementation. Replace
   // tabs by spaces
-  QChar *chr = ( QChar* )text.unicode();
+  QChar *chr = (QChar *)text.unicode();
   const QChar *end = chr + len;
   bool haveLineSep = FALSE;
-  while ( chr != end ) {
-    if ( *chr == '\r' || ( singleline && *chr == '\n' ) ) {
+  while (chr != end) {
+    if (*chr == '\r' || (singleline && *chr == '\n')) {
       *chr = ' ';
-    } else if ( *chr == '\n' ) {
+    } else if (*chr == '\n') {
       *chr = QChar_linesep;
       haveLineSep = TRUE;
-    } else if ( *chr == '&' ) {
+    } else if (*chr == '&') {
       ++maxUnderlines;
     }
     ++chr;
   }
-  if ( !expandtabs ) {
-    chr = ( QChar* )text.unicode();
-    while ( chr != end ) {
-      if ( *chr == '\t' )
+  if (!expandtabs) {
+    chr = (QChar *)text.unicode();
+    while (chr != end) {
+      if (*chr == '\t')
         *chr = ' ';
       ++chr;
     }
-  } else if ( !tabarraylen && !tabstops ) {
-    tabstops = fm.width( 'x' ) * 8;
+  } else if (!tabarraylen && !tabstops) {
+    tabstops = fm.width('x') * 8;
   }
 
-  if ( noaccel || showprefix ) {
-    if ( maxUnderlines > 32 )
+  if (noaccel || showprefix) {
+    if (maxUnderlines > 32)
       underlinePositions = new int[maxUnderlines];
-    QChar *cout = ( QChar* )text.unicode();
+    QChar *cout = (QChar *)text.unicode();
     QChar *cin = cout;
     int l = len;
-    while ( l ) {
-      if ( *cin == '&' ) {
+    while (l) {
+      if (*cin == '&') {
         ++cin;
         --l;
-        if ( !l )
+        if (!l)
           break;
-        if ( *cin != '&' )
+        if (*cin != '&')
           underlinePositions[numUnderlines++] = cout - text.unicode();
       }
       *cout = *cin;
@@ -2844,39 +2911,39 @@ void qt_format_text( const QFont& font, const QRect &_r,
       --l;
     }
     uint newlen = cout - text.unicode();
-    if ( newlen != text.length() )
-      text.setLength( newlen );
+    if (newlen != text.length())
+      text.setLength(newlen);
   }
 
   // no need to do extra work for underlines if we don't paint
-  if ( tf & Qt::DontPrint )
+  if (tf & Qt::DontPrint)
     numUnderlines = 0;
 
   int height = 0;
   int left = r.width();
   int right = 0;
 
-  QTextLayout textLayout( text, fnt );
-  int rb = QMAX( 0, -fm.minRightBearing() );
-  int lb = QMAX( 0, -fm.minLeftBearing() );
+  QTextLayout textLayout(text, fnt);
+  int rb = QMAX(0, -fm.minRightBearing());
+  int lb = QMAX(0, -fm.minLeftBearing());
 
-  if ( text.isEmpty() ) {
+  if (text.isEmpty()) {
     height = fm.height();
     left = right = 0;
     tf |= QPainter::DontPrint;
   } else {
-    textLayout.beginLayout(( haveLineSep || expandtabs || wordbreak ) ?
+    textLayout.beginLayout((haveLineSep || expandtabs || wordbreak) ?
                            QTextLayout::MultiLine :
-                           ( tf & Qt::DontPrint ) ? QTextLayout::NoBidi : QTextLayout::SingleLine );
+                           (tf & Qt::DontPrint) ? QTextLayout::NoBidi : QTextLayout::SingleLine);
 
     // break underline chars into items of their own
-    for ( int i = 0; i < numUnderlines; i++ ) {
-      textLayout.setBoundary( underlinePositions[i] );
-      textLayout.setBoundary( underlinePositions[i] + 1 );
+    for (int i = 0; i < numUnderlines; i++) {
+      textLayout.setBoundary(underlinePositions[i]);
+      textLayout.setBoundary(underlinePositions[i] + 1);
     }
 
-    int lineWidth = wordbreak ? QMAX( 0, r.width() - rb - lb ) : INT_MAX;
-    if ( !wordbreak )
+    int lineWidth = wordbreak ? QMAX(0, r.width() - rb - lb) : INT_MAX;
+    if (!wordbreak)
       tf |= Qt::IncludeTrailingSpaces;
 
     int leading = fm.leading();
@@ -2885,129 +2952,129 @@ void qt_format_text( const QFont& font, const QRect &_r,
     height = -leading;
 
     //qDebug("\n\nbeginLayout: lw = %d, rectwidth=%d", lineWidth , r.width());
-    while ( !textLayout.atEnd() ) {
+    while (!textLayout.atEnd()) {
       height += leading;
-      textLayout.beginLine( lineWidth == INT_MAX ? lineWidth : lineWidth );
+      textLayout.beginLine(lineWidth == INT_MAX ? lineWidth : lineWidth);
       //qDebug("-----beginLine( %d )-----",  lineWidth );
       bool linesep = FALSE;
-      while ( 1 ) {
+      while (1) {
         QTextItem ti = textLayout.currentItem();
         //qDebug("item: from=%d, ch=%x", ti.from(), text.unicode()[ti.from()].unicode() );
-        if ( expandtabs && ti.isTab() ) {
+        if (expandtabs && ti.isTab()) {
           int tw = 0;
           int x = textLayout.widthUsed();
-          if ( tabarraylen ) {
-//      qDebug("tabarraylen=%d", tabarraylen );
+          if (tabarraylen) {
+            //      qDebug("tabarraylen=%d", tabarraylen );
             int tab = 0;
-            while ( tab < tabarraylen ) {
-              if ( tabarray[tab] > x ) {
+            while (tab < tabarraylen) {
+              if (tabarray[tab] > x) {
                 tw = tabarray[tab] - x;
                 break;
               }
               ++tab;
             }
           } else {
-            tw = tabstops - ( x % tabstops );
+            tw = tabstops - (x % tabstops);
           }
           //qDebug("tw = %d",  tw );
-          if ( tw )
-            ti.setWidth( tw );
+          if (tw)
+            ti.setWidth(tw);
         }
-        if ( ti.isObject() && text.unicode()[ti.from()] == QChar_linesep )
+        if (ti.isObject() && text.unicode()[ti.from()] == QChar_linesep)
           linesep = TRUE;
 
-        if ( linesep || textLayout.addCurrentItem() != QTextLayout::Ok || textLayout.atEnd() )
+        if (linesep || textLayout.addCurrentItem() != QTextLayout::Ok || textLayout.atEnd())
           break;
       }
 
       int ascent = asc, descent = desc, lineLeft, lineRight;
-      textLayout.setLineWidth( r.width() - rb - lb );
-      textLayout.endLine( 0, height, tf, &ascent, &descent,
-                          &lineLeft, &lineRight );
+      textLayout.setLineWidth(r.width() - rb - lb);
+      textLayout.endLine(0, height, tf, &ascent, &descent,
+                         &lineLeft, &lineRight);
       //qDebug("finalizing line: lw=%d ascent = %d, descent=%d lineleft=%d lineright=%d", lineWidth, ascent, descent,lineLeft, lineRight  );
-      left = QMIN( left, lineLeft );
-      right = QMAX( right, lineRight );
+      left = QMIN(left, lineLeft);
+      right = QMAX(right, lineRight);
       height += ascent + descent + 1;
-      if ( linesep )
+      if (linesep)
         textLayout.nextItem();
     }
   }
 
   int yoff = 0;
-  if ( tf & Qt::AlignBottom )
+  if (tf & Qt::AlignBottom)
     yoff = r.height() - height;
-  else if ( tf & Qt::AlignVCenter )
-    yoff = ( r.height() - height ) / 2;
+  else if (tf & Qt::AlignVCenter)
+    yoff = (r.height() - height) / 2;
 
-  if ( brect ) {
-    *brect = QRect( r.x() + left, r.y() + yoff, right - left + lb + rb, height );
+  if (brect) {
+    *brect = QRect(r.x() + left, r.y() + yoff, right - left + lb + rb, height);
     //qDebug("br = %d %d %d/%d, left=%d, right=%d", brect->x(), brect->y(), brect->width(), brect->height(), left, right);
   }
 
-  if ( !( tf & QPainter::DontPrint ) ) {
+  if (!(tf & QPainter::DontPrint)) {
     bool restoreClipping = FALSE;
     bool painterHasClip = FALSE;
     QRegion painterClipRegion;
-    if ( !dontclip ) {
+    if (!dontclip) {
 #ifndef QT_NO_TRANSFORMATIONS
       QRegion reg = painter->xmat * r;
 #else
       QRegion reg = r;
-      reg.translate( painter->xlatex, painter->xlatey );
+      reg.translate(painter->xlatex, painter->xlatey);
 #endif
-      if ( painter->hasClipping() )
+      if (painter->hasClipping())
         reg &= painter->clipRegion();
 
       painterHasClip = painter->hasClipping();
       painterClipRegion = painter->clipRegion();
       restoreClipping = TRUE;
-      painter->setClipRegion( reg );
+      painter->setClipRegion(reg);
     } else {
-      if ( painter->hasClipping() ) {
+      if (painter->hasClipping()) {
         painterHasClip = painter->hasClipping();
         painterClipRegion = painter->clipRegion();
         restoreClipping = TRUE;
-        painter->setClipping( FALSE );
+        painter->setClipping(FALSE);
       }
     }
 
     int cUlChar = 0;
     int _tf = 0;
-    if ( fnt.underline() ) _tf |= Qt::Underline;
-    if ( fnt.overline() ) _tf |= Qt::Overline;
-    if ( fnt.strikeOut() ) _tf |= Qt::StrikeOut;
+    if (fnt.underline()) _tf |= Qt::Underline;
+    if (fnt.overline()) _tf |= Qt::Overline;
+    if (fnt.strikeOut()) _tf |= Qt::StrikeOut;
 
     //qDebug("have %d items",textLayout.numItems());
-    for ( int i = 0; i < textLayout.numItems(); i++ ) {
-      QTextItem ti = textLayout.itemAt( i );
+    for (int i = 0; i < textLayout.numItems(); i++) {
+      QTextItem ti = textLayout.itemAt(i);
       //qDebug("Item %d: from=%d,  length=%d,  space=%d x=%d", i, ti.from(),  ti.length(), ti.isSpace(), ti.x() );
-      if ( ti.isTab() || ti.isObject() )
+      if (ti.isTab() || ti.isObject())
         continue;
       int textFlags = _tf;
-      if ( !noaccel && numUnderlines > cUlChar && ti.from() == underlinePositions[cUlChar] ) {
+      if (!noaccel && numUnderlines > cUlChar && ti.from() == underlinePositions[cUlChar]) {
         textFlags |= Qt::Underline;
         cUlChar++;
       }
 #if defined(Q_WS_X11) || defined(Q_WS_QWS)
-      if ( painter->bg_mode == Qt::OpaqueMode ) {
+      if (painter->bg_mode == Qt::OpaqueMode) {
         int h = ti.ascent() + ti.descent() + 1;
-        if ( ti.y() + h < height )
+        if (ti.y() + h < height)
           // don't add leading to last line
           h += fm.leading();
-        qt_draw_background( painter, r.x() + lb + ti.x(), r.y() + yoff + ti.y() - ti.ascent(),
-                            ti.width(), h );
+        qt_draw_background(painter, r.x() + lb + ti.x(), r.y() + yoff + ti.y() - ti.ascent(),
+                           ti.width(), h);
       }
 #endif
-      painter->drawTextItem( r.x() + lb, r.y() + yoff, ti, textFlags );
+      painter->drawTextItem(r.x() + lb, r.y() + yoff, ti, textFlags);
     }
 
-    if ( restoreClipping ) {
-      painter->setClipRegion( painterClipRegion );
-      painter->setClipping( painterHasClip );
+    if (restoreClipping) {
+      painter->setClipRegion(painterClipRegion);
+      painter->setClipping(painterHasClip);
     }
   }
 
-  if ( underlinePositions != underlinePositionStack )
+  if (underlinePositions != underlinePositionStack)
     delete [] underlinePositions;
 }
 
@@ -3026,13 +3093,14 @@ void qt_format_text( const QFont& font, const QRect &_r,
     \sa drawText(), fontMetrics(), QFontMetrics::boundingRect(), Qt::TextFlags
 */
 
-QRect QPainter::boundingRect( const QRect &r, int flags,
-                              const QString& str, int len, QTextParag **internal ) {
+QRect QPainter::boundingRect(const QRect &r, int flags,
+                             const QString &str, int len, QTextParag **internal)
+{
   QRect brect;
-  if ( str.isEmpty() )
-    brect.setRect( r.x(), r.y(), 0, 0 );
+  if (str.isEmpty())
+    brect.setRect(r.x(), r.y(), 0, 0);
   else
-    drawText( r, flags | DontPrint, str, len, &brect, internal );
+    drawText(r, flags | DontPrint, str, len, &brect, internal);
   return brect;
 }
 
@@ -3157,10 +3225,11 @@ QRect QPainter::boundingRect( const QRect &r, int flags,
   Initializes the pen.
 */
 
-void QPen::init( const QColor &color, uint width, uint linestyle ) {
+void QPen::init(const QColor &color, uint width, uint linestyle)
+{
   data = new QPenData;
-  Q_CHECK_PTR( data );
-  data->style = ( PenStyle )( linestyle & MPenStyle );
+  Q_CHECK_PTR(data);
+  data->style = (PenStyle)(linestyle & MPenStyle);
   data->width = width;
   data->color = color;
   data->linest = linestyle;
@@ -3171,8 +3240,9 @@ void QPen::init( const QColor &color, uint width, uint linestyle ) {
     renders lines 1 pixel wide (fast diagonals).
 */
 
-QPen::QPen() {
-  init( Qt::black, 0, SolidLine );    // default pen
+QPen::QPen()
+{
+  init(Qt::black, 0, SolidLine);      // default pen
 }
 
 /*!
@@ -3182,8 +3252,9 @@ QPen::QPen() {
     \sa setStyle()
 */
 
-QPen::QPen( PenStyle style ) {
-  init( Qt::black, 0, style );
+QPen::QPen(PenStyle style)
+{
+  init(Qt::black, 0, style);
 }
 
 /*!
@@ -3193,8 +3264,9 @@ QPen::QPen( PenStyle style ) {
     \sa setWidth(), setStyle(), setColor()
 */
 
-QPen::QPen( const QColor &color, uint width, PenStyle style ) {
-  init( color, width, style );
+QPen::QPen(const QColor &color, uint width, PenStyle style)
+{
+  init(color, width, style);
 }
 
 /*!
@@ -3212,16 +3284,18 @@ QPen::QPen( const QColor &color, uint width, PenStyle style ) {
     \sa setWidth(), setStyle(), setColor()
 */
 
-QPen::QPen( const QColor &cl, uint w, PenStyle s, PenCapStyle c,
-            PenJoinStyle j ) {
-  init( cl, w, s | c | j );
+QPen::QPen(const QColor &cl, uint w, PenStyle s, PenCapStyle c,
+           PenJoinStyle j)
+{
+  init(cl, w, s | c | j);
 }
 
 /*!
     Constructs a pen that is a copy of \a p.
 */
 
-QPen::QPen( const QPen &p ) {
+QPen::QPen(const QPen &p)
+{
   data = p.data;
   data->ref();
 }
@@ -3230,8 +3304,9 @@ QPen::QPen( const QPen &p ) {
     Destroys the pen.
 */
 
-QPen::~QPen() {
-  if ( data->deref() )
+QPen::~QPen()
+{
+  if (data->deref())
     delete data;
 }
 
@@ -3245,8 +3320,9 @@ QPen::~QPen() {
     single reference.
 */
 
-void QPen::detach() {
-  if ( data->count != 1 )
+void QPen::detach()
+{
+  if (data->count != 1)
     *this = copy();
 }
 
@@ -3255,9 +3331,10 @@ void QPen::detach() {
     Assigns \a p to this pen and returns a reference to this pen.
 */
 
-QPen &QPen::operator=( const QPen & p ) {
+QPen &QPen::operator=(const QPen &p)
+{
   p.data->ref();
-  if ( data->deref() )
+  if (data->deref())
     delete data;
   data = p.data;
   return *this;
@@ -3268,8 +3345,9 @@ QPen &QPen::operator=( const QPen & p ) {
     Returns a \link shclass.html deep copy\endlink of the pen.
 */
 
-QPen QPen::copy() const {
-  QPen p( data->color, data->width, data->style, capStyle(), joinStyle() );
+QPen QPen::copy() const
+{
+  QPen p(data->color, data->width, data->style, capStyle(), joinStyle());
   return p;
 }
 
@@ -3299,12 +3377,13 @@ QPen QPen::copy() const {
     \sa style()
 */
 
-void QPen::setStyle( PenStyle s ) {
-  if ( data->style == s )
+void QPen::setStyle(PenStyle s)
+{
+  if (data->style == s)
     return;
   detach();
   data->style = s;
-  data->linest = ( data->linest & ~MPenStyle ) | s;
+  data->linest = (data->linest & ~MPenStyle) | s;
 }
 
 
@@ -3329,8 +3408,9 @@ void QPen::setStyle( PenStyle s ) {
     \sa width()
 */
 
-void QPen::setWidth( uint w ) {
-  if ( data->width == w )
+void QPen::setWidth(uint w)
+{
+  if (data->width == w)
     return;
   detach();
   data->width = w;
@@ -3342,8 +3422,9 @@ void QPen::setWidth( uint w ) {
 
     \sa setCapStyle()
 */
-Qt::PenCapStyle QPen::capStyle() const {
-  return ( PenCapStyle )( data->linest & MPenCapStyle );
+Qt::PenCapStyle QPen::capStyle() const
+{
+  return (PenCapStyle)(data->linest & MPenCapStyle);
 }
 
 /*!
@@ -3361,11 +3442,12 @@ Qt::PenCapStyle QPen::capStyle() const {
     \sa capStyle()
 */
 
-void QPen::setCapStyle( PenCapStyle c ) {
-  if (( data->linest & MPenCapStyle ) == c )
+void QPen::setCapStyle(PenCapStyle c)
+{
+  if ((data->linest & MPenCapStyle) == c)
     return;
   detach();
-  data->linest = ( data->linest & ~MPenCapStyle ) | c;
+  data->linest = (data->linest & ~MPenCapStyle) | c;
 }
 
 /*!
@@ -3373,8 +3455,9 @@ void QPen::setCapStyle( PenCapStyle c ) {
 
     \sa setJoinStyle()
 */
-Qt::PenJoinStyle QPen::joinStyle() const {
-  return ( PenJoinStyle )( data->linest & MPenJoinStyle );
+Qt::PenJoinStyle QPen::joinStyle() const
+{
+  return (PenJoinStyle)(data->linest & MPenJoinStyle);
 }
 
 /*!
@@ -3392,11 +3475,12 @@ Qt::PenJoinStyle QPen::joinStyle() const {
     \sa joinStyle()
 */
 
-void QPen::setJoinStyle( PenJoinStyle j ) {
-  if (( data->linest & MPenJoinStyle ) == j )
+void QPen::setJoinStyle(PenJoinStyle j)
+{
+  if ((data->linest & MPenJoinStyle) == j)
     return;
   detach();
-  data->linest = ( data->linest & ~MPenJoinStyle ) | j;
+  data->linest = (data->linest & ~MPenJoinStyle) | j;
 }
 
 /*!
@@ -3413,7 +3497,8 @@ void QPen::setJoinStyle( PenJoinStyle j ) {
     \sa color()
 */
 
-void QPen::setColor( const QColor &c ) {
+void QPen::setColor(const QColor &c)
+{
   detach();
   data->color = c;
 }
@@ -3439,9 +3524,10 @@ void QPen::setColor( const QColor &c ) {
     \sa operator!=()
 */
 
-bool QPen::operator==( const QPen &p ) const {
-  return ( p.data == data ) || ( p.data->linest == data->linest &&
-                                 p.data->width == data->width && p.data->color == data->color );
+bool QPen::operator==(const QPen &p) const
+{
+  return (p.data == data) || (p.data->linest == data->linest &&
+                              p.data->width == data->width && p.data->color == data->color);
 }
 
 
@@ -3458,13 +3544,14 @@ bool QPen::operator==( const QPen &p ) const {
     \sa \link datastreamformat.html Format of the QDataStream operators \endlink
 */
 
-QDataStream &operator<<( QDataStream &s, const QPen &p ) {
+QDataStream &operator<<(QDataStream &s, const QPen &p)
+{
   // ### width() should not be restricted to 8-bit values
-  if ( s.version() < 3 )
-    return s << ( Q_UINT8 )p.style() << ( Q_UINT8 )p.width() << p.color();
+  if (s.version() < 3)
+    return s << (Q_UINT8)p.style() << (Q_UINT8)p.width() << p.color();
   else
-    return s << ( Q_UINT8 )( p.style() | p.capStyle() | p.joinStyle() )
-           << ( Q_UINT8 )p.width() << p.color();
+    return s << (Q_UINT8)(p.style() | p.capStyle() | p.joinStyle())
+           << (Q_UINT8)p.width() << p.color();
 }
 
 /*!
@@ -3476,13 +3563,14 @@ QDataStream &operator<<( QDataStream &s, const QPen &p ) {
     \sa \link datastreamformat.html Format of the QDataStream operators \endlink
 */
 
-QDataStream &operator>>( QDataStream &s, QPen &p ) {
+QDataStream &operator>>(QDataStream &s, QPen &p)
+{
   Q_UINT8 style, width;
   QColor color;
   s >> style;
   s >> width;
   s >> color;
-  p = QPen( color, ( uint )width, ( Qt::PenStyle )style );  // owl
+  p = QPen(color, (uint)width, (Qt::PenStyle)style);        // owl
   return s;
 }
 #endif //QT_NO_DATASTREAM
@@ -3540,9 +3628,10 @@ QDataStream &operator>>( QDataStream &s, QPen &p ) {
   Initializes the brush.
 */
 
-void QBrush::init( const QColor &color, BrushStyle style ) {
+void QBrush::init(const QColor &color, BrushStyle style)
+{
   data = new QBrushData;
-  Q_CHECK_PTR( data );
+  Q_CHECK_PTR(data);
   data->style  = style;
   data->color  = color;
   data->pixmap = 0;
@@ -3553,15 +3642,16 @@ void QBrush::init( const QColor &color, BrushStyle style ) {
     not fill shapes).
 */
 
-QBrush::QBrush() {
-  static QBrushData* defBrushData = 0;
-  if ( !defBrushData ) {
+QBrush::QBrush()
+{
+  static QBrushData *defBrushData = 0;
+  if (!defBrushData) {
     static QSharedCleanupHandler<QBrushData> defBrushCleanup;
     defBrushData = new QBrushData;
     defBrushData->style = NoBrush;
     defBrushData->color = Qt::black;
     defBrushData->pixmap = 0;
-    defBrushCleanup.set( &defBrushData );
+    defBrushCleanup.set(&defBrushData);
   }
   data = defBrushData;
   data->ref();
@@ -3573,8 +3663,9 @@ QBrush::QBrush() {
     \sa setStyle()
 */
 
-QBrush::QBrush( BrushStyle style ) {
-  init( Qt::black, style );
+QBrush::QBrush(BrushStyle style)
+{
+  init(Qt::black, style);
 }
 
 /*!
@@ -3583,8 +3674,9 @@ QBrush::QBrush( BrushStyle style ) {
     \sa setColor(), setStyle()
 */
 
-QBrush::QBrush( const QColor &color, BrushStyle style ) {
-  init( color, style );
+QBrush::QBrush(const QColor &color, BrushStyle style)
+{
+  init(color, style);
 }
 
 /*!
@@ -3599,9 +3691,10 @@ QBrush::QBrush( const QColor &color, BrushStyle style ) {
     \sa setColor(), setPixmap()
 */
 
-QBrush::QBrush( const QColor &color, const QPixmap &pixmap ) {
-  init( color, CustomPattern );
-  setPixmap( pixmap );
+QBrush::QBrush(const QColor &color, const QPixmap &pixmap)
+{
+  init(color, CustomPattern);
+  setPixmap(pixmap);
 }
 
 /*!
@@ -3609,7 +3702,8 @@ QBrush::QBrush( const QColor &color, const QPixmap &pixmap ) {
     copy\endlink of \a b.
 */
 
-QBrush::QBrush( const QBrush &b ) {
+QBrush::QBrush(const QBrush &b)
+{
   data = b.data;
   data->ref();
 }
@@ -3618,8 +3712,9 @@ QBrush::QBrush( const QBrush &b ) {
     Destroys the brush.
 */
 
-QBrush::~QBrush() {
-  if ( data->deref() ) {
+QBrush::~QBrush()
+{
+  if (data->deref()) {
     delete data->pixmap;
     delete data;
   }
@@ -3635,8 +3730,9 @@ QBrush::~QBrush() {
     a single reference.
 */
 
-void QBrush::detach() {
-  if ( data->count != 1 )
+void QBrush::detach()
+{
+  if (data->count != 1)
     *this = copy();
 }
 
@@ -3645,9 +3741,10 @@ void QBrush::detach() {
     Assigns \a b to this brush and returns a reference to this brush.
 */
 
-QBrush &QBrush::operator=( const QBrush & b ) {
+QBrush &QBrush::operator=(const QBrush &b)
+{
   b.data->ref();        // beware of b = b
-  if ( data->deref() ) {
+  if (data->deref()) {
     delete data->pixmap;
     delete data;
   }
@@ -3660,12 +3757,13 @@ QBrush &QBrush::operator=( const QBrush & b ) {
     Returns a \link shclass.html deep copy\endlink of the brush.
 */
 
-QBrush QBrush::copy() const {
-  if ( data->style == CustomPattern ) {     // brush has pixmap
-    QBrush b( data->color, *data->pixmap );
+QBrush QBrush::copy() const
+{
+  if (data->style == CustomPattern) {       // brush has pixmap
+    QBrush b(data->color, *data->pixmap);
     return b;
   } else {              // brush has std pattern
-    QBrush b( data->color, data->style );
+    QBrush b(data->color, data->style);
     return b;
   }
 }
@@ -3711,12 +3809,13 @@ QBrush QBrush::copy() const {
     \sa style()
 */
 
-void QBrush::setStyle( BrushStyle s ) { // set brush style
-  if ( data->style == s )
+void QBrush::setStyle(BrushStyle s)     // set brush style
+{
+  if (data->style == s)
     return;
 #if defined(QT_CHECK_RANGE)
-  if ( s == CustomPattern )
-    qWarning( "QBrush::setStyle: CustomPattern is for internal use" );
+  if (s == CustomPattern)
+    qWarning("QBrush::setStyle: CustomPattern is for internal use");
 #endif
   detach();
   data->style = s;
@@ -3737,7 +3836,8 @@ void QBrush::setStyle( BrushStyle s ) { // set brush style
     \sa color(), setStyle()
 */
 
-void QBrush::setColor( const QColor &c ) {
+void QBrush::setColor(const QColor &c)
+{
   detach();
   data->color = c;
 }
@@ -3764,18 +3864,19 @@ void QBrush::setColor( const QColor &c ) {
     \sa pixmap(), color()
 */
 
-void QBrush::setPixmap( const QPixmap &pixmap ) {
+void QBrush::setPixmap(const QPixmap &pixmap)
+{
   detach();
-  if ( data->pixmap )
+  if (data->pixmap)
     delete data->pixmap;
-  if ( pixmap.isNull() ) {
+  if (pixmap.isNull()) {
     data->style  = NoBrush;
     data->pixmap = 0;
   } else {
     data->style = CustomPattern;
-    data->pixmap = new QPixmap( pixmap );
-    if ( data->pixmap->optimization() == QPixmap::MemoryOptim )
-      data->pixmap->setOptimization( QPixmap::NormalOptim );
+    data->pixmap = new QPixmap(pixmap);
+    if (data->pixmap->optimization() == QPixmap::MemoryOptim)
+      data->pixmap->setOptimization(QPixmap::NormalOptim);
   }
 }
 
@@ -3802,10 +3903,11 @@ void QBrush::setPixmap( const QPixmap &pixmap ) {
     \sa operator!=()
 */
 
-bool QBrush::operator==( const QBrush &b ) const {
-  return ( b.data == data ) || ( b.data->style == data->style &&
-                                 b.data->color  == data->color &&
-                                 b.data->pixmap == data->pixmap );
+bool QBrush::operator==(const QBrush &b) const
+{
+  return (b.data == data) || (b.data->style == data->style &&
+                              b.data->color  == data->color &&
+                              b.data->pixmap == data->pixmap);
 }
 
 
@@ -3833,13 +3935,14 @@ bool QBrush::operator==( const QBrush &b ) const {
     \sa \link datastreamformat.html Format of the QDataStream operators \endlink
 */
 
-QDataStream &operator<<( QDataStream &s, const QBrush &b ) {
-  s << ( Q_UINT8 )b.style() << b.color();
-  if ( b.style() == Qt::CustomPattern )
+QDataStream &operator<<(QDataStream &s, const QBrush &b)
+{
+  s << (Q_UINT8)b.style() << b.color();
+  if (b.style() == Qt::CustomPattern)
 #ifndef QT_NO_IMAGEIO
     s << *b.pixmap();
 #else
-    qWarning( "No Image Brush I/O" );
+    qWarning("No Image Brush I/O");
 #endif
   return s;
 }
@@ -3853,21 +3956,22 @@ QDataStream &operator<<( QDataStream &s, const QBrush &b ) {
     \sa \link datastreamformat.html Format of the QDataStream operators \endlink
 */
 
-QDataStream &operator>>( QDataStream &s, QBrush &b ) {
+QDataStream &operator>>(QDataStream &s, QBrush &b)
+{
   Q_UINT8 style;
   QColor color;
   s >> style;
   s >> color;
-  if ( style == Qt::CustomPattern ) {
+  if (style == Qt::CustomPattern) {
 #ifndef QT_NO_IMAGEIO
     QPixmap pm;
     s >> pm;
-    b = QBrush( color, pm );
+    b = QBrush(color, pm);
 #else
-    qWarning( "No Image Brush I/O" );
+    qWarning("No Image Brush I/O");
 #endif
   } else
-    b = QBrush( color, ( Qt::BrushStyle )style );
+    b = QBrush(color, (Qt::BrushStyle)style);
   return s;
 }
 #endif // QT_NO_DATASTREAM

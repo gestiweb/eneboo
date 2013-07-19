@@ -49,7 +49,8 @@ FLReportViewer::FLReportViewer(QWidget *parent, const char *name, bool embedInPa
   loop(false), reportPrinted_(false),
   rptViewer_(0), rptEngine_(0),
   report(0), qry_(0),
-  slotsPrintDisabled_(false), slotsExportDisabled_(false)
+  slotsPrintDisabled_(false), slotsExportDisabled_(false),
+  printing_(false)
 {
 
   if (!name)
@@ -181,6 +182,9 @@ QString FLReportViewer::csvData()
 
 void FLReportViewer::closeEvent(QCloseEvent *e)
 {
+  if (printing_)
+    return;
+    
   QWidget::show();
   frameGeometry();
   QWidget::hide();
@@ -459,27 +463,39 @@ void FLReportViewer::slotPrintReportToPS(const QString &outPsFile)
 {
   if (slotsPrintDisabled_)
     return;
+  setDisabled(true);
+  printing_ = true;
   reportPrinted_ = rptViewer_->printReportToPS(outPsFile);
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
+  printing_ = false;
+  setDisabled(false);
 }
 
 void FLReportViewer::slotPrintReportToPDF(const QString &outPdfFile)
 {
   if (slotsPrintDisabled_)
     return;
+  setDisabled(true);
+  printing_ = true;
   reportPrinted_ = rptViewer_->printReportToPDF(outPdfFile);
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
+  printing_ = false;
+  setDisabled(false);
 }
 
 void FLReportViewer::slotPrintReport()
 {
   if (slotsPrintDisabled_)
     return;
+  setDisabled(true);
+  printing_ = true;
   reportPrinted_ = rptViewer_->printReport();
   if (reportPrinted_ && autoClose_)
-    slotExit();
+    QTimer::singleShot(0, this, SLOT(slotExit()));
+  printing_ = false;
+  setDisabled(false);
 }
 
 bool FLReportViewer::setReportData(FLSqlQuery *q)
@@ -784,8 +800,26 @@ void FLReportViewer::setReportPages(FLReportPages *pgs)
   report = rptViewer_->reportPages();
 }
 
+void FLReportViewer::setColorMode(uint c)
+{
+  rptViewer_->setColorMode(c);
+}
+
+uint FLReportViewer::colorMode() const
+{
+  return rptViewer_->colorMode();
+}
+
 void FLReportViewer::disableSlotsPrintExports(bool disablePrints, bool disableExports)
 {
   slotsPrintDisabled_ = disablePrints;
   slotsExportDisabled_ = disableExports;
+}
+
+void FLReportViewer::exportToOds()
+{
+  if (slotsExportDisabled_)
+    return;
+
+  rptViewer_->exportToOds();
 }

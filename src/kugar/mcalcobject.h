@@ -52,7 +52,7 @@ public:
   /**
   Destructor
   */
-  ~MCalcObject();
+  virtual ~MCalcObject();
 
   /**
   Sets the field's  calculation type
@@ -85,6 +85,11 @@ public:
   Returns the field's calculation function
   */
   QString getCalculationFunction() const;
+
+  /**
+  Run-time type information
+  */
+  virtual int RTTI() const;
 
 private:
 

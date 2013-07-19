@@ -65,7 +65,8 @@
   #define _unlink unlink 
   #define _tzset tzset
   #define _getcwd getcwd
-  #ifdef __FreeBSD__
+  //#ifdef __FreeBSD__
+  #ifdef __APPLE__
     #define _timezone tzone
     extern long int tzone;	/* default for Estonia, but see initDigiDocLib() */
     #define _daylight daylight
@@ -76,9 +77,9 @@
   #endif
 #endif
 
-#ifdef __APPLE__
-#define __FreeBSD__ 1
-#endif
+//#ifdef __APPLE__
+//#define __FreeBSD__ 1
+//#endif
 
 
 #define WITH_BASE64_HASHING_HACK   1

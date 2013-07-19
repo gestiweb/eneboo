@@ -364,15 +364,15 @@
     \sa outputToFile(), setOutputFileName()
 */
 
-void QPrinter::setOutputToFile( bool enable )
+void QPrinter::setOutputToFile(bool enable)
 {
-    if ( state != 0 ) {
+  if (state != 0) {
 #if defined(QT_CHECK_STATE)
-        qWarning( "QPrinter::setOutputToFile: Cannot do this during printing" );
+    qWarning("QPrinter::setOutputToFile: Cannot do this during printing");
 #endif
-        return;
-    }
-    output_file = enable;
+    return;
+  }
+  output_file = enable;
 }
 
 
@@ -397,16 +397,16 @@ void QPrinter::setOutputToFile( bool enable )
     \sa outputFileName(), setOutputToFile()
 */
 
-void QPrinter::setOutputFileName( const QString &fileName )
+void QPrinter::setOutputFileName(const QString &fileName)
 {
-    if ( state != 0 ) {
+  if (state != 0) {
 #if defined(QT_CHECK_STATE)
-        qWarning("QPrinter::setOutputFileName: Cannot do this during printing");
+    qWarning("QPrinter::setOutputFileName: Cannot do this during printing");
 #endif
-        return;
-    }
-    output_filename = fileName;
-    output_file = !output_filename.isEmpty();
+    return;
+  }
+  output_filename = fileName;
+  output_file = !output_filename.isEmpty();
 }
 
 
@@ -436,9 +436,9 @@ void QPrinter::setOutputFileName( const QString &fileName )
     \sa printProgram()
 */
 
-void QPrinter::setPrintProgram( const QString &printProg )
+void QPrinter::setPrintProgram(const QString &printProg)
 {
-    print_prog = printProg;
+  print_prog = printProg;
 }
 
 
@@ -454,15 +454,15 @@ void QPrinter::setPrintProgram( const QString &printProg )
     Sets the document name to \a name.
 */
 
-void QPrinter::setDocName( const QString &name )
+void QPrinter::setDocName(const QString &name)
 {
-    if ( state != 0 ) {
+  if (state != 0) {
 #if defined(QT_CHECK_STATE)
-        qWarning( "QPrinter::setDocName: Cannot do this during printing" );
+    qWarning("QPrinter::setDocName: Cannot do this during printing");
 #endif
-        return;
-    }
-    doc_name = name;
+    return;
+  }
+  doc_name = name;
 }
 
 
@@ -485,9 +485,9 @@ void QPrinter::setDocName( const QString &name )
     \sa creator()
 */
 
-void QPrinter::setCreator( const QString &creator )
+void QPrinter::setCreator(const QString &creator)
 {
-    creator_name = creator;
+  creator_name = creator;
 }
 
 
@@ -516,11 +516,11 @@ void QPrinter::setCreator( const QString &creator )
     \sa orientation()
 */
 
-void QPrinter::setOrientation( Orientation orientation )
+void QPrinter::setOrientation(Orientation orientation)
 {
-    orient = orientation;
+  orient = orientation;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -547,17 +547,17 @@ void QPrinter::setOrientation( Orientation orientation )
     \sa pageSize() PageSize setFullPage() setResolution()
 */
 
-void QPrinter::setPageSize( PageSize newPageSize )
+void QPrinter::setPageSize(PageSize newPageSize)
 {
-    if ( newPageSize > NPageSize ) {
+  if (newPageSize > CustomOld) {
 #if defined(QT_CHECK_STATE)
-        qWarning("QPrinter::SetPageSize: illegal page size %d", newPageSize );
+    qWarning("QPrinter::SetPageSize: illegal page size %d", newPageSize);
 #endif
-        return;
-    }
-    page_size = newPageSize;
+    return;
+  }
+  page_size = newPageSize;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -575,11 +575,11 @@ void QPrinter::setPageSize( PageSize newPageSize )
     dialogs.
 */
 
-void QPrinter::setPageOrder( PageOrder newPageOrder )
+void QPrinter::setPageOrder(PageOrder newPageOrder)
 {
-    page_order = newPageOrder;
+  page_order = newPageOrder;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -595,7 +595,7 @@ void QPrinter::setPageOrder( PageOrder newPageOrder )
 
 QPrinter::PageOrder QPrinter::pageOrder() const
 {
-    return page_order;
+  return page_order;
 }
 
 
@@ -606,11 +606,11 @@ QPrinter::PageOrder QPrinter::pageOrder() const
     \sa colorMode()
 */
 
-void QPrinter::setColorMode( ColorMode newColorMode )
+void QPrinter::setColorMode(ColorMode newColorMode)
 {
-    color_mode = newColorMode;
+  color_mode = newColorMode;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -624,7 +624,7 @@ void QPrinter::setColorMode( ColorMode newColorMode )
 
 QPrinter::ColorMode QPrinter::colorMode() const
 {
-    return color_mode;
+  return color_mode;
 }
 
 
@@ -671,16 +671,16 @@ QPrinter::ColorMode QPrinter::colorMode() const
     \sa fromPage(), toPage(), setMinMax(), setup()
 */
 
-void QPrinter::setFromTo( int fromPage, int toPage )
+void QPrinter::setFromTo(int fromPage, int toPage)
 {
-    if ( state != 0 ) {
+  if (state != 0) {
 #if defined(QT_CHECK_STATE)
-        qWarning( "QPrinter::setFromTo: Cannot do this during printing" );
+    qWarning("QPrinter::setFromTo: Cannot do this during printing");
 #endif
-        return;
-    }
-    from_pg = fromPage;
-    to_pg = toPage;
+    return;
+  }
+  from_pg = fromPage;
+  to_pg = toPage;
 }
 
 
@@ -715,14 +715,14 @@ void QPrinter::setFromTo( int fromPage, int toPage )
     \sa minPage(), maxPage(), setFromTo(), setup()
 */
 
-void QPrinter::setMinMax( int minPage, int maxPage )
+void QPrinter::setMinMax(int minPage, int maxPage)
 {
-    min_pg = minPage;
-    max_pg = maxPage;
-    if ( from_pg == 0 || from_pg < minPage )
-	from_pg = minPage;
-    if ( to_pg == 0 || to_pg > maxPage )
-	to_pg = maxPage;
+  min_pg = minPage;
+  max_pg = maxPage;
+  if (from_pg == 0 || from_pg < minPage)
+    from_pg = minPage;
+  if (to_pg == 0 || to_pg > maxPage)
+    to_pg = maxPage;
 }
 
 
@@ -802,9 +802,9 @@ void QPrinter::setMinMax( int minPage, int maxPage )
 
 void QPrinter::setCollateCopies(bool on)
 {
-    if (!collateCopiesEnabled() && on)
-	setCollateCopiesEnabled(on);
-    usercolcopies = on;
+  if (!collateCopiesEnabled() && on)
+    setCollateCopiesEnabled(on);
+  usercolcopies = on;
 }
 
 /*!
@@ -816,11 +816,11 @@ void QPrinter::setCollateCopies(bool on)
     \sa numCopies(), setup()
 */
 
-void QPrinter::setNumCopies( int numCopies )
+void QPrinter::setNumCopies(int numCopies)
 {
-    ncopies = numCopies;
+  ncopies = numCopies;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -839,7 +839,7 @@ void QPrinter::setNumCopies( int numCopies )
 
 QString QPrinter::printerSelectionOption() const
 {
-    return option_string;
+  return option_string;
 }
 
 
@@ -855,9 +855,9 @@ QString QPrinter::printerSelectionOption() const
     \sa printerSelectionOption()
 */
 
-void QPrinter::setPrinterSelectionOption( const QString & option )
+void QPrinter::setPrinterSelectionOption(const QString &option)
 {
-    option_string = option;
+  option_string = option;
 }
 
 
@@ -880,9 +880,9 @@ void QPrinter::setPrinterSelectionOption( const QString & option )
     \sa PageSize setPageSize() QPaintDeviceMetrics fullPage()
 */
 
-void QPrinter::setFullPage( bool fp )
+void QPrinter::setFullPage(bool fp)
 {
-    to_edge = fp;
+  to_edge = fp;
 }
 
 
@@ -898,7 +898,7 @@ void QPrinter::setFullPage( bool fp )
 
 bool QPrinter::fullPage() const
 {
-    return to_edge;
+  return to_edge;
 }
 
 
@@ -918,10 +918,10 @@ bool QPrinter::fullPage() const
     \sa resolution() setPageSize()
 */
 
-void QPrinter::setResolution( int dpi )
+void QPrinter::setResolution(int dpi)
 {
-    res = dpi;
-    res_set = TRUE;
+  res = dpi;
+  res_set = TRUE;
 }
 
 
@@ -934,7 +934,7 @@ void QPrinter::setResolution( int dpi )
 
 int QPrinter::resolution() const
 {
-    return res;
+  return res;
 }
 
 /*!
@@ -946,11 +946,11 @@ int QPrinter::resolution() const
     \sa paperSource()
 */
 
-void QPrinter::setPaperSource( PaperSource source )
+void QPrinter::setPaperSource(PaperSource source)
 {
-    paper_source = source;
+  paper_source = source;
 #if defined(Q_WS_WIN)
-    reinit();
+  reinit();
 #endif
 }
 
@@ -962,7 +962,7 @@ void QPrinter::setPaperSource( PaperSource source )
 
 QPrinter::PaperSource QPrinter::paperSource() const
 {
-    return paper_source;
+  return paper_source;
 }
 
 /*!
@@ -972,16 +972,16 @@ QPrinter::PaperSource QPrinter::paperSource() const
 
   \sa printRange()
 */
-void QPrinter::setPrintRange( PrintRange range )
+void QPrinter::setPrintRange(PrintRange range)
 {
-    if( range != AllPages )
-	if( range == Selection
-	    && !isOptionEnabled( PrintSelection ) )
-	    setOptionEnabled( PrintSelection, TRUE );
-	else if( range == PageRange
-		 && !isOptionEnabled( PrintPageRange ) )
-	    setOptionEnabled( PrintPageRange, TRUE );
-    d->printRange = range;
+  if (range != AllPages)
+    if (range == Selection
+        && !isOptionEnabled(PrintSelection))
+      setOptionEnabled(PrintSelection, TRUE);
+    else if (range == PageRange
+             && !isOptionEnabled(PrintPageRange))
+      setOptionEnabled(PrintPageRange, TRUE);
+  d->printRange = range;
 }
 
 /*!
@@ -992,7 +992,7 @@ void QPrinter::setPrintRange( PrintRange range )
 */
 QPrinter::PrintRange QPrinter::printRange() const
 {
-    return d->printRange;
+  return d->printRange;
 }
 
 /*!
@@ -1001,15 +1001,15 @@ QPrinter::PrintRange QPrinter::printRange() const
 
     \sa isOptionEnabled()
 */
-void QPrinter::setOptionEnabled( PrinterOption option, bool enable )
+void QPrinter::setOptionEnabled(PrinterOption option, bool enable)
 {
-    if( enable ) {
-	d->printerOptions |= ( 1 << option );
-	if( ( option == PrintPageRange ) && min_pg==0 && max_pg==0 )
-	    max_pg = 9999;
-    } else {
-	d->printerOptions &= ( ~( 1 << option ) );
-    }
+  if (enable) {
+    d->printerOptions |= (1 << option);
+    if ((option == PrintPageRange) && min_pg == 0 && max_pg == 0)
+      max_pg = 9999;
+  } else {
+    d->printerOptions &= (~(1 << option));
+  }
 }
 
 /*!
@@ -1018,9 +1018,9 @@ void QPrinter::setOptionEnabled( PrinterOption option, bool enable )
 
   \sa setOptionEnabled()
  */
-bool QPrinter::isOptionEnabled( PrinterOption option )
+bool QPrinter::isOptionEnabled(PrinterOption option)
 {
-    return d->printerOptions & ( 1 << option );
+  return d->printerOptions & (1 << option);
 }
 #endif // QT_NO_PRINTER
 

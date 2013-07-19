@@ -30,7 +30,7 @@ class AQSFieldMD : public AQSVoidPtr
 
 protected:
   void specializedInternalFinish() {
-    if (!wrap_)
+    if (!wrap_ && o_ && o_->deref())
       delete o_;
   }
 
@@ -59,7 +59,7 @@ public slots:
   bool isIndex() const;
   bool isUnique() const;
   void addRelationMD(FLRelationMetaData *);
-  FLRelationMetaData *relationM1() const;
+  const FLRelationMetaData *relationM1() const;
   void setAssociatedField(FLFieldMetaData *, const QString &);
   void setAssociatedField(const QString &, const QString &);
   FLFieldMetaData *associatedField() const;
@@ -72,6 +72,10 @@ public slots:
   void setOptionsList(const QString &);
   bool isCheck() const;
   bool hasOptionsList() const;
+  bool fullyCalculated() const;
+  void setFullyCalculated(bool);
+  bool trimed() const;
+  void setTrimed(bool);
   void setMetadata(FLTableMetaData *);
   FLTableMetaData *metadata() const;
   uint flDecodeType(int);
@@ -432,7 +436,7 @@ inline void AQSFieldMD::addRelationMD(FLRelationMetaData *arg0)
 {
   AQ_CALL_VOID(addRelationMD(arg0));
 }
-inline FLRelationMetaData *AQSFieldMD::relationM1() const
+inline const FLRelationMetaData *AQSFieldMD::relationM1() const
 {
   AQ_CALL_RET(relationM1());
 }
@@ -483,6 +487,22 @@ inline bool AQSFieldMD::isCheck() const
 inline bool AQSFieldMD::hasOptionsList() const
 {
   AQ_CALL_RET_V(hasOptionsList(), bool);
+}
+inline bool AQSFieldMD::fullyCalculated() const
+{
+  AQ_CALL_RET_V(fullyCalculated(), bool);
+}
+inline void AQSFieldMD::setFullyCalculated(bool arg0)
+{
+  AQ_CALL_VOID(setFullyCalculated(arg0));
+}
+inline bool AQSFieldMD::trimed() const
+{
+  AQ_CALL_RET_V(trimed(), bool);
+}
+inline void AQSFieldMD::setTrimed(bool arg0)
+{
+  AQ_CALL_VOID(setTrimed(arg0));
 }
 inline void AQSFieldMD::setMetadata(FLTableMetaData *arg0)
 {

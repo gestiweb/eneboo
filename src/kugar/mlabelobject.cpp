@@ -172,11 +172,6 @@ int MLabelObject::draw(FLStylePainter *p)
   } else if (pixmap && drawPixmap(p, pixmap))
     return (changeHeight ? height : 0);
 
-  if (text.isEmpty()) {
-    drawBase(p);
-    return 0;
-  }
-
 #if defined(Q_OS_MACX)
   FLStylePainter *pt = new FLStylePainter;
   int retVal = 0;
@@ -265,9 +260,6 @@ int MLabelObject::draw(FLStylePainter *p)
   height /= 4;
   fontSize /= 4;
   drawPixmap(p, &pm);
-
-  height = originalHeight;
-  return retVal;
 #else
   int retVal = 0;
   uint originalHeight = height;
@@ -359,10 +351,10 @@ int MLabelObject::draw(FLStylePainter *p)
     p->painter()->setBackgroundMode(oldBgMode);
     p->painter()->setBackgroundColor(oldBgColor);
   }
+#endif
 
   height = originalHeight;
   return retVal;
-#endif
 }
 
 /** Calculates the height of the drawed object */
@@ -462,4 +454,9 @@ void MLabelObject::copy(const MLabelObject *mLabelObject)
   }
 
   domNodeData = mLabelObject->domNodeData;
+}
+
+int MLabelObject::RTTI() const
+{
+  return MReportObject::Label;
 }

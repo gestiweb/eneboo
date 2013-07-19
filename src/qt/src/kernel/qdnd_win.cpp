@@ -248,7 +248,7 @@ STDMETHODIMP_( ULONG )
 QOleDropSource::Release()
 {
     if ( --m_refs == 0 ) {
-        delete this;
+        if (this) delete this;
         return 0;
     }
     return m_refs;
@@ -499,7 +499,7 @@ STDMETHODIMP_( ULONG )
 QOleDropTarget::Release()
 {
     if ( --m_refs == 0 ) {
-        delete this;
+        if (this) delete this;
         return 0;
     }
     return m_refs;
@@ -628,7 +628,7 @@ STDMETHODIMP_( ULONG )
 qIEnumFORMATETC::Release()
 {
     if ( --m_refs == 0 ) {
-        delete this;
+        if (this) delete this;
         return 0;
     }
     return m_refs;
@@ -861,7 +861,7 @@ QOleDataObject::Release()
 {
     if ( --m_refs == 0 ) {
         releaseQt();
-        delete this;
+        if (this) delete this;
         return 0;
     }
     return m_refs;

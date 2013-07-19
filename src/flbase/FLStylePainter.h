@@ -22,9 +22,11 @@ email                : mail@infosial.com
 #include <qobject.h>
 #include <qpainter.h>
 
+#include "AQGlobal.h"
+
 class FLStylePainterPrivate;
 
-class FL_EXPORT FLStylePainter
+class AQ_EXPORT FLStylePainter
 {
 
 public:

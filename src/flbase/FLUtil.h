@@ -24,6 +24,8 @@
 #include <qvariant.h>
 #include <qdict.h>
 
+#include "AQGlobal.h"
+
 class QDomDocument;
 class QProgressDialog;
 class QDate;
@@ -41,7 +43,7 @@ empresarial.
 
 @author InfoSiAL S.L.
 */
-class FLUtil
+class AQ_EXPORT FLUtil
 {
 
 public:

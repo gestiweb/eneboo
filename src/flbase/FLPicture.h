@@ -26,9 +26,11 @@
 #include <qpixmap.h>
 #include <qdeepcopy.h>
 
+#include "AQGlobal.h"
+
 class FLPicturePrivate;
 
-class FL_EXPORT FLPicture : public QObject {
+class AQ_EXPORT FLPicture : public QObject {
 
   Q_OBJECT
   Q_ENUMS( FLPenStyle )

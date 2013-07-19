@@ -247,7 +247,10 @@ QCString MIMECodec::encodeQuotedPrintable(const QCString &str, bool compat, bool
   int i;
   QCString prestr = str;
   QSettings sett;
-  if (footer) {
+  bool addFooter = sett.readBoolEntry(AQ_KEYBASE + "/email/addFooter", true);
+  qWarning(AQ_KEYBASE + "/email/addFooter");
+  qWarning("addFooter %d", addFooter);
+  if (footer && addFooter) {
     sett.setPath("InfoSiAL", "AbanQ", QSettings::User);
     QString filepre(sett.readEntry(AQ_KEYBASE + "/email/footerText",
                                    AQ_DATA + "/text_mail.txt"));

@@ -30,7 +30,7 @@ class AQSRelationMD : public AQSVoidPtr
 
 protected:
   void specializedInternalFinish() {
-    if (!wrap_)
+    if (!wrap_ && o_ && o_->deref())
       delete o_;
   }
 
@@ -43,7 +43,7 @@ public slots:
   int cardinality() const;
   bool deleteCascade() const;
   bool updateCascade() const;
-  bool checkIn();
+  bool checkIn() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -119,7 +119,7 @@ inline bool AQSRelationMD::updateCascade() const
 {
   AQ_CALL_RET_V(updateCascade(), bool);
 }
-inline bool AQSRelationMD::checkIn()
+inline bool AQSRelationMD::checkIn() const
 {
   AQ_CALL_RET_V(checkIn(), bool);
 }

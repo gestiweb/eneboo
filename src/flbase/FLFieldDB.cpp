@@ -19,6 +19,9 @@
 #include <math.h>
 
 #include <qbuffer.h>
+#include <qcolordialog.h>
+#include <qfontdatabase.h>
+#include <qcombobox.h>
 
 #include "FLFieldDB.h"
 #include "FLSqlCursor.h"
@@ -41,7 +44,7 @@
 
 FLLineEdit::FLLineEdit(QWidget *parent, const char *name) :
   QLineEdit(parent, name),
-  type(QVariant::Invalid), partDecimal(0)
+  type(QVariant::Invalid), partDecimal(0), autoSelect(true)
 {
 }
 
@@ -52,12 +55,21 @@ QString FLLineEdit::text() const
     return text;
 
   bool ok = false;
+  bool minus = false;
 
   switch (type) {
     case QVariant::Double: {
+      if (text.left(1) == "-") {
+        minus = true;
+        text = text.mid(1);
+      }
+
       double val = aqApp->localeSystem().toDouble(text, &ok);
       if (ok)
         text.setNum(val, 'f', partDecimal);
+
+      if (minus)
+        text.prepend('-');
     }
     break;
     case QVariant::UInt: {
@@ -86,12 +98,21 @@ void FLLineEdit::setText(const QString &text)
 
   bool ok = false;
   QString s(text);
+  bool minus = false;
 
   switch (type) {
     case QVariant::Double: {
+      if (s.left(1) == "-") {
+        minus = true;
+        s = s.mid(1);
+      }
+
       double val = s.toDouble(&ok);
       if (ok)
         s = aqApp->localeSystem().toString(val, 'f', partDecimal);
+
+      if (minus)
+        s.prepend('-');
     }
     break;
     case QVariant::UInt: {
@@ -141,7 +162,7 @@ void FLLineEdit::focusInEvent(QFocusEvent *f)
     QLineEdit::setText(s);
     blockSignals(false);
   }
-  if (selectedText().isEmpty() && !isReadOnly())
+  if (autoSelect && selectedText().isEmpty() && !isReadOnly())
     selectAll();
   QLineEdit::focusInEvent(f);
 }
@@ -243,7 +264,8 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
   topWidget_(0), showed(false), showAlias_(true), datePopup_(0), dateFrame_(0),
   datePickerOn_(false), autoComPopup_(0), autoComFrame_(0), accel_(0), keepDisabled_(false),
   editorImg_(0), pbAux_(0), pbAux2_(0), pbAux3_(0), pbAux4_(0), fieldAlias_(QString::null),
-  showEditor_(true), fieldMapValue_(0)
+  showEditor_(true), fieldMapValue_(0), autoCompMode_(OnDemandF4), timerAutoComp_(0),
+  textFormat_(Qt::AutoText)
 {
 
   pushButtonDB->setFlat(true);
@@ -280,13 +302,56 @@ bool FLFieldDB::eventFilter(QObject *obj, QEvent *ev)
   if (ev->type() == QEvent::KeyPress) {
     QKeyEvent *k = static_cast<QKeyEvent *>(ev);
 
+    bool timerActive = false;
     if (autoComFrame_ && autoComFrame_->isVisible()) {
       if (k->key() == Key_Down && autoComPopup_) {
         autoComPopup_->setQuickFocus();
+#ifdef Q_OS_WIN32
+        autoComPopup_->grabKeyboard();
+#endif
         return true;
       }
 
+#ifdef Q_OS_WIN32
+      if (editor_)
+        editor_->releaseKeyboard();
+      if (autoComPopup_)
+        autoComPopup_->releaseKeyboard();
+#endif
       autoComFrame_->hide();
+      if (::qt_cast<QLineEdit *>(editor_) && k->key() == Key_BackSpace) {
+        ::qt_cast<QLineEdit *>(editor_)->backspace();
+      }
+      if (!timerAutoComp_) {
+        timerAutoComp_ = new QTimer(this, QObject::name());
+        connect(timerAutoComp_, SIGNAL(timeout()), SLOT(toggleAutoCompletion()));
+      } else
+        timerAutoComp_->stop();
+      if (k->key() != Key_Enter && k->key() != Key_Return) {
+        timerActive = true;
+        timerAutoComp_->start(500, true);
+      } else {
+        QTimer::singleShot(0, this, SLOT(autoCompletionUpdateValue()));
+        return true;
+      }
+    }
+
+    if (!timerActive && autoCompMode_ == AlwaysAuto &&
+        (!autoComFrame_ || !autoComFrame_->isVisible())) {
+      if (k->key() == Key_BackSpace || k->key() == Key_Delete ||
+          (k->key() >= Key_Space && k->key() <= Key_ydiaeresis)) {
+        if (!timerAutoComp_) {
+          timerAutoComp_ = new QTimer(this, QObject::name());
+          connect(timerAutoComp_, SIGNAL(timeout()), SLOT(toggleAutoCompletion()));
+        } else
+          timerAutoComp_->stop();
+        if (k->key() != Key_Enter && k->key() != Key_Return) {
+          timerAutoComp_->start(500, true);
+        } else {
+          QTimer::singleShot(0, this, SLOT(autoCompletionUpdateValue()));
+          return true;
+        }
+      }
     }
 
     if (::qt_cast<FLLineEdit *>(obj)) {
@@ -304,8 +369,7 @@ bool FLFieldDB::eventFilter(QObject *obj, QEvent *ev)
 
     if (k->key() == Key_Enter || k->key() == Key_Return) {
       focusNextPrevChild(true);
-      emit
-      keyReturnPressed();
+      emit keyReturnPressed();
       return true;
     }
     if (k->key() == Key_Up) {
@@ -431,9 +495,10 @@ void FLFieldDB::updateValue()
 {
   if (!cursor_)
     return;
-  if (!editor_->isA("QTextEdit"))
+  QTextEdit *ted = ::qt_cast<QTextEdit *>(editor_);
+  if (!ted)
     return;
-  QString t = ::qt_cast<QTextEdit *>(editor_)->text();
+  QString t(ted->text());
   if (!cursor_->bufferIsNull(fieldName_)) {
     if (t == cursor_->valueBuffer(fieldName_).toString())
       return;
@@ -447,36 +512,35 @@ void FLFieldDB::updateValue()
     cursor_->setValueBuffer(fieldName_, t);
 }
 
-void FLFieldDB::setTextFormat(const int &f)
+void FLFieldDB::setTextFormat(int f)
 {
-  if (!cursor_)
-    return;
-
-  FLTableMetaData *tMD = cursor_->metadata();
-  if (!tMD)
-    return;
-
-  FLFieldMetaData *field = tMD->field(fieldName_);
-
-  if (field && editor_ && field->type() == QVariant::StringList)
-    ::qt_cast<QTextEdit *>(editor_)->setTextFormat((Qt::TextFormat) f);
+  textFormat_ = (Qt::TextFormat) f;
+  QTextEdit *ted = ::qt_cast<QTextEdit *>(editor_);
+  if (ted)
+    ted->setTextFormat(textFormat_);
 }
 
 int FLFieldDB::textFormat() const
 {
-  if (!cursor_)
-    return PlainText;
+  QTextEdit *ted = ::qt_cast<QTextEdit *>(editor_);
+  if (ted)
+    return ted->textFormat();
+  return textFormat_;
+}
 
-  FLTableMetaData *tMD = cursor_->metadata();
-  if (!tMD)
-    return PlainText;
+void FLFieldDB::setEchoMode(int m)
+{
+  QLineEdit *led = ::qt_cast<QLineEdit *>(editor_);
+  if (led)
+    led->setEchoMode((QLineEdit::EchoMode) m);
+}
 
-  FLFieldMetaData *field = tMD->field(fieldName_);
-
-  if (field && editor_ && field->type() == QVariant::StringList)
-    return ::qt_cast<QTextEdit *>(editor_)->textFormat();
-
-  return PlainText;
+int FLFieldDB::echoMode() const
+{
+  QLineEdit *led = ::qt_cast<QLineEdit *>(editor_);
+  if (led)
+    return led->echoMode();
+  return QLineEdit::Normal;
 }
 
 void FLFieldDB::setValue(const QVariant &cv)
@@ -695,12 +759,14 @@ void FLFieldDB::initCursor()
 {
   if (!tableName_.isEmpty() && foreignField_.isEmpty() && fieldRelation_.isEmpty()) {
     cursorBackup_ = cursor_;
-    if (cursor_)
-      cursor_ = new FLSqlCursor(tableName_, true, cursor_->db()->connectionName(), 0, 0, this);
-    else {
+    if (cursor_) {
+      cursor_ = new FLSqlCursor(tableName_, true,
+                                cursor_->db()->connectionName(), 0, 0, this);
+    } else {
       if (!topWidget_)
         return;
-      cursor_ = new FLSqlCursor(tableName_, true, FLSqlConnections::database()->connectionName(),
+      cursor_ = new FLSqlCursor(tableName_, true,
+                                FLSqlConnections::database()->connectionName(),
                                 0, 0, this);
     }
     cursor_->setModeAccess(FLSqlCursor::BROWSE);
@@ -795,6 +861,9 @@ void FLFieldDB::initCursor()
       connect(cursor_, SIGNAL(bufferChanged(const QString &)), this,
               SLOT(refreshQuick(const QString &)));
       cursorAux = 0;
+      if (tMD && !tMD->inCache()) {
+        delete tMD;
+      }
       return;
     } else {
       if (showed)
@@ -815,6 +884,9 @@ void FLFieldDB::initCursor()
     cursorAuxInit = true;
     cursor_->append(cursor_->db()->db()->recordInfo(tableName_).find(fieldName_));
     cursor_->append(cursor_->db()->db()->recordInfo(tableName_).find(fieldRelation_));
+    if (tMD && !tMD->inCache()) {
+      delete tMD;
+    }
   }
 }
 
@@ -869,6 +941,8 @@ void FLFieldDB::initEditor()
     FLTableMetaData *tmd = cursor_->db()->manager()->metadata(rt);
     if (!tmd)
       pushButtonDB->setDisabled(true);
+    if (tmd && !tmd->inCache())
+      delete tmd;
   }
 
   initMaxSize_ = maximumSize();
@@ -940,8 +1014,16 @@ void FLFieldDB::initEditor()
             ::qt_cast<FLLineEdit *>(editor_)->setAlignment(Qt::AlignLeft);
 
             connect(this, SIGNAL(keyF4Pressed()), this, SLOT(toggleAutoCompletion()));
-            QToolTip::add(editor_, tr("Para completado automático pulsar F4"));
-            QWhatsThis::add(editor_, tr("Para completado automático pulsar F4"));
+            if (autoCompMode_ == OnDemandF4) {
+              QToolTip::add(editor_, tr("Para completado automático pulsar F4"));
+              QWhatsThis::add(editor_, tr("Para completado automático pulsar F4"));
+            } else if (autoCompMode_ == AlwaysAuto) {
+              QToolTip::add(editor_, tr("Completado automático permanente activado"));
+              QWhatsThis::add(editor_, tr("Completado automático permanente activado"));
+            } else {
+              QToolTip::add(editor_, tr("Completado automático desactivado"));
+              QWhatsThis::add(editor_, tr("Completado automático desactivado"));
+            }
           }
         }
 
@@ -1169,14 +1251,26 @@ void FLFieldDB::initEditor()
     }
     break;
 
-    case QVariant::StringList:
-      editor_ = new QTextEdit(this, "editor");
+    case QVariant::StringList: {
+      QTextEdit *ted = new QTextEdit(this, "editor");
+      editor_ = ted;
 
-      ::qt_cast<QTextEdit *>(editor_)->setFont(qApp->font());
-      ::qt_cast<QTextEdit *>(editor_)->setTabChangesFocus(true);
+      ted->setFont(qApp->font());
+      ted->setTabChangesFocus(true);
 
       editor_->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 7, QSizePolicy::Expanding,
                                          editor_->sizePolicy().hasHeightForWidth()));
+
+      ted->setTextFormat(textFormat_);
+
+      if (textFormat_ == Qt::RichText && cursor_->modeAccess() != FLSqlCursor::BROWSE) {
+        FLWidgetFieldDBLayout->setDirection(QBoxLayout::Down);
+        FLWidgetFieldDBLayout->remove(textLabelDB);
+        AQTextEditBar *textEditTab_ = new AQTextEditBar(this, "textEditTab_", textLabelDB);
+        textEditTab_->doConnections(ted);
+        FLWidgetFieldDBLayout->addWidget(textEditTab_);
+      }
+
       FLWidgetFieldDBLayout->addWidget(editor_);
       editor_->installEventFilter(this);
 
@@ -1185,9 +1279,18 @@ void FLFieldDB::initEditor()
       connect(editor_, SIGNAL(textChanged()), this, SLOT(updateValue()));
 
       connect(this, SIGNAL(keyF4Pressed()), this, SLOT(toggleAutoCompletion()));
-      QToolTip::add(editor_, tr("Para completado automático pulsar F4"));
-      QWhatsThis::add(editor_, tr("Para completado automático pulsar F4"));
-      break;
+      if (autoCompMode_ == OnDemandF4) {
+        QToolTip::add(editor_, tr("Para completado automático pulsar F4"));
+        QWhatsThis::add(editor_, tr("Para completado automático pulsar F4"));
+      } else if (autoCompMode_ == AlwaysAuto) {
+        QToolTip::add(editor_, tr("Completado automático permanente activado"));
+        QWhatsThis::add(editor_, tr("Completado automático permanente activado"));
+      } else {
+        QToolTip::add(editor_, tr("Completado automático desactivado"));
+        QWhatsThis::add(editor_, tr("Completado automático desactivado"));
+      }
+    }
+    break;
 
     case QVariant::Bool:
       editor_ = new QCheckBox(this, "editor");
@@ -1270,30 +1373,32 @@ void FLFieldDB::openFormRecordRelation()
   FLFieldMetaData *fMD = field->associatedField();
   FLAction *a = 0;
 
-  QVariant v = cursor_->valueBuffer(field->name());
-  if (v.toString().isEmpty()) {
+  QVariant v(cursor_->valueBuffer(field->name()));
+  if (v.toString().isEmpty() || (fMD && cursor_->bufferIsNull(fMD->name()))) {
     QMessageBox::warning(qApp->focusWidget(), tr("Aviso"),
                          tr("Debe indicar un valor para %1").arg(field->alias()), QMessageBox::Ok,
                          0, 0);
     return;
   }
+  FLManager *mng = cursor_->db()->manager();
   c = new FLSqlCursor(field->relationM1()->foreignTable(), true, cursor_->db()->connectionName());
-  c->select(cursor_->db()->manager()->formatAssignValue(field->relationM1()->foreignField(), field,
-                                                        v, true));
-  if (c->size() <= 0) {
+  c->select(mng->formatAssignValue(field->relationM1()->foreignField(), field,
+                                   v, true));
+  if (c->size() <= 0)
     return;
-  }
   c->next();
 
   if (actionName_.isEmpty())
-    a = cursor_->db()->manager()->action(field->relationM1()->foreignTable());
-  else {
-    a = cursor_->db()->manager()->action(actionName_);
-  }
+    a = mng->action(field->relationM1()->foreignTable());
+  else
+    a = mng->action(actionName_);
+
   c->setAction(a);
 
   int modeAccess = cursor_->modeAccess();
-  c->openFormInMode(FLSqlCursor::EDIT, false);
+  if (modeAccess == FLSqlCursor::INSERT || modeAccess == FLSqlCursor::DEL)
+    modeAccess = FLSqlCursor::EDIT;
+  c->openFormInMode(modeAccess, false);
 }
 
 void FLFieldDB::searchValue()
@@ -1330,41 +1435,43 @@ void FLFieldDB::searchValue()
       return;
     }
 
-    QVariant v = cursor_->valueBuffer(fMD->name());
-    if (v.toString().isEmpty()) {
+    QVariant v(cursor_->valueBuffer(fMD->name()));
+    if (v.toString().isEmpty() || cursor_->bufferIsNull(fMD->name())) {
       QMessageBox::warning(qApp->focusWidget(), tr("Aviso"),
                            tr("Debe indicar un valor para %1").arg(fMD->alias()), QMessageBox::Ok,
                            0, 0);
       return;
     }
-
+    FLManager *mng = cursor_->db()->manager();
     c = new FLSqlCursor(fMD->relationM1()->foreignTable(), true, cursor_->db()->connectionName());
-    c->select(cursor_->db()->manager()->formatAssignValue(fMD->relationM1()->foreignField(), fMD,
-                                                          v, true));
+    c->select(mng->formatAssignValue(fMD->relationM1()->foreignField(), fMD,
+                                     v, true));
     if (c->size() > 0)
       c->next();
 
     if (actionName_.isEmpty())
-      a = cursor_->db()->manager()->action(field->relationM1()->foreignTable());
+      a = mng->action(field->relationM1()->foreignTable());
     else {
-      a = cursor_->db()->manager()->action(actionName_);
+      a = mng->action(actionName_);
       a->setTable(field->relationM1()->foreignTable());
     }
 
     f = new FLFormSearchDB(c, a->name(), topWidget_);
   } else {
+    FLManager *mng = cursor_->db()->manager();
     if (actionName_.isEmpty()) {
-      a = cursor_->db()->manager()->action(field->relationM1()->foreignTable());
+      a = mng->action(field->relationM1()->foreignTable());
       if (!a)
         return;
     } else {
-      a = cursor_->db()->manager()->action(actionName_);
+      a = mng->action(actionName_);
       if (!a)
         return;
       a->setTable(field->relationM1()->foreignTable());
     }
 
-    f = new FLFormSearchDB(a->name(), topWidget_);
+    c = new FLSqlCursor(a->table(), true, cursor_->db()->connectionName());
+    f = new FLFormSearchDB(c, a->name(), topWidget_);
   }
 
   f->setMainWidget();
@@ -1372,23 +1479,27 @@ void FLFieldDB::searchValue()
   QObjectList *lObjs = f->queryList("FLTableDB");
   QObject *obj = lObjs->first();
   delete lObjs;
-  if (fMD && obj) {
-    ::qt_cast<FLTableDB *>(obj)->setTableName(field->relationM1()->foreignTable());
-    ::qt_cast<FLTableDB *>(obj)->setFieldRelation(field->associatedFieldFilterTo());
-    ::qt_cast<FLTableDB *>(obj)->setForeignField(fMD->relationM1()->foreignField());
+  FLTableDB *objTdb = ::qt_cast<FLTableDB *>(obj);
+  if (fMD && objTdb) {
+    objTdb->setTableName(field->relationM1()->foreignTable());
+    objTdb->setFieldRelation(field->associatedFieldFilterTo());
+    objTdb->setForeignField(fMD->relationM1()->foreignField());
     if (fMD->relationM1()->foreignTable() == tMD->name())
-      ::qt_cast<FLTableDB *>(obj)->setReadOnly(true);
+      objTdb->setReadOnly(true);
   }
 
   f->setFilter(filter_);
 
   if (f->mainWidget()) {
-    QVariant curValue(value());
-    if (field->type() == QVariant::String && !curValue.toString().isEmpty() && obj) {
-      ::qt_cast<FLTableDB *>(obj)->setInitSearch(curValue.toString());
-      ::qt_cast<FLTableDB *>(obj)->putFirstCol(field->relationM1()->foreignField());
+    if (objTdb) {
+      QVariant curValue(value());
+      if (field->type() == QVariant::String && !curValue.toString().isEmpty()) {
+        objTdb->setInitSearch(curValue.toString());
+        objTdb->putFirstCol(field->relationM1()->foreignField());
+      }
+      QTimer::singleShot(0, objTdb->lineEditSearch, SLOT(setFocus()));
     }
-    QVariant v = f->exec(field->relationM1()->foreignField());
+    QVariant v(f->exec(field->relationM1()->foreignField()));
     if (v.isValid() && !v.isNull()) {
       setValue(QVariant());
       setValue(v);
@@ -1847,36 +1958,54 @@ void FLFieldDB::refresh(const QString &fN)
       if (cursor_->bufferIsNull(fieldRelation_))
         return;
 
+      FLManager *mng = cursor_->db()->manager();
       FLFieldMetaData *field = tMD->field(fieldRelation_);
-      FLTableMetaData *tmd =
-        cursor_->db()->manager()->metadata(field->relationM1()->foreignTable());
+      FLTableMetaData *tmd = mng->metadata(field->relationM1()->foreignTable());
       if (!tmd)
         return;
-      if (topWidget_ && !topWidget_->isShown() && cursor_->modeAccess() != FLSqlCursor::INSERT)
+      if (topWidget_ && !topWidget_->isShown() && cursor_->modeAccess() != FLSqlCursor::INSERT) {
+        if (tmd && !tmd->inCache())
+          delete tmd;
         return;
-      if (!field)
+      }
+      if (!field) {
+        if (tmd && !tmd->inCache())
+          delete tmd;
         return;
+      }
 
       if (!field->relationM1()) {
 #ifdef FL_DEBUG
         qWarning("FLFieldDB : " + tr("El campo de la relación debe estar relacionado en M1"));
 #endif
+        if (tmd && !tmd->inCache())
+          delete tmd;
         return;
       }
 
-      QVariant v = cursor_->valueBuffer(fieldRelation_);
+      QVariant v(cursor_->valueBuffer(fieldRelation_));
       FLSqlQuery q(0, cursor_->db()->connectionName());
       q.setForwardOnly(true);
       q.setTablesList(field->relationM1()->foreignTable());
       q.setSelect(foreignField_ + "," + field->relationM1()->foreignField());
       q.setFrom(field->relationM1()->foreignTable());
+
+      QString where(mng->formatAssignValue(field->relationM1()->foreignField(),
+                                           field, v, true));
+      QString filterAc(cursor_->filterAssoc(fieldRelation_, tmd));
+
+      if (!filterAc.isEmpty()) {
+        if (where.isEmpty())
+          where = filterAc;
+        else
+          where += QString::fromLatin1(" AND ") + filterAc;
+      }
+
       if (filter_.isEmpty())
-        q.setWhere(cursor_->db()->manager()->formatAssignValue(field->relationM1()->foreignField(),
-                                                               field, v, true));
+        q.setWhere(where);
       else
-        q.setWhere(filter_ + " AND "
-                   + cursor_->db()->manager()->formatAssignValue(field->relationM1()->foreignField(),
-                                                                 field, v, true));
+        q.setWhere(filter_ + QString::fromLatin1(" AND ") + where);
+
       if (q.exec() && q.next()) {
         QVariant v0(q.value(0)), v1(q.value(1));
         if (v0 != value())
@@ -1884,6 +2013,8 @@ void FLFieldDB::refresh(const QString &fN)
         if (v1 != v)
           cursor_->setValueBuffer(fieldRelation_, v1);
       }
+      if (tmd && !tmd->inCache())
+        delete tmd;
     }
     return;
   }
@@ -1901,10 +2032,11 @@ void FLFieldDB::refresh(const QString &fN)
   int partDecimal = partDecimal_ != -1 ? partDecimal_ : field->partDecimal();
   bool ol = field->hasOptionsList();
 
-  setDisabled(keepDisabled_ || cursor_->fieldDisabled(fieldName_) ||
-              (modeAccess == FLSqlCursor::EDIT &&
-               (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
-              || !field->editable() || modeAccess == FLSqlCursor::BROWSE);
+  bool fDis = (keepDisabled_ || cursor_->fieldDisabled(fieldName_) ||
+               (modeAccess == FLSqlCursor::EDIT &&
+                (field->isPrimaryKey() || tMD->fieldListOfCompoundKey(fieldName_)))
+               || !field->editable() || modeAccess == FLSqlCursor::BROWSE);
+  setDisabled(fDis);
 
   switch (type) {
     case QVariant::Double:
@@ -2226,20 +2358,35 @@ void FLFieldDB::showWidget()
       refresh();
       if (cursorAux && cursor_ && cursor_->bufferIsNull(fieldName_)) {
         if (!cursorAux->bufferIsNull(foreignField_)) {
-          FLTableMetaData *tMD = cursor_->db()->manager()->metadata(tableName_);
+          FLManager *mng = cursor_->db()->manager();
+          FLTableMetaData *tMD = mng->metadata(tableName_);
           if (tMD) {
-            QVariant v = cursorAux->valueBuffer(foreignField_);
+            QVariant v(cursorAux->valueBuffer(foreignField_));
+
             FLSqlQuery q(0, cursor_->db()->connectionName());
             q.setForwardOnly(true);
             q.setTablesList(tableName_);
             q.setSelect(fieldName_);
             q.setFrom(tableName_);
+
+            QString where(mng->formatAssignValue(tMD->field(fieldRelation_), v, true));
+            QString filterAc(cursorAux->filterAssoc(foreignField_, tMD));
+
+            if (!filterAc.isEmpty()) {
+              if (where.isEmpty())
+                where = filterAc;
+              else
+                where += QString::fromLatin1(" AND ") + filterAc;
+            }
+
             if (filter_.isEmpty())
-              q.setWhere(cursor_->db()->manager()->formatAssignValue(tMD->field(fieldRelation_), v, true));
+              q.setWhere(where);
             else
-              q.setWhere(filter_ + " AND " + cursor_->db()->manager()->formatAssignValue(tMD->field(fieldRelation_), v, true));
+              q.setWhere(filter_ + QString::fromLatin1(" AND ") + where);
             if (q.exec() && q.next())
               setValue(q.value(0));
+            if (!tMD->inCache())
+              delete tMD;
           }
         }
       }
@@ -2301,21 +2448,35 @@ void FLFieldDB::setMapValue()
   if (!field || !fieldSender)
     return;
 
-  QString rt, fF;
   if (field->relationM1()) {
     if (field->relationM1()->foreignTable() != tMD->name()) {
-      rt = field->relationM1()->foreignTable();
-      fF = fieldMapValue_->foreignField();
+      FLManager *mng = cursor_->db()->manager();
+      QString rt(field->relationM1()->foreignTable());
+      QString fF(fieldMapValue_->foreignField());
       FLSqlQuery q(0, cursor_->db()->connectionName());
       q.setForwardOnly(true);
       q.setTablesList(rt);
       q.setSelect(field->relationM1()->foreignField() + "," + fF);
       q.setFrom(rt);
+
+      QString where(mng->formatAssignValue(fF, fieldSender, mapValue_, true));
+      FLTableMetaData *assocTmd = mng->metadata(rt);
+      QString filterAc(cursor_->filterAssoc(fF, assocTmd));
+      if (assocTmd && !assocTmd->inCache())
+        delete assocTmd;
+
+      if (!filterAc.isEmpty()) {
+        if (where.isEmpty())
+          where = filterAc;
+        else
+          where += QString::fromLatin1(" AND ") + filterAc;
+      }
+
       if (filter_.isEmpty())
-        q.setWhere(cursor_->db()->manager()->formatAssignValue(fF, fieldSender, mapValue_, true));
+        q.setWhere(where);
       else
-        q.setWhere(filter_ + " AND " + cursor_->db()->manager()->formatAssignValue(fF, fieldSender,
-                   mapValue_, true));
+        q.setWhere(filter_ + QString::fromLatin1(" AND ") + where);
+
       if (q.exec() && q.next()) {
         setValue(QVariant());
         setValue(q.value(0));
@@ -2402,10 +2563,12 @@ void FLFieldDB::savePixmap(int f)
 
 void FLFieldDB::toggleAutoCompletion()
 {
+  if (autoCompMode_ == NeverAuto)
+    return;
+
   if (!autoComFrame_ && cursor_) {
     autoComFrame_ = new QVBox(this, "autoComFrame", WType_Popup);
     autoComFrame_->setFrameStyle(QFrame::PopupPanel | QFrame::Raised);
-    autoComFrame_->setFixedSize(width() < 300 ? 300 : width(), 300);
     autoComFrame_->setLineWidth(1);
     autoComFrame_->hide();
 
@@ -2459,6 +2622,20 @@ void FLFieldDB::toggleAutoCompletion()
           }
         }
 
+        if (!autoComFieldRelation_.isEmpty() && topWidget_) {
+          QObjectList *l = static_cast<QObject *>(topWidget_)->queryList("FLFieldDB");
+          QObjectListIt itf(*l);
+          FLFieldDB *fdb = 0;
+          while ((fdb = static_cast<FLFieldDB *>(itf.current())) != 0) {
+            ++itf;
+            if (fdb->fieldName() == autoComFieldRelation_)
+              break;
+          }
+          delete l;
+
+          if (fdb && !fdb->filter().isEmpty())
+            cur->setMainFilter(fdb->filter());
+        }
         autoComPopup_->setFLSqlCursor(cur);
         autoComPopup_->setTopMargin(0);
         autoComPopup_->setLeftMargin(0);
@@ -2485,8 +2662,19 @@ void FLFieldDB::toggleAutoCompletion()
     }
 
     if (!autoComFrame_->isVisible() && cur->size() > 1) {
-      QPoint tmpPoint(mapToGlobal(editor_->geometry().bottomLeft()));
-      autoComFrame_->setGeometry(tmpPoint.x(), tmpPoint.y(), autoComPopup_->width(), 300);
+      QPoint tmpPoint;
+      if (showAlias_)
+        tmpPoint = mapToGlobal(textLabelDB->geometry().bottomLeft());
+      else if (pushButtonDB && pushButtonDB->isShown())
+        tmpPoint = mapToGlobal(pushButtonDB->geometry().bottomLeft());
+      else
+        tmpPoint = mapToGlobal(editor_->geometry().bottomLeft());
+      int frameWidth = width();
+      if (frameWidth < autoComPopup_->width())
+        frameWidth = autoComPopup_->width();
+      if (frameWidth < autoComFrame_->width())
+        frameWidth = autoComFrame_->width();
+      autoComFrame_->setGeometry(tmpPoint.x(), tmpPoint.y(), frameWidth, 300);
       autoComFrame_->show();
       autoComFrame_->setFocus();
     } else if (autoComFrame_->isVisible() && cur->size() == 1)
@@ -2508,6 +2696,12 @@ void FLFieldDB::autoCompletionUpdateValue()
   if (::qt_cast<FLDataTable *>(sender())) {
     setValue(cur->valueBuffer(autoComFieldName_));
     autoComFrame_->hide();
+#ifdef Q_OS_WIN32
+    if (editor_)
+      editor_->releaseKeyboard();
+    if (autoComPopup_)
+      autoComPopup_->releaseKeyboard();
+#endif
   } else if (::qt_cast<QTextEdit *>(editor_)) {
     setValue(cur->valueBuffer(autoComFieldName_));
   } else {
@@ -2516,22 +2710,28 @@ void FLFieldDB::autoCompletionUpdateValue()
       if (!autoComPopup_->hasFocus()) {
         QString cval(cur->valueBuffer(autoComFieldName_).toString());
         QString val(ed->text());
+        ed->autoSelect = false;
         ed->setText(cval);
         ed->QLineEdit::setFocus();
         ed->setCursorPosition(cval.length());
         ed->cursorBackward(true, cval.length() - val.length());
-      } else
+#ifdef Q_OS_WIN32
+        ed->grabKeyboard();
+#endif
+      } else {
         setValue(cur->valueBuffer(autoComFieldName_));
+      }
     } else if (!autoComFrame_->isVisible()) {
       QString cval(cur->valueBuffer(autoComFieldName_).toString());
       QString val(ed->text());
+      ed->autoSelect = false;
       ed->setText(cval);
       ed->QLineEdit::setFocus();
       ed->setCursorPosition(cval.length());
       ed->cursorBackward(true, cval.length() - val.length());
     }
   }
-  if (!autoComFieldRelation_.isEmpty()) {
+  if (!autoComFieldRelation_.isEmpty() && !autoComFrame_->isVisible()) {
     cursor_->setValueBuffer(fieldRelation_, cur->valueBuffer(autoComFieldRelation_));
   }
 }
@@ -2735,4 +2935,275 @@ void FLFieldDB::initFakeEditor()
     setShowEditor(false);
   else
     setShowEditor(showEditor_);
+}
+
+void FLFieldDB::setEnabled(bool enable)
+{
+  if (enable)
+    clearWState(WState_ForceDisabled);
+  else
+    setWState(WState_ForceDisabled);
+
+  if (!isTopLevel() && parentWidget() &&
+      !parentWidget()->isEnabled() && enable)
+    return; // nothing we can do
+
+  if (enable) {
+    if (testWState(WState_Disabled)) {
+      clearWState(WState_Disabled);
+      enabledChange(!enable);
+      if (children()) {
+        QObjectListIt it(*children());
+        QWidget *w;
+        while ((w = (QWidget *)it.current()) != 0) {
+          ++it;
+          if (w->isWidgetType() &&
+              !w->testWState(WState_ForceDisabled)) {
+            QLineEdit *le = ::qt_cast<QLineEdit *>(w);
+            if (le) {
+              le->setDisabled(false);
+              le->setReadOnly(false);
+              le->setCursor(QCursor::ibeamCursor);
+              QColor cBg = qApp->palette().color(QPalette::Active, QColorGroup::Base);
+              le->setPaletteBackgroundColor(cBg);
+              le->setFocusPolicy(QWidget::StrongFocus);
+              continue;
+            }
+
+            QTextEdit *te = ::qt_cast<QTextEdit *>(w);
+            if (te) {
+              te->setDisabled(false);
+              te->setReadOnly(false);
+              te->viewport()->setCursor(QCursor::ibeamCursor);
+              QColor cBg = qApp->palette().color(QPalette::Active, QColorGroup::Base);
+              te->setPaletteBackgroundColor(cBg);
+              te->setFocusPolicy(QWidget::WheelFocus);
+              continue;
+            }
+
+            w->setEnabled(true);
+          }
+        }
+      }
+    }
+  } else {
+    if (!testWState(WState_Disabled)) {
+      if (focusWidget() == this) {
+        bool parentIsEnabled = (!parentWidget() || parentWidget()->isEnabled());
+        if (!parentIsEnabled || !focusNextPrevChild(TRUE))
+          clearFocus();
+      }
+      setWState(WState_Disabled);
+      enabledChange(!enable);
+
+      if (children()) {
+        QObjectListIt it(*children());
+        QWidget *w;
+        while ((w = (QWidget *)it.current()) != 0) {
+          ++it;
+          if (w->isWidgetType() && w->isEnabled()) {
+            QLineEdit *le = ::qt_cast<QLineEdit *>(w);
+            if (le) {
+              le->setDisabled(false);
+              le->setReadOnly(true);
+              le->setCursor(QCursor::ibeamCursor);
+              QColor cBg = qApp->palette().color(QPalette::Disabled, QColorGroup::Background);
+              le->setPaletteBackgroundColor(cBg);
+              le->setFocusPolicy(QWidget::NoFocus);
+              continue;
+            }
+
+            QTextEdit *te = ::qt_cast<QTextEdit *>(w);
+            if (te) {
+              te->setDisabled(false);
+              te->setReadOnly(true);
+              te->viewport()->setCursor(QCursor::ibeamCursor);
+              QColor cBg = qApp->palette().color(QPalette::Disabled, QColorGroup::Background);
+              te->setPaletteBackgroundColor(cBg);
+              te->setFocusPolicy(QWidget::NoFocus);
+              continue;
+            }
+
+            if (w == textLabelDB && pushButtonDB) {
+              w->setDisabled(false);
+              continue;
+            }
+
+            w->setEnabled(false);
+            w->clearWState(WState_ForceDisabled);
+          }
+        }
+      }
+    }
+  }
+#if defined(Q_WS_X11)
+  if (testWState(WState_OwnCursor)) {
+    // enforce the windows behavior of clearing the cursor on
+    // disabled widgets
+    extern void qt_x11_enforce_cursor(QWidget * w);   // defined in qwidget_x11.cpp
+    qt_x11_enforce_cursor(this);
+  }
+#endif
+}
+
+AQTextEditBar::AQTextEditBar(QWidget *parent, const char *name, QLabel *lb) :
+  QWidget(parent, name), ted_(0)
+{
+  layout_ = new QHBoxLayout(this);
+
+  if (lb && !lb->isHidden()) {
+    lb_ = new QLabel(lb->text(), this, "lb_");
+    layout_->addWidget(lb_);
+  }
+
+  layout_->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum));
+
+  pbBold_ = new QPushButton(this, "pbBold_");
+  pbBold_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
+                                     pbBold_->sizePolicy().hasHeightForWidth()));
+  pbBold_->setMinimumSize(QSize(22, 22));
+  pbBold_->setFocusPolicy(QPushButton::NoFocus);
+  pbBold_->setIconSet(QIconSet(QPixmap::fromMimeSource("font-bold.png")));
+  pbBold_->setText(QString::null);
+  QToolTip::add(pbBold_, tr("Negrita"));
+  QWhatsThis::add(pbBold_, tr("Negrita"));
+  pbBold_->setToggleButton(true);
+  connect(pbBold_, SIGNAL(clicked()), this, SLOT(textBold()));
+  layout_->addWidget(pbBold_);
+
+  pbItal_ = new QPushButton(this, "pbItal_");
+  pbItal_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
+                                     pbItal_->sizePolicy().hasHeightForWidth()));
+  pbItal_->setMinimumSize(QSize(22, 22));
+  pbItal_->setFocusPolicy(QPushButton::NoFocus);
+  pbItal_->setIconSet(QIconSet(QPixmap::fromMimeSource("font-italic.png")));
+  pbItal_->setText(QString::null);
+  QToolTip::add(pbItal_, tr("Cursiva"));
+  QWhatsThis::add(pbItal_, tr("Cursiva"));
+  pbItal_->setToggleButton(true);
+  connect(pbItal_, SIGNAL(clicked()), this, SLOT(textItalic()));
+  layout_->addWidget(pbItal_);
+
+  pbUnde_ = new QPushButton(this, "pbUnde_");
+  pbUnde_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
+                                     pbUnde_->sizePolicy().hasHeightForWidth()));
+  pbUnde_->setMinimumSize(QSize(22, 22));
+  pbUnde_->setFocusPolicy(QPushButton::NoFocus);
+  pbUnde_->setIconSet(QIconSet(QPixmap::fromMimeSource("font-underline.png")));
+  pbUnde_->setText(QString::null);
+  QToolTip::add(pbUnde_, tr("Subrayado"));
+  QWhatsThis::add(pbUnde_, tr("Subrayado"));
+  pbUnde_->setToggleButton(true);
+  connect(pbUnde_, SIGNAL(clicked()), this, SLOT(textUnderline()));
+  layout_->addWidget(pbUnde_);
+
+  pbColor_ = new QPushButton(this, "pbColor_");
+  pbColor_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
+                                      pbColor_->sizePolicy().hasHeightForWidth()));
+  pbColor_->setMinimumSize(QSize(22, 22));
+  pbColor_->setFocusPolicy(QPushButton::NoFocus);
+  QPixmap pix(16, 16);
+  pix.fill(black);
+  pbColor_->setIconSet(pix);
+  pbColor_->setText(QString::null);
+  QToolTip::add(pbColor_, tr("Color"));
+  QWhatsThis::add(pbColor_, tr("Color"));
+  connect(pbColor_, SIGNAL(clicked()), this, SLOT(textColor()));
+  layout_->addWidget(pbColor_);
+
+  comboFont_ = new QComboBox(true, this, "comboFont_");
+  QFontDatabase db;
+  comboFont_->insertStringList(db.families());
+  comboFont_->lineEdit()->setText(QApplication::font().family());
+  connect(comboFont_, SIGNAL(activated(const QString &)),
+          this, SLOT(textFamily(const QString &)));
+  layout_->addWidget(comboFont_);
+
+  comboSize_ = new QComboBox(true, this, "comboSize_");
+  QValueList<int> sizes = db.standardSizes();
+  QValueList<int>::Iterator it = sizes.begin();
+  for (; it != sizes.end(); ++it)
+    comboSize_->insertItem(QString::number(*it));
+  connect(comboSize_, SIGNAL(activated(const QString &)),
+          this, SLOT(textSize(const QString &)));
+  comboSize_->lineEdit()->setText(QString::number(QApplication::font().pointSize()));
+  layout_->addWidget(comboSize_);
+}
+
+void AQTextEditBar::doConnections(QTextEdit *e)
+{
+  ted_ = e;
+  if (!ted_)
+    return;
+  connect(e, SIGNAL(currentFontChanged(const QFont &)),
+          this, SLOT(fontChanged(const QFont &)));
+  connect(e, SIGNAL(currentColorChanged(const QColor &)),
+          this, SLOT(colorChanged(const QColor &)));
+}
+
+void AQTextEditBar::textBold()
+{
+  if (!ted_)
+    return;
+  ted_->setBold(pbBold_->isOn());
+}
+
+void AQTextEditBar::textItalic()
+{
+  if (!ted_)
+    return;
+  ted_->setItalic(pbItal_->isOn());
+}
+
+void AQTextEditBar::textUnderline()
+{
+  if (!ted_)
+    return;
+  ted_->setUnderline(pbUnde_->isOn());
+}
+
+void AQTextEditBar::textColor()
+{
+  if (!ted_)
+    return;
+  QColor col = QColorDialog::getColor(ted_->color(), this);
+  if (!col.isValid())
+    return;
+  ted_->setColor(col);
+  QPixmap pix(16, 16);
+  pix.fill(col);
+  pbColor_->setIconSet(pix);
+}
+
+void AQTextEditBar::textFamily(const QString &f)
+{
+  if (!ted_)
+    return;
+  ted_->setFamily(f);
+  ted_->viewport()->setFocus();
+}
+
+void AQTextEditBar::textSize(const QString &p)
+{
+  if (!ted_)
+    return;
+  ted_->setPointSize(p.toInt());
+  ted_->viewport()->setFocus();
+}
+
+void AQTextEditBar::fontChanged(const QFont &f)
+{
+  pbBold_->setOn(f.bold());
+  pbItal_->setOn(f.italic());
+  pbUnde_->setOn(f.underline());
+  comboFont_->lineEdit()->setText(f.family());
+  comboSize_->lineEdit()->setText(QString::number(f.pointSize()));
+}
+
+void AQTextEditBar::colorChanged(const QColor &c)
+{
+  QPixmap pix(16, 16);
+  pix.fill(c);
+  pbColor_->setIconSet(pix);
 }

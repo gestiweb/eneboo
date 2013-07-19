@@ -57,10 +57,10 @@
 #include <quuid.h>
 
 // this isn't used, right ?
-unsigned long MailFolder::lastIndexID = 0;
+AQMAIL_EXPORT unsigned long MailFolder::lastIndexID = 0;
 
-QPtrList<class MailFolder> MailFolder::folderList;
-bool MailFolder::autoExpunge=true;
+AQMAIL_EXPORT QPtrList<class MailFolder> MailFolder::folderList;
+AQMAIL_EXPORT bool MailFolder::autoExpunge=true;
 
 MailFolder::MailFolder(const QString &_storageDevice)
         : storageDevice(_storageDevice),

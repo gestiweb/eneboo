@@ -6,20 +6,22 @@ else {
 	error("settings.pro missing, unable to build")
 }
 TEMPLATE = lib
-CONFIG += warn_off 
+CONFIG += warn_off
 !mac:CONFIG += plugin
 CONFIG -= x11 qt
 
 win32 {
 	CONFIG += dll
 	DLLDESTDIR = $$PREFIX/bin
-	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm
+	LIBS = -L$$PREFIX/lib -lpthreadAQ -lm
 }
 
 DESTDIR = $$PREFIX/lib
 
 unix:DEFINES += OPENSSL_SYS_UNIX
 win32:DEFINES += OPENSSL_SYS_WIN32
+mac:DEFINES += _REENTRANT
+DEFINES += NOCRYPT OPENSSL_NO_ASM OPENSSL_NO_INLINE_ASM
 
 INCLUDEPATH = $$ROOT/src/libdigidoc/openssl $$ROOT/src/libdigidoc/openssl/ssl \
               $$ROOT/src/libdigidoc/openssl/include $$ROOT/src/libdigidoc/openssl/crypto
@@ -29,7 +31,7 @@ LIBS = -L$$PREFIX/lib -lcrypto
 
 TARGET = ssl
 
-VERSION = 0.9.8
+VERSION = $$AQSSLVERSION
 
 HEADERS += dtls1.h \
            kssl.h \

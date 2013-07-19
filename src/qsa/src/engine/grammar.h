@@ -146,8 +146,8 @@ typedef union YYSTYPE
   QSVarBindingNode      *vbin;
   QSVarBindingListNode  *blist;
   QSAttributeNode       *attrs;
-  QSAttribute            attr;
-  Operator               op;
+  QSAttribute         	attr;
+  Operator            	op;
 
 
 

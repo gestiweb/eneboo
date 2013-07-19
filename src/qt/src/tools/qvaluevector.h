@@ -63,7 +63,7 @@ public:
 
     void derefAndDelete() // work-around for hp-cc
     {
-	if ( deref() )
+	if ( this && deref() )
 	    delete this;
     }
 
@@ -275,7 +275,7 @@ public:
 
     ~QValueVector()
     {
-	sh->derefAndDelete();
+	if (sh) sh->derefAndDelete();
     }
 
     QValueVector<T>& operator= ( const QValueVector<T>& v )

@@ -16,6 +16,8 @@
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
+#include <qsinterpreter.h>
+
 #include "FLSmtpClient.h"
 #include "smtp.h"
 #include "localmailfolder.h"
@@ -32,9 +34,17 @@
 
 QMimeSourceFactory *FLSmtpClient::mimeSourceFactory_ = 0;
 
+extern QSInterpreter *globalAQSInterpreter;
+
 FLSmtpClient::FLSmtpClient(QObject *parent) :
-  QObject(parent), from_(QString::null), to_(QString::null),
-  subject_(QString::null), body_(QString::null), mailServer_(QString::null) {}
+  QObject(parent)
+{
+  stateCode_ = Init;
+  priority_ = 0;
+  port_ = 25;
+  connectionType_ = FLSmtpClient::TcpConnection;
+  authMethod_ = FLSmtpClient::NoAuth;
+}
 
 FLSmtpClient::~FLSmtpClient() {}
 
@@ -43,9 +53,34 @@ void FLSmtpClient::setFrom(const QString &from)
   from_ = from;
 }
 
+void FLSmtpClient::setReplyTo(const QString &replyTo)
+{
+  replyTo_ = replyTo;
+}
+
 void FLSmtpClient::setTo(const QString &to)
 {
   to_ = to;
+}
+
+void FLSmtpClient::setCC(const QString &cc)
+{
+  cc_ = cc;
+}
+
+void FLSmtpClient::setBCC(const QString &bcc)
+{
+  bcc_ = bcc;
+}
+
+void FLSmtpClient::setOrganization(const QString &org)
+{
+  organization_ = org;
+}
+
+void FLSmtpClient::setPriority(int prio)
+{
+  priority_ = prio;
 }
 
 void FLSmtpClient::setSubject(const QString &subject)
@@ -66,9 +101,14 @@ void FLSmtpClient::addAttachment(const QString &attach, const QString &cid)
       if (!cid.isEmpty())
         mapAttachCid_.insert(attach, cid);
     }
-  } else
-    QMessageBox::warning(qApp->activeWindow(), tr("Error"),
-                         tr("El fichero %1 no existe o no se puede leer\n\n").arg(attach));
+  } else {
+    QString errorMsg(tr("El fichero %1 no existe o no se puede leer\n\n").arg(attach));
+    if (globalAQSInterpreter && globalAQSInterpreter->isRunning())
+      globalAQSInterpreter->throwError(errorMsg);
+    else
+      qWarning(errorMsg);
+    changeStatus(errorMsg, AttachError);
+  }
 }
 
 void FLSmtpClient::addTextPart(const QString &text, const QString &mimeType)
@@ -94,7 +134,7 @@ void FLSmtpClient::startSend()
 
   emit sendStepNumber(++step);
 
-  emit status(tr("Componiendo mensaje"));
+  changeStatus(tr("Componiendo mensaje"), Composing);
 
   // only send logo when configured
   if (FLUtil::readSettingEntry("email/sendMailLogo", "true").toBool()) {
@@ -109,9 +149,20 @@ void FLSmtpClient::startSend()
     mapAttachCid_.insert(logo, QFileInfo(logo).fileName() + "@3d8b627b6292");
   }
 
-  QString headerStr = QString::fromLatin1("from: ") + from_ +
-                      QString::fromLatin1("\nto: ") + to_ +
-                      QString::fromLatin1("\nsubject: ") + subject_;
+  QString headerStr(QString::fromLatin1("from: ") + from_);
+  if (!replyTo_.isEmpty())
+    headerStr += QString::fromLatin1("\nreply-to: ") + replyTo_;
+  headerStr += QString::fromLatin1("\nto: ") + to_ +
+               QString::fromLatin1("\nsubject: ") + subject_;
+  if (!cc_.isEmpty())
+    headerStr += QString::fromLatin1("\ncc: ") + cc_;
+  if (!bcc_.isEmpty())
+    headerStr += QString::fromLatin1("\nbcc: ") + bcc_;
+  if (!organization_.isEmpty())
+    headerStr += QString::fromLatin1("\norganization: ") + organization_;
+  if (priority_ > 0)
+    headerStr += QString::fromLatin1("\npriority: ") +
+                 QString::number(priority_);
 
   CharSets chS;
   HeaderClass hdr(headerStr.local8Bit());
@@ -138,7 +189,7 @@ void FLSmtpClient::startSend()
   for (uint i = 0; i < textParts_.count(); i += 2) {
     part0 = new MimePart();
     part0->charset = chS.getDefaultCharset();
-    part0->mimetype = textParts_[i+1];
+    part0->mimetype = textParts_[i + 1];
     part0->encoding = "quoted-printable";
     part0->type = "text";
     partData0 = textParts_[i].local8Bit();
@@ -155,7 +206,7 @@ void FLSmtpClient::startSend()
     itAttach = attachments_.at(i);
     fileName = *itAttach;
 
-    emit status(tr("Adjuntando %1").arg(QFileInfo(fileName).fileName()));
+    changeStatus(tr("Adjuntando %1").arg(QFileInfo(fileName).fileName()), Attach);
 
     MimePart *part1 = new MimePart();
     part1->charset = chS.getDefaultCharset();
@@ -184,19 +235,35 @@ void FLSmtpClient::startSend()
     emit sendStepNumber(++step);
   }
 
-  emit status(tr("Buscando servidores de correo"));
+  QStringList rcpts(hdr.To.toQStringList());
+  rcpts += hdr.Cc.toQStringList();
+  rcpts += hdr.Bcc.toQStringList();
 
-  Smtp *smtp = new Smtp(from_, to_, msgDev.rfc822Header(), mailServer_);
+  Smtp *smtp = new Smtp(from_, rcpts, msgDev.rfc822Header(),
+                        mailServer_, port_, this);
+
+  smtp->setUser(user_);
+  smtp->setPassword(password_);
+  smtp->setConnectionType(connectionType_);
+  smtp->setAuthMethod(authMethod_);
 
   emit sendStepNumber(++step);
 
-  connect(smtp, SIGNAL(destroyed()), this, SIGNAL(sendEnded()));
-  connect(smtp, SIGNAL(status(const QString &)), this, SIGNAL(status(const QString &)));
+  connect(smtp, SIGNAL(destroyed()),
+          this, SIGNAL(sendEnded()));
+  connect(smtp, SIGNAL(statusChanged(const QString &, int)),
+          this, SLOT(changeStatus(const QString &, int)));
+  smtp->init();
 }
 
 void FLSmtpClient::setMimeType(const QString &mT)
 {
   mimeType_ = mT;
+}
+
+void FLSmtpClient::setPort(int p)
+{
+  port_ = p;
 }
 
 QMimeSourceFactory *FLSmtpClient::mimeSourceFactory()
@@ -305,4 +372,52 @@ QMimeSourceFactory *FLSmtpClient::mimeSourceFactory()
   }
 
   return mimeSourceFactory_;
+}
+
+void FLSmtpClient::changeStatus(const QString &statusMsg, int stateCode)
+{
+  statusMsg_ = statusMsg;
+  stateCode_ = stateCode;
+  emit statusChanged(statusMsg_, stateCode_);
+  emit status(statusMsg_);
+}
+
+void FLSmtpClient::setUser(const QString &user)
+{
+  user_ = user;
+}
+
+QString FLSmtpClient::user() const
+{
+  return user_;
+}
+
+void FLSmtpClient::setPassword(const QString &password)
+{
+  password_ = password;
+}
+
+QString FLSmtpClient::password() const
+{
+  return password_;
+}
+
+void FLSmtpClient::setConnectionType(int ct)
+{
+  connectionType_ = (FLSmtpClient::ConnectionType) ct;
+}
+
+int FLSmtpClient::connectionType() const
+{
+  return connectionType_;
+}
+
+void FLSmtpClient::setAuthMethod(int method)
+{
+  authMethod_ = (FLSmtpClient::AuthMethod) method;
+}
+
+int FLSmtpClient::authMethod() const
+{
+  return authMethod_;
 }

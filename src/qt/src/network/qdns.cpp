@@ -1047,7 +1047,7 @@ void QDnsManager::cleanCache()
 	if ( !again )
 	    again = !d->isEmpty();
     }
-    if ( !again )
+    if ( !again && this )
 	delete this;
     lastSweep = thisSweep;
 }

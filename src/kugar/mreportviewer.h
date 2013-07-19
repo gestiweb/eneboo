@@ -43,12 +43,12 @@ Kugar QT report viewer widget
 
 @author Mutiny Bay Software
 */
-class FL_EXPORT MReportViewer: public QWidget
+class MReportViewer: public QWidget
 {
 
   Q_OBJECT
 
-  Q_ENUMS(RenderReportFlags)
+  Q_ENUMS(RenderReportFlags PrinterColorMode)
 
 public:
 
@@ -58,6 +58,10 @@ public:
     Display       = 0x00000002,
     PageBreak     = 0x00000004,
     FillRecords   = 0x00000008
+  };
+
+  enum PrinterColorMode {
+    PrintGrayScale, PrintColor
   };
 
   MReportViewer(QWidget *parent = 0, const char *name = 0);
@@ -90,6 +94,9 @@ public:
   void setReportPages(MPageCollection *pgs);
   MPageCollection *reportPages();
 
+  void setColorMode(uint c);
+  uint colorMode() const;
+
 public slots:
 
   void setReportEngine(MReportEngine * = 0);
@@ -100,6 +107,8 @@ public slots:
   void slotZoomUp();
   void slotZoomDown();
   void slotUpdateDisplay();
+
+  void exportToOds();
 
 signals:
 
@@ -134,6 +143,7 @@ protected:
   bool printToPos_;
   QString printerName_;
   int dpi_;
+  uint colorMode_;
 };
 
 inline void MReportViewer::setNumCopies(const int numCopies)
@@ -159,5 +169,15 @@ inline void MReportViewer::setResolution(int dpi)
 inline MPageCollection *MReportViewer::reportPages()
 {
   return report;
+}
+
+inline void MReportViewer::setColorMode(uint c)
+{
+  colorMode_ = c;
+}
+
+inline uint MReportViewer::colorMode() const
+{
+  return colorMode_;
 }
 #endif

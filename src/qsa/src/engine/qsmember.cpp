@@ -36,7 +36,7 @@ QSMember::~QSMember()
   setSuper(0);
 }
 
-void QSMember::setSuper(QSMember *super)
+void QSMember::setSuper(const QSMember *super)
 {
   if (super_ == super)
     return;

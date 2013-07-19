@@ -11,6 +11,32 @@
     </message>
 </context>
 <context>
+    <name>AQSql</name>
+    <message>
+        <source>No hay metadatos para &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AQTextEditBar</name>
+    <message>
+        <source>Negrita</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursiva</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subrayado</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AboutDialog</name>
     <message>
         <source>Qt Linguist</source>
@@ -111,6 +137,129 @@
     <message>
         <source></source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Config</name>
+    <message>
+        <source>Configure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 bit monochrome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 bit grayscale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12 (16) bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16 bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>32 bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Emulate touch screen (no mouse move).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gamma</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.0</source>
+        <translation type="unfinished">1.0</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set all to 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>240x320 &quot;PDA&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320x240 &quot;TV&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>640x480 &quot;VGA&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pda.skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ipaq.skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>qpe.skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cassiopeia.skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>other.skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Note that any applications using the virtual framebuffer will be terminated if you change the Size or Depth &lt;i&gt;above&lt;/i&gt;. You may freely modify the Gamma &lt;i&gt;below&lt;/i&gt;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1391,6 +1540,51 @@ Remove these functions?</source>
         <source>Copia de Seguridad</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Configurar carga est&#xe1;tica</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recargar scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regenerar base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mostrar Consola de mensajes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mensajes de AbanQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecutable Ghostscript: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aviso</source>
+        <translation type="unfinished">Avertissement</translation>
+    </message>
+    <message>
+        <source>Se han detectado transacciones abiertas en estado inconsistente.
+Esto puede suceder por un error en la conexi&#xf3;n o en la ejecuci&#xf3;n
+de alg&#xfa;n proceso de la aplicaci&#xf3;n.
+Para mantener la consistencia de los datos se han deshecho las
+&#xfa;ltimas operaciones sobre la base de datos.
+Los &#xfa;ltimos datos introducidos no han sido guardados, por favor
+revise sus &#xfa;ltimas acciones y repita las operaciones que no
+se han guardado.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexto: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FLApplicationInterface</name>
@@ -1454,6 +1648,10 @@ Remove these functions?</source>
     <message>
         <source>No</source>
         <translation>Non</translation>
+    </message>
+    <message>
+        <source>FLDataTable::paintCell() : Posici&#xf3;n no v&#xe1;lida %1 %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1550,6 +1748,14 @@ Remove these functions?</source>
         <source>Para completado autom&#xe1;tico pulsar F4</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Completado autom&#xe1;tico permanente activado</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Completado autom&#xe1;tico desactivado</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FLFormDB</name>
@@ -1572,6 +1778,10 @@ Remove these functions?</source>
     <message>
         <source>Esc</source>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Abrir Depurador (F3)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1625,12 +1835,6 @@ Remove these functions?</source>
         <translation>Accepter et fermer le formulaire (Esc)</translation>
     </message>
     <message>
-        <source>Se han detectado transacciones no finalizadas en la &#xfa;ltima operaci&#xf3;n.
-Se van a cancelar las transacciones pendientes.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>El campo &apos;%1&apos; con valor &apos;%2&apos; ha sido modificado
 por otro usuario con el valor &apos;%3&apos;</source>
         <translation type="unfinished"></translation>
@@ -1659,31 +1863,44 @@ por otro usuario con el valor &apos;%3&apos;</source>
 </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Abrir Depurador (F3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Se han detectado transacciones no finalizadas en la &#xfa;ltima operaci&#xf3;n.
+Se van a cancelar las transacciones pendientes.
+Los &#xfa;ltimos datos introducidos no han sido guardados, por favor
+revise sus &#xfa;ltimas acciones y repita las operaciones que no
+se han guardado.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FLFormSearchDB</name>
-    <message>
-        <source>No hay metadatos</source>
-        <translation>pas de metadata</translation>
-    </message>
     <message>
         <source>FLFormSearchDB::exec(): Se ha detectado una llamada recursiva</source>
         <translation>FLFormSearchDB::exec(): a détecté un appel recursive </translation>
     </message>
     <message>
-        <source>Seleccionar registro actual y cerrar formulario (F10)</source>
-        <translation>Sélectionner l&apos;enregistrement actuel et fermer le formulaire (F10)</translation>
+        <source>FLFormSearchDB : Nombre de acci&#xf3;n vac&#xed;o</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cerrar formulario sin seleccionar registro (Esc)</source>
-        <translation>Fermer le formulaire sans sélectionner l&apos;enregistrement (Esc)</translation>
+        <source>Abrir Depurador (F3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seleccionar registro actual y cerrar formulario (F10)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Esc</source>
-        <translation>Esc</translation>
+        <translation type="unfinished">Esc</translation>
     </message>
     <message>
-        <source>FLFormSearchDB : Nombre de acci&#xf3;n vac&#xed;o</source>
+        <source>Cerrar formulario sin seleccionar registro (Esc)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1944,17 +2161,9 @@ por otro usuario con el valor &apos;%3&apos;</source>
 <context>
     <name>FLSmtpClient</name>
     <message>
-        <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
-    </message>
-    <message>
         <source>El fichero %1 no existe o no se puede leer
 
 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Buscando servidores de correo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1997,44 +2206,12 @@ por otro usuario con el valor &apos;%3&apos;</source>
         <translation>FLSqlCursor::transaction() :  pas de connexion avec la base de données</translation>
     </message>
     <message>
-        <source>Iniciando transacci&#xf3;n...</source>
-        <translation>Initialisation de la transaction...</translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : Fallo al intentar iniciar transacci&#xf3;n</source>
-        <translation>FLSqlCursor : Echec en tentant d&apos;initier la transaction </translation>
-    </message>
-    <message>
         <source>FLSqlCursor::rollback() : No hay conexi&#xf3;n con la base de datos</source>
         <translation>FLSqlCursor::rollback() : Pas de connection avec la base de données</translation>
     </message>
     <message>
-        <source>Cancelar cambios</source>
-        <translation>Annuler les changements</translation>
-    </message>
-    <message>
-        <source>Todos los cambios efectuados en el formulario actual se cancelar&#xe1;n. &#xbf; Est&#xe1; seguro ?</source>
-        <translation>Tous les changements effectués dans le formulaire actuel seront annuler. Vous voulez continuer ?</translation>
-    </message>
-    <message>
-        <source>Deshaciendo transacci&#xf3;n...</source>
-        <translation>Défaillance de transaction...</translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : Fallo al intentar deshacer transacci&#xf3;n</source>
-        <translation>FLSqlCursor : Echec en tentant de défaire transaction </translation>
-    </message>
-    <message>
         <source>FLSqlCursor::commit() : No hay conexi&#xf3;n con la base de datos</source>
         <translation>FLSqlCursor::commit() : Pas de connection avec la base de données</translation>
-    </message>
-    <message>
-        <source>Terminando transacci&#xf3;n...</source>
-        <translation>Terminaison de transaction...</translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : Fallo al intentar terminar transacci&#xf3;n</source>
-        <translation>FLSqlCursor : Echec en tentant de terminer la transaction </translation>
     </message>
     <message>
         <source>Registro bloqueado, no se puede eliminar</source>
@@ -2077,18 +2254,6 @@ por otro usuario con el valor &apos;%3&apos;</source>
         <translation>      %1 on peut pas l&apos;associer à une valeur NULLE</translation>
     </message>
     <message>
-        <source>FLSqlCursor : Error en metadatos, %1 no es v&#xe1;lido</source>
-        <translation>FLSqlCursor : Erreur en metadata, %1 n&apos;est pas valide </translation>
-    </message>
-    <message>
-        <source>Creando punto de salvaguarda %1...</source>
-        <translation>Création de  point de sauvegarde %1...</translation>
-    </message>
-    <message>
-        <source>Restaurando punto de salvaguarda %1...</source>
-        <translation>Restauration de  point de sauvegarde %1...</translation>
-    </message>
-    <message>
         <source>FLSqlCursor::setUnLock s&#xf3;lo permite modificar campos del tipo Unlock</source>
         <translation>FLSqlCursor::setUnLock  il permet de modifier seulement des champs du type Unlock </translation>
     </message>
@@ -2103,10 +2268,6 @@ Ils ne s&apos;ouvriront pas davantage pour éviter des cycles repetitive d&apos;
         <translation>FLSqlCursor : Impossible actualiser le champ hors transaction, parce qu&apos;il n&apos;existe pas une clef primaire </translation>
     </message>
     <message>
-        <source>FLSqlCursor : No se puede bloquear la tabla</source>
-        <translation>FLSqlCursor : On ne peut pas bloquer le tableau</translation>
-    </message>
-    <message>
         <source>FLSqlCursor::setAtomicValueBuffer() : No existe el campo </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2119,22 +2280,6 @@ Ils ne s&apos;ouvriront pas davantage pour éviter des cycles repetitive d&apos;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FLSqlCursor : El cursor va a deshacer la transacci&#xf3;n %1 pero la &#xfa;ltima que inici&#xf3; es la %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : El cursor va a deshacer la transacci&#xf3;n %1 pero no ha iniciado ninguna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : El cursor va a terminar la transacci&#xf3;n %1 pero la &#xfa;ltima que inici&#xf3; es la %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FLSqlCursor : El cursor va a terminar la transacci&#xf3;n %1 pero no ha iniciado ninguna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FLSqlCursor : Deshaciendo transacci&#xf3;n abierta %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2144,10 +2289,6 @@ Ils ne s&apos;ouvriront pas davantage pour éviter des cycles repetitive d&apos;
     </message>
     <message>
         <source>FLSqlCursor::valueBufferCopy() : No existe el campo </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Liberando punto de salvaguarda %1...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2182,20 +2323,102 @@ si continua hay riesgo de que su conexi&#xf3;n quede congelada hasta finalizar e
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No se puede validar el registro actual, porque:
+        <source>No se puede validar el registro actual:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No se puede borrar registro, porque:
+        <source>No se puede borrar registro:
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLSqlCursor : Error en metadatos, %1.%2 no es v&#xe1;lido.
+Campo relacionado con %3.%4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Se han detectado transacciones no finalizadas en la &#xfa;ltima operaci&#xf3;n.
 Se van a cancelar las transacciones pendientes.
+Los &#xfa;ltimos datos introducidos no han sido guardados, por favor
+revise sus &#xfa;ltimas acciones y repita las operaciones que no
+se han guardado.
 </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLSqlCursor::atFrom Error al crear la consulta</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FLSqlCursorPrivate</name>
+    <message>
+        <source>Aviso</source>
+        <translation type="unfinished">Avertissement</translation>
+    </message>
+</context>
+<context>
+    <name>FLSqlDatabase</name>
+    <message>
+        <source>Iniciando transacci&#xf3;n...</source>
+        <translation type="unfinished">Initialisation de la transaction...</translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase::doTransaction : Fallo al intentar iniciar transacci&#xf3;n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creando punto de salvaguarda %1...</source>
+        <translation type="unfinished">Création de  point de sauvegarde %1...</translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase : El cursor va a terminar la transacci&#xf3;n %1 pero la &#xfa;ltima que inici&#xf3; es la %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase : El cursor va a terminar la transacci&#xf3;n %1 pero no ha iniciado ninguna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terminando transacci&#xf3;n...</source>
+        <translation type="unfinished">Terminaison de transaction...</translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase::doCommit : Fallo al intentar terminar transacci&#xf3;n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Liberando punto de salvaguarda %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelar cambios</source>
+        <translation type="unfinished">Annuler les changements</translation>
+    </message>
+    <message>
+        <source>Todos los cambios efectuados se cancelar&#xe1;n.&#xbf;Est&#xe1; seguro?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase : El cursor va a deshacer la transacci&#xf3;n %1 pero la &#xfa;ltima que inici&#xf3; es la %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLSqlDatabaser : El cursor va a deshacer la transacci&#xf3;n %1 pero no ha iniciado ninguna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deshaciendo transacci&#xf3;n...</source>
+        <translation type="unfinished">Défaillance de transaction...</translation>
+    </message>
+    <message>
+        <source>FLSqlDatabase::doRollback : Fallo al intentar deshacer transacci&#xf3;n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restaurando punto de salvaguarda %1...</source>
+        <translation type="unfinished">Restauration de  point de sauvegarde %1...</translation>
     </message>
 </context>
 <context>
@@ -2368,6 +2591,13 @@ Se van a cancelar las transacciones pendientes.
     </message>
     <message>
         <source>odsprogress</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FLTextEditOuput</name>
+    <message>
+        <source>Consola de mensajes de AbanQ</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3692,6 +3922,18 @@ References
     </message>
     <message>
         <source>Guardar como estilo SVG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Exportar a Hoja de Cálculo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <source>Exportar a H&amp;oja de Cálculo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7282,14 +7524,22 @@ Information may be lost if this form is saved.</source>
     </message>
 </context>
 <context>
+    <name>POP3Client</name>
+    <message>
+        <source>Authentication failed. 
+ Please check you user and password.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PageCurl</name>
     <message>
         <source>Next unfinished phrase</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Previous unfinished phrase</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7637,10 +7887,6 @@ Information may be lost if this form is saved.</source>
 <context>
     <name>PhraseLV</name>
     <message>
-        <source>(New Phrase)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source></source>
         <comment>The phrase list in the right panel of the main window (with Source phrase, Target phrase, and Definition in its header) is a PhraseLV object.</comment>
         <translation></translation>
@@ -7663,6 +7909,10 @@ Information may be lost if this form is saved.</source>
     </message>
     <message>
         <source>Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(New Phrase)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8765,14 +9015,6 @@ Information may be lost if this form is saved.</source>
 <context>
     <name>QApplication</name>
     <message>
-        <source>Executable &apos;%1&apos; requires Qt %2, found Qt %3.</source>
-        <translation>Exécutable  %1  éxige Qt %2,  créer Qt %3.</translation>
-    </message>
-    <message>
-        <source>Incompatible Qt Library Error</source>
-        <translation> Erreur d&apos;Incompatiblité de la bibliothèque Qt </translation>
-    </message>
-    <message>
         <source>Sistema</source>
         <translation>Système</translation>
     </message>
@@ -8899,19 +9141,11 @@ connection information.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Esta consulta s&#xf3;lo puede posicionarse hacia adelante.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No se puede conectar a la base de datos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hay m&#xe1;s de un campo tipo unlock. Solo puede haber uno.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FLManager : Tabla -&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9035,6 +9269,22 @@ connection information.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Error</source>
+        <translation type="unfinished">Erreur</translation>
+    </message>
+    <message>
+        <source>FLManager : Tabla-&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Executable &apos;%1&apos; requires Qt %2, found Qt %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible Qt Library Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Aviso</source>
         <translation type="unfinished">Avertissement</translation>
     </message>
@@ -9044,20 +9294,12 @@ connection information.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Se necesita para poder usar informes de JasperReports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No se ha encontrado el plugin AQReports.
 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Por favor visita http://abanq.org para obtenerlo.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Se necesita para poder usar informes de JasperReports.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9066,7 +9308,39 @@ connection information.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FLManager : Tabla-&gt; </source>
+        <source>Por favor visita http://abanq.org para obtenerlo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>La estructura de los metadatos de la tabla &apos;%1&apos; y su estructura interna en la base de datos no coinciden. Debe regenerar la base de datos.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>La estructura de los metadatos de la tabla &apos;%1&apos; y su estructura interna en la base de datos no coinciden. Intentando regenerarla.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esta consulta s&#xf3;lo puede posicionarse hacia adelante (isForwardOnly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No se ha podido declarar el cursor %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No se han podido extraer registros del cursor %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No se ha podido cerrar el cursor %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No se ha podido mover a una posici&#xf3;n del cursor %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No se ha podido calcular el tama&#xf1;o del cursor %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9612,7 +9886,7 @@ An Action may only occur once in a given toolbar.</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur</translation>
     </message>
     <message>
         <source>%1
@@ -10171,7 +10445,7 @@ to
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur</translation>
     </message>
     <message>
         <source>Crear base de datos</source>
@@ -10217,10 +10491,6 @@ antes de empezar.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Borrando regisro %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Borrando tabla %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10246,6 +10516,10 @@ Ahora es posible convertirlas, pero asegur&#xe9;se de tener una COPIA DE SEGURID
 se pueden peder datos en la conversi&#xf3;n de forma definitiva.
 
 &#xbf; Quiere convertirlas ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Borrando registro %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10378,6 +10652,10 @@ or contact sales@trolltech.com for further information</source>
         <source>Qt Linguist</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> is stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPSQLDriver</name>
@@ -10395,7 +10673,7 @@ or contact sales@trolltech.com for further information</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur</translation>
     </message>
     <message>
         <source>La versi&#xf3;n de PostgreSQL es inferior a la 7.4.
@@ -10443,10 +10721,6 @@ antes de empezar.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Borrando regisro %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Borrando tabla %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10463,15 +10737,27 @@ antes de empezar.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Vacunando base de datos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vacunando tabla %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Creando &#xed;ndices para %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Borrando registro %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analizando base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analizando tabla %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comprobando base de datos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comprobando tabla %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11106,6 +11392,64 @@ antes de empezar.
     </message>
 </context>
 <context>
+    <name>QVFb</name>
+    <message>
+        <source>QVFB</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QWSDecoration</name>
+    <message>
+        <source>Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KDE2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BeOS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hydro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Move</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QWhatsThisButton</name>
     <message>
         <source>What&apos;s this?</source>
@@ -11443,6 +11787,105 @@ antes de empezar.
     </message>
 </context>
 <context>
+    <name>SSLBase</name>
+    <message>
+        <source>An unknown error occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Self signed certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Self signed certificate in certificate chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to decrypt certificate&apos;s signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate signature failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The certificate is not yet valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The certificate has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format error in certificate&apos;s notBefore field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format error in certificate&apos;s notAfter field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to get local issuer certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to verify the first certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid CA certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to get issuer certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to decode issuer public key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path length constraint exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported certificate purpose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate not trusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate rejected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subject issuer mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authority and subject key identifier mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authority and issuer serial number mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key usage does not include certificate signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Out of memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SizeHandle</name>
     <message>
         <source>%1/%2</source>
@@ -11460,10 +11903,6 @@ antes de empezar.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Conectando a %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Conectado a %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11472,13 +11911,34 @@ antes de empezar.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error SMTP</source>
+        <source>Conexi&#xf3;n cerrada</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Respuesta inesperada desde el servidor SMTP:
+        <source>Error n&#xfa;mero %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error initSSL()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No puedo iniciar TLS:
 
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conectando a %1 %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Respuesta inesperada desde el servidor SMTP %1 :
+ %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11981,7 +12441,7 @@ de bases de datos como PostgreSQL o MySQL</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur</translation>
     </message>
     <message>
         <source>Mr. Proper</source>
@@ -13235,6 +13695,14 @@ Remove this variable?</source>
     </message>
     <message>
         <source>new form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estilo</source>
+        <translation type="unfinished">Style</translation>
+    </message>
+    <message>
+        <source>&amp;Estilo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

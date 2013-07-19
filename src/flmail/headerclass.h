@@ -68,7 +68,7 @@
 
 #include <messageclass.h>
 
-class HeaderClass
+class AQMAIL_EXPORT HeaderClass
 {
 public:
 

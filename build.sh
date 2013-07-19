@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR="$( cd -P "$( dirname "$0" )" && pwd )"
 cd "$DIR"
-VER="2.4.2.X"
+VER="2.4.5.X"
 
 REBUILD_QT=auto
 OPT_PREFIX=""
@@ -17,6 +17,8 @@ OPT_HOARD=no
 
 OPT_QWT=yes
 OPT_DIGIDOC=yes
+OPT_WIN64=no
+OPT_QWS=no
 OPT_MULTICORE=yes
 OPT_AQ_DEBUG=no
 OPT_QUICK_CLIENT=no
@@ -125,6 +127,14 @@ for a in "$@"; do
     -no-digidoc)
       OPT_DIGIDOC=no
     ;;
+    -win64)
+      OPT_WIN64=yes
+    ;;
+    -qws)
+      OPT_QWS=yes
+      OPT_QMAKESPEC="qws/linux-generic-g++"
+      export QMAKESPEC=$OPT_QMAKESPEC
+    ;;
     -prefix|-platform)
       VAR=`echo $a | sed "s,^-\(.*\),\1,"`
       shift
@@ -190,7 +200,9 @@ fi
   
 unlink src/libmysql 2>/dev/null
 if [ "$BUILD_MACX" == "no" ]; then
-  QT_DEBUG="$QT_DEBUG -DQT_NO_COMPAT"
+  if [ "$OPT_QWS" = "no" ]; then
+    QT_DEBUG="$QT_DEBUG -DQT_NO_COMPAT"
+  fi
   ln -s libmysql_std src/libmysql
 else
   ln -s libmysql_macosx src/libmysql
@@ -238,7 +250,7 @@ else
   BUILD_KEY="$VER-$CROSS"
 fi
 else
-  MAKE_INSTALL="install"
+MAKE_INSTALL="install"
 fi
 
 if [ "$OPT_PREFIX" == "" ]
@@ -269,6 +281,15 @@ echo -e "El comando MAKE es: $CMD_MAKE\n"
 
 echo -e "Estableciendo configuración...\n"
 
+cd $BASEDIR/src/libdigidoc/openssl/crypto
+rm -f opensslconf.h
+if [ "$OPT_QMAKESPEC" == "linux-g++-64" ]; then
+  ln -s opensslconf.h.64 opensslconf.h
+else
+  ln -s opensslconf.h.32 opensslconf.h
+fi
+cd $BASEDIR
+
 rm -f $HOME/.qmake.cache
 
 export QTDIR=$BASEDIR/src/qt
@@ -283,8 +304,8 @@ fi
 version=$(cat $QTDIR/include/qglobal.h | grep "QT_VERSION_STR" | sed "s/.*\"\(.*\)\"/\1/g")
 echo -e "Versión de Qt... $version\n"
 echo -e "Compilando qmake y moc...\n"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:../lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:../lib
 cd $QTDIR
 
 if [ "$OPT_HOARD" = "yes" ]
@@ -313,10 +334,19 @@ then
     cp -fv qconfig/qconfig.h src/qt/include
     cp -fv qconfig/qmodules.h src/qt/include
     cd $QTDIR
-    ./configure --win32 $QT_CONFIG_VERBOSE -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
-                -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
-                -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+  if [ "$OPT_WIN64" = "yes" ]
+  then
+    cp -fv mkspecs/win32-g++-cross/qmake.conf-w64 mkspecs/win32-g++-cross/qmake.conf
+    cp -fv mkspecs/win32-g++-cross/qtcrtentrypoint.cpp-w64 mkspecs/win32-g++-cross/qtcrtentrypoint.cpp
   else
+    cp -fv mkspecs/win32-g++-cross/qmake.conf-w32 mkspecs/win32-g++-cross/qmake.conf
+    cp -fv mkspecs/win32-g++-cross/qtcrtentrypoint.cpp-w32 mkspecs/win32-g++-cross/qtcrtentrypoint.cpp
+  fi
+ 
+  ./configure --win32 $QT_CONFIG_VERBOSE -prefix $PREFIX -L$PREFIX/lib $QT_DEBUG -thread -stl -no-pch -no-exceptions -platform linux-g++ \
+              -xplatform win32-g++-cross -buildkey $BUILD_KEY -disable-opengl -no-cups -no-nas-sound \
+              -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng
+else
     cp -vf Makefile.qt Makefile
     if [ "$BUILD_MACX" == "yes" ]; then
       mkdir -p $DIRINST/lib
@@ -336,9 +366,15 @@ then
       # rpath: -R $ORIGIN/../lib , sirve para que en Linux busque las librerías (también) de forma relativa al ejecutable del programa.
       # ... pero el símbolo dólar ($) da problemas tanto en bash como en make. En bash hay que escaparlo, y en make hay que duplicar el símbolo dolar.
       # ... hacer uso del flag "-continue" puede desembocar en que no se aplique el -rpath.
-      ./configure $QT_CONFIG_VERBOSE -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu -thread -stl \
-                  -no-pch -no-exceptions -buildkey $BUILD_KEY -xinerama -disable-opengl -no-cups \
+    if [ "$OPT_QWS" = "no" ]; then      
+      ./configure $QT_CONFIG_VERBOSE --x11 -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu  \
+                  -no-pch -no-exceptions -xinerama -buildkey $BUILD_KEY -disable-opengl -no-cups \
                   -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+    else
+      ./configure $QT_CONFIG_VERBOSE -depths 8,16,32 -qvfb -qt-gfx-vnc -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu  \
+            -no-pch -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups \
+            -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+    fi
     fi
   fi
 fi
@@ -382,7 +418,7 @@ if [ "$AQ_CIN" == "" ]; then
 fi
 
 if [ "$AQ_PACK_VER" == "" ]; then
-    AQ_PACK_VER="(qstrlen(V) > 0 && qstrcmp(AQPACKAGER_VERSION, V) == 0)"
+  AQ_PACK_VER="(qstrlen(V) > 0 && qstrcmp(AQPACKAGER_VERSION, V) == 0)"
 fi
 
 
@@ -403,6 +439,7 @@ cat > AQConfig.h <<EOF
 #define AQCONFIG_H_
 
 #include "qplatformdefs.h"
+#include "AQGlobal.h"
 
 #define AQ_DIRAPP                   AQConfig::aqDirApp
 #define AQ_PREFIX                   AQ_DIRAPP
@@ -420,7 +457,7 @@ cat > AQConfig.h <<EOF
 class QApplication;
 class FLApplication;
 
-class AQConfig
+class AQ_EXPORT AQConfig
 {
 public:
   static QString aqDirApp;
@@ -429,9 +466,8 @@ public:
   static QString aqLib;
   static QString aqBin;
   static QString aqUsrHome;
-      
+        
 private:
-
   static void init(QApplication *);
   friend class FLApplication;
 };
@@ -449,12 +485,12 @@ cat > AQConfig.cpp <<EOF
 
 #include "AQConfig.h"
 
-QString AQConfig::aqDirApp;
-QString AQConfig::aqKeyBase;
-QString AQConfig::aqData;
-QString AQConfig::aqLib;
-QString AQConfig::aqBin;
-QString AQConfig::aqUsrHome;
+AQ_EXPORT QString AQConfig::aqDirApp;
+AQ_EXPORT QString AQConfig::aqKeyBase;
+AQ_EXPORT QString AQConfig::aqData;
+AQ_EXPORT QString AQConfig::aqLib;
+AQ_EXPORT QString AQConfig::aqBin;
+AQ_EXPORT QString AQConfig::aqUsrHome;
 
 void AQConfig::init(QApplication *aqApp)
 {
@@ -474,10 +510,13 @@ EOF
 echo "include(./includes.pri)" > settings.pro
 echo "PREFIX = $PREFIX" >> settings.pro
 echo "ROOT = $BASEDIR" >> settings.pro
-echo "DEFINES *= FL_EXPORT=" >> settings.pro
 echo "INCLUDEPATH *= $PREFIX/include" >> settings.pro
 echo "INCLUDEPATH *= $BASEDIR/src/qt/src/tmp" >> settings.pro
 echo "CONFIG += warn_off" >> settings.pro
+echo "AQSSLVERSION = 0.9.8" >> settings.pro
+echo "DEFINES *= AQSTRSSLVERSION=\\\"098\\\"" >> settings.pro
+#echo "DEFINES *= AQ_NO_PRINT_FUN" >> settings.pro
+#echo "DEFINES *= AQ_NO_DEBUG_FUN" >> settings.pro
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   if [ "$OPT_DEBUG" == "yes" ];then
@@ -525,6 +564,12 @@ if [ "$OPT_DIGIDOC" = "yes" ]
 then
   echo "CONFIG *= enable_digidoc" >> settings.pro
   echo "DEFINES *= FL_DIGIDOC" >> settings.pro
+fi
+
+if [ "$OPT_WIN64" = "yes" ]
+then
+  echo "CONFIG *= enable_win64" >> settings.pro
+  echo "DEFINES *= AQ_WIN64" >> settings.pro
 fi
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
@@ -616,7 +661,7 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cro
     ./configure2/configure2
   $QTDIR/bin/qmake CONFIG+="shared"
 else
-  ./configure
+./configure
 fi
 $CMD_MAKE || exit 1
 $CMD_MAKE $MAKE_INSTALL || exit 1
@@ -629,7 +674,7 @@ $CMD_MAKE $MAKE_INSTALL || exit 1
 # <----------------------
 
 cd $BASEDIR
-
+echo ""
 echo -e "Creando Makefiles con qmake...\n"
 
 cp -f src/qt/.qmake.cache .qmake.cache
@@ -649,8 +694,10 @@ cp -f src/qt/.qmake.cache src/plugins/designer/fltabledb/
 cp -f src/qt/.qmake.cache src/plugins/sqldrivers/sqlite/
 cp -f src/qt/.qmake.cache src/plugins/sqldrivers/psql/
 cp -f src/qt/.qmake.cache src/plugins/styles/bluecurve/
-
+echo $QTDIR/bin/qmake user.pro
 $QTDIR/bin/qmake user.pro
+#echo $QTDIR/bin/qmake src/src.pro
+#$QTDIR/bin/qmake src.pro
 
 echo -e " * * * Compilando Eneboo ...\n"
 cd src/flbase
@@ -660,11 +707,19 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
 else
   $CMD_MAKE uicables || exit 1
 fi
+
 cd $BASEDIR
+
 # A veces (en win32) no compila correctamente qwt, porque compila antes el designer plugin de qwt que la propia librería.
 # , por eso, esperamos que el make falle y lo re-ejecutamos, para que complete.
 $CMD_MAKE || { $CMD_MAKE || exit 1; }
 $CMD_MAKE $MAKE_INSTALL
+make -s $MAKE_INSTALL
+
+cd $BASEDIR/src/libdigidoc/openssl/crypto
+rm -f opensslconf.h
+ln -s opensslconf.h.32 opensslconf.h
+cd $BASEDIR
 
 if  [ "$BUILD_MACX" == "yes" ];then
 	echo -e "\nConfigurando packete app ...\n"
@@ -715,7 +770,7 @@ if  [ "$BUILD_MACX" == "yes" ];then
 	  ${CROSS}install_name_tool -change libxsltproc.1.dylib @executable_path/../../../../lib/libxsltproc.1.dylib $i
 	done
 fi
-if [ "$OPT_QMAKESPEC" == "win32-g++-cross" ]; then
+if [ "$OPT_DEBUG" = "no" -a "$OPT_QMAKESPEC" == "win32-g++-cross" ]; then
   ${CROSS}strip --strip-unneeded $PREFIX/bin/* 2> /dev/null
   ${CROSS}strip --strip-unneeded $PREFIX/lib/* 2> /dev/null
   ${CROSS}strip --strip-unneeded $PREFIX/plugins/designer/* 2> /dev/null
@@ -743,6 +798,9 @@ cp -f ./src/translations/*.ts $PREFIX/share/eneboo/translations 2> /dev/null
 rm $PREFIX/share/eneboo/scripts/* 2> /dev/null
 cp -f ./src/scripts/*.qs $PREFIX/share/eneboo/scripts 2> /dev/null
 
+if [ "$OPT_QWS" != "no" ]; then
+  cp -fr ./src/qt/lib/fonts $PREFIX/lib/ 2> /dev/null
+fi
 
 cp -f ./src/docs/*.html $PREFIX/share/eneboo/doc 2> /dev/null
 cp -f ./src/*.xml $PREFIX/share/eneboo 2> /dev/null

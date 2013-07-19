@@ -23,6 +23,8 @@
 #include "FLWidgetReportViewer.h"
 #include "mreportviewer.h"
 
+#include "AQGlobal.h"
+
 class MReportViewer;
 class MPageCollection;
 class FLSqlQuery;
@@ -46,13 +48,13 @@ El visor tiene tiene dos modos de funcionamiento;
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLReportViewer: public FLWidgetReportViewer
+class AQ_EXPORT FLReportViewer: public FLWidgetReportViewer
 {
 
   Q_OBJECT
 
 public:
-	
+
 
   /**
   constructor
@@ -87,8 +89,8 @@ public:
   */
   bool renderReport(const int initRow = 0, const int initCol = 0,
                     const bool append = false, const bool displayReport = false);
-					
-	bool renderReport(const int initRow = 0, const int initCol = 0, const uint flags = MReportViewer::Display);
+
+  bool renderReport(const int initRow = 0, const int initCol = 0, const uint flags = MReportViewer::Display);
 
   /**
   Establece los datos del informe a partir de una consulta
@@ -215,6 +217,16 @@ public:
   tendran efecto (renderReport, csvData, etc..)
   */
   void setReportPages(FLReportPages *pgs);
+
+  /**
+  Establece el modo de color de la impresión (PrintColor, PrintGrayScale)
+  */
+  void setColorMode(uint c);
+
+  /**
+  Obtiene el modo de color de la impresión establecido
+  */
+  uint colorMode() const;
 
 public slots:
 
@@ -352,6 +364,13 @@ public slots:
   */
   void disableSlotsPrintExports(bool disablePrints = true, bool disableExports = true);
 
+  /**
+  Exporta el informe a una hoja de cálculo ODS y la visualiza
+
+  Solo tiene efecto si el visor tiene un motor de informes activo
+  */
+  void exportToOds();
+
 signals:
 
   /**
@@ -458,6 +477,9 @@ private:
   */
   bool slotsPrintDisabled_;
   bool slotsExportDisabled_;
+  
+  /** Uso interno */
+  bool printing_;
 
 public:
 

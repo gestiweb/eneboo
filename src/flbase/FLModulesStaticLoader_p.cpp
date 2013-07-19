@@ -296,14 +296,24 @@ void FLStaticLoaderWarning::updateScripts()
   QString n;
   QString *scrName = 0;
   QSScript *scr = 0;
+  QString sufMn("::Main");
+  QString sufFm("::Form");
+  QString sufFr("::FormRecord");
   for (QStringList::const_iterator it = paths_.begin(); it != paths_.end(); ++it) {
     n = (*it).section(':', 0, 0);
     if (!n.endsWith(".qs"))
       continue;
-    scr = scriptBaseFileName(n);
-    if (!scr)
-      continue;
-    scr->setFileName((*it).section(':', 1, 1) + n);
+    scr = scriptBaseFileName(n + sufMn);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
+
+    scr = scriptBaseFileName(n + sufFm);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
+
+    scr = scriptBaseFileName(n + sufFr);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
   }
   paths_.clear();
 }

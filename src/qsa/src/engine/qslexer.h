@@ -222,8 +222,8 @@ private:
   static QSLexer *lx;
   static int sid;
 
-  QIntDict<QString> ustrHash;
-  QPtrList<QString> ustrList;
+  QIntDict<const QString> ustrHash;
+  QPtrList<const QString> ustrList;
 
   uint hashUstr(QChar *s, uint len) {
     uint hash = 0;
@@ -239,7 +239,7 @@ private:
   }
 
   const QString *newUstr(QChar *s, uint len) {
-    QString *us = 0;
+    const QString *us = 0;
     if (len < 50) {
       uint hash = hashUstr(s, len);
       us = ustrHash.find(hash);

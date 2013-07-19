@@ -66,13 +66,15 @@
 #ifndef __MessageDescriptor__
 #define __MessageDescriptor__
 
+#include "aqmailglobal.h"
+
 class MessageClass;
 class QString;
 class QStringList;
 class QDataStream;
 
 // this is basically a smart struct
-class MessageDescriptor
+class AQMAIL_EXPORT MessageDescriptor
 {
     friend QDataStream& operator>>(QDataStream &, MessageDescriptor &);
     friend QDataStream& operator<<(QDataStream &, MessageDescriptor &);

@@ -23,6 +23,40 @@
 #include <qsqlcursor.h>
 #include <qpixmap.h>
 
+static QVariant::Type qDecodeSqliteType(fType t)
+{
+  QVariant::Type type = QVariant::Invalid;
+  switch (t) {
+    case ft_Boolean:
+      type = QVariant::Bool;
+      break;
+    case ft_Long:
+    case ft_ULong:
+    case ft_Short:
+    case ft_UShort:
+      type = QVariant::Int;
+      break;
+    case ft_Float:
+    case ft_Double:
+    case ft_LongDouble:
+      type = QVariant::Double;
+      break;
+    case ft_Object:
+      type = QVariant::ByteArray;
+      break;
+    case ft_String:
+    case ft_Char:
+    case ft_WChar:
+    case ft_WideString:
+      type = QVariant::String;
+      break;
+    default:
+      type = QVariant::String;
+      break;
+  }
+  return type;
+}
+
 SqliteDriver::SqliteDriver(QObject *parent, const char *name) :
   FLSqlDriver(parent, name), dataBase_(0) {}
 
@@ -84,11 +118,10 @@ bool SqliteDriver::tryConnect(const QString &db, const QString &user, const QStr
 {
   if (!open(db, user, password, host, port, QString::null)) {
     if (lastError().type() == QSqlError::Connection) {
-      QMessageBox::critical(0, tr("Conexión fallida"),
-                            tr("No se pudo conectar con la base de datos %1.").arg(db),
-                            QMessageBox::Ok, 0, 0);
-      QMessageBox::critical(0, tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
-                            QString(lastError().databaseText().utf8()), QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"),
+                     tr("No se pudo conectar con la base de datos %1.").arg(db));
+      msgBoxCritical(tr("Error"), QString(lastError().driverText().utf8()) + "\n" +
+                     QString(lastError().databaseText().utf8()));
       return false;
     }
   }
@@ -96,17 +129,19 @@ bool SqliteDriver::tryConnect(const QString &db, const QString &user, const QStr
   return true;
 }
 
-QString SqliteDriver::sqlCreateTable(FLTableMetaData *tmd)
+QString SqliteDriver::sqlCreateTable(const FLTableMetaData *tmd)
 {
 #ifndef FL_QUICK_CLIENT
   if (!tmd)
     return QString::null;
 
+  qWarning("NOTICE: CREATE TABLE " + tmd->name());
+
   QString primaryKey(QString::null);
   QString sql = "CREATE TABLE " + tmd->name() + " (";
 
   FLFieldMetaData *field;
-  FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
 
   unsigned int unlocks = 0;
   QDictIterator<FLFieldMetaData> it(*fieldList);
@@ -187,7 +222,7 @@ QString SqliteDriver::sqlCreateTable(FLTableMetaData *tmd)
         primaryKey = field->name();
       } else {
 #ifdef FL_DEBUG
-        qWarning(QApplication::tr("FLManager : Tabla -> ") +
+        qWarning(QApplication::tr("FLManager : Tabla-> ") +
                  tmd->name() + QApplication::tr(" . Se ha intentado poner una segunda clave primaria para el campo ") +
                  field->name() + QApplication::tr(" , pero el campo ") + primaryKey +
                  QApplication::tr(" ya es clave primaria. Sólo puede existir una clave primaria en FLTableMetaData, use FLCompoundKey para crear claves compuestas."));
@@ -393,7 +428,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
-  FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
   FLFieldMetaData *oldField = 0;
 
   if (!fieldList) {
@@ -418,7 +453,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
-  db_->dbAux() ->transaction();
+  db_->dbAux()->transaction();
 
   if (!key.isEmpty() && key.length() == 40) {
     QSqlCursor c("flfiles", true, db_->dbAux());
@@ -442,7 +477,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     qWarning("FLManager::alterTable : " + QApplication::tr("No se ha podido renombrar la tabla antigua."));
 #endif
 
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
     if ((oldMTD != newMTD) && oldMTD)
       delete oldMTD;
     if (newMTD)
@@ -451,7 +486,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
   }
 
   if (!db_->manager()->createTable(newMTD)) {
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
     if ((oldMTD != newMTD) && oldMTD)
       delete oldMTD;
     if (newMTD)
@@ -480,7 +515,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     qWarning("FLManager::alterTable : " + QApplication::tr("Los nuevos metadatos no tienen campos."));
 #endif
 
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
     if ((oldMTD != newMTD) && oldMTD)
       delete oldMTD;
     if (newMTD)
@@ -493,7 +528,7 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     qWarning("FLManager::alterTable : " + QApplication::tr("Los nuevos metadatos no tienen campos."));
 #endif
 
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
     if ((oldMTD != newMTD) && oldMTD)
       delete oldMTD;
     if (newMTD)
@@ -573,11 +608,13 @@ bool SqliteDriver::alterTable(const QString &mtd1, const QString &mtd2, const QS
     delete newMTD;
 
   if (ok)
-    db_->dbAux() ->commit();
+    db_->dbAux()->commit();
   else {
-    db_->dbAux() ->rollback();
+    db_->dbAux()->rollback();
     return false;
   }
+
+  return true;
 #else
 
   return true;
@@ -710,6 +747,21 @@ QSqlRecord SqliteDriver::record2(const QString &tblname) const
   return recordInfo(tblname).toRecord();
 }
 
+QSqlRecord SqliteDriver::record(const FLTableMetaData *mtd) const
+{
+  QSqlRecord fil;
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+
+  if (!fl || fl->isEmpty())
+    return record2(mtd->name());
+
+  QStringList fieldsNames = QStringList::split(",", mtd->fieldsNames());
+  for (QStringList::Iterator it = fieldsNames.begin(); it != fieldsNames.end(); ++it)
+    fil.append(QSqlField((*it), FLFieldMetaData::flDecodeType(mtd->fieldType((*it)))));
+
+  return fil;
+}
+
 QSqlRecord SqliteDriver::record(const QString &tablename) const
 {
   QSqlRecord fil;
@@ -729,7 +781,7 @@ QSqlRecord SqliteDriver::record(const QString &tablename) const
   if (!mtd)
     return record2(tablename);
 
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return record2(tablename);
@@ -750,6 +802,17 @@ QSqlRecord SqliteDriver::record(const QString &tablename) const
 
 QSqlRecord SqliteDriver::record(const QSqlQuery &query) const
 {
+  if (query.isActive() && query.driver() == this) {
+    QSqlRecord fil;
+    const SqliteResult *result = static_cast<const SqliteResult *>(query.result());
+    Dataset *ds = result->dataSet;
+    for (int i = 0; i < ds->fieldCount(); ++i) {
+      QString fName(ds->fieldName(i));
+      fType type = ds->fv(fName).get_fType();
+      fil.append(QSqlField(fName, qDecodeSqliteType(type)));
+    }
+    return fil;
+  }
   return QSqlRecord();
 }
 
@@ -783,7 +846,7 @@ QSqlRecordInfo SqliteDriver::recordInfo(const QString &tablename) const
   FLTableMetaData *mtd = db_->manager()->metadata(&docElem, true);
   if (!mtd)
     return recordInfo2(tablename);
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return recordInfo2(tablename);
@@ -796,7 +859,10 @@ QSqlRecordInfo SqliteDriver::recordInfo(const QString &tablename) const
   QStringList fieldsNames = QStringList::split(",", mtd->fieldsNames());
   for (QStringList::Iterator it = fieldsNames.begin(); it != fieldsNames.end(); ++it) {
     FLFieldMetaData *field = mtd->field((*it));
-    info.append(QSqlFieldInfo(field->name(), FLFieldMetaData::flDecodeType(field->type())));
+    info.append(QSqlFieldInfo(field->name(),
+                              FLFieldMetaData::flDecodeType(field->type()),
+                              !field->allowNull(),
+                              field->length(), field->partDecimal(), field->defaultValue()));
   }
 
   delete mtd;
@@ -805,6 +871,17 @@ QSqlRecordInfo SqliteDriver::recordInfo(const QString &tablename) const
 
 QSqlRecordInfo SqliteDriver::recordInfo(const QSqlQuery &query) const
 {
+  if (query.isActive() && query.driver() == this) {
+    QSqlRecordInfo info;
+    const SqliteResult *result = static_cast<const SqliteResult *>(query.result());
+    Dataset *ds = result->dataSet;
+    for (int i = 0; i < ds->fieldCount(); ++i) {
+      QString fName(ds->fieldName(i));
+      fType type = ds->fv(fName).get_fType();
+      info.append(QSqlFieldInfo(fName, qDecodeSqliteType(type)));
+    }
+    return info;
+  }
   return QSqlRecordInfo();
 }
 
@@ -881,7 +958,8 @@ bool SqliteResult::reset(const QString &q)
     setSelect(false);
   query.replace("'true'", "'1'");
   query.replace("'false'", "'0'");
-  query.replace("=;", "= NULL;");
+  // ###
+  //q.replace("=;", "= NULL;");
   while (query.endsWith(";"))
     query.truncate(query.length() - 1);
   if (query.upper().endsWith("NOWAIT"))
@@ -890,7 +968,7 @@ bool SqliteResult::reset(const QString &q)
     query.truncate(query.length() - 10);
   if (!isSelect()) {
     if (query.find("CREATE TABLE", 0, false) == 0) {
-      Dataset *ds = ((SqliteDriver *) driver) ->dataBase() ->CreateDataset();
+      Dataset *ds = ((SqliteDriver *) driver)->dataBase()->CreateDataset();
 
       if (!ds)
         return false;
@@ -903,7 +981,7 @@ bool SqliteResult::reset(const QString &q)
     } else {
       if (dataSet)
         delete dataSet;
-      dataSet = ((SqliteDriver *) driver) ->dataBase() ->CreateDataset();
+      dataSet = ((SqliteDriver *) driver)->dataBase()->CreateDataset();
       if (!dataSet->exec(query.latin1()))
         return false;
     }
@@ -913,7 +991,7 @@ bool SqliteResult::reset(const QString &q)
 
   if (dataSet)
     delete dataSet;
-  dataSet = ((SqliteDriver *) driver) ->dataBase() ->CreateDataset();
+  dataSet = ((SqliteDriver *) driver)->dataBase()->CreateDataset();
   if (dataSet->query(query.latin1())) {
     setActive(true);
     return true;

@@ -705,6 +705,10 @@ inline int qRound( double d )
 // Size-dependent types (architechture-dependent byte order)
 //
 
+#if defined(Q_OS_WIN64)
+#define __int64 long long int
+#endif
+
 #if !defined(QT_CLEAN_NAMESPACE)
 // source compatibility with Qt 1.x
 typedef signed char		INT8;		// 8 bit signed

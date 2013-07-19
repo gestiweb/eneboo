@@ -21,7 +21,16 @@ email                : mail@infosial.com
 #include "FLSqlDatabase.h"
 #include "AQConfig.h"
 
-QString FLDiskCache::absoluteDirPath;
+AQ_EXPORT QString FLDiskCache::absoluteDirPath;
+
+AQ_EXPORT bool aqDiskCacheFind(const QString &key, QString &str)
+{
+  return FLDiskCache::find(key, str);
+}
+AQ_EXPORT bool aqDiskCacheInsert(const QString &key, const QString &str)
+{
+  return FLDiskCache::insert(key, str);
+}
 
 bool FLDiskCache::find(const QString &key, QString &str)
 {
@@ -31,6 +40,19 @@ bool FLDiskCache::find(const QString &key, QString &str)
     return false;
   QTextStream t(&fi);
   str = t.read();
+  fi.close();
+  return true;
+}
+
+bool FLDiskCache::find(const QString &key, QByteArray &ba)
+{
+  QString fileCache(AQ_DISKCACHE_DIRPATH + '/' + key +
+                    QString::fromLatin1("-BIN"));
+  QFile fi(fileCache);
+  if (!fi.open(IO_ReadOnly))
+    return false;
+  QDataStream dat(&fi);
+  dat >> ba;
   fi.close();
   return true;
 }
@@ -51,7 +73,27 @@ bool FLDiskCache::insert(const QString &key, const QString &str)
       fi.close();
       return true;
     }
-    return false;
+  }
+  return false;
+}
+
+bool FLDiskCache::insert(const QString &key, const QByteArray &ba)
+{
+  QString fileCache(AQ_DISKCACHE_DIRPATH + '/' + key +
+                    QString::fromLatin1("-BIN"));
+  QFile fi(fileCache);
+  QDir d(AQ_DISKCACHE_DIRPATH);
+  if (!d.exists())
+    d.mkdir(AQ_DISKCACHE_DIRPATH);
+  else if (fi.exists())
+    return true;
+  if (!ba.isEmpty()) {
+    if (fi.open(IO_WriteOnly)) {
+      QDataStream dat(&fi);
+      dat << ba;
+      fi.close();
+      return true;
+    }
   }
   return false;
 }
@@ -123,5 +165,15 @@ void FLDiskCache::init(FLApplication *app)
     
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
+
+    QDir d(AQ_DISKCACHE_DIRPATH);
+    if (d.exists()) {
+      QStringList lst = d.entryList("*.*", QDir::Files);
+      for (QStringList::Iterator it = lst.begin(); it != lst.end(); ++it) {
+        QString item(*it);
+        if (!item.endsWith(".qm"))
+          d.remove(AQ_DISKCACHE_DIRPATH + '/' + item);
+      }
+    }
   }
 }

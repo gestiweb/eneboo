@@ -302,7 +302,7 @@ void FLAccessControlTable::processObject(QObject *obj)
   QString *fieldPermPtr;
   int maskFieldPerm = 0;
 
-  FLTableMetaData::FLFieldMetaDataList *fL = tm->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fL = tm->fieldList();
   if (!fL)
     return ;
 
@@ -358,7 +358,7 @@ void FLAccessControlTable::setFromObject(QObject *obj)
   acosPerms_ = new QDict < QString >(31);
   acosPerms_->setAutoDelete(true);
 
-  FLTableMetaData::FLFieldMetaDataList *fL = tm->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fL = tm->fieldList();
   if (!fL)
     return;
 

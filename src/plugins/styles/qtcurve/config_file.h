@@ -28,14 +28,14 @@ extern void qtcLoadBgndImage(QtCImage *img);
 
 #endif // !defined QT_VERSION || QT_VERSION >= 0x040000)
 
-extern const char * qtcGetHome();
+extern const char *qtcGetHome();
 extern const char *qtcConfDir();
 extern void qtcSetRgb(color *col, const char *str);
 extern void qtcDefaultSettings(Options *opts);
 extern void qtcCheckConfig(Options *opts);
 #ifdef __cplusplus
-extern bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts=0L, bool checkImages=true);
-extern WindowBorders qtcGetWindowBorderSize(bool force=false);
+extern bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts = 0L, bool checkImages = true);
+extern WindowBorders qtcGetWindowBorderSize(bool force = false);
 #else
 extern bool qtcReadConfig(const char *file, Options *opts, Options *defOpts);
 extern WindowBorders qtcGetWindowBorderSize(gboolean force);
@@ -43,7 +43,7 @@ extern WindowBorders qtcGetWindowBorderSize(gboolean force);
 
 #ifdef CONFIG_WRITE
 class KConfig;
-extern bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false);
+extern bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle = false);
 #endif
 
 #endif

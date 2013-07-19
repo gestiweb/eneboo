@@ -24,6 +24,7 @@ mac {
 
 INCLUDEPATH += $$ROOT/src/qt/src/kernel
 INCLUDEPATH += $$ROOT $$ROOT/src/flbase
+win32:INCLUDEPATH += $$ROOT/src/fllite
 DEPENDPATH += $$ROOT/src/flbase
 
 LIBS *= -L$$PREFIX/lib
@@ -36,12 +37,14 @@ enable_digidoc:mac:LIBS *= -llibdigidoc -lcrypto -lssl -lxml2
 load(qsa)
 
 SOURCES += main.cpp
+win32:SOURCES += backtrace.c
+win32:HEADERS += execinfo.h
 
 IMAGES += images/splashdebugger.png \
           images/splashclient.png
 
 
-win32:QMAKE_LFLAGS += -mconsole -mwindows
+win32:QMAKE_LFLAGS += -mwindows
 
 win32 { 
     INCLUDEPATH += $$ROOT/src/qsa/src/qsa

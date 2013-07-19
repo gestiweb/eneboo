@@ -7,10 +7,10 @@ else {
 }
 
 TEMPLATE = lib
-DEFINES += _REENTRANT HAVE_CONFIG_H
-CONFIG += warn_off exceptions
+DEFINES += _REENTRANT__CLEANUP_C PTW32_BUILD PTW32_BUILD_INLINED HAVE_PTW32_CONFIG_H
+CONFIG += warn_off
 CONFIG -= qt debug
-TARGET = pthreadGCE
+TARGET = pthreadAQ
 DESTDIR = $$PREFIX/lib
 INCLUDEPATH += $$ROOT/src/pthreads
 
@@ -19,33 +19,14 @@ win32 {
   DLLDESTDIR = $$PREFIX/bin
   RC_FILE = version.rc
   LIBS += -lws2_32
-  QMAKE_CC = $(CXX)
   QMAKE_CFLAGS = 
   QMAKE_LFLAGS =
 }
 
-VERSION = 2
+VERSION = 2.9.1
 
-SOURCES	+= attr.c \
-		barrier.c \
-		cancel.c \
-		cleanup.c \
-		condvar.c \
-		create.c \
-		dll.c \
-		errno.c \
-		exit.c \
-		fork.c \
-		global.c \
-		misc.c \
-		mutex.c \
-		nonportable.c \
-		private.c \
-		rwlock.c \
-		sched.c \
-		semaphore.c \
-		signal.c \
-		spin.c \
-		sync.c \
-		tsd.c
+QMAKE_CXXFLAGS += -O3
+QMAKE_CFLAGS += -O3
+
+SOURCES	+= pthread.c
 

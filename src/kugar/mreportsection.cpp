@@ -70,8 +70,7 @@ MReportSection::~MReportSection()
 }
 
 /** Frees all resources allocated by the report section */
-void
-MReportSection::clear()
+void MReportSection::clear()
 {
   // Clear the line collection
   lines.clear();
@@ -424,9 +423,6 @@ void MReportSection::drawObjects(FLStylePainter *p, int xoffset, int yoffset, in
 
   int modifiedHeight = 0;
 
-  csvData_ = "";
-  QString fieldValue;
-
   QObject::setName(QString("_##%1-%2").arg(strIdSec_).arg(level));
   p->beginSection(xcalc, ycalc, width, height, this);
   uint countObj = 0;
@@ -491,13 +487,6 @@ void MReportSection::drawObjects(FLStylePainter *p, int xoffset, int yoffset, in
       if (modifiedHeight && (calcfield->getY() + modifiedHeight) > height)
         newHeight = calcfield->getY() + modifiedHeight;
     }
-
-    if (calcfield->getCalculationType() == MCalcObject::NoOperation ||
-        calcfield->getCalculationType() == MCalcObject::CallFunction) {
-      fieldValue = calcfield->getText();
-      fieldValue.replace("\n", "-");
-      csvData_ += "|" + fieldValue;
-    }
   }
 
   // Draw the special field collection
@@ -550,13 +539,35 @@ void MReportSection::drawObjects(FLStylePainter *p, int xoffset, int yoffset, in
 
     if (modifiedHeight && (field->getY() + modifiedHeight) > height)
       newHeight = field->getY() + modifiedHeight;
-
-    fieldValue = field->getText();
-    fieldValue.replace("\n", "-");
-    csvData_ += "|" + fieldValue;
   }
 
   p->endSection();
+}
+
+QString MReportSection::csvData()
+{
+  MCalcObject *calcfield;
+  MFieldObject *field;
+  QString fieldValue;
+  QString csvData;
+
+  for (calcfield = calculatedFields.first(); calcfield != 0;
+       calcfield = calculatedFields.next()) {
+    if (calcfield->getCalculationType() == MCalcObject::NoOperation ||
+        calcfield->getCalculationType() == MCalcObject::CallFunction) {
+      fieldValue = calcfield->getText();
+      fieldValue.replace("\n", "-");
+      csvData += "|" + fieldValue;
+    }
+  }
+
+  for (field = fields.first(); field != 0; field = fields.next()) {
+    fieldValue = field->getText();
+    fieldValue.replace("\n", "-");
+    csvData += "|" + fieldValue;
+  }
+
+  return csvData;
 }
 
 /** Calculates the height of se section according to its ChangeHeight Fields */

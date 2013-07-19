@@ -28,7 +28,7 @@
 FLFormSearchDB::FLFormSearchDB(const QString &actionName, QWidget *parent) :
   FLFormDB(parent, actionName, Qt::WStyle_Customize | Qt::WStyle_Maximize | Qt::WStyle_Title
            | Qt::WStyle_NormalBorder | Qt::WType_Dialog | Qt::WShowModal | Qt::WStyle_SysMenu),
-  loop(false), accepted_(false), iface(0)
+  loop(false), acceptingRejecting_(false), inExec_(false)
 {
   setFocusPolicy(QWidget::NoFocus);
 
@@ -53,9 +53,9 @@ FLFormSearchDB::FLFormSearchDB(const QString &actionName, QWidget *parent) :
 }
 
 FLFormSearchDB::FLFormSearchDB(FLSqlCursor *cursor, const QString &actionName, QWidget *parent) :
-  FLFormDB(parent, actionName, Qt::WStyle_Customize | Qt::WStyle_Maximize | Qt::WStyle_NormalBorder
-           | Qt::WType_Dialog | Qt::WShowModal | Qt::WStyle_SysMenu), loop(false), accepted_(false),
-  iface(0)
+  FLFormDB(parent, actionName, Qt::WStyle_Customize | Qt::WStyle_Maximize | Qt::WStyle_Title
+           | Qt::WStyle_NormalBorder | Qt::WType_Dialog | Qt::WShowModal | Qt::WStyle_SysMenu),
+  loop(false), acceptingRejecting_(false), inExec_(false)
 {
   setFocusPolicy(QWidget::NoFocus);
 
@@ -66,49 +66,24 @@ FLFormSearchDB::FLFormSearchDB(FLSqlCursor *cursor, const QString &actionName, Q
   else
     action_ = FLSqlConnections::database()->manager()->action(actionName);
   cursor_ = cursor;
-  name_ = QString::null;
+  name_ = (action_ ? action_->name() : QString::null);
 
   initForm();
 }
 
 FLFormSearchDB::~FLFormSearchDB()
 {
-  if (iface && iface->obj() == this) {
-    iface->finish();
-    iface->setObj(0);
+  if (cursor_ && !cursor_->aqWasDeleted()) {
+    cursor_->restoreEditionFlag(this);
+    cursor_->restoreBrowseFlag(this);
   }
-}
-
-void FLFormSearchDB::initForm()
-{
-  if (cursor_ && cursor_->metadata()) {
-    QString caption = "";
-    if (action_) {
-      cursor_->setAction(action_);
-      if (action_->caption() != QString::null)
-        setCaption(action_->caption() + caption);
-      idMDI_ = action_->name();
-    }
-
-    if (iface)
-      iface->finish();
-    setCaption(cursor_->metadata() ->alias() + caption);
-    setName("formSearch" + idMDI_);
-    QSProject *p = aqApp ->project();
-    iface = static_cast<FLFormSearchDBInterface *>(p->object(name()));
-    if (iface) {
-      iface->setObj(this);
-      if (!oldCursorCtxt)
-        oldCursorCtxt = cursor_->context();
-      cursor_->setContext(iface);
-    }
-  } else
-    setCaption(tr("No hay metadatos"));
 }
 
 void FLFormSearchDB::setFilter(const QString &f)
 {
-  QString previousF = cursor_->mainFilter();
+  if (!cursor_)
+    return;
+  QString previousF(cursor_->mainFilter());
   QString newF;
   if (previousF.isEmpty())
     newF = f;
@@ -124,22 +99,33 @@ QVariant FLFormSearchDB::exec(const QString &n)
   if (!cursor_)
     return QVariant();
 
-  if (loop) {
+  if (loop || inExec_) {
 #ifdef FL_DEBUG
     qWarning(tr("FLFormSearchDB::exec(): Se ha detectado una llamada recursiva"));
 #endif
+    QWidget::show();
+    if (initFocusWidget_)
+      initFocusWidget_->setFocus();
     return QVariant();
   }
+
+  inExec_ = true;
+  acceptingRejecting_ = false;
 
   QWidget::show();
   if (initFocusWidget_)
     initFocusWidget_->setFocus();
+
   if (iface)
-    aqApp ->call("init", QSArgumentList(), iface);
+    aqApp->call("init", QSArgumentList(), iface);
+  if (!isClosing_ && !aqApp->project()->interpreter()->hadError())
+    QTimer::singleShot(0, this, SLOT(emitFormReady()));
 
   accepted_ = false;
   loop = true;
-  QApplication::eventLoop()->enterLoop();
+  if (!isClosing_ && !acceptingRejecting_)
+    QApplication::eventLoop()->enterLoop();
+  loop = false;
 
   clearWFlags(WShowModal);
   QVariant v;
@@ -147,6 +133,9 @@ QVariant FLFormSearchDB::exec(const QString &n)
     v = cursor_->valueBuffer(n);
   else
     v = QVariant();
+
+  inExec_ = false;
+
   return v;
 }
 
@@ -176,8 +165,7 @@ void FLFormSearchDB::closeEvent(QCloseEvent *e)
     if (!pushButtonCancel->isEnabled())
       return;
     isClosing_ = true;
-    if (cursor_ && oldCursorCtxt)
-      cursor_->setContext(oldCursorCtxt);
+    setCursor(0);
   } else
     isClosing_ = true;
   if (isShown())
@@ -191,17 +179,29 @@ void FLFormSearchDB::closeEvent(QCloseEvent *e)
 
 void FLFormSearchDB::setCursor(FLSqlCursor *c)
 {
+  if (c != cursor_ && cursor_ && oldCursorCtxt)
+    cursor_->setContext(oldCursorCtxt);
+
   if (!c)
     return;
-  if (cursor_)
+
+  if (cursor_) {
     disconnect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
+    disconnect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
+  }
+  if (cursor_ && cursor_ != c) {
+    cursor_->restoreEditionFlag(this);
+    cursor_->restoreBrowseFlag(this);
+  }
   cursor_ = c;
-  cursor_->setEdition(false);
-  cursor_->setBrowse(false);
+  cursor_->setEdition(false, this);
+  cursor_->setBrowse(false, this);
   connect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
-  if (iface)
-    iface->setObjCursor(c);
-  initForm();
+  connect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
+  if (iface && cursor_) {
+    oldCursorCtxt = cursor_->context();
+    cursor_->setContext(iface);
+  }
 }
 
 void FLFormSearchDB::setMainWidget(QWidget *w)
@@ -251,6 +251,22 @@ void FLFormSearchDB::setMainWidget(QWidget *w)
   layoutButtons->addWidget(wt);
   wt->show();
 
+#ifdef QSDEBUGGER
+  pushButtonDebug = new QPushButton(this, "pushButtonDebug");
+  pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
+                                             pushButtonDebug->sizePolicy().hasHeightForWidth()));
+  pushButtonDebug->setMinimumSize(pbSize);
+  pushButtonDebug->setMaximumSize(pbSize);
+  QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
+  pushButtonDebug->setIconSet(qsa);
+  pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
+  QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
+  layoutButtons->addWidget(pushButtonDebug);
+  connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+#endif
+
   layoutButtons->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
   pushButtonAccept = new QPushButton(this, "pushButtonAccept");
@@ -281,6 +297,7 @@ void FLFormSearchDB::setMainWidget(QWidget *w)
   pushButtonCancel->setAccel(QKeySequence(tr("Esc")));
   QToolTip::add(pushButtonCancel, tr("Cerrar formulario sin seleccionar registro (Esc)"));
   QWhatsThis::add(pushButtonCancel, tr("Cerrar formulario sin seleccionar registro (Esc)"));
+  layoutButtons->addItem(new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Fixed));
   layoutButtons->addWidget(pushButtonCancel);
   connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -309,35 +326,37 @@ void FLFormSearchDB::setMainWidget(QWidget *w)
   }
 }
 
-void FLFormSearchDB::initScript()
-{
-}
-
 void FLFormSearchDB::setMainWidget()
 {
-  if (!action_)
-    return;
-  if (cursor_)
-    setMainWidget(cursor_->db()->managerModules()->createForm(action_, this, this));
-  else
-    setMainWidget(FLSqlConnections::database()->managerModules()->createForm(action_, this, this));
+  FLFormDB::setMainWidget();
+}
+
+bool FLFormSearchDB::initScript()
+{
+  return false;
 }
 
 void FLFormSearchDB::accept()
 {
+  if (acceptingRejecting_)
+    return;
   frameGeometry();
   if (cursor_) {
     disconnect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
     accepted_ = true;
   }
+  acceptingRejecting_ = true;
   hide();
 }
 
 void FLFormSearchDB::reject()
 {
+  if (acceptingRejecting_)
+    return;
   frameGeometry();
   if (cursor_)
     disconnect(cursor_, SIGNAL(recordChoosed()), this, SLOT(accept()));
+  acceptingRejecting_ = true;
   hide();
 }
 
@@ -347,4 +366,19 @@ void FLFormSearchDB::setCaptionWidget(const QString &text) {
     return;
 
   setCaption(text);
+}
+
+QString FLFormSearchDB::geoName() const
+{
+  return QString::fromLatin1("formSearch") + idMDI_;
+}
+
+QString FLFormSearchDB::formClassName() const
+{
+  return "FormSearchDB";
+}
+
+void FLFormSearchDB::show()
+{
+  exec();
 }

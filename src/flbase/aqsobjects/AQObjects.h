@@ -41,6 +41,15 @@
 #include "FLReportViewer.h"
 #include "FLJasperEngine.h"
 #include "FLSqlConnections.h"
+#include "FLSmtpClient.h"
+
+class AQSmtpClient : public FLSmtpClient
+{
+  Q_OBJECT
+
+public:
+  AQSmtpClient(QObject *parent = 0) : FLSmtpClient(parent) {}
+};
 
 class AQJasperEngine : public FLJasperEngine
 {
@@ -173,6 +182,7 @@ class AQSql : public QObject
   Q_ENUMS(Cardinality)
   Q_ENUMS(TableType)
   Q_ENUMS(SqlErrorType)
+  Q_ENUMS(Refresh)
 
 public:
   enum ModeAccess {
@@ -215,7 +225,24 @@ public:
     SqlErrorUnknown
   };
 
+  enum Refresh {
+    RefreshData = 1,
+    RefreshColumns = 2,
+    RefreshAll = 3
+  };
+
   AQSql() : QObject(0, "aqs_aqsql") {}
+
+  void throwError(const QString &msg, FLSqlDatabase *db) {
+    if (!db->qsaExceptions() || !globalAQSInterpreter) {
+      qWarning(msg);
+      return;
+    }
+    if (globalAQSInterpreter->isRunning())
+      globalAQSInterpreter->throwError(msg);
+    else
+      qWarning(msg);
+  }
 
 public slots:
   /**
@@ -231,12 +258,17 @@ public slots:
   @param host  Nombre o dirección del servidor de la base de datos
   @param port  Puerto TCP de conexion
   @param connectionName Nombre de la conexion
+    @param connectOptions Contiene opciones auxiliares de conexión a la base de datos.
+                        El formato de la cadena de opciones es una lista separada por punto y coma
+                        de nombres de opción o la opción = valor. Las opciones dependen del uso del
+                        driver de base de datos.
   @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
   */
   bool addDatabase(const QString &driverAlias, const QString &nameDB, const QString &user,
                    const QString &password, const QString &host, int port,
-                   const QString &connectionName) {
-    return FLSqlConnections::addDatabase(driverAlias, nameDB, user, password, host, port, connectionName);
+                   const QString &connectionName, const QString &connectOptions = QString::null) {
+    return FLSqlConnections::addDatabase(driverAlias, nameDB, user, password, host, port,
+                                         connectionName, connectOptions);
   }
 
   /**
@@ -317,11 +349,13 @@ public slots:
   */
   bool insert(FLSqlCursor *cur, const QStringList &fields,
               const QValueList<QVariant> &values) {
-    if (!cur) {
-      if (cur->lastError().type() != QSqlError::None) {
-        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                         cur->lastError().databaseText());
-      }
+    if (!cur)
+      return false;
+
+    if (!cur->metadata()) {
+      throwError(
+        tr("No hay metadatos para '%1'").arg(cur->QObject::name()), cur->db()
+      );
       return false;
     }
 
@@ -329,20 +363,27 @@ public slots:
     int valuesCount = values.size();
 
     cur->setModeAccess(Insert);
-    cur->refreshBuffer();
+    if (!cur->refreshBuffer())
+      return false;
     for (int i = 0; i < fieldsCount; ++i)
       cur->setValueBuffer(fields[i], (i < valuesCount ? values[i] : QVariant()));
 
-    bool ok = cur->commitBuffer();
-    if (!ok && cur->lastError().type() != QSqlError::None) {
-      globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                       cur->lastError().databaseText());
+    QString msgCheck(cur->msgCheckIntegrity());
+    if (!msgCheck.isEmpty()) {
+      throwError(msgCheck, cur->db());
+      return false;
     }
+
+    bool actCheck = cur->activatedCheckIntegrity();
+    cur->setActivatedCheckIntegrity(false);
+    bool ok = cur->commitBuffer();
+    cur->setActivatedCheckIntegrity(actCheck);
     return ok;
   }
 
   bool insert(const QString &table, const QStringList &fields,
-              const QValueList<QVariant> &values, const QString &connName = "default") {
+              const QValueList<QVariant> &values,
+              const QString &connName = "default") {
     AQSqlCursor cur(table, true, connName);
     return insert(&cur, fields, values);
   }
@@ -366,31 +407,46 @@ public slots:
   */
   bool update(FLSqlCursor *cur, const QStringList &fields,
               const QValueList<QVariant> &values, const QString &where = "") {
-    if (!cur || !cur->select(where)) {
-      if (cur->lastError().type() != QSqlError::None) {
-        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                         cur->lastError().databaseText());
-      }
+    if (!cur)
+      return false;
+
+    if (!cur->metadata()) {
+      throwError(
+        tr("No hay metadatos para '%1'").arg(cur->QObject::name()), cur->db()
+      );
       return false;
     }
 
+    if (!cur->select(where))
+      return false;
+
+    bool ok = true;
+    QString msgCheck;
+    bool actCheck = cur->activatedCheckIntegrity();
     int fieldsCount = fields.size();
     int valuesCount = values.size();
 
-    while (cur->next()) {
+    while (ok && cur->next()) {
       cur->setModeAccess(Edit);
-      cur->refreshBuffer();
+      if (!cur->refreshBuffer()) {
+        ok = false;
+        break;
+      }
       for (int i = 0; i < fieldsCount; ++i)
         cur->setValueBuffer(fields[i], (i < valuesCount ? values[i] : QVariant()));
-      if (!cur->commitBuffer()) {
-        if (cur->lastError().type() != QSqlError::None) {
-          globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                           cur->lastError().databaseText());
-        }
-        return false;
+
+      msgCheck = cur->msgCheckIntegrity();
+      if (!msgCheck.isEmpty()) {
+        ok = false;
+        throwError(msgCheck, cur->db());
+        break;
       }
+
+      cur->setActivatedCheckIntegrity(false);
+      ok = cur->commitBuffer();
+      cur->setActivatedCheckIntegrity(actCheck);
     }
-    return true;
+    return ok;
   }
 
   bool update(const QString &table, const QStringList &fields,
@@ -416,26 +472,42 @@ public slots:
   }
   */
   bool del(FLSqlCursor *cur, const QString &where = "") {
-    if (!cur || !cur->select(where)) {
-      if (cur->lastError().type() != QSqlError::None) {
-        globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                         cur->lastError().databaseText());
-      }
+    if (!cur)
+      return false;
+
+    if (!cur->metadata()) {
+      throwError(
+        tr("No hay metadatos para '%1'").arg(cur->QObject::name()), cur->db()
+      );
       return false;
     }
 
-    while (cur->next()) {
+    if (!cur->select(where))
+      return false;
+
+    bool ok = true;
+    QString msgCheck;
+    bool actCheck = cur->activatedCheckIntegrity();
+
+    while (ok && cur->next()) {
       cur->setModeAccess(Del);
-      cur->refreshBuffer();
-      if (!cur->commitBuffer()) {
-        if (cur->lastError().type() != QSqlError::None) {
-          globalAQSInterpreter->throwError(cur->lastError().driverText() + ":" +
-                                           cur->lastError().databaseText());
-        }
-        return false;
+      if (!cur->refreshBuffer()) {
+        ok = false;
+        break;
       }
+
+      msgCheck = cur->msgCheckIntegrity();
+      if (!msgCheck.isEmpty()) {
+        ok = false;
+        throwError(msgCheck, cur->db());
+        break;
+      }
+
+      cur->setActivatedCheckIntegrity(false);
+      ok = cur->commitBuffer();
+      cur->setActivatedCheckIntegrity(actCheck);
     }
-    return true;
+    return ok;
   }
 
   bool del(const QString &table, const QString &where = "",
@@ -500,13 +572,8 @@ public slots:
     qry.setWhere(where);
     qry.setOrderBy(orderBy);
     qry.setForwardOnly(true);
-    if (!qry.exec()) {
-      if (qry.lastError().type() != QSqlError::None) {
-        globalAQSInterpreter->throwError(qry.lastError().driverText() + ":" +
-                                         qry.lastError().databaseText());
-      }
+    if (!qry.exec())
       return QVariantList();
-    }
 
     QVariantList ret;
     int countFields = qry.fieldList().count();
@@ -550,13 +617,8 @@ public slots:
                  w + QString::fromLatin1(" FOR UPDATE NOWAIT") :
                  w + QString::fromLatin1(" FOR UPDATE"));
     qry.setForwardOnly(true);
-    if (!qry.exec()) {
-      if (qry.lastError().type() != QSqlError::None) {
-        globalAQSInterpreter->throwError(qry.lastError().driverText() + ":" +
-                                         qry.lastError().databaseText());
-      }
+    if (!qry.exec())
       return QVariantList();
-    }
 
     QVariantList ret;
     int countFields = qry.fieldList().count();

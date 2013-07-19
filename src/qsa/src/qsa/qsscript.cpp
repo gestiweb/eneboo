@@ -29,6 +29,17 @@
 #include "qsproject.h"
 #include "qsscript.h"
 
+#if defined (Q_OS_LINUX)
+#define AQ_ENABLE_SCRIPTCACHE
+#endif
+
+#ifdef AQ_ENABLE_SCRIPTCACHE
+#include "AQGlobal.h"
+extern AQ_EXPORT QString aqSha1(const QString &str);
+extern AQ_EXPORT bool aqDiskCacheFind(const QString &key, QString &str);
+extern AQ_EXPORT bool aqDiskCacheInsert(const QString &key, const QString &str);
+#endif
+
 /*!
   \class QSScript qsscript.h
 
@@ -93,7 +104,13 @@ QSScript::QSScript(QSProject *project,
   QObject(project, name.local8Bit())
 {
   d = new QSScriptPrivate;
+#ifndef AQ_ENABLE_SCRIPTCACHE
   d->code = code;
+#else
+  d->code = aqSha1(code);
+  aqDiskCacheInsert(d->code, code);
+#endif
+
   d->name = name;
   d->project = project;
 
@@ -102,7 +119,6 @@ QSScript::QSScript(QSProject *project,
     connect(context, SIGNAL(destroyed()),
             this, SLOT(objectDestroyed()));
   }
-  context_ = context;
 }
 
 /*!
@@ -129,7 +145,13 @@ QString QSScript::name() const
 */
 QString QSScript::code() const
 {
+#ifndef AQ_ENABLE_SCRIPTCACHE
   return d->code;
+#else
+  QString str;
+  aqDiskCacheFind(d->code, str);
+  return str;
+#endif
 }
 
 
@@ -140,13 +162,10 @@ QString QSScript::code() const
   The name of the context \c context()->name() is to be the same
   name as this script.
 */
-// ### AbanQ
-#if 0
 QObject *QSScript::context() const
 {
   return d->context;
 }
-#endif
 
 /*!
   \internal
@@ -156,7 +175,7 @@ void QSScript::setContext(QObject *context)
   Q_ASSERT(!d->context);
   connect(context, SIGNAL(destroyed()),
           this, SLOT(objectDestroyed()));
-  d->context = context_ = context;
+  d->context = context;
 }
 
 
@@ -175,7 +194,12 @@ QSProject *QSScript::project() const
 */
 void QSScript::setCode(const QString &code)
 {
+#ifndef AQ_ENABLE_SCRIPTCACHE
   d->code = code;
+#else
+  d->code = aqSha1(code);
+  aqDiskCacheInsert(d->code, code);
+#endif
   emit codeChanged();
 }
 
@@ -186,7 +210,14 @@ void QSScript::setCode(const QString &code)
 */
 void QSScript::addCode(const QString &code)
 {
+#ifndef AQ_ENABLE_SCRIPTCACHE
   d->code += code;
+#else
+  QString cod(this->code());
+  cod += code;
+  d->code = aqSha1(cod);
+  aqDiskCacheInsert(d->code, cod);
+#endif
   emit codeChanged();
 }
 
@@ -222,7 +253,14 @@ bool QSScript::addFunction(const QString &functionName,
   QString str = QString::fromLatin1("function %1()\n{\n%2\n}")
                 .arg(functionName)
                 .arg(functionBody);
+#ifndef AQ_ENABLE_SCRIPTCACHE
   d->code += str;
+#else
+  QString cod(this->code());
+  cod += str;
+  d->code = aqSha1(cod);
+  aqDiskCacheInsert(d->code, cod);
+#endif
   emit codeChanged();
   return TRUE;
 }
@@ -253,7 +291,7 @@ void QSScript::setBaseFileName(const QString &name)
 void QSScript::objectDestroyed()
 {
   const QObject *object = QObject::sender();
-  if (object == d->context) {
+  if (object == d->context && this) {
     delete this;
   }
 }

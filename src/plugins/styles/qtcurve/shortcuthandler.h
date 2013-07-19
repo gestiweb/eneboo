@@ -29,33 +29,35 @@ class QWidget;
 
 class ShortcutHandler : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    public:
-        
-    explicit ShortcutHandler(QObject *parent = 0);
-    virtual ~ShortcutHandler();
+public:
 
-    bool hasSeenAlt(const QWidget *widget) const; 
-    bool isAltDown() const { return itsAltDown; }
-    bool showShortcut(const QWidget *widget) const;
+  explicit ShortcutHandler(QObject *parent = 0);
+  virtual ~ShortcutHandler();
 
-    private slots:
+  bool hasSeenAlt(const QWidget *widget) const;
+  bool isAltDown() const {
+    return itsAltDown;
+  }
+  bool showShortcut(const QWidget *widget) const;
 
-    void widgetDestroyed(QObject *o);
+private slots:
 
-    protected:
+  void widgetDestroyed(QObject *o);
 
-    void updateWidget(QWidget *w);
-    void setSeenAlt(QWidget *w);
-    bool eventFilter(QObject *watched, QEvent *event);
+protected:
 
-    private:
+  void updateWidget(QWidget *w);
+  void setSeenAlt(QWidget *w);
+  bool eventFilter(QObject *watched, QEvent *event);
 
-    bool                  itsAltDown;
-    QValueList<QWidget *> itsSeenAlt,
-                          itsUpdated,
-                          itsOpenMenus;
+private:
+
+  bool                  itsAltDown;
+  QValueList<QWidget *> itsSeenAlt,
+             itsUpdated,
+             itsOpenMenus;
 
 };
 

@@ -127,3 +127,13 @@ bool AQS::UrlInfo_equal(AQSUrlInfo *i1, AQSUrlInfo *i2, int sortBy)
 {
   return (i1 && i2) ? QUrlInfo::equal(*i1, *i2, sortBy) : false;
 }
+
+void AQS::Application_postEvent(QObject *receiver, AQSEvent *event)
+{
+  QApplication::postEvent(receiver, *event);
+}
+
+void AQS::Application_sendEvent(QObject *receiver, AQSEvent *event)
+{
+  QApplication::sendEvent(receiver, *event);
+}

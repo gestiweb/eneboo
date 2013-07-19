@@ -3125,13 +3125,13 @@ void QApplication::postEvent(QObject *receiver, QEvent *event)
     delete event;
     return;
   }
-    if ( receiver->aqWasDeleted() ) {
+  if (receiver->aqWasDeleted()) {
 #if defined(QT_CHECK_NULL)
-	qWarning( "QApplication::postEvent: Unexpected posted event for an already deleted QObject" );
+    qWarning("QApplication::postEvent: Unexpected posted event for an already deleted QObject");
 #endif
-	delete event;
-	return;
-    }
+    delete event;
+    return;
+  }
 
 #ifdef QT_THREAD_SUPPORT
   QMutexLocker locker(postevent_mutex);
@@ -3391,6 +3391,28 @@ void QApplication::removePostedEvents(QObject *receiver)
   delete l;
 }
 
+// ### AbanQ
+bool QApplication::hasPostedEvent(QObject *receiver, int event_type)
+{
+  if (!receiver)
+    return false;
+#ifdef QT_THREAD_SUPPORT
+  QMutexLocker locker(postevent_mutex);
+#endif // QT_THREAD_SUPPORT
+  if (!receiver->postedEvents)
+    return false;
+
+  QPostEventList *l = receiver->postedEvents;
+  QPostEventListIt it(*l);
+  QPostEvent *pe;
+  while ((pe = it.current()) != 0) {
+    ++it;
+    if (pe->event && pe->event->type() == event_type)
+      return true;
+  }
+  return false;
+}
+// ###
 
 /*!
   Removes \a event from the queue of posted events, and emits a

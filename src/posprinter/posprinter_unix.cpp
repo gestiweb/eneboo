@@ -18,66 +18,77 @@ email                : mail@infosial.com
 
 #include "posprinter.h"
 #include "FLDiskCache.h"
+#include "FLApplication.h"
+
+void FLPosPrinter::setPrinterName(const QString &pName)
+{
+  if (pName == printerName_)
+    return;
+
+  printerName_ = pName;
+  parsePrinterName();
+}
 
 void FLPosPrinter::flush()
 {
-  if (!file)
-    initFile();
+  initFile();
 
-  QString fileName(AQ_DISKCACHE_DIRPATH + "/outposprinter.tmp");
+  QFile file(fileName_);
+
+  if (!file.open(IO_Raw | IO_WriteOnly)) {
+    qWarning(file.errorString());
+    return;
+  }
 
   for (int i = 0; i < idxBuffer; i++) {
     if (escBuffer && escBuffer->contains(i)) {
       const QString &esc = (*escBuffer)[i];
       for (int j = 0; j < esc.length(); j++)
-        file->putch(esc[j]);
+        file.putch(esc[j]);
     }
 
     if (strBuffer && strBuffer->contains(i))
-      file->putch((*strBuffer)[i]);
+      file.putch((*strBuffer)[i]);
   }
 
-  file->flush();
-  file->close();
+  file.flush();
+  file.close();
 
   if (printerName_.isNull())
-    printerName_ = "localhost:tpv";
-
-  int posdots = printerName_.find(":");
-  QString server = printerName_.left(posdots);
-  QString name = printerName_.right(printerName_.length() - posdots - 1);
+    setPrinterName("localhost:tpv");
 
 #ifdef AQ_LPR_EXTERNAL
   QProcess *proc = new QProcess();
 
   proc->addArgument("/usr/bin/lpr");
   proc->addArgument("-P");
-  proc->addArgument(printerName_);
-  proc->addArgument(fileName);
+  proc->addArgument(queueName_);
+  proc->addArgument(fileName_);
+
+  QString cmd("/usr/bin/lpr ");
+  cmd += "-P ";
+  cmd += queueName_ + " ";
+  cmd += fileName_;
+  if (aqApp->consoleShown())
+    qWarning(cmd);
 
   if (!proc->start())
-    qWarning("FLPosPrinter::flush() : Error escribiendo en impresora /usr/bin/lpr -P " + printerName_);
-
-  while (proc->isRunning())
-    qApp->processEvents();
-
+    qWarning("FLPosPrinter::flush() : Error escribiendo en impresora: " + cmd);
   qApp->processEvents();
-
   if (proc)
-    delete proc;
+    proc->deleteLater();
 #else
   int optc = 6;
   char *optv[optc];
 
   optv[0] = (char *) "-H";
-  optv[1] = (char *) server.latin1();
+  optv[1] = (char *) server_.latin1();
   optv[2] = (char *) "-P";
-  optv[3] = (char *) name.latin1();
+  optv[3] = (char *) queueName_.latin1();
   optv[4] = (char *) "-l";
-  optv[5] = (char *) fileName.latin1();
+  optv[5] = (char *) fileName_.latin1();
 
-  qWarning(fileName + server + name);
   if (lpr_main(optc, optv) != 0)
-    qWarning("FLPosPrinter::flush() : Error escribiendo en impresora /usr/bin/lpr -P " + printerName_);
+    qWarning("FLPosPrinter::flush() : Error ejecutando lpr_main");
 #endif
 }

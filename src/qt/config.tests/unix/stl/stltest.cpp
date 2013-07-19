@@ -8,6 +8,7 @@ templates for common STL container classes.
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cstddef>
 
 int main()
 {

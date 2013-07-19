@@ -69,10 +69,12 @@
 #include <qcstring.h>
 #include <qtextstream.h>
 
+#include "aqmailglobal.h"
+
 #define PART_VERSION       1
 #define PART_VERSION_TXT  "1"
 
-class MimePart
+class AQMAIL_EXPORT MimePart
 {
     friend QDataStream& operator>>(QDataStream &, MimePart &);
     friend QDataStream& operator<<(QDataStream &, MimePart &);
@@ -85,7 +87,11 @@ public:
 
     // fields
     QCString mimetype, name, cid, encoding, charset, type, embeddedPath;
+#if defined(AQ_WIN64)
+    int offset, length;
+#else
     long offset, length;
+#endif
     QCString version;
 };
 

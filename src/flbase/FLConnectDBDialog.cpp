@@ -137,17 +137,21 @@ void FLConnectDBDialog::tryConnect()
     error_ = true;
     delete db;
     this->accept();
-    return ;
+    return;
   }
   QString DBName = comboBoxNameDB->currentText();
+  QString connOpts;
+  if (db->driverName() == "FLQPSQL7")
+    connOpts = "connect_timeout=30";
   if (comboBoxDB->currentText() == "SQLite3") 
   	DBName = DBName + ".s3db";
   if (!db->connectDB(DBName, usuario,
-                     lineEditPassword->text(), host, puerto.toInt())) {
+                     lineEditPassword->text(), host, puerto.toInt(), 
+                     QString::fromLatin1("default"), connOpts)) {
     error_ = true;
     delete db;
     this->accept();
-    return ;
+    return;
   }
 
   // connectionPath_("%1");

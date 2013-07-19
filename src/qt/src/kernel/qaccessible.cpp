@@ -344,7 +344,7 @@ void AccessibleCache::removeObject(QObject *object)
 
     remove(object);
     if (!count()) {
-        delete this;
+        if (this) delete this;
         qAccessibleInterface = 0;
     }
 }

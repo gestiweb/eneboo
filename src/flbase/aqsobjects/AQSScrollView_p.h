@@ -56,6 +56,10 @@ public slots:
   QSize viewportSize(int, int) const;
   bool isHorizontalSliderPressed();
   bool isVerticalSliderPressed();
+  uint vScrollBarMode() const;
+  virtual void setVScrollBarMode(uint);
+  uint hScrollBarMode() const;
+  virtual void setHScrollBarMode(uint);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -195,6 +199,22 @@ inline bool AQSScrollView::isHorizontalSliderPressed()
 inline bool AQSScrollView::isVerticalSliderPressed()
 {
   AQ_CALL_RET_V(isVerticalSliderPressed(), bool);
+}
+inline uint AQSScrollView::vScrollBarMode() const
+{
+  AQ_CALL_RET_V(vScrollBarMode(), uint);
+}
+inline void AQSScrollView::setVScrollBarMode(uint arg0)
+{
+  AQ_CALL_VOID(setVScrollBarMode(static_cast<QScrollView::ScrollBarMode>(arg0)));
+}
+inline uint AQSScrollView::hScrollBarMode() const
+{
+  AQ_CALL_RET_V(hScrollBarMode(), uint);
+}
+inline void AQSScrollView::setHScrollBarMode(uint arg0)
+{
+  AQ_CALL_VOID(setHScrollBarMode(static_cast<QScrollView::ScrollBarMode>(arg0)));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

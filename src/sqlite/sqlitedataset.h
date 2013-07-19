@@ -33,30 +33,35 @@
 #include <dataset.h>
 #include <sqlite3.h>
 
-namespace dbiplus {
-/***************** Class SqliteDatabase definition ******************
+#include "aqsqliteglobal.h"
 
-       class 'SqliteDatabase' connects with Sqlite-server
+namespace dbiplus
+{
+  /***************** Class SqliteDatabase definition ******************
 
-******************************************************************/
+         class 'SqliteDatabase' connects with Sqlite-server
 
-class FL_EXPORT SqliteDatabase: public Database {
-protected:
-/* connect descriptor */
+  ******************************************************************/
+
+  class AQSQLITE_EXPORT SqliteDatabase: public Database
+  {
+  protected:
+    /* connect descriptor */
   sqlite3 *conn;
-  bool _in_transaction;
-  int last_err;
+    bool _in_transaction;
+    int last_err;
 
-public:
-/* default constructor */
-  SqliteDatabase();
-/* destructor */
-  ~SqliteDatabase();
+  public:
+    /* default constructor */
+    SqliteDatabase();
+    /* destructor */
+    ~SqliteDatabase();
 
-  Dataset *CreateDataset() const; 
+    Dataset *CreateDataset() const;
 
-/* func. returns connection handle with SQLite-server */
+    /* func. returns connection handle with SQLite-server */
   sqlite3 *getHandle() {  return conn; }
+  
 /* func. returns current status about SQLite-server connection */
   virtual int status();
   virtual int setErr(int err_code,const char * qry);
@@ -72,93 +77,96 @@ public:
 /* func. deletes database */
   virtual int drop();
 
-  virtual long nextid(const char* seq_name);
+    virtual long nextid(const char *seq_name);
 
-/* virtual methods for transaction */
+    /* virtual methods for transaction */
 
-  virtual void start_transaction();
-  virtual void commit_transaction();
-  virtual void rollback_transaction();
+    virtual void start_transaction();
+    virtual void commit_transaction();
+    virtual void rollback_transaction();
 
-  bool in_transaction() {return _in_transaction;}; 	
+    bool in_transaction() {
+      return _in_transaction;
+    };
 
-};
+  };
 
 
 
-/***************** Class SqliteDataset definition *******************
+  /***************** Class SqliteDataset definition *******************
 
-       class 'SqliteDataset' does a query to SQLite-server
+         class 'SqliteDataset' does a query to SQLite-server
 
-******************************************************************/
+  ******************************************************************/
 
-class FL_EXPORT SqliteDataset : public Dataset {
-protected:
-/* query results*/
-  result_set result;
-  result_set exec_res;
-  bool autorefresh;
-  char* errmsg;
-  
+  class AQSQLITE_EXPORT SqliteDataset : public Dataset
+  {
+  protected:
+    /* query results*/
+    result_set result;
+    result_set exec_res;
+    bool autorefresh;
+    char *errmsg;
+
   sqlite3* handle();
 
-/* Makes direct queries to database */
-  virtual void make_query(StringList &_sql);
-/* Makes direct inserts into database */
-  virtual void make_insert();
-/* Edit SQL */
-  virtual void make_edit();
-/* Delete SQL */
-  virtual void make_deletion();
+    /* Makes direct queries to database */
+    virtual void make_query(StringList &_sql);
+    /* Makes direct inserts into database */
+    virtual void make_insert();
+    /* Edit SQL */
+    virtual void make_edit();
+    /* Delete SQL */
+    virtual void make_deletion();
 
-  //static int sqlite_callback(void* res_ptr,int ncol, char** reslt, char** cols);
+    //static int sqlite_callback(void* res_ptr,int ncol, char** reslt, char** cols);
 
-/* This function works only with MySQL database
-  Filling the fields information from select statement */
-  virtual void fill_fields();
-/* Changing field values during dataset navigation */
+    /* This function works only with MySQL database
+      Filling the fields information from select statement */
+    virtual void fill_fields();
+    /* Changing field values during dataset navigation */
 
-public:
-/* constructor */
-  SqliteDataset();
-  SqliteDataset(SqliteDatabase *newDb);
+  public:
+    /* constructor */
+    SqliteDataset();
+    SqliteDataset(SqliteDatabase *newDb);
 
-/* destructor */
-  ~SqliteDataset();
+    /* destructor */
+    ~SqliteDataset();
 
-/* set autorefresh boolean value (if true - refresh the data after edit() 
-or insert() operations default = false) */
-  void set_autorefresh(bool val);
+    /* set autorefresh boolean value (if true - refresh the data after edit()
+    or insert() operations default = false) */
+    void set_autorefresh(bool val);
 
-/* opens a query  & then sets a query results */
-  virtual void open();
-  virtual void open(const string &sql);
-/* func. executes a query without results to return */
-  virtual int  exec ();
-  virtual int  exec (const string &sql);
-  virtual const void* getExecRes();
-/* as open, but with our query exept Sql */
-  virtual bool query(const char *query);
-  virtual bool query(const string &query);
-/* func. closes a query */
-  virtual void close(void);
-/* Cancel changes, made in insert or edit states of dataset */
-  virtual void cancel();
-/* sequence numbers */
-  virtual long nextid(const char *seq_name);
-/* sequence numbers */
-  virtual int num_rows();
+    /* opens a query  & then sets a query results */
+    virtual void open();
+    virtual void open(const string &sql);
+    /* func. executes a query without results to return */
+    virtual int  exec();
+    virtual int  exec(const string &sql);
+    virtual const void *getExecRes();
+    /* as open, but with our query exept Sql */
+    virtual bool query(const char *query);
+    virtual bool query(const string &query);
+    /* func. closes a query */
+    virtual void close(void);
+    /* Cancel changes, made in insert or edit states of dataset */
+    virtual void cancel();
+    /* sequence numbers */
+    virtual long nextid(const char *seq_name);
+    /* sequence numbers */
+    virtual int num_rows();
 
-  virtual bool bof();
-  virtual bool eof();
-  virtual void first();
-  virtual void last();
-  virtual void prev();
-  virtual void next();
-/* Go to record No (starting with 0) */
-  virtual bool seek(int pos=0);
+    virtual bool bof();
+    virtual bool eof();
+    virtual void first();
+    virtual void last();
+    virtual void prev();
+    virtual void next();
+    /* Go to record No (starting with 0) */
+    virtual bool seek(int pos = 0);
 
 
-};
+  };
 } //namespace
 #endif

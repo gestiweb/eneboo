@@ -13,10 +13,8 @@ CONFIG -= x11 qt
 win32 {
 	CONFIG += dll
 	DLLDESTDIR = $$PREFIX/bin
-	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm -lws2_32
+	LIBS = -L$$PREFIX/lib -lm -lws2_32
 }
-else {
-        LIBS += -lz 
 }
 
 mac {
@@ -28,6 +26,11 @@ DESTDIR = $$PREFIX/lib
 
 DEFINES += HAVE_CONFIG_H 
 win32:DEFINES += IN_LIBXML
+
+mac {
+	DEFINES += _REENTRANT
+	LIBS += -liconv
+}
 
 INCLUDEPATH +=  $$ROOT/src/libdigidoc/libxml2 $$ROOT/src/libdigidoc/libxml2/include $$ROOT/src/libdigidoc/libxml2/libxml
 QMAKE_LIBS_X11SM =
@@ -142,3 +145,5 @@ SOURCES += c14n.c \
            xpath.c \
            xpointer.c
            
+mac:QMAKE_CFLAGS += -fno-common
+mac:QMAKE_CXXFLAGS += -fno-common

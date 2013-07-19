@@ -84,7 +84,9 @@
 #include <qstring.h>
 #include <qdatastream.h>
 
-class FL_EXPORT DateClass
+#include "aqmailglobal.h"
+
+class AQMAIL_EXPORT DateClass
 {
     friend QTextStream& operator<<(QTextStream &, const DateClass &);
     friend QDataStream& operator<<(QDataStream &, const DateClass &);

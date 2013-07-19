@@ -1,12 +1,12 @@
 /*
  * $Id$
- * 
+ *
  * KStyle
  * Copyright (C) 2001-2002 Karol Szwed <gallium@kde.org>
- * 
+ *
  * QWindowsStyle CC_ListView and style images were kindly donated by TrollTech,
  * Copyright (C) 1998-2000 TrollTech AS.
- * 
+ *
  * Many thanks to Bradley T. Hughes for the 3 button scrollbar code.
  *
  * This library is free software; you can redistribute it and/or
@@ -35,9 +35,9 @@
 #include <qcommonstyle.h>
 
 struct QtCKStylePrivate;
-/** 
+/**
  * Simplifies and extends the QStyle API to make style coding easier.
- *  
+ *
  * The KStyle class provides a simple internal menu transparency engine
  * which attempts to use XRender for accelerated blending where requested,
  * or falls back to fast internal software tinting/blending routines.
@@ -52,270 +52,270 @@ struct QtCKStylePrivate;
  */
 class QtCKStyle: public QCommonStyle
 {
-	Q_OBJECT
+  Q_OBJECT
 
-	public:
+public:
 
-		/**
-		 * QtCKStyle Flags:
-		 * 
-		 * @li Default - Default style setting, where menu transparency
-		 * and the FilledFrameWorkaround are disabled.
-		 * 
-		 * @li AllowMenuTransparency - Enable this flag to use QtCKStyle's
-		 * internal menu transparency engine.
-		 * 
-		 * @li FilledFrameWorkaround - Enable this flag to facilitate 
-		 * proper repaints of QMenuBars and QToolBars when the style chooses 
-		 * to paint the interior of a QFrame. The style primitives in question 
-		 * are PE_PanelMenuBar and PE_PanelDockWindow. The HighColor style uses
-		 * this workaround to enable painting of gradients in menubars and 
-		 * toolbars.
-		 */
-		typedef uint KStyleFlags;
-		enum KStyleOption {
-			Default 	      =		0x00000000, //!< All options disabled
-			AllowMenuTransparency =		0x00000001, //!< Internal transparency enabled
-			FilledFrameWorkaround = 	0x00000002  //!< Filled frames enabled
-		};
+  /**
+   * QtCKStyle Flags:
+   *
+   * @li Default - Default style setting, where menu transparency
+   * and the FilledFrameWorkaround are disabled.
+   *
+   * @li AllowMenuTransparency - Enable this flag to use QtCKStyle's
+   * internal menu transparency engine.
+   *
+   * @li FilledFrameWorkaround - Enable this flag to facilitate
+   * proper repaints of QMenuBars and QToolBars when the style chooses
+   * to paint the interior of a QFrame. The style primitives in question
+   * are PE_PanelMenuBar and PE_PanelDockWindow. The HighColor style uses
+   * this workaround to enable painting of gradients in menubars and
+   * toolbars.
+   */
+  typedef uint KStyleFlags;
+  enum KStyleOption {
+    Default         =   0x00000000, //!< All options disabled
+    AllowMenuTransparency =   0x00000001, //!< Internal transparency enabled
+    FilledFrameWorkaround =   0x00000002  //!< Filled frames enabled
+  };
 
-		/**
-		 * KStyle ScrollBarType:
-		 *
-		 * Allows the style writer to easily select what type of scrollbar
-		 * should be used without having to duplicate large amounts of source
-		 * code by implementing the complex control CC_ScrollBar.
-		 *
-		 * @li WindowsStyleScrollBar - Two button scrollbar with the previous
-		 * button at the top/left, and the next button at the bottom/right.
-		 *
-		 * @li PlatinumStyleScrollBar - Two button scrollbar with both the 
-		 * previous and next buttons at the bottom/right.
-		 *
-		 * @li ThreeButtonScrollBar - %KDE style three button scrollbar with
-		 * two previous buttons, and one next button. The next button is always
-		 * at the bottom/right, whilst the two previous buttons are on either 
-		 * end of the scrollbar.
-		 *
-		 * @li NextStyleScrollBar - Similar to the PlatinumStyle scroll bar, but
-		 * with the buttons grouped on the opposite end of the scrollbar.
-		 *
-		 * @see KStyle::KStyle()
-		 */
-		enum KStyleScrollBarType {
-			WindowsStyleScrollBar  = 	0x00000000, //!< two button, windows style
-			PlatinumStyleScrollBar = 	0x00000001, //!< two button, platinum style
-			ThreeButtonScrollBar   = 	0x00000002, //!< three buttons, %KDE style
-			NextStyleScrollBar     = 	0x00000004  //!< two button, NeXT style
-		};
+  /**
+   * KStyle ScrollBarType:
+   *
+   * Allows the style writer to easily select what type of scrollbar
+   * should be used without having to duplicate large amounts of source
+   * code by implementing the complex control CC_ScrollBar.
+   *
+   * @li WindowsStyleScrollBar - Two button scrollbar with the previous
+   * button at the top/left, and the next button at the bottom/right.
+   *
+   * @li PlatinumStyleScrollBar - Two button scrollbar with both the
+   * previous and next buttons at the bottom/right.
+   *
+   * @li ThreeButtonScrollBar - %KDE style three button scrollbar with
+   * two previous buttons, and one next button. The next button is always
+   * at the bottom/right, whilst the two previous buttons are on either
+   * end of the scrollbar.
+   *
+   * @li NextStyleScrollBar - Similar to the PlatinumStyle scroll bar, but
+   * with the buttons grouped on the opposite end of the scrollbar.
+   *
+   * @see KStyle::KStyle()
+   */
+  enum KStyleScrollBarType {
+    WindowsStyleScrollBar  =  0x00000000, //!< two button, windows style
+    PlatinumStyleScrollBar =  0x00000001, //!< two button, platinum style
+    ThreeButtonScrollBar   =  0x00000002, //!< three buttons, %KDE style
+    NextStyleScrollBar     =  0x00000004  //!< two button, NeXT style
+  };
 
-		/** 
-		 * Constructs a KStyle object.
-		 *
-		 * Select the appropriate KStyle flags and scrollbar type
-		 * for your style. The user's style preferences selected in KControl
-		 * are read by using QSettings and are automatically applied to the style.
-		 * As a fallback, KStyle paints progressbars and tabbars. It inherits from
-		 * QCommonStyle for speed, so don't expect much to be implemented. 
-		 *
-		 * It is advisable to use a currently implemented style such as the HighColor
-		 * style as a foundation for any new KStyle, so the limited number of
-		 * drawing fallbacks should not prove problematic.
-		 *
-		 * @param flags the style to be applied
-		 * @param sbtype the scroll bar type
-		 * @see KStyle::KStyleFlags
-		 * @see KStyle::KStyleScrollBarType
-		 * @author Karol Szwed (gallium@kde.org)
-		 */
-		QtCKStyle( KStyleFlags flags = QtCKStyle::Default,
-			KStyleScrollBarType sbtype = QtCKStyle::WindowsStyleScrollBar );
+  /**
+   * Constructs a KStyle object.
+   *
+   * Select the appropriate KStyle flags and scrollbar type
+   * for your style. The user's style preferences selected in KControl
+   * are read by using QSettings and are automatically applied to the style.
+   * As a fallback, KStyle paints progressbars and tabbars. It inherits from
+   * QCommonStyle for speed, so don't expect much to be implemented.
+   *
+   * It is advisable to use a currently implemented style such as the HighColor
+   * style as a foundation for any new KStyle, so the limited number of
+   * drawing fallbacks should not prove problematic.
+   *
+   * @param flags the style to be applied
+   * @param sbtype the scroll bar type
+   * @see KStyle::KStyleFlags
+   * @see KStyle::KStyleScrollBarType
+   * @author Karol Szwed (gallium@kde.org)
+   */
+  QtCKStyle(KStyleFlags flags = QtCKStyle::Default,
+            KStyleScrollBarType sbtype = QtCKStyle::WindowsStyleScrollBar);
 
-		/** 
-		 * Destructs the QtCKStyle object.
-		 */
-		~QtCKStyle();
+  /**
+   * Destructs the QtCKStyle object.
+   */
+  ~QtCKStyle();
 
-		/**
-		 * Returns the default widget style depending on color depth.
-		 */
-		static QString defaultStyle();
+  /**
+   * Returns the default widget style depending on color depth.
+   */
+  static QString defaultStyle();
 
-		/**
-		 * Modifies the scrollbar type used by the style.
-		 * 
-		 * This function is only provided for convenience. It allows
-		 * you to make a late decision about what scrollbar type to use for the
-		 * style after performing some processing in your style's constructor.
-		 * In most situations however, setting the scrollbar type via the QtCKStyle
-		 * constructor should suffice.
-		 * @param sbtype the scroll bar type
-		 * @see QtCKStyle::KStyleScrollBarType
-		 */
-		void setScrollBarType(KStyleScrollBarType sbtype);
+  /**
+   * Modifies the scrollbar type used by the style.
+   *
+   * This function is only provided for convenience. It allows
+   * you to make a late decision about what scrollbar type to use for the
+   * style after performing some processing in your style's constructor.
+   * In most situations however, setting the scrollbar type via the QtCKStyle
+   * constructor should suffice.
+   * @param sbtype the scroll bar type
+   * @see QtCKStyle::KStyleScrollBarType
+   */
+  void setScrollBarType(KStyleScrollBarType sbtype);
 
-		/**
-		 * Returns the KStyle flags used to initialize the style.
-		 *
-		 * This is used solely for the kcmstyle module, and hence is internal.
-		 */
-		KStyleFlags styleFlags() const;
+  /**
+   * Returns the KStyle flags used to initialize the style.
+   *
+   * This is used solely for the kcmstyle module, and hence is internal.
+   */
+  KStyleFlags styleFlags() const;
 
-		/**
-		 * KStyle Primitive Elements:
-		 *
-		 * The KStyle class extends the Qt's Style API by providing certain 
-		 * simplifications for parts of QStyle. To do this, the KStylePrimitive
-		 * elements were defined, which are very similar to Qt's PrimitiveElement.
-		 * 
-		 * The first three Handle primitives simplify and extend PE_DockWindowHandle, 
-		 * so do not reimplement PE_DockWindowHandle if you want the KStyle handle 
-		 * simplifications to be operable. Similarly do not reimplement CC_Slider,
-		 * SC_SliderGroove and SC_SliderHandle when using the KStyle slider
-		 * primitives. KStyle automatically double-buffers slider painting
-		 * when they are drawn via these KStyle primitives to avoid flicker.
-		 *
-		 * @li KPE_DockWindowHandle - This primitive is already implemented in KStyle,
-		 * and paints a bevelled rect with the DockWindow caption text. Re-implement
-		 * this primitive to perform other more fancy effects when drawing the dock window
-		 * handle.
-		 *
-		 * @li KPE_ToolBarHandle - This primitive must be reimplemented. It currently
-		 * only paints a filled rectangle as default behavior. This primitive is used
-		 * to render QToolBar handles.
-		 *
-		 * @li KPE_GeneralHandle - This primitive must be reimplemented. It is used
-		 * to render general handles that are not part of a QToolBar or QDockWindow, such
-		 * as the applet handles used in Kicker. The default implementation paints a filled
-		 * rect of arbitrary color.
-		 *
-		 * @li KPE_SliderGroove - This primitive must be reimplemented. It is used to 
-		 * paint the slider groove. The default implementation paints a filled rect of
-		 * arbitrary color.
-		 *
-		 * @li KPE_SliderHandle - This primitive must be reimplemented. It is used to
-		 * paint the slider handle. The default implementation paints a filled rect of
-		 * arbitrary color.
-		 *
-		 * @li KPE_ListViewExpander - This primitive is already implemented in KStyle. It
-		 * is used to draw the Expand/Collapse element in QListViews. To indicate the 
-		 * expanded state, the style flags are set to Style_Off, while Style_On implies collapsed.
-		 *
-		 * @li KPE_ListViewBranch - This primitive is already implemented in KStyle. It is
-		 * used to draw the ListView branches where necessary.
-		 */
-		enum KStylePrimitive {
-			KPE_DockWindowHandle,
-			KPE_ToolBarHandle,
-			KPE_GeneralHandle,
+  /**
+   * KStyle Primitive Elements:
+   *
+   * The KStyle class extends the Qt's Style API by providing certain
+   * simplifications for parts of QStyle. To do this, the KStylePrimitive
+   * elements were defined, which are very similar to Qt's PrimitiveElement.
+   *
+   * The first three Handle primitives simplify and extend PE_DockWindowHandle,
+   * so do not reimplement PE_DockWindowHandle if you want the KStyle handle
+   * simplifications to be operable. Similarly do not reimplement CC_Slider,
+   * SC_SliderGroove and SC_SliderHandle when using the KStyle slider
+   * primitives. KStyle automatically double-buffers slider painting
+   * when they are drawn via these KStyle primitives to avoid flicker.
+   *
+   * @li KPE_DockWindowHandle - This primitive is already implemented in KStyle,
+   * and paints a bevelled rect with the DockWindow caption text. Re-implement
+   * this primitive to perform other more fancy effects when drawing the dock window
+   * handle.
+   *
+   * @li KPE_ToolBarHandle - This primitive must be reimplemented. It currently
+   * only paints a filled rectangle as default behavior. This primitive is used
+   * to render QToolBar handles.
+   *
+   * @li KPE_GeneralHandle - This primitive must be reimplemented. It is used
+   * to render general handles that are not part of a QToolBar or QDockWindow, such
+   * as the applet handles used in Kicker. The default implementation paints a filled
+   * rect of arbitrary color.
+   *
+   * @li KPE_SliderGroove - This primitive must be reimplemented. It is used to
+   * paint the slider groove. The default implementation paints a filled rect of
+   * arbitrary color.
+   *
+   * @li KPE_SliderHandle - This primitive must be reimplemented. It is used to
+   * paint the slider handle. The default implementation paints a filled rect of
+   * arbitrary color.
+   *
+   * @li KPE_ListViewExpander - This primitive is already implemented in KStyle. It
+   * is used to draw the Expand/Collapse element in QListViews. To indicate the
+   * expanded state, the style flags are set to Style_Off, while Style_On implies collapsed.
+   *
+   * @li KPE_ListViewBranch - This primitive is already implemented in KStyle. It is
+   * used to draw the ListView branches where necessary.
+   */
+  enum KStylePrimitive {
+    KPE_DockWindowHandle,
+    KPE_ToolBarHandle,
+    KPE_GeneralHandle,
 
-			KPE_SliderGroove,
-			KPE_SliderHandle,
+    KPE_SliderGroove,
+    KPE_SliderHandle,
 
-			KPE_ListViewExpander,
-			KPE_ListViewBranch
-		};
+    KPE_ListViewExpander,
+    KPE_ListViewBranch
+  };
 
-		/**
-		 * This function is identical to Qt's QStyle::drawPrimitive(), except that 
-		 * it adds one further parameter, 'widget', that can be used to determine 
-		 * the widget state of the KStylePrimitive in question.
-		 *
-		 * @see KStyle::KStylePrimitive
-		 * @see QStyle::drawPrimitive
-		 * @see QStyle::drawComplexControl
-		 */
-		virtual void drawKStylePrimitive( KStylePrimitive kpe,
-					QPainter* p,
-					const QWidget* widget,
-					const QRect &r,
-					const QColorGroup &cg,
-					SFlags flags = Style_Default,
-					const QStyleOption& = QStyleOption::Default ) const;
+  /**
+   * This function is identical to Qt's QStyle::drawPrimitive(), except that
+   * it adds one further parameter, 'widget', that can be used to determine
+   * the widget state of the KStylePrimitive in question.
+   *
+   * @see KStyle::KStylePrimitive
+   * @see QStyle::drawPrimitive
+   * @see QStyle::drawComplexControl
+   */
+  virtual void drawKStylePrimitive(KStylePrimitive kpe,
+                                   QPainter *p,
+                                   const QWidget *widget,
+                                   const QRect &r,
+                                   const QColorGroup &cg,
+                                   SFlags flags = Style_Default,
+                                   const QStyleOption& = QStyleOption::Default) const;
 
 
-		enum KStylePixelMetric {
-			KPM_MenuItemSeparatorHeight		= 0x00000001,
-			KPM_MenuItemHMargin			= 0x00000002,
-			KPM_MenuItemVMargin			= 0x00000004,
-			KPM_MenuItemHFrame			= 0x00000008,
-			KPM_MenuItemVFrame			= 0x00000010,
-			KPM_MenuItemCheckMarkHMargin	        = 0x00000020,
-			KPM_MenuItemArrowHMargin		= 0x00000040,
-			KPM_MenuItemTabSpacing			= 0x00000080,
-			KPM_ListViewBranchThickness		= 0x00000100
-		};
+  enum KStylePixelMetric {
+    KPM_MenuItemSeparatorHeight   = 0x00000001,
+    KPM_MenuItemHMargin     = 0x00000002,
+    KPM_MenuItemVMargin     = 0x00000004,
+    KPM_MenuItemHFrame      = 0x00000008,
+    KPM_MenuItemVFrame      = 0x00000010,
+    KPM_MenuItemCheckMarkHMargin          = 0x00000020,
+    KPM_MenuItemArrowHMargin    = 0x00000040,
+    KPM_MenuItemTabSpacing      = 0x00000080,
+    KPM_ListViewBranchThickness   = 0x00000100
+  };
 
-		int kPixelMetric( KStylePixelMetric kpm, const QWidget* widget = 0 ) const;
+  int kPixelMetric(KStylePixelMetric kpm, const QWidget *widget = 0) const;
 
-		// ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
-		void polish( QWidget* widget );
-		void unPolish( QWidget* widget );
-		void polishPopupMenu( QPopupMenu* );
+  void polish(QWidget *widget);
+  void unPolish(QWidget *widget);
+  void polishPopupMenu(QPopupMenu *);
 
-		void drawPrimitive( PrimitiveElement pe,
-					QPainter* p,
-					const QRect &r,
-					const QColorGroup &cg,
-					SFlags flags = Style_Default,
-					const QStyleOption& = QStyleOption::Default ) const;
+  void drawPrimitive(PrimitiveElement pe,
+                     QPainter *p,
+                     const QRect &r,
+                     const QColorGroup &cg,
+                     SFlags flags = Style_Default,
+                     const QStyleOption& = QStyleOption::Default) const;
 
-		void drawControl( ControlElement element,
-					QPainter* p,
-					const QWidget* widget,
-					const QRect &r,
-					const QColorGroup &cg,
-					SFlags flags = Style_Default,
-					const QStyleOption& = QStyleOption::Default ) const;
+  void drawControl(ControlElement element,
+                   QPainter *p,
+                   const QWidget *widget,
+                   const QRect &r,
+                   const QColorGroup &cg,
+                   SFlags flags = Style_Default,
+                   const QStyleOption& = QStyleOption::Default) const;
 
-		void drawComplexControl( ComplexControl control,
-					QPainter *p,
-					const QWidget* widget,
-					const QRect &r,
-					const QColorGroup &cg,
-					SFlags flags = Style_Default,
-					SCFlags controls = SC_All,
-					SCFlags active = SC_None,
-					const QStyleOption& = QStyleOption::Default ) const;
+  void drawComplexControl(ComplexControl control,
+                          QPainter *p,
+                          const QWidget *widget,
+                          const QRect &r,
+                          const QColorGroup &cg,
+                          SFlags flags = Style_Default,
+                          SCFlags controls = SC_All,
+                          SCFlags active = SC_None,
+                          const QStyleOption& = QStyleOption::Default) const;
 
-		SubControl querySubControl( ComplexControl control,
-					const QWidget* widget,
-					const QPoint &pos,
-					const QStyleOption& = QStyleOption::Default ) const;
+  SubControl querySubControl(ComplexControl control,
+                             const QWidget *widget,
+                             const QPoint &pos,
+                             const QStyleOption& = QStyleOption::Default) const;
 
-		QRect querySubControlMetrics( ComplexControl control,
-					const QWidget* widget,
-					SubControl sc,
-					const QStyleOption& = QStyleOption::Default ) const;
+  QRect querySubControlMetrics(ComplexControl control,
+                               const QWidget *widget,
+                               SubControl sc,
+                               const QStyleOption& = QStyleOption::Default) const;
 
-		int pixelMetric( PixelMetric m, 
-					const QWidget* widget = 0 ) const;
+  int pixelMetric(PixelMetric m,
+                  const QWidget *widget = 0) const;
 
-		QRect subRect( SubRect r, 
-					const QWidget* widget ) const;
+  QRect subRect(SubRect r,
+                const QWidget *widget) const;
 
-		QPixmap stylePixmap( StylePixmap stylepixmap,
-					const QWidget* widget = 0,
-					const QStyleOption& = QStyleOption::Default ) const;
+  QPixmap stylePixmap(StylePixmap stylepixmap,
+                      const QWidget *widget = 0,
+                      const QStyleOption& = QStyleOption::Default) const;
 
-		int styleHint( StyleHint sh, 
-					const QWidget* w = 0,
-					const QStyleOption &opt = QStyleOption::Default,
-					QStyleHintReturn* shr = 0 ) const;
+  int styleHint(StyleHint sh,
+                const QWidget *w = 0,
+                const QStyleOption &opt = QStyleOption::Default,
+                QStyleHintReturn *shr = 0) const;
 
-	protected:
-		bool eventFilter( QObject* object, QEvent* event );
+protected:
+  bool eventFilter(QObject *object, QEvent *event);
 
-	private:
-		// Disable copy constructor and = operator
-		QtCKStyle( const QtCKStyle & );
-		QtCKStyle& operator=( const QtCKStyle & );
+private:
+  // Disable copy constructor and = operator
+  QtCKStyle(const QtCKStyle &);
+  QtCKStyle &operator=(const QtCKStyle &);
 
-	protected:
-		virtual void virtual_hook( int id, void* data );
-	private:
-		QtCKStylePrivate *d;
+protected:
+  virtual void virtual_hook(int id, void *data);
+private:
+  QtCKStylePrivate *d;
 };
 
 

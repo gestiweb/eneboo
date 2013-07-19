@@ -18,7 +18,6 @@
 #ifndef QSQLITE_H
 #define QSQLITE_H
 
-#include <qsqlresult.h>
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qdir.h>
@@ -49,12 +48,12 @@ public:
 
   SqliteDriver(QObject *parent = 0, const char *name = 0);
   ~SqliteDriver();
-  bool open(const QString &db, 
+  bool open(const QString &db,
             const QString &user = QString::null,
             const QString &password = QString::null,
             const QString &host = QString::null,
             int port = -1);
-  bool open(const QString &db, const QString &user, 
+  bool open(const QString &db, const QString &user,
             const QString &password, const QString &host,
             int port, const QString &connOpts);
   void close();
@@ -77,7 +76,7 @@ public:
                   const QString &password = QString::null,
                   const QString &host = QString::null,
                   int port = -1);
-  QString sqlCreateTable(FLTableMetaData *tmd);
+  QString sqlCreateTable(const FLTableMetaData *tmd);
   QString formatValueLike(int t, const QVariant &v, const bool upper = false);
   QString formatValue(int t, const QVariant &v, const bool upper = false);
   QVariant nextSerialVal(const QString &table, const QString &field);
@@ -88,6 +87,7 @@ private:
 
   QSqlIndex primaryIndex2(const QString &tablename) const;
   QSqlRecord record2(const QString &tablename) const;
+  QSqlRecord record(const FLTableMetaData *mtd) const;
   QSqlRecordInfo recordInfo2(const QString &tablename) const;
   SqliteDatabase *dataBase_;
 };
@@ -116,6 +116,8 @@ private:
   QString query;
   const SqliteDriver *driver;
   Dataset *dataSet;
+
+  friend class SqliteDriver;
 };
 
 #endif

@@ -37,7 +37,9 @@
 // IMPERATIVE that this line appear before any files get included.
 
 #undef __GXX_WEAK__ 
+#ifndef AQ_WIN64
 #undef _WIN32
+#endif
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -90,7 +92,9 @@ namespace Hoard {
 
 }
 
+#ifndef AQ_WIN64
 #undef _WIN32
+#endif
 
 #include "ansiwrapper.h"
 #include "cpuinfo.h"
@@ -155,7 +159,9 @@ inline static HoardHeapType * getMainHoardHeap (void) {
   return th;
 }
 
+#ifndef AQ_WIN64
 #undef _WIN32
+#endif
 
 #include "tls.cpp"
 

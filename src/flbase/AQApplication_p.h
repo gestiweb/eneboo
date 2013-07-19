@@ -24,12 +24,14 @@ class AQApplicationPrivate
 public:
   AQApplicationPrivate() :
     oldApi_(true),
-    aqAppScript_(0)
+    aqAppScript_(0),
+    proxyDesktop_(0)
   {}
 
   bool oldApi_;
   QSScript *aqAppScript_;
   QObject *aqAppScriptObject_;
+  QWidget *proxyDesktop_;
 };
 
 #endif /* AQAPPLICATION_P_H_ */

@@ -378,7 +378,7 @@ public:
   QPicture *onPage();
   void setOnPage(QPicture *page);
 
-  QString csvData() const;
+  QString csvData();
 
   void setIdSec(uint id) {
     idSec_ = id;
@@ -408,7 +408,6 @@ private:
   int lastYOffset;
   uint lastPageIndex;
   QPicture *onPage_;
-  QString csvData_;
 
   uint idSec_;
   static uint idSecGlob_;
@@ -522,11 +521,6 @@ inline void MReportSection::setPrintFrequency(int printFrequency)
 inline int MReportSection::printFrequency()
 {
   return frequency;
-}
-
-inline QString MReportSection::csvData() const
-{
-  return csvData_;
 }
 
 inline int MReportSection::getLastXOffset() const

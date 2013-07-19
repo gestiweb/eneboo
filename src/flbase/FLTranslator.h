@@ -23,9 +23,11 @@ email                : mail@infosial.com
 #include <qstring.h>
 #include <qfile.h>
 
+#include "AQGlobal.h"
+
 class FLApplication;
 
-class FL_EXPORT FLTranslator : public QTranslator
+class AQ_EXPORT FLTranslator : public QTranslator
 {
 
   Q_OBJECT

@@ -2373,8 +2373,12 @@ bool QETWidget::translateKeyEvent( MSG msg, bool grab )
                         parent = GetParent(parent);
                     }
                 }
-                if (store)
+                if (store) {
                     store_key_rec( msg.wParam, a, state, text );
+                    // ### AbanQ
+                    if (code == Qt::Key_F10)
+                      return true;
+                }
             }
         } else {
             // Must be KEYUP
@@ -2390,6 +2394,9 @@ bool QETWidget::translateKeyEvent( MSG msg, bool grab )
 
                 k0 = sendKeyEvent(msg, QEvent::KeyRelease, code, rec->ascii, state, grab, rec->text);
 
+                // ### AbanQ
+                if (t == WM_SYSKEYDOWN && code == Qt::Key_F10)
+                  return true;
                 // don't pass Alt to Windows unless we are embedded in a non-Qt window
                 if ( code == Qt::Key_Alt ) {
                     k0 = true;

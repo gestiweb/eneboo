@@ -118,6 +118,9 @@ public slots:
   void commitEditorContents();
   void revertEditorContents();
 
+  // ### AbanQ
+  void evaluate();
+
 signals:
   void editorTextChanged();
   void projectChanged();
@@ -127,7 +130,8 @@ private slots:
   void objectDestroyed();
   void invalidateProject();
   void scriptChanged();
-  void evaluate();
+  // ### AbanQ
+  //void evaluate();
 
 private:
   // disabled copy constructor and assignment operator

@@ -142,10 +142,10 @@ void MFieldObject::setText(const QString txt)
             pixmap->load(txt);
           else
             pixmap->loadFromData(cs);
+          if (!pixmap->isNull())
+            QPixmapCache::insert(cs.left(100), *pixmap);
         }
-        if (!pixmap->isNull()) {
-          QPixmapCache::insert(cs.left(100), *pixmap);
-        } else {
+        if (pixmap->isNull()) {
           delete pixmap;
           pixmap = 0;
         }
@@ -287,4 +287,9 @@ void MFieldObject::copy(const MFieldObject *mFieldObject)
   blankZero = mFieldObject->blankZero;
   codbarType = mFieldObject->codbarType;
   codbarRes = mFieldObject->codbarRes;
+}
+
+int MFieldObject::RTTI() const
+{
+  return MReportObject::Field;
 }

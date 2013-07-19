@@ -172,6 +172,12 @@ public:
   void setTimeoutInterval(int msecs);
   int timeoutInterval() const;
 
+  // ### AbanQ
+  /** Ver propiedad d->interactiveGUI_ */
+  bool interactiveGUI() const;
+  void setInteractiveGUI(bool on = true);
+  // ### AbanQ
+
 public slots:
   void clear();
   void stopExecution();

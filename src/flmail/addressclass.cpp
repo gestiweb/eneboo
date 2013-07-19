@@ -206,9 +206,9 @@ QCString AddressClass::getOriginalAddress() const
     }
 
     if ( !email.isEmpty() ) {
-        t.append("<");
+        //t.append("<");
         t.append(email);
-        t.append(">");
+        //t.append(">");
     }
 
     return t;

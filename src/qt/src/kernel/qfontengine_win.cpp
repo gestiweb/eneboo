@@ -54,8 +54,15 @@ typedef unsigned short  quint16;
 typedef unsigned int    quint32;
 
 /* needed for dynamic loading ... */
+#ifndef _WIN64
 static BOOL ( WINAPI * qtGetWorldTransform ) ( HDC hdc, LPXFORM lpXform  ) = NULL;
 static BOOL ( WINAPI * qtSetWorldTransform ) ( HDC hdc, CONST XFORM *lpXform ) = NULL;
+#else
+typedef BOOL (WINAPI *gWFunc)(HDC, LPXFORM);
+typedef BOOL (WINAPI *sWFunc)(HDC, CONST XFORM *);
+static gWFunc qtGetWorldTransform = NULL;
+static sWFunc qtSetWorldTransform = NULL;
+#endif
 static bool useWorldTransform = false;
 
 static unsigned char *getCMap(HDC hdc, bool &);
@@ -371,8 +378,13 @@ QFontEngineWin::QFontEngineWin( const char *nameIn, HDC hdcIn, HFONT hfIn, bool 
     memset( widthCache, 0, sizeof( widthCache ) );
 
     if ( qt_winver >= Qt::WV_NT && !useWorldTransform ) {
+#ifndef _WIN64
         ( DWORD& ) qtGetWorldTransform = ( DWORD ) QLibrary::resolve( "gdi32.dll", "GetWorldTransform" );
         ( DWORD& ) qtSetWorldTransform = ( DWORD ) QLibrary::resolve( "gdi32.dll", "SetWorldTransform" );
+#else
+        qtGetWorldTransform = ( gWFunc ) QLibrary::resolve( "gdi32.dll", "GetWorldTransform" );
+        qtSetWorldTransform = ( sWFunc ) QLibrary::resolve( "gdi32.dll", "SetWorldTransform" );
+#endif
         useWorldTransform = ( qtGetWorldTransform && qtSetWorldTransform );
     }
 }

@@ -21,11 +21,17 @@
 
 #include <qsqldatabase.h>
 #include <qsqlresult.h>
+#include <qptrstack.h>
+#include <qptrqueue.h>
+#include <qguardedptr.h>
+
+#include "AQGlobal.h"
 
 class FLTableMetaData;
 class FLSqlCursor;
 class FLManager;
 class FLManagerModules;
+class FLSqlSavePoint;
 
 /**
 Gestión de bases de datos.
@@ -42,7 +48,7 @@ tipo de base de datos de la que exista un controlador.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlDatabase
+class AQ_EXPORT FLSqlDatabase
 {
 
 public:
@@ -134,22 +140,24 @@ public:
   @param host  Servidor de la base de datos
   @param port  Puerto TCP de conexión
   @param connName Nombre de la conexion
+  @param connectOptions Contiene opciones auxiliares de conexión a la base de datos.
+                        El formato de la cadena de opciones es una lista separada por punto y coma
+                        de nombres de opción o la opción = valor. Las opciones dependen del uso del
+                        driver de base de datos.
+                        Si a las opciones se añade 'nogui' desactiva interactiveGUI_
+                        Si a las opciones se añade 'noexceptions' desactiva qsaExceptions_
   @return True si la conexión tuvo éxito, false en caso contrario
   */
   bool connectDB(const QString &database, const QString &user = QString::null,
                  const QString &password = QString::null,
                  const QString &host = QString::null,
-                 int port = -1, const QString &connName = "default");
+                 int port = -1, const QString &connName = "default",
+                 const QString &connectOptions = QString::null);
 
   /**
   Conecta con una base de datos utilizando los datos de conexión actuales
   */
   bool connectDB();
-
-  /**
-  Cierra la conexión actual de la base de datos
-  */
-  void closeDB();
 
   /**
   Crea una tabla en la base de datos actual.
@@ -339,6 +347,12 @@ public:
   bool canTransaction() const;
 
   /**
+  @return True si la base de datos soporta la sentencia OVER
+  */
+  bool canOverPartition() const;
+
+
+  /**
   Ejecuta tareas de limpieza y optimización de la base de datos
   */
   void Mr_Proper();
@@ -400,6 +414,56 @@ public:
   */
   bool regenTable(const QString &n, FLTableMetaData *tmd);
 
+  /**
+  Devuelve la suma md5 con el total de registros insertados, borrados y modificados en la base de datos hasta ahora
+
+  Util para saber si la base de datos ha sido modificada desde un momento dado
+  */
+  QString md5TuplesState() const;
+
+  /**
+  Devuelve la suma md5 con el total de registros insertados, borrados y modificados en una tabla hasta ahora
+
+  Util para saber si una tabla ha sido modificada desde un momento dado
+  */
+  QString md5TuplesStateTable(const QString &table) const;
+
+  /** Ver propiedad interactiveGUI_ */
+  bool interactiveGUI() const;
+  void setInteractiveGUI(bool on = true);
+
+  /** Ver propiedad qsaExceptions_ */
+  bool qsaExceptions() const;
+  void setQsaExceptions(bool on = true) {
+    qsaExceptions_ = on;
+  }
+
+  /**
+  Indica si la estructura de los metadatos de una tabla no coincide con la estructura de la tabla
+  en la base de datos
+  */
+  bool mismatchedTable(const QString &table,
+                       const FLTableMetaData *tmd) const;
+
+  /**
+  Indica si existe la tabla
+  */
+  bool existsTable(const QString &n) const;
+
+  /**
+  @return El nivel actual de anidamiento de transacciones, 0 no hay transaccion
+  */
+  int transactionLevel() const {
+    return transaction_;
+  }
+
+  /**
+  @return El último cursor activo en esta base de datos con una transacción abierta
+  */
+  FLSqlCursor *lastActiveCursor() const {
+    return lastActiveCursor_;
+  }
+
   // Some Wrappers to QSqlDatabase
   bool isOpen() const;
   bool isOpenError() const;
@@ -409,6 +473,11 @@ public:
   QString connectOptions() const;
 
 private:
+
+  /**
+  Cierra la conexión actual de la base de datos
+  */
+  void closeDB();
 
   /** Conexión principal a la base de datos actual */
   QSqlDatabase *db_;
@@ -434,17 +503,35 @@ private:
   /**  Nombre interno del driver utilizado para conectar a la base de datos actual */
   QString driverName_;
 
+  /** Nombre de la conexion, ver FLSqlConnections */
+  QString connectionName_;
+
   /** Manejador general */
   FLManager *manager_;
 
   /** Manejador de módulos */
   FLManagerModules *managerModules_;
 
-  /** Nombre de la conexion, ver FLSqlConnections */
-  QString connectionName_;
+  /** Indica si el driver de la base de datos puede interactuar con el GUI, por defecto activado */
+  bool interactiveGUI_;
 
-  /** Indica si esta activado la detección de bloqueos */
-  bool lockDetection_;
+  /** Indica si el driver puede lanzar excepciones a los scripts QSA, por defecto activado */
+  bool qsaExceptions_;
+
+private:
+  friend class FLSqlCursor;
+
+  int transaction_;
+  QPtrStack<FLSqlSavePoint> *stackSavePoints_;
+  QPtrQueue<FLSqlSavePoint> *queueSavePoints_;
+  FLSqlSavePoint *currentSavePoint_;
+  QGuardedPtr<FLSqlCursor> lastActiveCursor_;
+
+  bool doTransaction(FLSqlCursor *cur);
+  bool doCommit(FLSqlCursor *cur, bool notify = true);
+  bool doRollback(FLSqlCursor *cur);
+  void initInternal();
+  void finishInternal();
 };
 
 #endif

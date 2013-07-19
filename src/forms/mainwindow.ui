@@ -163,6 +163,18 @@
             <string>Visita Eneboo.org</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>styleAction</cstring>
+        </property>
+        <property name="text">
+            <string>Estilo</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Estilo</string>
+        </property>
+    </action>
+    
 </actions>
 <images>
     <image name="image26803">

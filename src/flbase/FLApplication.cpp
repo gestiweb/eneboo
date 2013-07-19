@@ -37,7 +37,14 @@ email                : mail@infosial.com
 #include "AQSWrapperFactory.h"
 #include "metatranslator.h"
 
+#ifdef FL_DEBUG
+#include "FLFieldMetaData.h"
+#include "FLRelationMetaData.h"
+#endif
+
 #include "AQConfig.h"
+
+extern bool aqQSARunning;
 
 // Uso interno
 class FLWorkspace : public QWorkspace
@@ -111,17 +118,104 @@ bool FLPopupWarn::clicked(const QString &href)
   return false;
 }
 
+static QTextEdit *abanqTedOutput = 0;
+static void (*aq_default_message_handler)(QtMsgType, const char *msg) = 0;
+
+void abanqMessageOutput(QtMsgType type, const char *msg)
+{
+  if (aq_default_message_handler) {
+    aq_default_message_handler(type, msg);
+  } else {
+    fprintf(stderr, "%s\n", msg);
+    fflush(stderr);
+  }
+
+  if (abanqTedOutput) {
+    if (QStyleSheet::mightBeRichText(msg))
+      abanqTedOutput->append(msg);
+    else
+      abanqTedOutput->append(QStyleSheet::convertFromPlainText(msg));
+  }
+}
+
+#if !defined(QSDEBUGGER) && !defined(AQ_NEBULA_BUILD_VERBOSE)
+void abanqMessageVoidOutput(QtMsgType, const char *)
+{
+}
+#endif
+
+class FLTextEditOuput : public QTextEdit
+{
+public:
+  FLTextEditOuput(QWidget *parent = 0, const char *name = 0)
+    : QTextEdit(parent, "abanqTedOutput") {
+    setProperty("readOnly", true);
+    setProperty("frameShape", "LineEditPanel");
+    setProperty("textFormat", "RichText");
+    setProperty("undoDepth", 0);
+    setProperty("overwriteMode", QVariant(false, 0));
+    setProperty("paletteBackgroundColor", Qt::white);
+    setProperty("paletteForegroundColor", Qt::black);
+    setCaption(tr("Consola de mensajes de AbanQ"));
+  }
+
+protected:
+  void hideEvent(QHideEvent *e) {
+    if (e->spontaneous())
+      return;
+    aqApp->saveGeometryForm(name(), geometry());
+#if !defined(QSDEBUGGER) && !defined(AQ_NEBULA_BUILD_VERBOSE)
+    qInstallMsgHandler(abanqMessageVoidOutput);
+#else
+    if (abanqTedOutput)
+      qInstallMsgHandler(0);
+#endif
+    abanqTedOutput = 0;
+    if (::qt_cast<QDockWindow *>(parentWidget()))
+      parentWidget()->hide();
+  }
+
+  void showEvent(QShowEvent *e) {
+    if (e->spontaneous())
+      return;
+    QRect geo(aqApp->geometryForm(name()));
+    if (geo.isNull()) {
+      QDesktopWidget *dsk = QApplication::desktop();
+      resize(dsk->width() / 2, dsk->height() / 3);
+    } else
+      setGeometry(geo);
+#if !defined(QSDEBUGGER) && !defined(AQ_NEBULA_BUILD_VERBOSE)
+    qInstallMsgHandler(0);
+#else
+    if (abanqTedOutput)
+      qInstallMsgHandler(0);
+#endif
+    abanqTedOutput = this;
+    aq_default_message_handler = qInstallMsgHandler(abanqMessageOutput);
+  }
+
+  void keyPressEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key_Escape)
+      close();
+    else
+      QTextEdit::keyPressEvent(e);
+    e->accept();
+  }
+};
+
 FLApplication::FLApplication(int &argc, char **argv) :
   AQ_IMPL_APP(argc, argv),
   pWorkspace(0), mainWidget_(0), container(0), toolBox(0),
   toggleBars(0), project_(0), wb_(0), dictMainWidgets(0),
   formAlone_(false), notExit_(false), acl_(0), popupWarn_(0),
-  noGUI_(false), mngLoader_(0), sysTr_(0), initializing_(false),
-  flFactory_(0), opCheckUpdate_(0)
+  mngLoader_(0), sysTr_(0), initializing_(false), destroying_(false),
+  flFactory_(0), opCheckUpdate_(0),
+  notifyBeginTransaction_(false),
+  notifyEndTransaction_(false),
+  notifyRollbackTransaction_(false),
+  tedOutput_(0), style(0), timerIdle_(0)
 {
   aqApp = this;
-
-  dictMainWidgets = new QDict <QWidget>(37);
 
   AQConfig::init(this);
   FLMemCache::init();
@@ -136,12 +230,33 @@ FLApplication::FLApplication(int &argc, char **argv) :
   commaSeparator_ = localeSystem_.toString(v, 'f', 1).at(1);
 
   QObject::setName("aqApp");
+
+  QPixmapCache::setCacheLimit(2048);
+
+#if !defined(QSDEBUGGER) && !defined(AQ_NEBULA_BUILD_VERBOSE)
+  qInstallMsgHandler(abanqMessageVoidOutput);
+#endif
 }
 
 FLApplication::~FLApplication()
 {
+  destroying_ = true;
+  stopTimerIdle();
+  checkAndFixTransactionLevel("Application::~Application()");
+  FLSqlDatabase *appDb = db();
+  if (appDb) {
+    appDb->setInteractiveGUI(false);
+    appDb->setQsaExceptions(false);
+  }
+  if (dictMainWidgets) {
+    dictMainWidgets->setAutoDelete(true);
+    dictMainWidgets->clear();
+    dictMainWidgets->setAutoDelete(false);
+  }
+  clearProject();
+  delete project_;
+  delete tedOutput_;
   FLSqlConnections::finish();
-  delete dictMainWidgets;
 
 #ifdef FL_DEBUG
   qWarning("*************************************************");
@@ -159,12 +274,17 @@ FLApplication::~FLApplication()
   qWarning("*************************************************");
   qWarning("FLSqlCursor::countRefCursor");
   qWarning("*************************************************");
+  qWarning("FLTableMetaData::count_ %d", FLTableMetaData::count_);
+  qWarning("FLFieldMetaData::count_ %d", FLFieldMetaData::count_);
+  qWarning("FLRelationMetaData::count_ %d", FLRelationMetaData::count_);
 #endif
+
+  aqApp = 0;
 }
 
 bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (initializing_)
+  if (initializing_ || destroying_)
     return QApplication::eventFilter(obj, ev);
 
   if (activeModalWidget() || activePopupWidget())
@@ -318,10 +438,14 @@ void FLApplication::init(const QString &n, const QString &callFunction,
 {
   initializing_ = true;
 
+  dictMainWidgets = new QDict <QWidget>(37);
   container = new QMainWindow(0);
   container->setName("container");
   container->setIcon(QPixmap::fromMimeSource("icono_abanq.png"));
-  container->setCaption("Eneboo " AQ_VERSION);
+  if (db())
+    container->setCaption(db()->database());
+  else
+    container->setCaption("Eneboo " AQ_VERSION);
 
   FLDiskCache::init(this);
 #if 0
@@ -360,11 +484,11 @@ void FLApplication::init(const QString &n, const QString &callFunction,
 
   qInitNetworkProtocols();
 
-#ifdef QSDEBUGGER
-  project_ = new QSProject(this, db()->database());
-#else
+  //#ifdef QSDEBUGGER
+  //  project_ = new QSProject(this, db()->database());
+  //#else
   project_ = new QSProject(0, db()->database());
-#endif
+  //#endif
 
   AQ_SET_MNGLOADER
 
@@ -400,6 +524,7 @@ void FLApplication::init(const QString &n, const QString &callFunction,
 #else
     i->setErrorMode( QSInterpreter::Notify );
 #endif
+    i->setInteractiveGUI(db()->interactiveGUI());
   } else {
     // Failed loading QSA.
   }
@@ -453,8 +578,10 @@ void FLApplication::init(const QString &n, const QString &callFunction,
   }
 
   AQ_UNSET_MNGLOADER
-
   initializing_ = false;
+
+  connect(project_, SIGNAL(projectEvaluated()), this, SLOT(evaluatedProject()));
+  startTimerIdle();
 }
 
 void FLApplication::openQSWorkbench()
@@ -465,6 +592,7 @@ void FLApplication::openQSWorkbench()
       wb_ = new QSWorkbench(project_, 0, db()->database());
     wb_->open();
     wb_->widget()->raise();
+    wb_->widget()->showMaximized();
   }
 #endif
 }
@@ -512,7 +640,10 @@ void FLApplication::showMainWidget(QWidget *w)
       container->raise();
       container->setActiveWindow();
     }
-    container->setCaption("Eneboo " AQ_VERSION);
+    if (db())
+      container->setCaption(db()->database());
+    else
+      container->setCaption("Eneboo  " AQ_VERSION);
     return;
   }
 
@@ -609,6 +740,8 @@ void FLApplication::chooseFont()
 
 void FLApplication::showStyles()
 {
+  if (!style)
+    initStyles();
   if (style)
     style->exec(QCursor::pos());
 }
@@ -664,90 +797,127 @@ void FLApplication::initToolBox()
     for (QStringList::Iterator itM = listModules.begin(); itM != listModules.end(); ++itM, ++c) {
       if (QChar(c) == 'Q')
         ++c;
-        
-#ifdef FL_QUICK_CLIENT
-      if (*itM == "sys")
-        continue;
-#endif
-        
-    if (*itM == "sys") {
-       
+      if (*itM == "sys") {
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Cargar Paquete de Módulos");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
+                                             newAreaBar, "loadAbanQPackageAction");
         newModuleAction->setIconSet(QPixmap::fromMimeSource("load.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(loadModules()));
 
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Exportar Módulos a Disco");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, "exportModulesAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("export.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(exportModules()));
 
-       // ++c; 
-       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Importar Módulos desde Disco");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, "importModulesAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("import.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
+
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Actualización y Soporte");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
+                                             newAreaBar, "updateAbanQAction");
         newModuleAction->setIconSet(QPixmap::fromMimeSource("settings.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
+
         ++c;
-        */
-
-        
-#ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
-
-  if (ap2->isDebuggerMode())
-                                  {      
-	++c;  
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("QSA WorkBench");
+                        tr("Copia de Seguridad");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("bug.png"));
+                                             newAreaBar, "dumpDatabaseAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("fileexport.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
-        
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(dumpDatabase()));
+
         ++c;
-       
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Carga Estática desde Disco Duro");
+                        tr("Regenerar base de datos");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("image-svg.png"));
+                                             newAreaBar, "mrProperAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("eraser.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(mrProper()));
+       
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Mostrar Consola de mensajes");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, "shConsoleAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("consola.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(showConsole()));
+#ifndef QSDEBUGGER
+#if defined (Q_OS_LINUX)
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Configurar carga estática");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, "staticLoaderSetupAction");
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("folder_update.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
 
-        ++c; 
-       descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Reiniciar Scripts");
+        ++c;
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Recargar scripts");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
+                                             newAreaBar, "reinitAction");
         newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
-                                  }
-#endif
 
-#ifndef QSDEBUGGER
-
+        continue;
+#endif // defined (Q_OS_LINUX)
+        if (*itM == "sys")
+          continue;
 #else
         ++c;
 #endif
       }
+#ifdef FL_QUICK_CLIENT
+      if (*itM == "sys")
+        continue;
+#endif
 
       descripModule = QString(QChar(c)) + ": " + mngLoader_->idModuleToDescription(*itM);
       newModuleAction = new FLWidgetAction(tr(descripModule),
@@ -950,6 +1120,8 @@ bool FLApplication::queryExit()
 {
   if (notExit_)
     return false;
+  if (!db()->interactiveGUI())
+    return true;
   return (QMessageBox::Yes == QMessageBox::question(
             aqApp->mainWidget(), tr("Salir..."),
             tr("¿ Quiere salir de la aplicación ?"),
@@ -960,12 +1132,18 @@ bool FLApplication::queryExit()
          );
 }
 
-void FLApplication::generalExit()
+void FLApplication::generalExit(bool askExit)
 {
   if (wb_)
     wb_->close();
 
-  if (queryExit()) {
+  bool doExit = true;
+  if (askExit)
+    doExit = queryExit();
+  if (doExit) {
+    destroying_ = true;
+    if (tedOutput_)
+      tedOutput_->close();
     if (!formAlone_) {
       writeState();
       writeStateModule();
@@ -974,7 +1152,7 @@ void FLApplication::generalExit()
       FLVar::clean();
     db()->managerModules()->finish();
     db()->manager()->finish();
-    quit();
+    QTimer::singleShot(0, this, SLOT(quit()));
   }
 }
 
@@ -1349,7 +1527,7 @@ void FLApplication::readState()
 
     QString activeIdModule(db()->managerModules()->activeIdModule());
 
-#if defined (FL_QUICK_CLIENT)
+#if defined (FL_QUICK_CLIENT) || !defined(QSDEBUGGER)
     if (activeIdModule == "sys")
       activeIdModule = QString::null;
 #endif
@@ -1359,7 +1537,7 @@ void FLApplication::readState()
       QStringList::Iterator it(windowsOpened.end());
       do {
         --it;
-#if defined (FL_QUICK_CLIENT)
+#if defined (FL_QUICK_CLIENT) || !defined(QSDEBUGGER)
         if ((*it) == "sys")
           continue;
 #endif
@@ -1367,6 +1545,9 @@ void FLApplication::readState()
         if ((*it) != activeIdModule && db()->managerModules()->listAllIdModules().contains(*it)) {
           w = dictMainWidgets->find(*it);
           if (!w) {
+            QAction *act = ::qt_cast<QAction *>(container->child((*it), "QAction"));
+            if (!act || !act->isVisible())
+              continue;
             w = db()->managerModules()->createUI(*it + ".ui", this, 0, *it);
             dictMainWidgets->replace(*it, w);
             setName(*it);
@@ -1412,7 +1593,7 @@ void FLApplication::readState()
 void FLApplication::readStateModule()
 {
   QString idM(db()->managerModules()->activeIdModule());
-#if defined (FL_QUICK_CLIENT)
+#if defined (FL_QUICK_CLIENT) || !defined(QSDEBUGGER)
   if (idM == "sys")
     return;
 #endif
@@ -1658,6 +1839,7 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
     return;
   }
 
+  QString sufMn("::Main");
   QString extqs(".qs");
   QString stream(mngLoader_->contentCode(idM + extqs));
   if (idM == "sys") {
@@ -1672,22 +1854,24 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
     ap->setName(idM);
     project_->addObject(ap);
     QSScript *scr = project_->createScript(ap, stream);
-    scr->setBaseFileName(idM + extqs);
+    scr->setBaseFileName(idM + extqs + sufMn);
   } else {
     QSScript *scr = project_->script(ap);
     if (scr) {
       scr->setCode(stream);
     } else {
       scr = project_->createScript(ap, stream);
-      scr->setBaseFileName(idM + extqs);
+      scr->setBaseFileName(idM + extqs + sufMn);
     }
   }
 
   QDomNode no(doc.documentElement().firstChild());
   QString scriptForm, scriptFormRecord, name;
   QString preFm("form");
-  QString preFs("formSearch");
   QString preFr("formRecord");
+  QString sufFm("::Form");
+  QString sufFr("::FormRecord");
+
   int matchs;
 
   while (!no.isNull()) {
@@ -1734,7 +1918,7 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
             project_->addObject(f);
             stream = mngLoader_->contentCode(scriptForm);
             QSScript *scr = project_->createScript(f, stream);
-            scr->setBaseFileName(scriptForm);
+            scr->setBaseFileName(scriptForm + sufFm);
             f->setScript(scr);
           } else {
             QSScript *scr = f->script();
@@ -1745,42 +1929,11 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
               else {
                 stream = mngLoader_->contentCode(scriptForm);
                 scr = project_->createScript(f, stream);
-                scr->setBaseFileName(scriptForm);
+                scr->setBaseFileName(scriptForm + sufFm);
                 f->setScript(scr);
               }
             } else {
               stream = mngLoader_->contentCode(scriptForm);
-              if (QString::compare(scr->code(), stream))
-                scr->setCode(stream);
-            }
-          }
-
-          FLFormSearchDBInterface *fs = static_cast<FLFormSearchDBInterface *>(project_->object(preFs + name));
-          if (!fs) {
-            fs = new FLFormSearchDBInterface(0);
-            fs->setName(preFs + name);
-            project_->addObject(fs);
-            if (stream.isEmpty())
-              stream = mngLoader_->contentCode(scriptForm);
-            QSScript *scr = project_->createScript(fs, stream);
-            scr->setBaseFileName(scriptForm);
-            fs->setScript(scr);
-          } else {
-            QSScript *scr = fs->script();
-            if (!scr) {
-              scr = project_->script(fs);
-              if (scr)
-                fs->setScript(scr);
-              else {
-                if (stream.isEmpty())
-                  stream = mngLoader_->contentCode(scriptForm);
-                scr = project_->createScript(fs, stream);
-                scr->setBaseFileName(scriptForm);
-                fs->setScript(scr);
-              }
-            } else {
-              if (stream.isEmpty())
-                stream = mngLoader_->contentCode(scriptForm);
               if (QString::compare(scr->code(), stream))
                 scr->setCode(stream);
             }
@@ -1795,7 +1948,7 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
             project_->addObject(fr);
             stream = mngLoader_->contentCode(scriptFormRecord);
             QSScript *scr = project_->createScript(fr, stream);
-            scr->setBaseFileName(scriptFormRecord);
+            scr->setBaseFileName(scriptFormRecord + sufFr);
             fr->setScript(scr);
           } else {
             QSScript *scr = fr->script();
@@ -1806,7 +1959,7 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
               else {
                 stream = mngLoader_->contentCode(scriptFormRecord);
                 scr = project_->createScript(fr, stream);
-                scr->setBaseFileName(scriptFormRecord);
+                scr->setBaseFileName(scriptFormRecord + sufFr);
                 fr->setScript(scr);
               }
             } else {
@@ -1835,13 +1988,14 @@ void FLApplication::activateModule(const QString &idM)
 
   QWidget *w = 0;
   if (db()->managerModules()->listAllIdModules().contains(idM)) {
-    w = dictMainWidgets->find(idM);
+    w = dictMainWidgets ? dictMainWidgets->find(idM) : 0;
     if (!w) {
       w = db()->managerModules()->createUI(idM + QString::fromLatin1(".ui"),
                                            this, 0, idM);
       if (!w)
         return;
-      dictMainWidgets->replace(idM, w);
+      if (dictMainWidgets)
+        dictMainWidgets->replace(idM, w);
       setName(idM);
       if (acl_)
         acl_->process(w);
@@ -1889,12 +2043,16 @@ void FLApplication::activateModule()
 
 void FLApplication::reinit()
 {
-  if (initializing_)
+  if (initializing_ || destroying_)
     return;
 
+  stopTimerIdle();
+  aqAppIdle();
   initializing_ = true;
   writeState();
   writeStateModule();
+
+  pWorkspace = 0;
 
   QTimer::singleShot(0, this, SLOT(reinitP()));
 }
@@ -1906,6 +2064,10 @@ void FLApplication::clearProject()
     wb_->deleteLater();
     wb_ = 0;
   }
+
+  notifyBeginTransaction_ = false;
+  notifyEndTransaction_ = false;
+  notifyRollbackTransaction_ = false;
 
   if (!project_)
     return;
@@ -1943,9 +2105,11 @@ void FLApplication::reinitP()
   setMainWidget(0);
   db()->managerModules()->setActiveIdModule("");
 
-  dictMainWidgets->setAutoDelete(true);
-  dictMainWidgets->clear();
-  dictMainWidgets->setAutoDelete(false);
+  if (dictMainWidgets) {
+    dictMainWidgets->setAutoDelete(true);
+    dictMainWidgets->clear();
+    dictMainWidgets->setAutoDelete(false);
+  }
 
   clearProject();
 
@@ -1972,6 +2136,7 @@ void FLApplication::reinitP()
   callScriptEntryFunction();
 
   initializing_ = false;
+  startTimerIdle();
 }
 
 void FLApplication::showDocPage(const QString &url)
@@ -2001,8 +2166,8 @@ QSArgument FLApplication::call(const QString &function,
 
   if (!objectContext) {
     fKey = function;
-    QMap<QString, QString>::const_iterator it(aqCallsCache_.find(fKey));
 
+    QMap<QString, QString>::const_iterator it(aqCallsCache_.find(fKey));
     if (it != aqCallsCache_.end())
       return ((*it).isEmpty() ? QSArgument() : i->call(*it, arguments));
 
@@ -2010,11 +2175,14 @@ QSArgument FLApplication::call(const QString &function,
       QString dot(".");
       QString dotIface(".iface.");
       QStringList sL(QStringList::split('.', function));
-      QStringList classes(i->classes(sL[ 0 ]));
+      QStringList classes(i->classes(sL[0]));
+
+      QString cls(sL[0]);
+      QString fun(sL.last());
 
       for (QStringList::const_iterator it = classes.begin(); it != classes.end(); ++it) {
-        if (i->hasFunction(sL[ 0 ] + dot + *it + dot + sL[ 1 ])) {
-          QString fn(sL[ 0 ] + dotIface + sL[ 1 ]);
+        if (i->hasFunction(cls + dot + *it + dot + fun)) {
+          QString fn(cls + dotIface + fun);
           aqCallsCache_.insert(fKey, fn);
           return i->call(fn, arguments);
         }
@@ -2062,6 +2230,9 @@ void FLApplication::setCaptionMainWidget(const QString &text)
     QWidget *mwi = aqApp->mainWidget();
     if (mwi) {
       QString bd(db()->driverNameToDriverAlias(db()->driverName()));
+     /* mwi->setCaption(db()->database() +
+                      " - [ " + lastTextCaption_ + " ] - [" + bd + ":" +
+                      db()->user() + "]");*/
       mwi->setCaption(QString::fromLatin1("Eneboo " AQ_VERSION) + " - " + lastTextCaption_);
     }
     return;
@@ -2077,19 +2248,14 @@ void FLApplication::setCaptionMainWidget(const QString &text)
 }
 
 
-void FLApplication::setNotExit(const bool &b)
+void FLApplication::setNotExit(bool b)
 {
   notExit_ = b;
 }
 
-void FLApplication::setNoGUI(const bool &b)
-{
-  noGUI_ = b;
-}
-
 void FLApplication::printTextEdit(QTextEdit *editor)
 {
-  if (!editor || !mainWidget_)
+  if (!editor)
     return;
 
 #if defined(Q_OS_WIN32)
@@ -2098,7 +2264,7 @@ void FLApplication::printTextEdit(QTextEdit *editor)
   QPrinter printer(QPrinter::ScreenResolution);
 #endif
   printer.setFullPage(true);
-  if (printer.setup(mainWidget_)) {
+  if (printer.setup(aqApp->mainWidget())) {
     QPainter p(&printer);
     if (!p.device())
       return;
@@ -2114,7 +2280,8 @@ void FLApplication::printTextEdit(QTextEdit *editor)
     richText.setWidth(&p, view.width());
     int page = 1;
     do {
-      richText.draw(&p, margin, margin, view, mainWidget_->colorGroup());
+      if (aqApp->mainWidget())
+        richText.draw(&p, margin, margin, view, aqApp->mainWidget()->colorGroup());
       view.moveBy(0, view.height());
       p.translate(0 , -view.height());
       p.setFont(font);
@@ -2133,14 +2300,9 @@ void FLApplication::setPrintProgram(const QString &printProgram)
   printProgram_ = printProgram;
 }
 
-const QString &FLApplication::printProgram() const
+QString FLApplication::printProgram() const
 {
   return printProgram_;
-}
-
-bool FLApplication::noGUI() const
-{
-  return noGUI_;
 }
 
 FLSqlDatabase *FLApplication::db()
@@ -2232,6 +2394,8 @@ void FLApplication::setDatabaseLockDetection(bool on, int msecLapsus, int limChe
 void FLApplication::popupWarn(const QString &msgWarn,
                               const QMap<QString, QSArgumentList> & scriptCalls)
 {
+  if (!container)
+    return;
   if (!popupWarn_)
     popupWarn_ = new FLPopupWarn(container);
   popupWarn_->scriptCalls_ = scriptCalls;
@@ -2240,6 +2404,8 @@ void FLApplication::popupWarn(const QString &msgWarn,
 
 void FLApplication::popupWarn(const QString &msgWarn)
 {
+  if (!container)
+    return;
   QWhatsThis::display(msgWarn, QApplication::desktop()->mapToGlobal(QPoint(5, 5)), container);
   processEvents(50);
 }
@@ -2335,9 +2501,41 @@ void FLApplication::dumpDatabase()
   call("sys.dumpDatabase", QSArgumentList(), 0);
 }
 
+void FLApplication::mrProper()
+{
+  FLSqlConnections::database()->Mr_Proper();
+}
+
+void FLApplication::showConsole()
+{
+  QMainWindow *mw = ::qt_cast<QMainWindow *>(mainWidget());
+  if (mw && !tedOutput_) {
+    QDockWindow *dw = new QDockWindow(QDockWindow::InDock, mw, "tedOutputDock");
+    tedOutput_ = new FLTextEditOuput(dw);
+    dw->setWidget(tedOutput_);
+    dw->setCaption(tr("Mensajes de AbanQ"));
+    dw->setResizeEnabled(true);
+    dw->setCloseMode(QDockWindow::Always);
+    dw->setFixedExtentWidth(300);
+    mw->setDockEnabled(dw, Qt::DockTop, false);
+    mw->setDockEnabled(dw, Qt::DockLeft, false);
+    mw->setDockEnabled(dw, Qt::DockRight, false);
+    mw->moveDockWindow(dw, Qt::DockBottom);
+  }
+  if (!tedOutput_)
+    tedOutput_ = new FLTextEditOuput;
+  if (::qt_cast<QDockWindow *>(tedOutput_->parentWidget()))
+    tedOutput_->parentWidget()->show();
+  tedOutput_->show();
+}
+bool FLApplication::consoleShown() const
+{
+  return (tedOutput_ && tedOutput_->isShown());
+}
+
 QWidget *FLApplication::modMainWidget(const QString &idModulo) const
 {
-  QWidget *w = dictMainWidgets->find(idModulo);
+  QWidget *w = dictMainWidgets ? dictMainWidgets->find(idModulo) : 0;
   if (!w) {
     QWidgetList *list = QApplication::topLevelWidgets();
     QWidgetListIt it(*list);
@@ -2368,6 +2566,139 @@ void FLApplication::callScriptEntryFunction()
     call(scriptEntryFunction_, QSArgumentList(), aqApp);
     scriptEntryFunction_ = QString::null;
   }
+}
+
+void FLApplication::emitTransactionBegin(QObject *o)
+{
+  if (notifyBeginTransaction_)
+    emit transactionBegin(o);
+}
+
+void FLApplication::emitTransactionEnd(QObject *o)
+{
+  if (notifyEndTransaction_)
+    emit transactionEnd(o);
+}
+
+void FLApplication::emitTransactionRollback(QObject *o)
+{
+  if (notifyRollbackTransaction_)
+    emit transactionRollback(o);
+}
+
+QString FLApplication::gsExecutable()
+{
+  if (!gsExecutable_.isEmpty())
+    return gsExecutable_;
+
+#if defined(Q_OS_WIN32)
+#if defined(AQ_WIN64)
+  gsExecutable_ = "gswin64c";
+  bool gsOk = false;
+  QProcess *procTemp = new QProcess();
+  procTemp->addArgument(gsExecutable_);
+  procTemp->addArgument("--version");
+  gsOk = procTemp->start();
+  delete procTemp;
+  if (!gsOk)
+#endif // AQ_WIN64
+    gsExecutable_ = "gswin32c";
+#else
+  gsExecutable_ = "gs";
+#endif // Q_OS_WIN32
+
+  qWarning(tr("Ejecutable Ghostscript: ") + gsExecutable_);
+  return gsExecutable_;
+}
+
+void FLApplication::evaluatedProject()
+{
+  notifyBeginTransaction_ = false;
+  notifyEndTransaction_ = false;
+  notifyRollbackTransaction_ = false;
+}
+
+void FLApplication::aqAppIdle()
+{
+  if (wb_ || !project_ || QApplication::activeModalWidget() || QApplication::activePopupWidget())
+    return;
+  if (QApplication::eventLoop()->loopLevel() > 1)
+    return;
+  QSInterpreter *i = project_->interpreter();
+  if (!i || i->isRunning())
+    return;
+  if (aqQSARunning)
+    return;
+  checkAndFixTransactionLevel("Application::aqAppIdle()");
+}
+
+void FLApplication::startTimerIdle()
+{
+  if (!timerIdle_) {
+    timerIdle_ = new QTimer(this);
+    connect(timerIdle_, SIGNAL(timeout()), this, SLOT(aqAppIdle()));
+  } else
+    timerIdle_->stop();
+  timerIdle_->start(1000, false);
+}
+
+void FLApplication::stopTimerIdle()
+{
+  if (timerIdle_ && timerIdle_->isActive())
+    timerIdle_->stop();
+}
+
+void FLApplication::msgBoxWarning(const QString &text, bool gui)
+{
+  qWarning(text);
+  if (gui && db()->interactiveGUI()) {
+    QMessageBox::warning(focusWidget(), tr("Aviso"),
+                         text, QMessageBox::Ok, 0, 0);
+  }
+}
+
+void FLApplication::checkAndFixTransactionLevel(const QString &ctx)
+{
+  // ###
+#ifndef QSDEBUGGER
+  return;
+#endif
+  QDict<FLSqlDatabase> *dictDb = FLSqlConnections::dictDatabases();
+  if (!dictDb)
+    return;
+  bool rollbackDone = false;
+  FLSqlDatabase *curDb;
+  QDictIterator<FLSqlDatabase> it(*dictDb);
+  while ((curDb = it.current()) != 0) {
+    ++it;
+    if (curDb->transactionLevel() <= 0)
+      continue;
+    rollbackDone = true;
+    if (curDb->lastActiveCursor())
+      curDb->lastActiveCursor()->rollbackOpened(-1);
+    if (curDb->transactionLevel() <= 0)
+      continue;
+    FLSqlCursor caux;
+    caux.rollback();
+  }
+  if (!rollbackDone)
+    return;
+  QString msg(
+    tr("Se han detectado transacciones abiertas en estado inconsistente.\n"
+       "Esto puede suceder por un error en la conexión o en la ejecución\n"
+       "de algún proceso de la aplicación.\n"
+       "Para mantener la consistencia de los datos se han deshecho las\n"
+       "últimas operaciones sobre la base de datos.\n"
+       "Los últimos datos introducidos no han sido guardados, por favor\n"
+       "revise sus últimas acciones y repita las operaciones que no\n"
+       "se han guardado.\n")
+  );
+  if (!ctx.isEmpty())
+    msg += tr("Contexto: %1\n").arg(ctx);
+  msgBoxWarning(msg);
+#ifndef QSDEBUGGER
+  printf("%s\n", msg.latin1());
+#endif
 }
 
 FLWorkspace::FLWorkspace(QWidget *parent, const char *name) : QWorkspace(parent, name)
