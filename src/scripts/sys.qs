@@ -57,8 +57,10 @@ function afterCommit_flfiles(curFiles) {
         v = util.sha1(v + qry.value(0));
         var curSerial = new FLSqlCursor("flserial");
         curSerial.select();
-        if (!curSerial.first()) curSerial.setModeAccess(curSerial.Insert);
-        else curSerial.setModeAccess(curSerial.Edit);
+        if (!curSerial.first())
+          curSerial.setModeAccess(curSerial.Insert);
+        else
+          curSerial.setModeAccess(curSerial.Edit);
         curSerial.refreshBuffer();
         curSerial.setValueBuffer("sha", v);
         curSerial.commitBuffer();
@@ -66,8 +68,10 @@ function afterCommit_flfiles(curFiles) {
     } else {
       var curSerial = new FLSqlCursor("flserial");
       curSerial.select();
-      if (!curSerial.first()) curSerial.setModeAccess(curSerial.Insert);
-      else curSerial.setModeAccess(curSerial.Edit);
+      if (!curSerial.first())
+        curSerial.setModeAccess(curSerial.Insert);
+      else
+        curSerial.setModeAccess(curSerial.Edit);
       curSerial.refreshBuffer();
       curSerial.setValueBuffer("sha", curFiles.valueBuffer("sha"));
       curSerial.commitBuffer();
@@ -77,79 +81,82 @@ function afterCommit_flfiles(curFiles) {
   return true;
 }
 
-function statusDbLocksDialog( locks ) {
+function statusDbLocksDialog(locks)
+{
   var util = new FLUtil;
   var diag = new Dialog;
   var txtEdit = new TextEdit;
 
-  diag.caption = util.translate( "scripts", "Bloqueos de la base de datos" );
+  diag.caption = util.translate("scripts", "Bloqueos de la base de datos");
   diag.width = 500;
 
   var html = "<html><table border=\"1\">";
-      
-  if ( locks != undefined && locks.length ) {
+
+  if (locks != undefined && locks.length) {
     var i = 0;
     var j = 0;
     var item = "";
-    var fields = locks[0].split( "@" );
+    var fields = locks[0].split("@");
     var closeInfo = false;
     var closeRecord = false;
-        
+
     var headInfo = "<table border=\"1\"><tr>";
-    for ( i = 0; i < fields.length; ++i )
+    for (i = 0; i < fields.length; ++i)
       headInfo += "<td><b>" + fields[i] + "</b></td>";
     headInfo += "</tr>";
-    
-    var headRecord = "<table border=\"1\"><tr><td><b>" + util.translate( "scripts", "Registro bloqueado" ) + "</b></td></tr>";
-    
-    for ( i = 1; i < locks.length; ++i ) {
-        item = locks[i];
-        
-        if ( item.left( 2 ) == "##" ) {
-            if ( closeInfo )
-                html += "</table>";
-            if ( !closeRecord )
-                html += headRecord;
-            
-            html += "<tr><td>" + item.right( item.length - 2 ) + "</td></tr>";
-            
-            closeRecord = true;
-            closeInfo = false
-        } else {
-            if ( closeRecord )
-                html += "</table>";
-            if ( !closeInfo )
-                html += headInfo;
-            
-            html += "<tr>";
-            fields = item.split( "@" );
-            for ( j = 0; j < fields.length; ++j )
-              html += "<td>" + fields[j] + "</td>";
-            html += "</tr>";
-            
-            closeRecord = false;
-            closeInfo = true
-        }
+
+    var headRecord = "<table border=\"1\"><tr><td><b>" + util.translate("scripts", "Registro bloqueado") + "</b></td></tr>";
+
+    for (i = 1; i < locks.length; ++i) {
+      item = locks[i];
+
+      if (item.left(2) == "##") {
+        if (closeInfo)
+          html += "</table>";
+        if (!closeRecord)
+          html += headRecord;
+
+        html += "<tr><td>" + item.right(item.length - 2) + "</td></tr>";
+
+        closeRecord = true;
+        closeInfo = false
+      } else {
+        if (closeRecord)
+          html += "</table>";
+        if (!closeInfo)
+          html += headInfo;
+
+        html += "<tr>";
+        fields = item.split("@");
+        for (j = 0; j < fields.length; ++j)
+          html += "<td>" + fields[j] + "</td>";
+        html += "</tr>";
+
+        closeRecord = false;
+        closeInfo = true
+      }
     }
   }
 
-  html += "</table></table></html>";
-  
+              html += "</table></table></html>";
+
   txtEdit.text = html;
-  diag.add( txtEdit );
+  diag.add(txtEdit);
   diag.exec();
 }
 
-function terminateChecksLocks( sqlCursor ) {
-   if ( sqlCursor != undefined )
-    sqlCursor.checkRisksLocks( true );
+function terminateChecksLocks(sqlCursor)
+{
+  if (sqlCursor != undefined)
+    sqlCursor.checkRisksLocks(true);
 }
 
-function execQSA(fileQSA, args) {
+function execQSA(fileQSA, args)
+{
   var file = new File(fileQSA);
   try {
     file.open(File.ReadOnly);
-  } catch(e) {
+  } catch (e) {
     debug(e);
     return;
   }
@@ -157,26 +164,31 @@ function execQSA(fileQSA, args) {
   fn(args);
 }
 
-class AQGlobalFunctions {
+class AQGlobalFunctions
+{
   static var functions_ = [];
   static var mappers_ = [];
   static var count_ = 0;
-  
-  static function set(functionName, globalFunction) {
+
+  static function set(functionName, globalFunction)
+  {
     functions_[functionName] = globalFunction;
   }
-  
-  static function get(functionName) {
+
+  static function get(functionName)
+  {
     return functions_[functionName];
   }
 
-  static function exec(functionName) {
+  static function exec(functionName)
+  {
     var fn = functions_[functionName];
     if (fn != undefined)
       fn();
   }
-  
-  static function mapConnect(obj, signal, functionName) {
+
+  static function mapConnect(obj, signal, functionName)
+  {
     const c = count_ % 100;
     var sigMap = mappers_[c] = new AQSignalMapper(obj);
     var killMapper = function() {
@@ -189,17 +201,21 @@ class AQGlobalFunctions {
   }
 }
 
-class AQTimer {
+class AQTimer
+{
   static var timers_ = [];
   static var count_ = 0;
-  
-  static function singleShot(msec, timeoutFunction) {
+
+  static function singleShot(msec, timeoutFunction)
+  {
     const c = count_ % 100;
     var callback = function() {
       killTimer(timers_[c]);
       timers_[c] = undefined;
       timeoutFunction();
+      aqApp.startTimerIdle();
     }
+    aqApp.stopTimerIdle();
     timers_[c] = startTimer(msec, callback);
     ++count_;
   }
@@ -422,8 +438,8 @@ function localChanges()
   var docUpt = new QDomDocument;
   if (!docUpt.setContent(strXmlUpt)) {
     errorMsgBox(sys.translate(
-                      "Error XML al intentar cargar la definición de los ficheros."
-                    ));
+                  "Error XML al intentar cargar la definición de los ficheros."
+                ));
     return ret;
   }
 
@@ -439,18 +455,18 @@ function diffXmlFilesDef(xmlOld, xmlNew)
   var arrNew = filesDefToArray(xmlNew);
   var ret = [];
   var size = 0;
-  
+
   for (var key in arrOld) {
     if (!(key in arrNew)) {
       var info = [
-        key,
-        "del",
-        arrOld[key].shatext,
-        arrOld[key].shabinary,
-        "",
-        ""
-      ]
-      ret[key] = info.join('@');
+                   key,
+                   "del",
+                   arrOld[key].shatext,
+                   arrOld[key].shabinary,
+                   "",
+                   ""
+                 ]
+                 ret[key] = info.join('@');
       ++size;
     }
   }
@@ -458,26 +474,26 @@ function diffXmlFilesDef(xmlOld, xmlNew)
   for (var key in arrNew) {
     if (!(key in arrOld)) {
       var info = [
-        key,
-        "new",
-        "",
-        "",
-        arrNew[key].shatext,
-        arrNew[key].shabinary
-      ]
-      ret[key] = info.join('@');
+                   key,
+                   "new",
+                   "",
+                   "",
+                   arrNew[key].shatext,
+                   arrNew[key].shabinary
+                 ]
+                 ret[key] = info.join('@');
       ++size;
     } else if (arrNew[key].shatext != arrOld[key].shatext || 
                arrNew[key].shabinary != arrOld[key].shabinary) {
       var info = [
-        key,
-        "mod",
-        arrOld[key].shatext,
-        arrOld[key].shabinary,
-        arrNew[key].shatext,
-        arrNew[key].shabinary
-      ]
-      ret[key] = info.join('@');
+                   key,
+                   "mod",
+                   arrOld[key].shatext,
+                   arrOld[key].shabinary,
+                   arrNew[key].shatext,
+                   arrNew[key].shabinary
+                 ]
+                 ret[key] = info.join('@');
       ++size;
     }
   }
@@ -530,7 +546,7 @@ function xmlFilesDefBd()
   var shaSum = "";
   var shaSumTxt = "";
   var shaSumBin = "";
-  
+
   while (qry.next()) {
     var idMod = qry.value(0).toString();
     if (idMod == "sys")
@@ -695,7 +711,7 @@ function loadModules(input, warnBackup)
 
 function loadAbanQPackage(input, warnBackup)
 {
-  if (warnBackup) {
+  if (warnBackup && interactiveGUI()) {
     var txt = "";
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
@@ -704,21 +720,15 @@ function loadAbanQPackage(input, warnBackup)
     txt += sys.translate("¿Desea continuar?");
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
       return;
-  } 
-  
+  }
+
   if (input) {
     var ok = true;
-   
+
     var changes = localChanges();
     if (changes.size != 0) {
       if (!warnLocalChanges(changes))
         return;
-        
-      var tmpVar = new FLVar;
-      tmpVar.set("mrproper", "dirty");
-      sys.Mr_Proper();
-      if (tmpVar.get("mrproper") == "dirty")
-        ok = false;
     }
 
     if (ok) {
@@ -753,12 +763,11 @@ function loadAbanQPackage(input, warnBackup)
                     "No se ha podido realizar la carga de los módulos."
                   ));
     } else {
-      sys.Mr_Proper();
       registerUpdate(input);
-      MessageBox.information(sys.translate("La carga de módulos se ha realizado con éxito."),
-                             MessageBox.Ok, MessageBox.NoButton,
-                             MessageBox.NoButton, "Eneboo");
+      infoMsgBox(sys.translate("La carga de módulos se ha realizado con éxito."));
       sys.AQTimer.singleShot(0, sys.reinit);
+      var tmpVar = new FLVar;
+      tmpVar.set("mrproper", "dirty");
     }
   }
 }
@@ -878,6 +887,12 @@ function checkProjectName(proName)
   txt += sys.translate("- Nombre del proyecto instalado: %1\n").arg(dbProName);
   txt += sys.translate("- Nombre del proyecto a cargar: %1\n\n").arg(proName);
   txt += "\n\n";
+
+  if (!interactiveGUI()) {
+    debug(txt);
+    return false;
+  }
+
   txt += sys.translate("¿Desea continuar?");
   return (MessageBox.Yes == MessageBox.warning(txt, MessageBox.No, MessageBox.Yes,
                                                MessageBox.NoButton, "AbanQ"));
@@ -899,8 +914,8 @@ function loadModulesDef(un)
 
   if (!checkProjectName(root.toElement().attribute("projectname", "")))
     return false;
-  
-  var ok = true;  
+
+  var ok = true;
   var modules = root.childNodes();
 
   AQUtil.createProgressDialog(sys.translate("Registrando módulos"), modules.length());
@@ -960,11 +975,82 @@ function registerModule(mod)
   return cur.commitBuffer();
 }
 
+function infoMsgBox(msg)
+{
+  if ((typeof msg) != "string")
+    return;
+  msg += "\n";
+  if (interactiveGUI()) {
+    MessageBox.information(msg, MessageBox.Ok, MessageBox.NoButton,
+                           MessageBox.NoButton, "AbanQ");
+  } else {
+    debug("INFO: " + msg);
+  }
+}
+
+function warnMsgBox(msg)
+{
+  if ((typeof msg) != "string")
+    return;
+  msg += "\n";
+  if (interactiveGUI()) {
+    MessageBox.warning(msg, MessageBox.Ok, MessageBox.NoButton,
+                       MessageBox.NoButton, "AbanQ");
+  } else {
+    debug("WARN: " + msg);
+  }
+}
+
 function errorMsgBox(msg)
 {
+  if ((typeof msg) != "string")
+    return;
   msg += "\n";
-  MessageBox.critical(msg, MessageBox.Ok, MessageBox.NoButton,
+  if (interactiveGUI()) {
+    MessageBox.critical(msg, MessageBox.Ok, MessageBox.NoButton,
                       MessageBox.NoButton, "Eneboo");
+  } else {
+    debug("ERROR: " + msg);
+  }
+}
+
+function infoPopup(msg)
+{
+  if ((typeof msg) != "string")
+    return;
+  var caption = sys.translate("AbanQ Información");
+  var regExp = new RegExp("\n");
+  regExp.global = true;
+  var msgHtml = "<img source=\"about.png\" align=\"right\">" +
+                "<b><u>" + caption + "</u></b><br><br>" +
+                msg.replace(regExp, "<br>") + "<br>";
+  sys.popupWarn(msgHtml, []);
+}
+
+function warnPopup(msg)
+{
+  if ((typeof msg) != "string")
+    return;
+  var caption = sys.translate("AbanQ Aviso");
+  var regExp = new RegExp("\n");
+  regExp.global = true;
+  var msgHtml = "<img source=\"bug.png\" align=\"right\">" +
+                "<b><u>" + caption + "</u></b><br><br>" +
+                msg.replace(regExp, "<br>") + "<br>";
+  sys.popupWarn(msgHtml, []);
+}
+
+function errorPopup(msg)
+{
+  if ((typeof msg) != "string")
+    return;
+  var caption = sys.translate("AbanQ Error");
+  var regExp = new RegExp("\n");
+  regExp.global = true;
+  var msgHtml = "<img source=\"remove.png\" align=\"right\">" +
+                "<b><u>" + caption + "</u></b><br><br>" +
+                msg.replace(regExp, "<br>") + "<br>";
+  sys.popupWarn(msgHtml, []);
 }
 
 function trTagText(tagText)
@@ -989,6 +1075,9 @@ function questionMsgBox(msg, keyRemember, txtRemember, forceShow,
     if (valRemember && !forceShow)
       return MessageBox.Yes;
   }
+
+  if (!interactiveGUI())
+    return true;
 
   var diag = new QDialog;
   diag.caption = txtCaption ? txtCaption : "Eneboo";
@@ -1041,7 +1130,7 @@ function questionMsgBox(msg, keyRemember, txtRemember, forceShow,
   return ret;
 }
 
-function decryptFromBase64(str) 
+function decryptFromBase64(str)
 {
   var ba = new QByteArray;
   ba.string = str;
@@ -1066,7 +1155,7 @@ class AbanQUpdater
     var lay = new QVBoxLayout(this.w_);
     lay.margin = 0;
     lay.spacing = 0;
-    
+
     this.prBar_ = new QProgressBar(this.w_);
     this.prBar_.setCenterIndicator(true);
     this.prBar_.setTotalSteps(100);
@@ -1094,8 +1183,7 @@ class AbanQUpdater
     this.state_ = netOp.state();
     this.w_.close();
     if (this.state_ == AQS.StFailed) {
-      MessageBox.critical(netOp.protocolDetail(), MessageBox.Ok,
-                          MessageBox.NoButton, MessageBox.NoButton, "Error");
+      errorMsgBox(netOp.protocolDetail());
     }
   }
 
@@ -1135,7 +1223,7 @@ function updateAbanQ()
 
   if (questionMsgBox(msg, "autoConnectInfoSiAL", txtRem) != MessageBox.Yes)
     return;
-        
+
   var updater = new AbanQUpdater;
   updater.w_.exec();
 
@@ -1148,7 +1236,7 @@ function updateAbanQ()
     var mng = aqApp.db().managerModules();
     var scrCode = mng.byteCodeToStr(baCode);
     var scr = QSProject.script(scrName);
-    
+
     if (!scr) {
       scriptInfos.push([scrName, scrCode, QSProject.New, ""]);
     } else if (scr.code() != scrCode) {
@@ -1173,21 +1261,21 @@ function exportModules()
   var dirBasePath = FileDialog.getExistingDirectory(Dir.home);
   if (!dirBasePath)
     return;
+  var dataBaseName = aqApp.db().database();
   dirBasePath = Dir.cleanDirPath(dirBasePath + "/modulos_exportados_" +
-                                 aqApp.db().database());
+                                 dataBaseName.mid(dataBaseName.lastIndexOf("/") + 1));
 
   var dir = new Dir;
   if (!dir.fileExists(dirBasePath)) {
     try {
       dir.mkdir(dirBasePath);
     } catch (e) {
-      MessageBox.critical("" + e, MessageBox.Ok);
+      errorMsgBox("" + e);
       return;
     }
   } else {
-    MessageBox.warning(dirBasePath + 
-                       sys.translate(" ya existe,\ndebe borrarlo antes de continuar"),
-                       MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "Eneboo");
+    warnMsgBox(dirBasePath +
+               sys.translate(" ya existe,\ndebe borrarlo antes de continuar"));
     return;
   }
 
@@ -1212,7 +1300,7 @@ function exportModules()
       exportModule(idMod, dirBasePath);
     } catch (e) {
       AQUtil.destroyProgressDialog();
-      MessageBox.critical("" + e, MessageBox.Ok);
+      errorMsgBox("" + e);
       return;
     }
   }
@@ -1229,17 +1317,15 @@ function exportModules()
       File.write(dirBasePath + "/mvproject.xml", doc.toString(2));
     } catch (e) {
       AQUtil.destroyProgressDialog();
-      MessageBox.critical("" + e, MessageBox.Ok);
+      errorMsgBoxl("" + e);
       return;
     }
   }
-  
+
   AQUtil.destroyProgressDialog();
-  MessageBox.information(sys.translate("Módulos exportados en:\n") + dirBasePath,
-                         MessageBox.Ok, MessageBox.NoButton,
-                         MessageBox.NoButton, "Eneboo");
+  infoMsgBox(sys.translate("Módulos exportados en:\n") + dirBasePath);
 }
- 
+
 function xmlModule(idMod)
 {
   var qry = new AQSqlQuery;
@@ -1288,7 +1374,7 @@ function xmlModule(idMod)
 }
 
 function fileWriteIso(fileName, content)
-{  
+{
   var fileISO = new QFile(fileName);
   if (!fileISO.open(File.WriteOnly)) {
     debug("Error abriendo fichero " + fileName + " para escritura");
@@ -1301,7 +1387,7 @@ function fileWriteIso(fileName, content)
 }
 
 function fileWriteUtf8(fileName, content)
-{  
+{
   var fileUTF = new QFile(fileName);
   if (!fileUTF.open(File.WriteOnly)) {
     debug("Error abriendo fichero " + fileName + " para escritura");
@@ -1388,7 +1474,7 @@ function importModules(warnBackup)
 {
   if (warnBackup == undefined)
     warnBackup = true;
-  if (warnBackup) {
+  if (warnBackup && interactiveGUI()) {
     var txt = "";
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
@@ -1415,11 +1501,11 @@ function importModules(warnBackup)
   var listFilesMod = selectModsDialog(AQUtil.findFiles([dirMods], "*.mod", false));
   AQUtil.createProgressDialog(sys.translate("Importando"), listFilesMod.length);
   AQUtil.setProgress(1);
-  
+
   for (var i = 0; i < listFilesMod.length; ++i) {
     AQUtil.setLabelText(listFilesMod[i]);
     AQUtil.setProgress(i);
-    
+
     if (!importModule(listFilesMod[i])) {
       errorMsgBox(sys.translate("Error al cargar el módulo:\n") + listFilesMod[i]);
       break;
@@ -1428,9 +1514,7 @@ function importModules(warnBackup)
 
   AQUtil.destroyProgressDialog();
   AQUtil.writeSettingEntry(key, dirMods);
-  MessageBox.information(sys.translate("Importación de módulos finalizada."),
-                         MessageBox.Ok, MessageBox.NoButton,
-                         MessageBox.NoButton, "AbanQ");
+  infoMsgBox(sys.translate("Importación de módulos finalizada."));
   sys.AQTimer.singleShot(0, sys.reinit);
 }
 
@@ -1531,7 +1615,7 @@ function importFiles(dirPath, ext, idMod)
 
   AQUtil.createProgressDialog(sys.translate("Importando"), listFiles.length);
   AQUtil.setProgress(1);
-  
+
   for (var i = 0; i < listFiles.length; ++i) {
     AQUtil.setLabelText(listFiles[i]);
     AQUtil.setProgress(i);
@@ -1650,7 +1734,7 @@ function importReportAr(filePath, idMod, content)
 class AbanQDbDumper
 {
   const SEP_CSV = '\u00b6';
-  
+
   var db_;
   var showGui_;
   var dirBase_;
@@ -1680,7 +1764,7 @@ class AbanQDbDumper
       this.w_.exec();
     }
   }
-  
+
   function buildGui()
   {
     this.w_ = new QDialog;
@@ -1763,9 +1847,7 @@ class AbanQDbDumper
       this.w_.enabled = true;
     if (this.state_.ok) {
       if (gui) {
-        MessageBox.information(this.state_.msg,
-                               MessageBox.Ok, MessageBox.NoButton,
-                               MessageBox.NoButton, "AbanQ");
+        infoMsgBox(this.state_.msg);
       }
       this.w_.close();
     } else if (gui)
@@ -1893,7 +1975,7 @@ class AbanQDbDumper
 
     if (!ok)
       this.dumpAllTablesToCsv();
-      
+
     if (!ok) {
       this.setState(
         false,
@@ -1988,7 +2070,7 @@ class AbanQDbDumper
     this.setState(true, "");
     return true;
   }
-  
+
   function dumpTableToCsv(table, dirBase)
   {
     var fileName = dirBase + table + ".csv";
@@ -2017,7 +2099,7 @@ class AbanQDbDumper
 
     AQUtil.createProgressDialog(sys.translate("Haciendo copia en CSV de ") + table, qry.size());
     var p = 0;
-    
+
     while (qry.next()) {
       rec = "";
       for (var i = 0; i < fieldNames.length; ++i) {
@@ -2111,6 +2193,32 @@ function disableObj(container, component)
   return true;
 }
 
+function enableObj(container, component)
+{
+  var c = testObj(container, component);
+  if (!c) {
+    return false;
+  }
+  // Temporal hasta que ls FL... dispongan de className()
+  var clase = "editor" in c ?
+              "FLFieldDB" :
+              ("tableName" in c ? "FLTableDB" : c.className());
+  switch (clase) {
+    case "QPushButton":
+    case "QToolButton": {
+      runObjMethod(container, component, "setEnabled", true);
+      break;
+    }
+    case "FLFieldDB": {
+      runObjMethod(container, component, "setDisabled", false);
+      break;
+    }
+    default : {
+      return false;
+    }
+  }
+  return true;
+}
 function filterObj(container, component, filter)
 {
   var c = testObj(container, component)
@@ -2176,6 +2284,15 @@ function runObjMethod(container, component, method, param)
   return true;
 }
 
+/// Realiza una conexión comprobando antes si el emisor existe
+function connectSS(ssSender, ssSignal, ssReceiver, ssSlot)
+{
+  if (!ssSender) {
+    return false;
+  }
+  connect(ssSender, ssSignal, ssReceiver, ssSlot);
+  return true;
+}
 /** Encapsula una función en una transacción.
 Ejemplo de uso:
     var oParam = new Object;
@@ -2188,28 +2305,52 @@ Ejemplo de uso:
 */
 function runTransaction(f, oParam)
 {
-  var errorMsg = "errorMsg" in oParam ? oParam.errorMsg : false;
-  
   var curT = new FLSqlCursor("flfiles");
   curT.transaction(false);
-  var valor;
+  var valor, errorMsg;
+  var gui = interactiveGUI();
+  if (gui) {
+    try {
+      AQS.Application_setOverrideCursor(AQS.WaitCursor);
+    } catch (e) {}
+  }
   try {
     valor = f(oParam);
+    errorMsg = "errorMsg" in oParam ? oParam.errorMsg : false;
     if (valor) {
       curT.commit();
     } else {
       curT.rollback();
-      if (errorMsg ) {
-        MessageBox.warning(errorMsg , MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
-        return false;
+      if (gui) {
+        try {
+          AQS.Application_restoreOverrideCursor();
+        } catch (e) {}
       }
+      if (errorMsg) {
+        warnMsgBox(errorMsg);
+      } else {
+        warnMsgBox(translate("Error al ejecutar la función"));
+      }
+      return false;
     }
   } catch (e) {
     curT.rollback();
-    if (errorMsg ) {
-      MessageBox.warning(errorMsg  + ": " + e, MessageBox.Ok, MessageBox.NoButton, MessageBox.NoButton, "AbanQ");
+    if (gui) {
+      try {
+        AQS.Application_restoreOverrideCursor();
+      } catch (e) {}
+    }
+    if (errorMsg) {
+      warnMsgBox(errorMsg  + ": " + e.toString());
+    } else {
+      warnMsgBox(translate("Error ejecutando la función") + ":\n" + e);
     }
     return false;
+  }
+  if (gui) {
+    try {
+      AQS.Application_restoreOverrideCursor();
+    } catch (e) {}
   }
   return valor;
 }
@@ -2218,7 +2359,7 @@ function openUrl(url)
 {
   if (!url || (typeof url) != "string" || url.isEmpty())
     return false;
-  
+
   switch (sys.osName()) {
     case "LINUX": {
       if (launchCommand(["xdg-open", url]))
@@ -2272,3 +2413,36 @@ function launchCommand(command)
   }
 }
 
+function isUserBuild()
+{
+  return sys.version().upper().indexOf("USER") != -1;
+}
+
+function isDeveloperBuild()
+{
+  return sys.version().upper().indexOf("DEVELOPER") != -1;
+}
+
+function interactiveGUI()
+{
+  return aqApp.db().interactiveGUI();
+}
+
+function qsaExceptions()
+{
+  return aqApp.db().qsaExceptions();
+}
+
+function serverTime()
+{
+  var db = aqApp.db().db();
+  // o así
+  //var db = AQSql.database().db();
+  var sql = "select current_time";
+  var ahora;
+  var q = new QSqlSelectCursor(sql, db);
+  if (q.isActive() && q.next()) {
+    ahora = q.value(0);
+  }
+  return ahora;
+}

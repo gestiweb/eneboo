@@ -11,66 +11,38 @@ var form = this;
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; version 2 of the License.               *
  ***************************************************************************/
-/***************************************************************************************************
- * Este programa es software libre. Puede redistribuirlo y/o modificarlo bajo los términos de la
- * Licencia Pública General de GNU en su versión 2, publicada por la Free Software Foundation.
- **************************************************************************************************/
+/***************************************************************************
+   Este  programa es software libre. Puede redistribuirlo y/o modificarlo
+   bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
+   versión 2, publicada  por  la  Free  Software Foundation.
+ ***************************************************************************/
 
-function init()
-{
-  var qry = new AQSqlQuery;
-  qry.setSelect("valor");
-  qry.setFrom("flsettings");
-  qry.setWhere("flkey='sysmodver'");
-
-  if (!qry.exec() || !qry.next())
-    return;
-
-  var modVer = qry.value(0).toString();
-  if (modVer.charAt(0) == '@') {
-    if (interactiveGUI()) {
-      var txt = "";
-      txt += sys.translate("La versión instalada de los módulos en esta  base\n");
-      txt += sys.translate("de datos está desactualizada, le recomendamos que\n");
-      txt += sys.translate("la actualice lo antes posible.\n");
-      txt += sys.translate("Mientras tanto,  AbanQ  necesita realizar algunos\n");
-      txt += sys.translate("ajustes para  poder ser  ejecutado con las nuevas\n");
-      txt += sys.translate("versiones.\n");
-      txt += sys.translate("No  debería  continuar  si no tiene una  copia de\n");
-      txt += sys.translate("seguridad que le  permita deshacer  los cambios y\n");
-      txt += sys.translate("volver al estado anterior en cualquier momento.\n\n");
-      txt += sys.translate("Obtenga soporte en");
-      txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
-      txt += "\n\n";
-      txt += sys.translate("¿Desea continuar?");
-
-      var res = MessageBox.warning(txt, MessageBox.No, MessageBox.Yes);
-      if (res == MessageBox.No) {
-        sys.AQTimer.singleShot(0, aqApp.quit);
-        return;
-      }
-    }
-
-    modVer = '#' + modVer.mid(1);
-    AQSql.update("flsettings", ["valor"], [modVer], "flkey='sysmodver'");
-    sys.AQTimer.singleShot(0, sys.reinit);
-    return;
-  }
-
+function init() {
   if (isLoadedModule("flfactppal")) {
-    var codEjercicio = flfactppal.iface.pub_ejercicioActual();
-    var nombreEjercicio = AQUtil.sqlSelect("ejercicios", "nombre",
-                                           "codejercicio='" + codEjercicio + "'");
+    var util: FLUtil = new FLUtil();
+    var codEjercicio: String = flfactppal.iface.pub_ejercicioActual();
+    var nombreEjercicio: String = util.sqlSelect("ejercicios", "nombre", "codejercicio='" + codEjercicio + "'");
     setCaptionMainWidget(nombreEjercicio);
-  }
-
-  var tmpVar = new FLVar;
-  if (tmpVar.get("mrproper") == "dirty")
-    sys.AQTimer.singleShot(10, sys.Mr_Proper);
+    var settings = new AQSettings;
+    var oldApi:Boolean = settings.readBoolEntry("application/oldApi");
+ if (!oldApi)
+ 	{
+    	var valor:String = util.readSettingEntry("ebcomportamiento/ebCallFunction");
+	if (valor)
+     		{
+        	var funcion = new Function( valor );
+    		try {
+    			funcion(); //Ejecuta la función
+  		    } catch(e) {
+    				debug(e);
+  			       }
+  	      }	
+  	}
+  }		
+  
 }
 
-function afterCommit_flfiles(curFiles)
-{
+function afterCommit_flfiles(curFiles) {
   if (curFiles.modeAccess() != curFiles.Browse) {
     var qry = new FLSqlQuery();
     qry.setTablesList("flserial");
@@ -82,7 +54,7 @@ function afterCommit_flfiles(curFiles)
         var util = new FLUtil();
         var v = util.sha1(qry.value(0));
         while (qry.next())
-          v = util.sha1(v + qry.value(0));
+        v = util.sha1(v + qry.value(0));
         var curSerial = new FLSqlCursor("flserial");
         curSerial.select();
         if (!curSerial.first())
@@ -359,6 +331,9 @@ function registerUpdate(input)
     errorMsgBox(msg);
     return;
   }
+  unpacker.jump(); //Espacio1
+  unpacker.jump(); //Espacio2
+  unpacker.jump(); //Espacio3
 
   var now = new Date;
   var file = new File(input);
@@ -391,8 +366,6 @@ function warnLocalChanges(changes)
   txt += sys.translate("la última actualización/instalación de un paquete de módulos.\n");
   txt += sys.translate("Si continua es posible que estos cambios sean sobreescritos por\n");
   txt += sys.translate("los cambios que incluye el paquete que quiere cargar.\n\n");
-  txt += sys.translate("Obtenga soporte en");
-  txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
   txt += "\n\n";
   txt += sys.translate("Registro de cambios");
 
@@ -423,7 +396,7 @@ function warnLocalChanges(changes)
   var pbCancel = new QPushButton(diag);
   pbCancel.text = sys.translate("Cancelar");
   var pbAccept = new QPushButton(diag);
-  pbAccept.text = sys.translate("Continuar");
+  pbAccept.text = sys.translate("continue");
   lay2.addWidget(pbCancel);
   lay2.addWidget(pbAccept);
 
@@ -444,9 +417,9 @@ function reportChanges(changes)
     ret += "Nombre: " + chg[0] + "\n";
     ret += "Estado: " + chg[1] + "\n";
     ret += "ShaOldTxt: " + chg[2] + "\n";
-    ret += "ShaOldBin: " + chg[3] + "\n";
+    //ret += "ShaOldBin: " + chg[3] + "\n";
     ret += "ShaNewTxt: " + chg[4] + "\n";
-    ret += "ShaNewBin: " + chg[5] + "\n";
+    //ret += "ShaNewBin: " + chg[5] + "\n";
     ret += "###########################################\n";
   }
 
@@ -510,7 +483,7 @@ function diffXmlFilesDef(xmlOld, xmlNew)
                  ]
                  ret[key] = info.join('@');
       ++size;
-    } else if (arrNew[key].shatext != arrOld[key].shatext ||
+    } else if (arrNew[key].shatext != arrOld[key].shatext || 
                arrNew[key].shabinary != arrOld[key].shabinary) {
       var info = [
                    key,
@@ -564,7 +537,7 @@ function xmlFilesDefBd()
   doc.appendChild(root);
 
   var qry = new AQSqlQuery;
-  qry.setSelect("idmodulo,nombre,contenido,binario");
+  qry.setSelect("idmodulo,nombre,contenido");
   qry.setFrom("flfiles");
 
   if (!qry.exec())
@@ -702,16 +675,16 @@ function xmlFilesDefBd()
 
 function textPacking(ext)
 {
-  return ext.endsWith(".ui") ||
-         ext.endsWith(".qry") ||
-         ext.endsWith(".kut") ||
-         ext.endsWith(".jrxml") ||
-         ext.endsWith(".ar") ||
-         ext.endsWith(".mtd") ||
-         ext.endsWith(".ts") ||
-         ext.endsWith(".qs") ||
-         ext.endsWith(".xml") ||
-         ext.endsWith(".xpm") ||
+  return ext.endsWith(".ui") || 
+         ext.endsWith(".qry") || 
+         ext.endsWith(".kut") || 
+         ext.endsWith(".jrxml") || 
+         ext.endsWith(".ar") || 
+         ext.endsWith(".mtd") || 
+         ext.endsWith(".ts") || 
+         ext.endsWith(".qs") || 
+         ext.endsWith(".xml") || 
+         ext.endsWith(".xpm") || 
          ext.endsWith(".svg");
 }
 
@@ -723,10 +696,10 @@ function binaryPacking(ext)
 function loadModules(input, warnBackup)
 {
   if (input == undefined) {
-    var dir = new Dir(sys.installPrefix() + "/share/abanq/packages");
+    var dir = new Dir(sys.installPrefix() + "/share/eneboo/packages");
     dir.setCurrent();
     input = FileDialog.getOpenFileName(
-              "AbanQ Packages (*.abanq)",
+              "Eneboo Packages (*.eneboopkg)\nAbanQ Packages (*.abanq)",
               AQUtil.translate("scripts", "Seleccionar Fichero")
             );
   }
@@ -740,13 +713,9 @@ function loadAbanQPackage(input, warnBackup)
 {
   if (warnBackup && interactiveGUI()) {
     var txt = "";
-    txt += sys.translate("IMPORTANTE: Si carga este paquete ya no podrá utilizar sobre\n");
-    txt += sys.translate("esta base de datos motores de AbanQ versión 2.3 y anteriores.\n\n");
     txt += sys.translate("Asegúrese de tener una copia de seguridad de todos los datos\n");
     txt += sys.translate("y de que  no hay ningun otro  usuario conectado a la base de\n");
     txt += sys.translate("datos mientras se realiza la carga.\n\n");
-    txt += sys.translate("Obtenga soporte en");
-    txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
     txt += "\n\n";
     txt += sys.translate("¿Desea continuar?");
     if (MessageBox.Yes != MessageBox.warning(txt, MessageBox.No, MessageBox.Yes))
@@ -775,7 +744,13 @@ function loadAbanQPackage(input, warnBackup)
         errorMsgBox(msg);
         ok = false;
       }
+      //debug("Versión " + unpacker.getVersion()); //devuelve el fabricante del paquete
+          //Por ahora los paquetes a cargar usan la misma estructura
+                   unpacker.jump(); //Espacio1
+                   unpacker.jump(); //Espacio2
+                   unpacker.jump(); //Espacio3
 
+ 
       if (ok)
         ok = loadModulesDef(unpacker);
 
@@ -850,6 +825,7 @@ function loadFilesDef(un)
 
 function registerFile(fil, un)
 {
+var Dump;
   if (fil.id.endsWith(".xpm")) {
     var cur = new AQSqlCursor("flmodules");
     if (!cur.select("idmodulo='" + fil.module + "'"))
@@ -879,9 +855,9 @@ function registerFile(fil, un)
       cur.setValueBuffer("contenido", un.getText());
   }
   if (fil.binary.length > 0) {
-    cur.setValueBuffer("binario", un.getBinary());
-    if (fil.id.endsWith(".qs"))
-      AQUtil.writeDBSettingEntry(fil.id.left(30), fil.shatext);
+    un.getBinary(); // Hay que solicitarlo para que cuente el espacio.
+    //if (fil.id.endsWith(".qs"))
+    //  AQUtil.writeDBSettingEntry(fil.id.left(30), fil.shatext);
   }
   return cur.commitBuffer();
 }
@@ -907,11 +883,9 @@ function checkProjectName(proName)
   txt += sys.translate("nombre difiere del instalado actualmente en la base de datos.\n");
   txt += sys.translate("Es posible que la estructura de los módulos que quiere cargar\n");
   txt += sys.translate("sea completamente distinta a la instalada actualmente, y si continua\n");
-  txt += sys.translate("podría dañar el código, datos y la estructura de tablas de AbanQ.\n\n");
+  txt += sys.translate("podría dañar el código, datos y la estructura de tablas de Eneboo.\n\n");
   txt += sys.translate("- Nombre del proyecto instalado: %1\n").arg(dbProName);
   txt += sys.translate("- Nombre del proyecto a cargar: %1\n\n").arg(proName);
-  txt += sys.translate("Obtenga soporte en");
-  txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
   txt += "\n\n";
 
   if (!interactiveGUI()) {
@@ -1034,7 +1008,7 @@ function errorMsgBox(msg)
   msg += "\n";
   if (interactiveGUI()) {
     MessageBox.critical(msg, MessageBox.Ok, MessageBox.NoButton,
-                        MessageBox.NoButton, "AbanQ");
+                      MessageBox.NoButton, "Eneboo");
   } else {
     debug("ERROR: " + msg);
   }
@@ -1106,7 +1080,7 @@ function questionMsgBox(msg, keyRemember, txtRemember, forceShow,
     return true;
 
   var diag = new QDialog;
-  diag.caption = txtCaption ? txtCaption : "AbanQ";
+  diag.caption = txtCaption ? txtCaption : "Eneboo";
   diag.modal = true;
 
   var lay = new QVBoxLayout(diag);
@@ -1174,7 +1148,7 @@ class AbanQUpdater
   function AbanQUpdater()
   {
     this.w_ = new QDialog;
-    this.w_.caption = "AbanQ";
+    this.w_.caption = "Eneboo";
     this.w_.name = "abanqUpdaterDialog";
     this.w_.modal = true;
 
@@ -1229,6 +1203,9 @@ class AbanQUpdater
 
 function updateAbanQ()
 {
+  MessageBox.warning(sys.translate("Funcionalidad no soportada aún en Eneboo."), MessageBox.Ok, MessageBox.NoButton,MessageBox.NoButton, "Eneboo");
+  return;
+  /*
   var msg = "";
   msg += sys.translate("Se va a proceder a conectar a través de Internet\n");
   msg += sys.translate("con los sistemas de InfoSiAL S.L. para obtener la\n");
@@ -1276,6 +1253,7 @@ function updateAbanQ()
     } else
       aqUpdaterMain24();
   }
+  */
 }
 
 function exportModules()
@@ -1365,7 +1343,7 @@ function xmlModule(idMod)
   tag.appendChild(doc.createTextNode(idMod));
   tagMod.appendChild(tag);
 
-  var trNoop = "QT_TRANSLATE_NOOP(\"AbanQ\",\"%1\")";
+  var trNoop = "QT_TRANSLATE_NOOP(\"Eneboo\",\"%1\")";
   tag = doc.createElement("alias");
   tag.appendChild(doc.createTextNode(trNoop.argStr(qry.value(0))));
   tagMod.appendChild(tag);
@@ -1667,10 +1645,10 @@ function importFile(filePath, idMod)
 
   var ok = true;
   var name = file.name;
-  if ((!AQUtil.isFLDefFile(content) &&
-       !name.endsWith(".qs") &&
-       !name.endsWith(".ar") &&
-       !name.endsWith(".svg")) ||
+  if ((!AQUtil.isFLDefFile(content) && 
+       !name.endsWith(".qs") && 
+       !name.endsWith(".ar") && 
+       !name.endsWith(".svg")) || 
       name.endsWith("untranslated.ts"))
     return ok;
 
