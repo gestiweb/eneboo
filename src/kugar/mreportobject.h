@@ -125,11 +125,6 @@ protected:
   int borderStyle;
 	
 	/**
-  Object's border radius [d5]
-  */
-  int borderRadius;
-
-  /**
   Report section index. -1 when is not yet in a report section
   */
   int sectionIndex;
@@ -215,11 +210,6 @@ public:
   Sets the object's border style - default is SolidLine
   */
   void setBorderStyle(int style);
-	
-  /**
-  Sets the object's border radius - default is 0 [d5]
-  */
-  void setBorderRadius( int radius );
 
   /**
   Sets the object's transparent mode

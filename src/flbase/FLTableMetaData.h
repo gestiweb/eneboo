@@ -339,12 +339,6 @@ public:
   void setDetectLocks(bool b = true);
 
   /**
-  Establece el nombre de función a llamar para Full Text Search
-  */
-  QString FTSFunction();
-  void setFTSFunction(QString ftsfun);
-
-  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache() const;
@@ -467,11 +461,6 @@ public:
   bool detectLocks_;
   
   /**
-  Indica el nombre de función a llamar para la búsqueda con Full Text Search
-  */
-  QString ftsfun_;
-  
-  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache_;
@@ -555,19 +544,6 @@ inline bool FLTableMetaData::inCache() const
 inline void FLTableMetaData::setInCache(bool b)
 {
   d->inCache_ = b;
-}
-
-
-
-inline QString FLTableMetaData::FTSFunction()
-{
-  return d->ftsfun_;
-}
-
-
-inline void FLTableMetaData::setFTSFunction(QString ftsfun)
-{
-  d->ftsfun_ = ftsfun;  
 }
 
 #endif

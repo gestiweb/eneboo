@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>521</width>
+            <width>862</width>
             <height>529</height>
         </rect>
     </property>
@@ -927,143 +927,6 @@ References
                     </widget>
                 </vbox>
             </widget>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>TabPage</cstring>
-                </property>
-                <attribute name="title">
-                    <string>A&amp;utoría</string>
-                </attribute>
-                <vbox>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <widget class="QTextEdit">
-                        <property name="name">
-                            <cstring>TextEdit1_2</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <family>Monospace</family>
-                                <bold>0</bold>
-                                <italic>0</italic>
-                            </font>
-                        </property>
-                        <property name="focusPolicy">
-                            <enum>WheelFocus</enum>
-                        </property>
-                        <property name="textFormat">
-                            <enum>PlainText</enum>
-                        </property>
-                        <property name="text">
-                            <string>En la realización de Eneboo han participado:
-
-Motor Eneboo :
-InfoSiAL S.L. &lt;mail@infosial.com&gt; 
-Gestiweb Integración de Soluciones Web S.L. &lt;info@gestiweb.com&gt;
-Grupo Easy Soft. &lt;info@easysoftcommunity.com&gt;
-Digital5, S.L. &lt;info@digital5.es&gt;
-José A. Fernández &lt;aullasistemas@gmail.com&gt;
-Silix, Soluciones informáticas libres &lt;contacto@silix.com.ar&gt;
-
-Documentación :
-David Zafra Gómez (KLO Ingeniería Informática, www.klo.es)
-
-Instaladores (Wizards) :
-Calidae S.L. &lt;erp@calidae.com&gt;</string>
-                        </property>
-                        <property name="wordWrap">
-                            <enum>WidgetWidth</enum>
-                        </property>
-                        <property name="overwriteMode">
-                            <bool>false</bool>
-                        </property>
-                        <property name="readOnly">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                </vbox>
-            </widget>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>TabPage</cstring>
-                </property>
-                <attribute name="title">
-                    <string>&amp;Compilación</string>
-                </attribute>
-                <grid>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <widget class="QPushButton" row="1" column="2">
-                        <property name="name">
-                            <cstring>pbtncopiar</cstring>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <bold>0</bold>
-                                <italic>0</italic>
-                            </font>
-                        </property>
-                        <property name="text">
-                            <string>Copiar al Portapapeles</string>
-                        </property>
-                    </widget>
-                    <spacer row="0" column="0">
-                        <property name="name">
-                            <cstring>spacer6_2</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>230</width>
-                                <height>21</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLabel" row="0" column="1" rowspan="2" colspan="1">
-                        <property name="name">
-                            <cstring>lblCompilacion</cstring>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <italic>0</italic>
-                            </font>
-                        </property>
-                        <property name="text">
-                            <string></string>
-                        </property>
-                        <property name="alignment">
-                            <set>AlignTop</set>
-                        </property>
-                    </widget>
-                    <spacer row="0" column="2">
-                        <property name="name">
-                            <cstring>spacer7</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>220</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                </grid>
-            </widget>
         </widget>
         <widget class="QLayoutWidget">
             <property name="name">
@@ -1144,20 +1007,11 @@ Calidae S.L. &lt;erp@calidae.com&gt;</string>
         <receiver>FLWidgetAbout</receiver>
         <slot>accept()</slot>
     </connection>
-    <connection>
-        <sender>pbtncopiar</sender>
-        <signal>clicked()</signal>
-        <receiver>FLWidgetAbout</receiver>
-        <slot>copy2Clipboard()</slot>
-    </connection>
 </connections>
 <tabstops>
     <tabstop>cerrar</tabstop>
     <tabstop>TabWidget2</tabstop>
 </tabstops>
-<slots>
-    <slot>copy2Clipboard()</slot>
-</slots>
 <includes>
     <include location="global" impldecl="in declaration">AQGlobal.h</include>
 </includes>

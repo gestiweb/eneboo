@@ -18,8 +18,6 @@
 
 #include <qdom.h>
 
-#include <stdio.h>
-
 #include "FLSqlDatabase.h"
 #include "FLManager.h"
 #include "FLManagerModules.h"
@@ -94,11 +92,7 @@ void AQApplication::init(const QString &n, const QString &callFunction,
     i->addWrapperFactory(new AQSWrapperFactory);
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
-#ifdef FL_DEBUGGER
-    i->setErrorMode( QSInterpreter::AskForDebug );
-#else
     i->setErrorMode( QSInterpreter::Notify );
-#endif
   }
 
 #ifdef QSDEBUGGER

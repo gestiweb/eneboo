@@ -2081,8 +2081,6 @@ void MReportEngine::setLabelAttributes(MLabelObject *label, QDomNamedNodeMap *at
 
   label->setBorderWidth(attr->namedItem("BorderWidth").nodeValue().toInt());
   label->setBorderStyle(attr->namedItem("BorderStyle").nodeValue().toInt());
-  label->setBorderRadius(attr->namedItem( "BorderRadius" ).nodeValue().toInt());
-  
   label->setFont(attr->namedItem("FontFamily").nodeValue(),
                  attr->namedItem("FontSize").nodeValue().toFloat() * relCalcDpi_,
                  attr->namedItem("FontWeight").nodeValue().toInt(),

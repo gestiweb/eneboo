@@ -26,7 +26,6 @@ email                : mail@infosial.com
 #include "FLRelationMetaData.h"
 #include "FLFormSearchDB.h"
 #include "FLManager.h"
-#include "FLManagerModules.h"
 #include "FLAction.h"
 #include "FLApplication.h"
 #include "FLSqlDatabase.h"
@@ -36,7 +35,6 @@ email                : mail@infosial.com
 #include "FLSqlQuery.h"
 #include "FLDiskCache.h"
 #include "AQOds.h"
-#include "FLSettings.h"
 
 FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent, name),
   tableRecords_(0), tableName_(QString::null), foreignField_(QString::null),
@@ -45,8 +43,7 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   editonly_(false), reqEditOnly_(false), insertonly_(false), reqInsertOnly_(false),
   sortField_(0), initSearch_(QString::null), checkColumnEnabled_(false),
   aliasCheckColumn_(tr("Seleccionar")), fieldNameCheckColumn_(QString::null),
-  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), sortColumn2_(1),
-  orderAsc2_(true), sortColumn3_(2), orderAsc3_(true), tdbFilterLastWhere_(QString::null),
+  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), tdbFilterLastWhere_(QString::null),
   findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0),
   reqOnlyTable_(false), onlyTable_(false), autoSortColumn_(true)
 {
@@ -85,7 +82,6 @@ FLDataTable *FLTableDB::tableRecords()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
-    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
     if (autoSortColumn_)
@@ -107,7 +103,6 @@ void FLTableDB::setTableRecordsCursor()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
-    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
   }
@@ -123,7 +118,7 @@ void FLTableDB::setTableRecordsCursor()
 
 bool FLTableDB::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
+  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
     return FLWidgetTableDB::eventFilter(obj, ev);
   if (ev->type() == QEvent::KeyPress && obj == tableRecords_) {
     QKeyEvent *k = static_cast<QKeyEvent *>(ev);
@@ -175,25 +170,7 @@ void FLTableDB::putFirstCol(int c)
   moveCol(c, 0);
 }
 
-// Silix - dpinelo
-void FLTableDB::putSecondCol(const QString &c)
-{
-  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
-  if (c != comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1)) {
-    moveCol(c, comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1), false);
-  }
-}
-
-// Silix - dpinelo
-void FLTableDB::putSecondCol(int c)
-{
-  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
-  if (c != (comboBoxFieldToSearch->currentItem() + 1)) {
-    moveCol(c, (comboBoxFieldToSearch->currentItem() + 1), false);
-  }
-}
-
-void FLTableDB::moveCol(const QString &from, const QString &to, bool firstSearch)
+void FLTableDB::moveCol(const QString &from, const QString &to)
 {
   if (!topWidget || !cursor_ || !showed)
     return;
@@ -228,12 +205,12 @@ void FLTableDB::moveCol(const QString &from, const QString &to, bool firstSearch
 #endif
     return;
   }
-  moveCol(iFrom - sortColumn_, iTo - sortColumn_, firstSearch);
+  moveCol(iFrom - sortColumn_, iTo - sortColumn_);
 }
 
-void FLTableDB::moveCol(int from, int to, bool firstSearch)
+void FLTableDB::moveCol(int from, int to)
 {
-  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
+  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
     return;
 
   if (comboBoxFieldToSearch->text(from) == "*" || comboBoxFieldToSearch->text(to) == "*")
@@ -271,18 +248,16 @@ void FLTableDB::moveCol(int from, int to, bool firstSearch)
   refresh(true);
   if (!textSearch.isEmpty()) {
     refresh(false, true);
-    if (firstSearch) {
       disconnect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
       lineEditSearch->setText(textSearch);
       connect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
       lineEditSearch->selectAll();
-    }
     seekCursor();
     QTimer::singleShot(0, tableRecords_, SLOT(ensureRowSelectedVisible()));
   } else
     refreshDelayed();
   if (!sender())
-    lineEditSearch->setFocus();
+    tableRecords_->setQuickFocus();
 }
 
 void FLTableDB::setReadOnly(const bool mode)
@@ -333,7 +308,6 @@ QString FLTableDB::findFilter()
 
 void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 {
-  QString bfilter = filter_;
   if (!timer)
     return;
 
@@ -352,15 +326,14 @@ void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 
   if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
     return;
-  if (refreshData) {
+  if (refreshData)
     refresh(false, true);
-  }
   seekCursor();
 }
 
 void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
 {
-  if (!lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_ || (topWidget && !topWidget->isShown()))
+  if (!lineEditSearch || !comboBoxFieldToSearch || !cursor_ || (topWidget && !topWidget->isShown()))
     return;
 
   FLTableMetaData *tMD = cursor_->metadata();
@@ -391,8 +364,6 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
         setTableRecordsCursor();
         tableRecords_->setColumn(0, fieldNameCheckColumn_, aliasCheckColumn_);
         sortColumn_ = 1;
-        sortColumn2_ = 2;
-        sortColumn3_ = 3;
         QSqlRecord *buffer_ = cursor_->editBuffer(true);
         for (uint i = 0; i < buffer_->count(); ++i)
           buffer_->setGenerated(i, true);
@@ -409,8 +380,6 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
           cursor_->append(QSqlFieldInfo(*(recordCursor.field(i))));
         setTableRecordsCursor();
         sortColumn_ = 0;
-        sortColumn2_ = 1;
-        sortColumn3_ = 2;
       }
       checkColumnVisible_ = false;
     }
@@ -435,8 +404,6 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     }
     if (autoSortColumn_) {
       QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
-    s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
-    s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
       tableRecords_->setSort(s);
     }
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
@@ -452,24 +419,10 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       horizHeader->setLabel(i, field->alias());
       tableRecords_->setColumn(i, field->name(), field->alias());
     }
-    comboBoxFieldToSearch2->clear();
-    for (int i = sortColumn2_; i < tableRecords_->numCols(); ++i) {
-      field = tMD->field(tMD->fieldAliasToName(horizHeader->label(i)));
-      if (!field)
-        continue;
-      if (i == sortColumn2_)
-        sortField2_ = field;
-      if (comboBoxFieldToSearch2->count() == (i - sortColumn2_))
-        comboBoxFieldToSearch2->insertItem(field->alias());
-      horizHeader->setLabel(i, field->alias());
-      tableRecords_->setColumn(i, field->name(), field->alias());
-    }
     comboBoxFieldToSearch->insertItem("*");
-    comboBoxFieldToSearch2->setCurrentText(comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1));
     if (autoSortColumn_) {
       horizHeader->setClickEnabled(false);
       horizHeader->setClickEnabled(true, sortColumn_);
-    horizHeader->setClickEnabled(true, sortColumn2_);
       horizHeader->setSortIndicator(-1, Qt::Ascending);
       horizHeader->setSortIndicator(sortColumn_, (orderAsc_ ? Qt::Ascending : Qt::Descending));
     }
@@ -532,63 +485,27 @@ void FLTableDB::filterRecords(const QString &p)
     return;
 
   bool refreshData = filter_.contains("%");
-  QString fieldSearch = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem());
-  bool allFields = fieldSearch == "*";
-  int msec_refresh = 400;
-  QString bfilter = "";
+  bool allFields = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem()) == "*";
+  filter_ = "";
   if (!p.isEmpty() && allFields) {
-    QString FTSFunction = cursor_->metadata()->FTSFunction();
-    if (FTSFunction.isEmpty()) {
       const FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
       if (fieldList) {
 	FLFieldMetaData *field;
 	QDictIterator<FLFieldMetaData> it(*fieldList);
-	bfilter = "( false";
 	while ((field = it.current()) != 0) {
 	  ++it;
-	  bool searchField = true;
-	  if (!field->visibleGrid()) searchField = false;
-	  if (field->type() != QVariant::String) searchField = false;
-	  QStringList sOptions = field->searchOptions();
-	  QString allFieldSearchInclude = "allfieldsearch:include";
-	  QString allFieldSearchExclude = "allfieldsearch:exclude";
-
-	  if (sOptions.contains(allFieldSearchExclude) > 0) {
-	    if (searchField) {
-	      //qDebug("Excluding field in allfield search: " + field->name());
-	      searchField = false;
+        if (!field->visibleGrid())
+          continue;
+        if (!p.contains("'") && !p.contains("\\") && field->type() == QVariant::String) {
+          if (!filter_.isEmpty())
+            filter_ += " OR ";
+          else
+            filter_ = "(";
+          filter_ += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
 	    }
 	  }
-	  if (sOptions.contains(allFieldSearchInclude) > 0) {
-	    if (!searchField) {
-	      //qDebug("Including field in allfield search: " + field->name());
-	      searchField = true;
-	    }
-	  }
-        
-	  if (searchField) {
-	    bfilter += " OR ";
-	    bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
-	  }
-	}
-        bfilter += ")";
-        msec_refresh = 800;
-      }
-    } else {
-      QString ftsfilter = p;
-      QString tablename = cursor_->metadata()->name();
-      ftsfilter = ftsfilter.replace(",", " ");
-      ftsfilter = ftsfilter.replace("&", " ");
-      ftsfilter = ftsfilter.replace("|", " ");
-      ftsfilter = ftsfilter.replace("'", " ");
-      ftsfilter = ftsfilter.replace("\"", " ");
-      ftsfilter = ftsfilter.replace(":", " ");
-      ftsfilter = ftsfilter.replace("%", " ");
-      ftsfilter = ftsfilter.replace(QRegExp("\\s+"), " ");
-      ftsfilter = ftsfilter.replace(QRegExp("(^\\s+|\\s+$)"), "");
-      ftsfilter = ftsfilter.replace(" ", " & ");
-      bfilter += FTSFunction + "(" + tablename + ") @@ to_tsquery('" + ftsfilter + ":*')";
-      qDebug("Using Full Text Search: " + bfilter);
+      if (!filter_.isEmpty())
+        filter_ += ")";
     }
   }
 
@@ -605,43 +522,14 @@ void FLTableDB::filterRecords(const QString &p)
           if (qField == sortField_->name() || qField.endsWith("." + sortField_->name()))
             break;
         }
-        bfilter = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
+        filter_ = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
         qry->deleteLater();
       }
     } else
-      bfilter = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
-    fieldSearch = sortField_->name();
+      filter_ = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
   }
 
-  QString functionQSA = tableDB_filterRecords_functionName_;
-
-  if (functionQSA.isEmpty()) {
-    QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
-                                                           QString::fromLatin1(".mtd")));
-    functionQSA = idMod + QString::fromLatin1(".tableDB_filterRecords_") + cursor_->metadata()->name();
-  }
-                                                   
-  if (!functionQSA.isEmpty()) {
-    QValueList<QVariant> vargs = QValueList<QVariant>();
-    vargs.append(cursor_->metadata()->name());
-    vargs.append(p);
-    vargs.append(fieldSearch);
-    vargs.append(bfilter);
-    QSArgumentList args = QSArgumentList(vargs);
-    QVariant v = aqApp->call(functionQSA,args, 0).variant();
-    QString ret = v.toString();
-    if (!ret.isNull()) {
-      bfilter = ret;   
-      qDebug("functionQSA:" + functionQSA + " : " + ret.replace("%","%%"));
-    } else {
-      qDebug("functionQSA:" + functionQSA + " -> NULL");
-    }
-  } else {
-    qDebug("functionQSA: (empty)");
-  }
-
-  refreshDelayed(msec_refresh, !bfilter.isEmpty() || refreshData);
-  filter_ = bfilter;
+  refreshDelayed(500, !filter_.isEmpty() || refreshData);
 }
 
 QString FLTableDB::tableName() const
@@ -937,7 +825,7 @@ void FLTableDB::showWidget()
         refreshDelayed();
     }
     if (!topWidget->isA("FLFormRecordDB"))
-      lineEditSearch->setFocus();
+      tableRecords_->setQuickFocus();
   }
 
   if (cursorAux) {
@@ -1118,35 +1006,14 @@ void FLTableDB::setAliasCheckColumn(const QString &t)
   aliasCheckColumn_ = t;
 }
 
-void FLTableDB::switchSortOrder(int col)
+void FLTableDB::switchSortOrder(int)
 {
   if (!autoSortColumn_)
     return;
-  if (checkColumnVisible_)
-    --col;
-  if (col == 0) {
     orderAsc_ = !orderAsc_;
-  } else if (col == 1) {
-    orderAsc2_ = !orderAsc2_;
-  }
   tableRecords()->hide();
   refresh( true, true );
 }
-
-void FLTableDB::setSortOrder(int ascending)
-{
-  if (orderAsc_ == ascending) return;
-  
-  orderAsc_ = ascending;
-  tableRecords()->hide();
-  refresh(true, true);
-}
-
-bool FLTableDB::isSortOrderAscending()
-{
-    return orderAsc_;
-}
-
 
 void FLTableDB::activeTabData(bool on)
 {
@@ -1642,15 +1509,6 @@ void FLTableDB::exportToOds()
 {
   if (!cursor_)
     return;
-//-->Aulla : Desactiva exportar a ODS
-if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc", true))
-	{
-	QMessageBox::information(this, tr("Opción deshabilitada"),
-                                                 tr("Esta opción ha sido deshabilitada por el administrador"),
-                                                  QMessageBox::Yes);
-	return;
-	}
-//>--Aulla : Desactiva exportar a ODS
   FLTableMetaData *mtd = cursor_->metadata();
   if (!mtd)
     return;

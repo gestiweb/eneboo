@@ -61,7 +61,7 @@
 #include <qgroupbox.h>
 #include <qnetwork.h>
 #include <qlocale.h>
-#include "../qt/include/aqapplication.h"
+#include <aqapplication.h>
 
 #include "AQGlobal.h"
 
@@ -525,17 +525,6 @@ public slots:
 
   /** Uso interno */
   void callScriptEntryFunction();
-   
-  /**
-  Muestra la venta de ayuda con el índice
-  */
-  void helpIndex();
-  
-  /**
-  Muestra la url http://www.eneboo.org
-  */
-  void urlEneboo();
-  
   QLocale localeSystem() const {
     return localeSystem_;
   }
@@ -622,6 +611,11 @@ protected slots:
   Conmuta la barra de estado entre visible y oculta
   */
   void toggleStatusBar(bool toggle);
+
+  /**
+  Muestra la venta de ayuda con el índice
+  */
+  void helpIndex();
 
   /**
   Llamado cuando el menu Ventana es activado; regenera el menu ventana con todas

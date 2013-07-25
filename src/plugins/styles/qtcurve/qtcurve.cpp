@@ -2999,13 +2999,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement pe, QPainter *p, const QRect &
 
       flags = ((flags | Style_Sunken) ^ Style_Sunken) | Style_Raised;
 
-                if(NO_SECT!=itsHoverSect && HOVER_HEADER==itsHover && itsHoverWidget)
-                {
+      if (NO_SECT != itsHoverSect && HOVER_HEADER == itsHover && itsHoverWidget) {
                     QHeader *hd(::qt_cast<QHeader *>(itsHoverWidget));
-		    if (hd && hd->mapToIndex(itsHoverSect) > 0) //Aulla. Evitamos que sea un index vacio
+
+        if (hd && hd->mapToIndex(itsHoverSect) > 0) {
                          if(hd->isClickEnabled(itsHoverSect) && r==hd->sectionRect(itsHoverSect))
                              flags|=Style_MouseOver;
                 }
+      }
 
       bool sunken(flags & (Style_Down | Style_On | Style_Sunken));
 

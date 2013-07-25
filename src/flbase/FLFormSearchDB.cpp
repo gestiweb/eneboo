@@ -360,14 +360,6 @@ void FLFormSearchDB::reject()
   hide();
 }
 
-// Silix
-void FLFormSearchDB::setCaptionWidget(const QString &text) {
-  if (text.isEmpty())
-    return;
-
-  setCaption(text);
-}
-
 QString FLFormSearchDB::geoName() const
 {
   return QString::fromLatin1("formSearch") + idMDI_;

@@ -266,12 +266,6 @@ public:
   void setFunctionGetColor(const QString &f);
 
   /**
-    Asigna el nombre de función a llamar cuando cambia el filtro.
-  */  
-  void setFilterRecordsFunction( QString fn) {
-    tableDB_filterRecords_functionName_ = fn;
-  }
-  /**
   Ver FLTableDB::onlyTable_
   */
   void setOnlyTable(bool on = true);
@@ -432,13 +426,6 @@ private:
   FLFieldMetaData *sortField_;
 
   /**
-  Almacena los metadatos del campo por el que está actualmente ordenada la tabla en segunda instancia
-
-  @author Silix - dpinelo
-   */
-  FLFieldMetaData *sortField2_;
-
-  /**
   Crónometro interno
   */
   QTimer *timer;
@@ -474,37 +461,9 @@ private:
   int sortColumn_;
 
   /**
-  Indica el número de columna por la que ordenar los registros
-
-  @author Silix - dpinelo
-  */
-  int sortColumn2_;
-
-  /**
-  Indica el número de columna por la que ordenar los registros
-
-  @author Silix
-  */
-  int sortColumn3_;
-
-  /**
   Indica el sentido ascendente o descendente del la ordenacion actual de los registros
   */
   bool orderAsc_;
-
-  /**
-  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
-
-  @author Silix - dpinelo
-  */
-  bool orderAsc2_;
-
-  /**
-  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
-
-  @author Silix
-  */
-  bool orderAsc3_;
 
   /**
   Indica si se debe establecer automáticamente la primera columna como de ordenación
@@ -594,8 +553,6 @@ private:
   */
   QWidget *fakeEditor_;
   
-  QString tableDB_filterRecords_functionName_;
-
 public slots:
 
   /**
@@ -655,21 +612,12 @@ public slots:
   void putFirstCol(const QString &c);
 
   /**
-  Coloca la columna como segunda pasando el nombre del campo.
-
-  @author Silix - dpinelo
-  */
-  void putSecondCol( const QString & c );
-
-  /**
   Mueve una columna de un campo origen a la columna de otro campo destino
 
   @param  from  Nombre del campo de la columna de origen
   @param  to    Nombre del campo de la columna de destino
-  @param  firstSearch dpinelo: Indica si se mueven columnas teniendo en cuenta que esta función
-          se ha llamado o no, desde el combo principal de búsqueda y filtrado
   */
-  void moveCol( const QString & from, const QString & to, bool firstSearch = true );
+  void moveCol(const QString &from, const QString &to);
 
   /**
   Inicia el cursor segun este campo sea de la tabla origen o de
@@ -725,7 +673,7 @@ public slots:
   */
   void switchSortOrder(int col = 0);
 
-// protected slots:
+protected slots:
 
   /**
   Coloca la columna indicada como primera.
@@ -742,19 +690,12 @@ public slots:
   void putFirstCol(int c);
 
   /**
-  Coloca la columna indicada como segunda.
-
-  @author Silix - dpinelo
-  */
-  void putSecondCol( int c );
-
-  /**
   Mueve una columna desde una posicion origen a otra posicion destino.
 
   @param  from  Posicion de la columna de origen
   @param  to    Posicion de la columna de destino
   */
-  void moveCol( int from, int to, bool firstSearch = true);
+  void moveCol(int from, int to);
 
   /**
   Filtra los registros de la tabla utilizando el primer campo, según el patrón dado.
@@ -766,10 +707,6 @@ public slots:
   */
   void filterRecords(const QString &p);
 
-  // void switchSortOrder( int col ); // AbanQ 2.5 agrego esta funcion
-  void setSortOrder(int ascending);
-  bool isSortOrderAscending();
-  
   /**
   Activa la tabla de datos
   */

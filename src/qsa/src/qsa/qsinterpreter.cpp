@@ -1077,10 +1077,6 @@ void QSInterpreter::runtimeError(const QString &message,
       else
         qWarning(errorMsg);
     }
-  } else if (errorMode() == AskForDebug) {
-    // TODO: Add here code to debug the runtimeError...
-    qDebug("Error in script: '%s', line: %d\n  %s\n",
-           scriptName.latin1(), lineNumber, message.latin1());
   }
 #else
   QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),

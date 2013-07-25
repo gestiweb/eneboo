@@ -15,7 +15,6 @@ email                : mail@infosial.com
    bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
-#include <stdio.h>
 
 #include <qtoolbutton.h>
 
@@ -51,7 +50,7 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
                  "</p>");
   lblCredito->setText(verMsg.arg(AQ_VERSION));
 
-
+  rememberPasswd_ = FLSettings::readBoolEntry("DBA/rememberPasswd");
   if (FLSettings::readBoolEntry("application/forceOldApi", false)) {
     setOldApi(true);
     chkOldApi->hide();
@@ -64,12 +63,17 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
 
   comboBoxInsert(comboBoxMarks, FLSettings::readListEntry("DBA/marks"));
   lineEditUser->setText(FLSettings::readEntry("DBA/username"));
+  if (rememberPasswd_) {
+    chkRemember->setChecked(true);
+    lineEditPassword->setText(FLSettings::readEntry("DBA/password"));
+  }
   if (oldApi_)
     chkOldApi->setChecked(true);
   lineEditHost->setText(FLSettings::readEntry("DBA/hostname", "localhost"));
   comboBoxNameDB->clear();
   comboBoxInsert(comboBoxNameDB, FLSettings::readListEntry("DBA/namesDB"));
-  comboBoxNameDB->setCurrentText(FLSettings::readEntry("DBA/lastDB", "eneboo"));
+  comboBoxNameDB->setCurrentText(FLSettings::readEntry("DBA/lastDB", "abanq"));
+  lineEditUser->setFocus();
 
   connect(comboBoxNameDB, SIGNAL(activated(const QString &)), this, SLOT(changeDB(const QString &)));
 
@@ -80,54 +84,12 @@ FLConnectDBDialog::FLConnectDBDialog(bool disabled, QWidget *parent, const char 
   lineEditPort->setText(FLSettings::readEntry("DBA/port", FLSqlDatabase::defaultPort(alias)));
   if (!strConn.isEmpty())
     selectMark(strConn);
-
-  QString usuario = lineEditUser->text();
-  QString host = lineEditHost->text();
-  QString puerto = lineEditPort->text();
-
-  connectionPath_ = usuario;
-  connectionPath_ = connectionPath_ + puerto;
-  connectionPath_ = connectionPath_ + host;
-  connectionPath_ = connectionPath_ + alias;
-  connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
-  rememberPasswd_ = FLSettings::readBoolEntry("DBA/rememberPasswd" + connectionPath_);
-
-  if (rememberPasswd_) {
-    chkRemember->setChecked(true);
-    lineEditPassword->setText(FLSettings::readEntry("DBA/password" + connectionPath_));
-  }
-
-  lineEditPassword->setFocus();
 }
 
 FLConnectDBDialog::~FLConnectDBDialog() {}
 
 void FLConnectDBDialog::tryConnect()
 {
-  QString usuario = lineEditUser->text();
-  usuario = usuario.replace(QRegExp("^[\\s\\t]+|[\\s\\t]+$"), "");
-  if (usuario.isEmpty() && comboBoxDB->currentText() != "SQLite3") {
-    error_ = true;
-    this->accept();
-    return ;
-  }
-
-  QString host = lineEditHost->text();
-  host = host.replace(QRegExp("^[\\s\\t]+|[\\s\\t]+$"),"");
-  if (host.isEmpty()) {
-    error_ = true;
-    this->accept();
-    return ;
-  }
-  
-  QString puerto = lineEditPort->text();
-  puerto = puerto.replace(QRegExp("[^0-9]+"), "");
-  if (puerto.isEmpty() && comboBoxDB->currentText() != "SQLite3") {
-    error_ = true;
-    this->accept();
-    return ;
-  }  
-
   FLSqlDatabase *db = new FLSqlDatabase();
 
   if (!db->loadDriver(FLSqlDatabase::driverAliasToDriverName(comboBoxDB->currentText()))) {
@@ -139,14 +101,13 @@ void FLConnectDBDialog::tryConnect()
     this->accept();
     return;
   }
-  QString DBName = comboBoxNameDB->currentText();
+
   QString connOpts;
   if (db->driverName() == "FLQPSQL7")
     connOpts = "connect_timeout=30";
-  if (comboBoxDB->currentText() == "SQLite3") 
-  	DBName = DBName + ".s3db";
-  if (!db->connectDB(DBName, usuario,
-                     lineEditPassword->text(), host, puerto.toInt(), 
+  if (!db->connectDB(comboBoxNameDB->currentText(), lineEditUser->text(),
+                     lineEditPassword->text(), lineEditHost->text(),
+                     lineEditPort->text().toInt(),
                      QString::fromLatin1("default"), connOpts)) {
     error_ = true;
     delete db;
@@ -154,20 +115,14 @@ void FLConnectDBDialog::tryConnect()
     return;
   }
 
-  // connectionPath_("%1");
-  connectionPath_ = usuario;
-  connectionPath_ = connectionPath_ + puerto;
-  connectionPath_ = connectionPath_ + host;
-  connectionPath_ = connectionPath_ + comboBoxDB->currentText();
-  connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
-  FLSettings::writeEntry("DBA/rememberPasswd" + connectionPath_, rememberPasswd_);
-  FLSettings::writeEntry("DBA/username", usuario);
+  FLSettings::writeEntry("DBA/rememberPasswd", rememberPasswd_);
+  FLSettings::writeEntry("DBA/username", lineEditUser->text());
   if (rememberPasswd_)
-    FLSettings::writeEntry("DBA/password" + connectionPath_, lineEditPassword->text());
+    FLSettings::writeEntry("DBA/password", lineEditPassword->text());
   else
-    FLSettings::writeEntry("DBA/password" + connectionPath_, QString::null);
-  FLSettings::writeEntry("DBA/port", puerto);
-  FLSettings::writeEntry("DBA/hostname", host);
+    FLSettings::writeEntry("DBA/password", QString::null);
+  FLSettings::writeEntry("DBA/port", lineEditPort->text());
+  FLSettings::writeEntry("DBA/hostname", lineEditHost->text());
   FLSettings::writeEntry("DBA/db", comboBoxDB->currentText());
   FLSettings::writeEntry("DBA/lastDB", comboBoxNameDB->currentText());
   QStringList names;
@@ -275,20 +230,6 @@ void FLConnectDBDialog::removeMark()
     names << comboBoxMarks->text(i);
 
   FLSettings::writeEntry("DBA/marks", names);
-
-  QString usuario = lineEditUser->text();
-  QString host = lineEditHost->text();
-  QString puerto = lineEditPort->text();
-
-  connectionPath_ = usuario;
-  connectionPath_ = connectionPath_ + puerto;
-  connectionPath_ = connectionPath_ + host;
-  connectionPath_ = connectionPath_ + comboBoxDB->currentText();
-  connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
-  FLSettings::writeEntry("DBA/rememberPasswd" + connectionPath_,false);
-  FLSettings::writeEntry("DBA/password" + connectionPath_, QString::null);
-   chkRemember->setChecked(false);
-
 }
 
 void FLConnectDBDialog::selectMark(const QString &mark)
@@ -318,25 +259,6 @@ void FLConnectDBDialog::selectMark(const QString &mark)
         break;
     }
   }
-  QString usuario = lineEditUser->text();
-  QString host = lineEditHost->text();
-  QString puerto = lineEditPort->text();
-
-  connectionPath_ = usuario;
-  connectionPath_ = connectionPath_ + puerto;
-  connectionPath_ = connectionPath_ + host;
-  connectionPath_ = connectionPath_ + comboBoxDB->currentText();
-  connectionPath_ = connectionPath_ + comboBoxNameDB->currentText();
-  rememberPasswd_ = FLSettings::readBoolEntry("DBA/rememberPasswd" + connectionPath_);
-
-  if (rememberPasswd_) {
-    chkRemember->setChecked(true);
-    lineEditPassword->setText(FLSettings::readEntry("DBA/password" + connectionPath_));
-  } else
-        {
-         chkRemember->setChecked(false);
-         lineEditPassword->setText("");
-       }
 }
 
 void FLConnectDBDialog::popupMarks()
@@ -432,6 +354,5 @@ void FLConnectDBDialog::setRememberPasswd(bool on)
 void FLConnectDBDialog::setOldApi(bool on)
 {
   oldApi_ = on;
-  // printf("--> Setting old api: %s\n", on ? "True" : "False");
   FLSettings::writeEntry("application/oldApi", oldApi_);
 }

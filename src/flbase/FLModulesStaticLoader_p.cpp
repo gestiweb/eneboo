@@ -318,7 +318,7 @@ void FLStaticLoaderWarning::updateScripts()
   paths_.clear();
 }
 
-#define AQ_STATIC_LOADER_POPUP_WARN
+//#define AQ_STATIC_LOADER_POPUP_WARN
 
 FLStaticLoaderWarning *FLModulesStaticLoader::warn_ = 0;
 
@@ -335,7 +335,7 @@ QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
       if (!warn_)
         warn_ = new FLStaticLoaderWarning;
 #ifdef AQ_STATIC_LOADER_POPUP_WARN
-      if (warn_->warns_.isEmpty() && FLSettings::readBoolEntry("ebcomportamiento/SLInterface", true))
+      if (warn_->warns_.isEmpty())
         QTimer::singleShot(500, warn_, SLOT(popupWarnings()));
 #endif
       if (warn_->paths_.isEmpty())
@@ -346,10 +346,9 @@ QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
       if (!warn_->warns_.contains(msg)) {
         warn_->warns_ << msg;
         warn_->paths_ << QString(n + ':' + info->path_);
-        if (FLSettings::readBoolEntry("ebcomportamiento/SLConsola", true))
         qWarning("CARGA ESTATICA ACTIVADA:" + n + " -> " + info->path_);
       }
-      return FLManagerModules::contentFS(info->path_ + separator + n);
+      return FLManagerModules::contentFS(info->path_ + n);
     }
   }
   return QString::null;

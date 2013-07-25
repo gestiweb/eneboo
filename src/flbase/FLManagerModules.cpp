@@ -35,37 +35,6 @@ email                : mail@infosial.com
 
 #include "AQConfig.h"
 
-
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-
-#include <openssl/sha.h>
-
-using namespace std;
-
-void test_sha256(const string name, const string str)
-{
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, str.c_str(), str.size());
-    SHA256_Final(hash, &sha256);
-    stringstream ss;
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
-    {
-        ss << hex << setw(2) << setfill('0') << (int)hash[i];
-    }
-    ss << "  " << name;
-    const std::string tmp = ss.str();
-    const char* cstr = tmp.c_str();
-    qDebug(cstr);
-    // return ss.str();
-}
-
-
 class FLInfoMod
 {
 public:
@@ -76,8 +45,6 @@ public:
   QString version;
   QCString icono;
   QString areaDescripcion;
-  QDomDocument signatures;
-  QDomDocument certificates;
 };
 
 FLManagerModules::FLManagerModules(FLSqlDatabase *db) : db_(db)
@@ -116,7 +83,6 @@ void FLManagerModules::loadAllIdModules()
   q.setForwardOnly(true);
   q.exec("SELECT idmodulo,flmodules.idarea,flmodules.descripcion,version,icono,flareas.descripcion "
          "FROM flmodules left join flareas on flmodules.idarea = flareas.idarea");
-  bool sysModuleFound = false;
   while (q.next()) {
     FLInfoMod *infoMod = new FLInfoMod();
     infoMod->idModulo = q.value(0).toString();
@@ -126,130 +92,9 @@ void FLManagerModules::loadAllIdModules()
     infoMod->icono = q.value(4).toCString();
     infoMod->areaDescripcion = q.value(5).toString();
     dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
-
-    QString signatures = content(infoMod->idModulo + ".signatures");
-    QString certificates = content(infoMod->idModulo + ".certificates");
-
-    QDomDocument xmlDocSignatures;
-    xmlDocSignatures.setContent(signatures);
-
-    QDomDocument xmlDocCertificates;
-    xmlDocCertificates.setContent(certificates);
-    
-    infoMod->signatures = xmlDocSignatures;
-    infoMod->certificates = xmlDocCertificates;
-    
     if (infoMod->idModulo != "sys")
       listAllIdModules_->append(infoMod->idModulo);
-    else
-      sysModuleFound = true;
-    
-    checkSignatures(infoMod);
-        
-    
   }
-  if (!sysModuleFound) {
-    FLInfoMod *infoMod = new FLInfoMod();
-    infoMod->idModulo = QString("sys");
-    infoMod->idArea = QString("sys");
-    infoMod->descripcion = QString("Administración");
-    infoMod->version = QString("0.0");
-    infoMod->icono = contentFS(AQ_DATA + "/sys.xpm");
-    infoMod->areaDescripcion = QString("Sistema");
-    dictInfoMods->replace(infoMod->idModulo.upper(), infoMod);
-  }
-}
-
-
-void FLManagerModules::checkSignatures(FLInfoMod *mod)
-{
-    QDomDocument sig = mod->signatures;
-    QDomDocument cert = mod->certificates;
-    
-    QDomElement sigRoot = sig.firstChild().toElement();
-    if (sigRoot.isNull()) {
-        return;
-    }
-    if (sigRoot.tagName() != "eneboo-signatures") {
-        qWarning("Signatures: XML Root Tag for signatures unknown: " + sigRoot.tagName());
-        return;
-    }
-    QDomNode n = sigRoot.firstChild();
-    while ( !n.isNull() ) {
-        if ( n.isElement() ) {
-            QDomElement e = n.toElement();
-            if (e.tagName() != "signed-document") {
-                qWarning("Signatures: tag unknown: " + e.tagName());
-            } else {
-                bool checkSignature = true;
-                qDebug("Signature found.");
-                QString checkval = e.attribute("check","true").lower();
-                if (
-                    checkval == "false" ||
-                    checkval == "f" ||
-                    checkval == "no" ||
-                    checkval == "n" ||
-                    checkval == "0"
-                    ) {
-                    checkSignature = false;
-                    qDebug("Signature will be ignored.");
-                } else if (
-                    checkval == "true" ||
-                    checkval == "t" ||
-                    checkval == "yes" ||
-                    checkval == "y" ||
-                    checkval == "1"
-                    ) {
-                    checkSignature = true;
-                    qDebug("Signature will be fully checked.");
-                } else {
-                    qWarning("Signatures: signed-document: Attribute check has unrecognized value: " + checkval);
-                }
-                QDomElement certificate, document, signature;
-                
-                QDomNode n1 = e.firstChild();
-                while ( !n1.isNull() ) {
-                    if ( n1.isElement() ) {
-                        QDomElement e = n.toElement();
-                        if (e.tagName() == "signer-certificate") {
-                            certificate = e;
-                        } else if (e.tagName() == "document") {
-                            document = e;
-                        } else if (e.tagName() == "signature") {
-                            signature = e;
-                        } else {
-                            qWarning("Signatures: tag unknown: " + e.tagName());
-                        }
-                    }
-                    n1 = n1.nextSibling();
-                }
-                
-                if (certificate.isNull()) {
-                    qWarning("Signatures: Certificate tag not found");
-                    continue;
-                }
-                
-                if (document.isNull()) {
-                    qWarning("Signatures: Document tag not found");
-                    continue;
-                }
-                
-                if (signature.isNull()) {
-                    qWarning("Signatures: Signature tag not found");
-                    continue;
-                }
-                
-
-                
-                
-                
-            }
-        }
-        n = n.nextSibling();
-    }
-    
-    
-
 }
 
 void FLManagerModules::loadIdAreas()
@@ -273,13 +118,13 @@ void FLManagerModules::loadIdAreas()
 void FLManagerModules::loadKeyFiles()
 {
   if (!dictKeyFiles) {
-    dictKeyFiles = new QDict < QString >(3989);
+    dictKeyFiles = new QDict < QString >(571);
     dictKeyFiles->setAutoDelete(true);
   } else
     dictKeyFiles->clear();
 
   if (!dictModFiles) {
-    dictModFiles = new QDict < QString >(3989);
+    dictModFiles = new QDict < QString >(277);
     dictModFiles->setAutoDelete(true);
   } else
     dictModFiles->clear();
@@ -495,10 +340,9 @@ QString FLManagerModules::content(const QString &n)
 
   if (notSysTable && staticBdInfo_ && staticBdInfo_->enabled_) {
     retFS = contentStatic(n);
-    if (!retFS.isEmpty()) {
+    if (!retFS.isEmpty())
       return retFS;
     }
-  }
 
   if (n.endsWith(".xml"))
     retFS = contentFS(rootDir_ + n);
@@ -515,9 +359,8 @@ QString FLManagerModules::content(const QString &n)
   else if (n.endsWith(".ts"))
     retFS = contentFS(transDir_ + n);
 
-  if (!retFS.isEmpty()) {
+  if (!retFS.isEmpty())
     return retFS;
-  }
 
   if (notSysTable) {
     QString formatVal(db_->manager()->formatAssignValue("nombre", QVariant::String, n, true));
@@ -526,20 +369,6 @@ QString FLManagerModules::content(const QString &n)
     q.exec(QString::fromLatin1("SELECT contenido,sha FROM flfiles WHERE ") + formatVal);
     if (q.next()) {
       QString ret = q.value(0).toString();
-
-      /* **** PRUEBAS COMPROBACION FICHEROS EN SHA-256 ****** */
-      QTextCodec *codec = QTextCodec::codecForName("ISO8859-15"); 
-      QCString ret_latin = codec->fromUnicode( ret );
-      
-      test_sha256(n.latin1(), (const char *)ret_latin);
-      QString path = QString(".cache/") + n;
-      ofstream myfile;
-      myfile.open(path.latin1());
-      myfile << ret_latin;
-      myfile.close();  
-      /* **** PRUEBAS COMPROBACION FICHEROS EN SHA-256 ****** */
-      
-      
       if (q.value(1).toString().isEmpty()) {
         FLSqlCursor cursor("flfiles", true, db_->dbAux());
         cursor.select(formatVal);

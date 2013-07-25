@@ -194,7 +194,6 @@ class MainWindow
   var actSigMap_;
   var initializedMods_;
   var mainWidgets_;
-  var ListaTabs_ = [];
 
   function MainWindow(app)
   {
@@ -223,7 +222,7 @@ class MainWindow
       }
 
       case AQS.Close: {
-        if (aqApp.mainWidget() != undefined && 
+        if (aqApp.mainWidget() != undefined &&
             o.isEqual(aqApp.mainWidget())) {
           this.w_.setDisabled(true);
           var ret = this.exit();
@@ -267,7 +266,7 @@ class MainWindow
     var res = MessageBox.information(
                 sys.translate("¿Quiere salir de la aplicación?"),
                 MessageBox.Yes, MessageBox.No,
-              MessageBox.NoButton, "Eneboo"
+                MessageBox.NoButton, "Eneboo"
               );
     var doExit = (MessageBox.Yes == res);
     if (doExit) {
@@ -325,8 +324,7 @@ class MainWindow
   function readState()
   {
     var w = this.w_;
-    var action;
-    var moduleName;
+
     this.dckMod_.readState();
     this.dckRec_.readState();
     this.dckMar_.readState();
@@ -391,7 +389,6 @@ class MainWindow
     this.initTabWidget();
     this.initHelpMenu();
     this.initConfigMenu();
-    this.initTextLabel();
     this.initDocks();
     this.initEventFilter();
   }
@@ -441,7 +438,7 @@ class MainWindow
       aqApp.name = module;
       mwi.show();
     }
-    if (!(module in this.initializedMods_) || 
+    if (!(module in this.initializedMods_) ||
         this.initializedMods_[module] != true) {
       this.initializedMods_[module] = true;
       aqApp.call("init", module);
@@ -563,7 +560,7 @@ class MainWindow
 
   function removeMarkFromItem(item, pos)
   {
-    if (item == undefined || this.agMar_ == undefined || 
+    if (item == undefined || this.agMar_ == undefined ||
         this.dckMar_.lw_.childCount == 0)
       return false;
     if (item.text(1).isEmpty())
@@ -600,8 +597,6 @@ class MainWindow
     connect(w.child("aboutAbanQAction"), "activated()", aqApp, "aboutAbanQ()");
     connect(w.child("fontAction"), "activated()", aqApp, "chooseFont()");
     connect(w.child("styleAction"), "activated()", aqApp, "showStyles()");
-    connect(w.child("helpIndexAction"), "activated()", aqApp, "helpIndex()");
-    connect(w.child("urlEnebooAction"), "activated()", aqApp, "urlEneboo()");
   }
 
   function updateActionGroup()
@@ -630,7 +625,6 @@ class MainWindow
     for (var i = 0; i < areas.length; ++i) {
       var ag = new QActionGroup(agm);
       ag.name = areas[i];
-      if (!sys.isDebuggerEnabled() && ag.name == "sys") break;
       ag.menuText = ag.text = mng.idAreaToDescription(ag.name);
       ag.usesDropDown = true;
       ag.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("folder.png")));
@@ -641,11 +635,6 @@ class MainWindow
           continue;
         var ac = new QActionGroup(ag);
         ac.name = modules[j];
-        if (sys.isQuickBuild()) {
-            if (ac.name == "sys") {
-                continue;
-            }
-        }
 
         var actions = this.widgetActions(ac.name + ".ui", ac);
         if (actions == undefined) {
@@ -661,62 +650,45 @@ class MainWindow
 
         connect(ac, "activated()", this.actSigMap_, "map()");
         this.actSigMap_.setMapping(ac, "activated():initModule():" + ac.name);
-        if (ac.name == "sys" && ag.name == "sys")
-          {
-            if (sys.isDebuggerMode())
-              {
-                var wb = new QAction(ag);
-                wb.name = "runWorkBench";
-                wb.menuText = sys.translate("QSA Work Bench");
-                wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
-                connect(wb, "activated()", this.actSigMap_, "map()");
-		this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
-		
-		var sLoad = new QAction(ag);
-    		sLoad.name = "StaticLoadAction";
-    		sLoad.menuText = sys.translate("Cargar &Estática desde Disco Duro");
-    		sLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("image-svg.png")));
-    		connect(sLoad, "activated()", this.actSigMap_, "map()");
-    		this.actSigMap_.setMapping(sLoad, "activated():staticLoad():" + sLoad.name);
+      }
+    }
 
-    		var resetSC = new QAction(ag);
-    		resetSC.name = "resetScriptAction";
-    		resetSC.menuText = sys.translate("Resetear &Scripts");
-    		resetSC.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
-    		connect(resetSC, "activated()", this.actSigMap_, "map()");
-    		this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
+    agm.addSeparator();
 
-              }
-
-
-    var load = new QAction(ac);
+    var load = new QAction(agm);
     load.name = "loadAbanQPackageAction";
     load.menuText = sys.translate("Cargar Paquete de &Módulos");
     load.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("load.png")));
     connect(load, "activated()", this.actSigMap_, "map()");
     this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
 
-              
-   // var exportMod = new QAction(ac);
-   // exportMod.name = "exportModulesAction";
-   // exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
-   // exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
-   // connect(exportMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
+    var exportMod = new QAction(agm);
+    exportMod.name = "exportModulesAction";
+    exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
+    exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
+    connect(exportMod, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
 
-   // var importMod = new QAction(ac);
-   // importMod.name = "importModulesAction";
-   // importMod.menuText = sys.translate("&Importar Módulos desde Disco");
-   // importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
-   // connect(importMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
+    var importMod = new QAction(agm);
+    importMod.name = "importModulesAction";
+    importMod.menuText = sys.translate("&Importar Módulos desde Disco");
+    importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
+    connect(importMod, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
 
-   // var update = new QAction(ac);
-   // update.name = "updateAbanQAction";
-   // update.menuText = sys.translate("Act&ualización y Soporte");
-   // update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
-   // connect(update, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
+    var update = new QAction(agm);
+    update.name = "updateAbanQAction";
+    update.menuText = sys.translate("Act&ualización y Soporte");
+    update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
+    connect(update, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
+
+    var dumpDb = new QAction(agm);
+    dumpDb.name = "dumpDatabaseAction";
+    dumpDb.menuText = sys.translate("Copia de Seguridad");
+    dumpDb.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("fileexport.png")));
+    connect(dumpDb, "activated()", this.actSigMap_, "map()");
+    this.actSigMap_.setMapping(dumpDb, "activated():dumpDatabase():" + dumpDb.name);
 
     var mrProper = new QAction(agm);
     mrProper.name = "mrProperAction";
@@ -791,18 +763,6 @@ class MainWindow
       this.iconSet16x16(AQS.Pixmap_fromMimeSource("icono_abanq.png"))
     );
     connect(aboutAbanQ, "activated()", aqApp, "aboutAbanQ()");
-
-   var helpIndex = w.child("helpIndexAction");
-    helpIndex.setIconSet(
-      this.iconSet16x16(AQS.Pixmap_fromMimeSource("help_index.png"))
-    );
-    connect(helpIndex, "activated()", aqApp, "helpIndex()");
-    
-    var urlEneboo = w.child("urlEnebooAction");
-    urlEneboo.setIconSet(
-      this.iconSet16x16(AQS.Pixmap_fromMimeSource("icono_abanq.png"))
-    );
-    connect(urlEneboo, "activated()", aqApp, "urlEneboo()");
   }
 
   function initConfigMenu()
@@ -817,15 +777,6 @@ class MainWindow
     style.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("estilo.png")));
     connect(style, "activated()", aqApp, "showStyles()");
   }
-
-    function initTextLabel()
-    {
-    var w = this.w_;
-    var tL = w.child("tLabel");
-    var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='verticalName'");
-    if (texto)
-    tL.text = texto;
-    }
 
   function initDocks()
   {
@@ -974,8 +925,8 @@ function initScript()
   mw.init();
   mw.updateMenuAndDocks();
   mw.initModule("sys");
-  mw.show();
   mw.readState();
+  mw.show();
 }
 
 function reinitScript()
@@ -983,8 +934,8 @@ function reinitScript()
   var mainWid = (this.mainWindow_.w_ == undefined)
                 ? aqApp.mainWidget()
                 : this.mainWindow_.w_;
-  if (mainWid == undefined || 
-      mainWid.name != "container" || 
+  if (mainWid == undefined ||
+      mainWid.name != "container" ||
       mainWid.isEqual(this.mainWindow_.w_))
     return;
   var mw = this.mainWindow_;
@@ -1031,7 +982,7 @@ function triggerAction(signature)
 
     case "openDefaultForm()":
       if (ok) {
-        mw.addForm(ac.name,ac.iconSet().pixmap());
+        mw.addForm(ac.name);
         mw.addRecent(ac);
       }
       break;

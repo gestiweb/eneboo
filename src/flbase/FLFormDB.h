@@ -169,14 +169,6 @@ public:
   void saveSnapShot(const QString &pathFile);
 
   /**
-  Establece el título de la ventana.
-
-  @param text Texto a establecer como título de la ventana
-  @author Silix
-  */
-  void setCaptionWidget(const QString &text);
-
-  /**
   Devuelve si se ha aceptado el formulario
   */
   bool accepted() {

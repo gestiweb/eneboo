@@ -137,13 +137,6 @@ void FLFieldMetaData::addRelationMD(FLRelationMetaData *r)
   d->relationList_->append(r);
 }
 
-void FLFieldMetaData::setSearchOptions(const QString &ol)
-{
-  d->searchOptions_.clear();
-  d->searchOptions_ = QStringList::split(',', ol);
-}
-
-
 void FLFieldMetaData::setOptionsList(const QString &ol)
 {
   d->optionsList_.clear();

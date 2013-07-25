@@ -52,7 +52,7 @@
 #include "mimecodec.h"
 #include "qextserialport.h"
 #include "FLDigiDoc.h"
-#include "FLSettings.h"
+
 #include "AQConfig.h"
 
 #include <qsobjectfactory.h>
@@ -232,30 +232,6 @@ public slots:
   }
 
   /**
-   Indica si la aplicación se compiló en modo DEBUGGER
-
-   @return TRUE en caso de que la aplicación se compilara en modo DEBUGGER, FALSE en caso contrario
-   */
-  bool isDebuggerEnabled() {
-#ifdef QSDEBUGGER
-    return true;
-#endif
-    return false;
-  }
-
-  /**
-   Indica si la aplicación se ejecuta en modo DEBUGGER
-
-   @return TRUE en caso de que la aplicación se ejecuta en modo DEBUGGER, FALSE en caso contrario
-   */
-  bool isDebuggerMode() {
-#ifdef QSDEBUGGER
-    return FLSettings::readBoolEntry("application/isDebuggerMode");
-#endif
-    return false;
-  }
-
-  /**
    Indica si la aplicación se compiló en modo TEST
 
    @return TRUE en caso de que la aplicación se compilara en modo TEST, FALSE en caso contrario
@@ -351,16 +327,6 @@ public slots:
    */
   QString nameUser(const QString &connName = "default") const {
     return FLSqlConnections::database(connName)->user();
-  }
-
-  /**
-   Obtiene la contraseña del usuario conectado a la base de datos
-
-   @param connName Nombre de la conexion
-   @return Contraseña del usuario
-   */
-  QString passUser(const QString &connName = "default") const {
-    return FLSqlConnections::database(connName)->password();
   }
 
   /**
@@ -521,32 +487,6 @@ public slots:
   }
 
     /**
-   Crea un fichero con la codificación especificada
-
-   @param file Nombre del fichero a escribir
-   @param encode Codificación. Puede ser ISO-8859-1 o UTF8
-   @param contenido Datos a grabar en el fichero
-   */
-  void write(const QString &encode, const QString &file, const QString &text) {
-      QFile f(file);
-       if (f.open(IO_WriteOnly))
-     {
-     QTextStream dt(&f);
-     
-     if (encode == "ISO-8859-1")
-         {
-         dt.setCodec( QTextCodec::codecForName("ISO-8859-1") ); 
-         dt << text.latin1();
-         } 
-    else
-         {
-         dt.setCodec( QTextCodec::codecForName("UTF-8") );
-         dt << text.latin1();
-         }
-     f.close();
-     }
-  }
-  /**
    Convierte una cadena en Unicode a la codificacion indicada
 
    @param codec Nombre de la codificación a utilizar
@@ -853,14 +793,14 @@ public slots:
   }
 
   bool isQuickBuild() const {
-#ifdef FL_QUICK_CLIENT
+#ifdef AQ_QUICK_BUILD
     return true;
 #endif
     return false;
   }
 
   bool isDebuggerBuild() const {
-#ifdef AQ_DEBUGGER
+#ifdef AQ_DEBUGGER_BUILD
     return true;
 #endif
     return false;
@@ -2399,39 +2339,6 @@ public slots:
   }
 
   /**
-  Carga una imagen en el campo de tipo pixmap con el ancho y alto preferido
-
-  @param pixmap: pixmap a cargar en el campo
-  @param w: ancho preferido de la imagen
-  @param h: alto preferido de la imagen
-  @author Silix
-  */
-  void setPixmapFromPixmap(const QPixmap &pixmap, const int w = 0, const int h = 0) {
-    obj_->setPixmapFromPixmap(pixmap, w, h);
-  }
-
-  /**
-  Guarda imagen de campos tipo Pixmap en una ruta determinada.
-
-  @param filename: Ruta al fichero donde se guardará la imagen
-  @param fmt Indica el formato con el que guardar la imagen
-  @author Silix
-  */
-  void savePixmap(const QString &filename, const char *format) {
-    obj_->savePixmap(filename, format);
-  }
-
-  /**
-  Devueve el objeto imagen asociado al campo
-
-  @return imagen asociada al campo
-  @author Silix
-  */
-  QPixmap pixmap() {
-    return obj_->pixmap();
-  }
-
-  /**
    Hace que el control tome el foco
    */
   void setFocus() {
@@ -2735,13 +2642,6 @@ public slots:
   }
 
   /**
-   Establece el nombre de función a llamar cuando cambia el filtro de búsqueda
-   */
-  void setFilterRecordsFunction( QString fn) {
-    obj_->setFilterRecordsFunction(fn);
-    
-  } 
-  /**
    Establece si el componente esta en modo solo edición o no.
    */
   void setEditOnly(const bool mode) {
@@ -2829,14 +2729,6 @@ public slots:
    */
   QString filter() {
     return obj_->filter();
-  }
-  
-  bool isSortOrderAscending() {
-    return obj_->isSortOrderAscending();  
-  }
-  
-  void setSortOrder(int ascending) {
-    obj_->setSortOrder(ascending);  
   }
   
   /**
@@ -2943,15 +2835,6 @@ public slots:
   }
 
   /**
-  Establece el segundo campo de búsqueda
-
-  @author Silix - dpinelo
-  */
-  void putSecondCol(const QString &c) {
-    obj_->putSecondCol(c);
-  }
-
-  /**
    Mueve una columna de un campo origen a la columna de otro campo destino
 
    @param  from  Nombre del campo de la columna de origen
@@ -2981,7 +2864,7 @@ public slots:
   Conmuta el sentido de la ordenación de los registros de la tabla, de ascendente a descendente y
   viceversa. Los registros siempre se ordenan por la primera columna.
   */
-  void switchSortOrder(int col = -1) {
+  void switchSortOrder(int col = 0) {
     obj_->switchSortOrder(col);
   }
 
@@ -4415,16 +4298,6 @@ public slots:
   }
 
   /**
-  Establece el título de la ventana.
-
-  @param text Texto a establecer como título de la ventana
-  @author Silix
-  */
-  void setCaptionWidget(const QString &text) {
-    obj_->setCaptionWidget(text);
-  }
-
-  /**
   Devuelve el nombre de la clase del formulario en tiempo de ejecución
   */
   QString formClassName() const {
@@ -4729,16 +4602,6 @@ public slots:
   void setMaximized() {
     if (obj_)
       obj_->setMaximized();
-  }
-
-  /**
-  Establece el título de la ventana.
-
-  @param text Texto a establecer como título de la ventana
-  @author Silix
-  */
-  void setCaptionWidget(const QString &text) {
-    obj_->setCaptionWidget(text);
   }
 
   /**
@@ -5050,16 +4913,6 @@ public slots:
   void setMaximized() {
     if (obj_)
       obj_->setMaximized();
-  }
-
-  /**
-  Establece el título de la ventana.
-
-  @param text Texto a establecer como título de la ventana
-  @author Silix
-  */
-  void setCaptionWidget(const QString &text) {
-    obj_->setCaptionWidget(text);
   }
 
   /**
@@ -5527,33 +5380,6 @@ public slots:
   }
 	
   /**
-  dpinelo: Este mÃ©todo es una extensiÃ³n de nextCounter pero permitiendo la introducciÃ³n de una primera
-  secuencia de caracteres. Es Ãºtil cuando queremos mantener diversos contadores dentro de una misma tabla.
-  Ejemplo, Tabla Grupo de clientes: Agregamos un campo prefijo, que serÃ¡ una letra: A, B, C, D.
-  Queremos que la numeraciÃ³n de los clientes sea del tipo A00001, o B000023. Con esta funciÃ³n, podremos
-  seguir usando los mÃ©todos counter cuando agregamos esa letra.
-  
-  Este metodo devuelve el siguiente valor de un campo tipo contador de una tabla para una serie determinada.
-
-  Este metodo es muy util cuando se insertan registros en los que
-  la referencia es secuencial segÃºn una secuencia y no nos acordamos de cual fue el Ãºltimo
-  numero usado. El valor devuelto es un QVariant del tipo de campo es
-  el que se busca la ultima referencia. Lo mÃ¡s aconsejable es que el tipo
-  del campo sea 'String' porque asÃ­ se le puede dar formato y ser
-  usado para generar un cÃ³digo de barras. De todas formas la funciÃ³n
-  soporta tanto que el campo sea de tipo 'String' como de tipo 'double'.
-
-  @param serie serie que diferencia los contadores
-  @param name Nombre del campo
-  @param cursor_ Cursor a la tabla donde se encuentra el campo.
-  @return Qvariant con el numero siguiente.
-  @author AndrÃ©s OtÃ³n Urbano.
-   */
-  QVariant nextCounterSerial( const QString &serie, const QString & name, FLSqlCursorInterface * cursor_ ) {
-	  return FLUtil::nextCounter( serie, name, cursor_->obj() );
-  }
-
-  /**
    Devuelve el siguiente valor de la secuencia segun la profundidad indicada por nivel.
    Para explicar el funcionamiento pondremos un ejemplo. Supongamos una secuencia tipo %A-%N.
    %A indica que se coloque en esa posicion una secuencia en letras y %N una secuencia en numero.
@@ -5988,18 +5814,6 @@ public slots:
 
   bool execSql(const QString &sql, const QString &connName = "default") {
     return FLUtil::execSql(sql, connName);
-  }
-
-  /**
-  Guarda imagen Pixmap en una ruta determinada.
-
-  @param data Contenido de la imagen en una cadena de caracteres
-  @param filename: Ruta al fichero donde se guardará la imagen
-  @param fmt Indica el formato con el que guardar la imagen
-  @author Silix
-  */
-  void savePixmap(const QString &data, const QString &filename, const char *format) {
-    FLUtil::savePixmap(data, filename, format);
   }
 
   /**
@@ -7115,10 +6929,11 @@ public slots:
 
   @return TRUE si todo ha ido bien
   */
-  bool renderReport(const int initRow = 0, const int initCol = 0, const bool append = false, const bool displayReport = true) {
-    return obj_->renderReport(initRow, initCol, append, displayReport);
-  }
-  bool renderReport2(const int initRow = 0, const int initCol = 0, const uint flags = FLReportViewerInterface::Display) {
+  // Obsoleta
+  //   bool renderReport(const int initRow = 0, const int initCol = 0, const bool append = false, const bool displayReport = true) {
+  //     return obj_->renderReport(initRow, initCol, append, displayReport);
+  //   }
+  bool renderReport(const int initRow = 0, const int initCol = 0, const uint flags = FLReportViewerInterface::Display) {
     return obj_->renderReport(initRow, initCol, flags);
   }
 

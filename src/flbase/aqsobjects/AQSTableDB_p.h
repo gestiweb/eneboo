@@ -22,11 +22,11 @@
 #include "AQSWidget_p.h"
 #include "AQObjects.h"
 
-class FLSTableDB : public AQSWidget
+class AQSTableDB : public AQSWidget
 {
   Q_OBJECT
 
-  AQ_DECLARE_AQS_FLOBJECT(TableDB,Widget);
+  AQ_DECLARE_AQS_AQOBJECT(TableDB, Widget);
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
@@ -107,206 +107,196 @@ public:
   //@AQ_END_DEF_PUB_SLOTS@
 };
 
-
-class AQSTableDB : public FLSTableDB
-{
-  Q_OBJECT
-
-  AQ_DECLARE_AQS_AQFLOBJECT(TableDB,TableDB);
-  
-};
-
-
 //@AQ_BEGIN_IMP_PUB_SLOTS@
-inline QString FLSTableDB::tableName() const
+inline QString AQSTableDB::tableName() const
 {
   AQ_CALL_RET_V(tableName(), QString);
 }
-inline void FLSTableDB::setTableName(const QString &arg0)
+inline void AQSTableDB::setTableName(const QString &arg0)
 {
   AQ_CALL_VOID(setTableName(arg0));
 }
-inline QString FLSTableDB::foreignField() const
+inline QString AQSTableDB::foreignField() const
 {
   AQ_CALL_RET_V(foreignField(), QString);
 }
-inline void FLSTableDB::setForeignField(const QString &arg0)
+inline void AQSTableDB::setForeignField(const QString &arg0)
 {
   AQ_CALL_VOID(setForeignField(arg0));
 }
-inline QString FLSTableDB::fieldRelation() const
+inline QString AQSTableDB::fieldRelation() const
 {
   AQ_CALL_RET_V(fieldRelation(), QString);
 }
-inline void FLSTableDB::setFieldRelation(const QString &arg0)
+inline void AQSTableDB::setFieldRelation(const QString &arg0)
 {
   AQ_CALL_VOID(setFieldRelation(arg0));
 }
-inline void FLSTableDB::setReadOnly(const bool arg0)
+inline void AQSTableDB::setReadOnly(const bool arg0)
 {
   AQ_CALL_VOID(setReadOnly(arg0));
 }
-inline void FLSTableDB::setEditOnly(const bool arg0)
+inline void AQSTableDB::setEditOnly(const bool arg0)
 {
   AQ_CALL_VOID(setEditOnly(arg0));
 }
-inline void FLSTableDB::setInsertOnly(const bool arg0)
+inline void AQSTableDB::setInsertOnly(const bool arg0)
 {
   AQ_CALL_VOID(setInsertOnly(arg0));
 }
-inline void FLSTableDB::refresh()
+inline void AQSTableDB::refresh()
 {
   AQ_CALL_VOID(refresh());
 }
-inline void FLSTableDB::refresh(const bool arg0,  const bool arg1)
+inline void AQSTableDB::refresh(const bool arg0,  const bool arg1)
 {
   AQ_CALL_VOID(refresh(arg0, arg1));
 }
-inline void FLSTableDB::insertRecord()
+inline void AQSTableDB::insertRecord()
 {
   AQ_CALL_VOID(insertRecord());
 }
-inline void FLSTableDB::editRecord()
+inline void AQSTableDB::editRecord()
 {
   AQ_CALL_VOID(editRecord());
 }
-inline void FLSTableDB::browseRecord()
+inline void AQSTableDB::browseRecord()
 {
   AQ_CALL_VOID(browseRecord());
 }
-inline void FLSTableDB::deleteRecord()
+inline void AQSTableDB::deleteRecord()
 {
   AQ_CALL_VOID(deleteRecord());
 }
-inline void FLSTableDB::copyRecord()
+inline void AQSTableDB::copyRecord()
 {
   AQ_CALL_VOID(copyRecord());
 }
-inline void FLSTableDB::show()
+inline void AQSTableDB::show()
 {
   AQ_CALL_VOID(show());
 }
-inline void FLSTableDB::setFocus()
+inline void AQSTableDB::setFocus()
 {
   AQ_CALL_VOID(setFocus());
 }
-inline void FLSTableDB::setFilter(const QString &arg0)
+inline void AQSTableDB::setFilter(const QString &arg0)
 {
   AQ_CALL_VOID(setFilter(arg0));
 }
-inline QString FLSTableDB::filter()
+inline QString AQSTableDB::filter()
 {
   AQ_CALL_RET_V(filter(), QString);
 }
-inline QString FLSTableDB::findFilter() const
+inline QString AQSTableDB::findFilter() const
 {
   AQ_CALL_RET_V(findFilter(), QString);
 }
-inline void FLSTableDB::setInitSearch(const QString &arg0)
+inline void AQSTableDB::setInitSearch(const QString &arg0)
 {
   AQ_CALL_VOID(setInitSearch(arg0));
 }
-inline FLSqlCursor *FLSTableDB::cursor()
+inline FLSqlCursor *AQSTableDB::cursor()
 {
   AQ_CALL_RET(cursor());
 }
-inline FLDataTable *FLSTableDB::tableRecords()
+inline FLDataTable *AQSTableDB::tableRecords()
 {
   AQ_CALL_RET(tableRecords());
 }
-inline void FLSTableDB::close()
+inline void AQSTableDB::close()
 {
   AQ_CALL_VOID(close());
 }
-inline void FLSTableDB::setDisabled(const bool arg0)
+inline void AQSTableDB::setDisabled(const bool arg0)
 {
   AQ_CALL_VOID(setDisabled(arg0));
 }
-inline void FLSTableDB::putFirstCol(const QString &arg0)
+inline void AQSTableDB::putFirstCol(const QString &arg0)
 {
   AQ_CALL_VOID(putFirstCol(arg0));
 }
-inline void FLSTableDB::moveCol(const QString &arg0,  const QString &arg1)
+inline void AQSTableDB::moveCol(const QString &arg0,  const QString &arg1)
 {
   AQ_CALL_VOID(moveCol(arg0, arg1));
 }
-inline void FLSTableDB::setOrderCols(QStringList &arg0)
+inline void AQSTableDB::setOrderCols(QStringList &arg0)
 {
   AQ_CALL_VOID(setOrderCols(arg0));
 }
-inline QStringList FLSTableDB::orderCols()
+inline QStringList AQSTableDB::orderCols()
 {
   AQ_CALL_RET_V(orderCols(), QStringList);
 }
-inline bool FLSTableDB::checkColumnEnabled() const
+inline bool AQSTableDB::checkColumnEnabled() const
 {
   AQ_CALL_RET_V(checkColumnEnabled(), bool);
 }
-inline void FLSTableDB::setCheckColumnEnabled(bool arg0)
+inline void AQSTableDB::setCheckColumnEnabled(bool arg0)
 {
   AQ_CALL_VOID(setCheckColumnEnabled(arg0));
 }
-inline QString FLSTableDB::aliasCheckColumn() const
+inline QString AQSTableDB::aliasCheckColumn() const
 {
   AQ_CALL_RET_V(aliasCheckColumn(), QString);
 }
-inline void FLSTableDB::setAliasCheckColumn(const QString &arg0)
+inline void AQSTableDB::setAliasCheckColumn(const QString &arg0)
 {
   AQ_CALL_VOID(setAliasCheckColumn(arg0));
 }
-inline bool FLSTableDB::findHidden() const
+inline bool AQSTableDB::findHidden() const
 {
   AQ_CALL_RET_V(findHidden(), bool);
 }
-inline void FLSTableDB::setFindHidden(bool arg0)
+inline void AQSTableDB::setFindHidden(bool arg0)
 {
   AQ_CALL_VOID(setFindHidden(arg0));
 }
-inline bool FLSTableDB::filterHidden() const
+inline bool AQSTableDB::filterHidden() const
 {
   AQ_CALL_RET_V(filterHidden(), bool);
 }
-inline void FLSTableDB::setFilterHidden(bool arg0)
+inline void AQSTableDB::setFilterHidden(bool arg0)
 {
   AQ_CALL_VOID(setFilterHidden(arg0));
 }
-inline void FLSTableDB::setColumnWidth(const QString &arg0,  int arg1)
+inline void AQSTableDB::setColumnWidth(const QString &arg0,  int arg1)
 {
   AQ_CALL_VOID(setColumnWidth(arg0, arg1));
 }
-inline int FLSTableDB::columnWidth(int arg0)
+inline int AQSTableDB::columnWidth(int arg0)
 {
   AQ_CALL_RET_V(columnWidth(arg0), int);
 }
-inline void FLSTableDB::setRowHeight(int arg0,  int arg1)
+inline void AQSTableDB::setRowHeight(int arg0,  int arg1)
 {
   AQ_CALL_VOID(setRowHeight(arg0, arg1));
 }
-inline int FLSTableDB::rowHeight(int arg0)
+inline int AQSTableDB::rowHeight(int arg0)
 {
   AQ_CALL_RET_V(rowHeight(arg0), int);
 }
-inline bool FLSTableDB::showAllPixmaps() const
+inline bool AQSTableDB::showAllPixmaps() const
 {
   AQ_CALL_RET_V(showAllPixmaps(), bool);
 }
-inline void FLSTableDB::setShowAllPixmaps(bool arg0)
+inline void AQSTableDB::setShowAllPixmaps(bool arg0)
 {
   AQ_CALL_VOID(setShowAllPixmaps(arg0));
 }
-inline QString FLSTableDB::functionGetColor() const
+inline QString AQSTableDB::functionGetColor() const
 {
   AQ_CALL_RET_V(functionGetColor(), QString);
 }
-inline void FLSTableDB::setFunctionGetColor(const QString &arg0)
+inline void AQSTableDB::setFunctionGetColor(const QString &arg0)
 {
   AQ_CALL_VOID(setFunctionGetColor(arg0));
 }
-inline void FLSTableDB::exportToOds()
+inline void AQSTableDB::exportToOds()
 {
   AQ_CALL_VOID(exportToOds());
 }
-inline void FLSTableDB::switchSortOrder(int arg0)
+inline void AQSTableDB::switchSortOrder(int arg0)
 {
   AQ_CALL_VOID(switchSortOrder(arg0));
 }

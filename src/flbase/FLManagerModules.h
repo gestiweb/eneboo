@@ -284,11 +284,6 @@ public:
   Carga la lista de todos los identificadores de areas
   */
   void loadIdAreas();
-  
-  /**
-  Comprueba las firmas para un modulo dado
-  */
-  void checkSignatures(FLInfoMod *);
 
   /**
   Para obtener el identificador del módulo al que pertenece un fichero dado.

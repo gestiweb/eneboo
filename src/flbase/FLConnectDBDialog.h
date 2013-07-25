@@ -24,7 +24,6 @@
 #include <qlistbox.h>
 #include <qimage.h>
 #include <qcheckbox.h>
-#include <qregexp.h>
 
 #include "FLWidgetConnectDB.h"
 
@@ -149,12 +148,6 @@ private:
   Indicador recordar contraseña
   */
   bool rememberPasswd_;
-
-  /**
-  Indicador flag relacionada con conexion actual
-  */
-  QString connectionPath_;
-
 
   /**
   Desactivar avances de AbanQ v3

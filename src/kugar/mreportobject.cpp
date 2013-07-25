@@ -31,8 +31,6 @@ MReportObject::MReportObject() :
   borderWidth = 1;
   borderStyle = MReportObject::SolidLine;
   
-  borderRadius = 0;
-
   sectionIndex = -1;
   transparent = false;
   objectId = 0;
@@ -87,8 +85,6 @@ int MReportObject::draw(FLStylePainter *p)
 /** Draws the base object to the specified painter & x/y offsets */
 void MReportObject::drawBase(FLStylePainter *p)
 {
-  int rx, ry;
-
   if (p->drawRect(this))
     return;
 
@@ -111,17 +107,9 @@ void MReportObject::drawBase(FLStylePainter *p)
     else
       p->painter()->setPen(Qt::NoPen);
 	
-      if ( borderRadius != 0 ) {
-          rx = int( 200.0 * double( borderRadius ) / double( width ) );
-          ry = int( 200.0 * double( borderRadius ) / double( height ) );
-          p->painter()->drawRoundRect( 0, 0, width, height, rx, ry);
-      } else {
         p->painter()->drawRect( 0, 0, width, height );
-      }
-  } else {
+  } else
     p->painter()->fillRect(0, 0, width, height, backgroundColor);
-    // p->painter()->drawRect( 0, 0, width, height );
-  }
 
   if (restore)
     p->painter()->restore();
@@ -161,11 +149,6 @@ void MReportObject::setBorderColor(int r, int g, int b)
   borderColor.setRgb(r, g, b);
 }
 
-/** Sets the object's border radius */
-void MReportObject::setBorderRadius( int radius ) {
-  borderRadius = radius;
-}  
-  
 /** Copies member data from one object to another.
  Used by the copy constructor and assignment operator */
 void MReportObject::copy(const MReportObject *mReportObject)

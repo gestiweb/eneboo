@@ -40,7 +40,6 @@
 #include "FLSqlDatabase.h"
 #include "FLSqlConnections.h"
 #include "vdatepopup.h"
-#include "FLSettings.h"
 
 FLLineEdit::FLLineEdit(QWidget *parent, const char *name) :
   QLineEdit(parent, name),
@@ -162,7 +161,7 @@ void FLLineEdit::focusInEvent(QFocusEvent *f)
     QLineEdit::setText(s);
     blockSignals(false);
   }
-  if (autoSelect && selectedText().isEmpty() && !isReadOnly())
+  if (autoSelect && selectedText().isEmpty())
     selectAll();
   QLineEdit::focusInEvent(f);
 }
@@ -263,16 +262,13 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
   filter_(QString::null), cursor_(0), cursorAux(0), cursorInit(false), cursorAuxInit(false),
   topWidget_(0), showed(false), showAlias_(true), datePopup_(0), dateFrame_(0),
   datePickerOn_(false), autoComPopup_(0), autoComFrame_(0), accel_(0), keepDisabled_(false),
-  editorImg_(0), pbAux_(0), pbAux2_(0), pbAux3_(0), pbAux4_(0), fieldAlias_(QString::null),
+  editorImg_(0), pbAux_(0), pbAux2_(0), pbAux3_(0), fieldAlias_(QString::null),
   showEditor_(true), fieldMapValue_(0), autoCompMode_(OnDemandF4), timerAutoComp_(0),
   textFormat_(Qt::AutoText)
 {
 
   pushButtonDB->setFlat(true);
   setFocusProxy(pushButtonDB);
-
-  // Silix //Aulla : Se carga valor desde clave local
-  maxPixImages_ = FLSettings::readEntry("ebcomportamiento/maxPixImages","600").toInt();
 
   topWidget_ = topLevelWidget();
 
@@ -959,9 +955,6 @@ void FLFieldDB::initEditor()
         ::qt_cast<QComboBox *>(editor_)->setEditable(false);
         ::qt_cast<QComboBox *>(editor_)->setAutoCompletion(true);
         ::qt_cast<QComboBox *>(editor_)->setFont(qApp->font());
-        if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
-          if (!field->allowNull())
-            ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(QColor(255, 233, 173));
 
         QStringList olTranslated;
         QStringList olNoTranslated(field->optionsList());
@@ -982,9 +975,6 @@ void FLFieldDB::initEditor()
         ::qt_cast<FLLineEdit *>(editor_)->setFont(qApp->font());
         ::qt_cast<FLLineEdit *>(editor_)->type = type;
         ::qt_cast<FLLineEdit *>(editor_)->partDecimal = partDecimal;
-        if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
-          if (!field->allowNull())
-            ::qt_cast<FLLineEdit *>(editor_)->setPaletteBackgroundColor(QColor(255, 233, 173));
         editor_->installEventFilter(this);
 
         if (type == QVariant::Double) {
@@ -1114,23 +1104,6 @@ void FLFieldDB::initEditor()
             pbAux3_->setFocusPolicy(QPushButton::StrongFocus);
             pbAux3_->installEventFilter(this);
           }
-        }
-
-        // Silix
-        if (!pbAux4_) {
-          pbAux4_ = new QPushButton(this, "pbAux4");
-          pbAux4_->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed,
-                                             pbAux4_->sizePolicy().hasHeightForWidth()));
-          pbAux4_->setMinimumSize(QSize(22, 22));
-          pbAux4_->setFocusPolicy(QPushButton::NoFocus);
-          pbAux4_->setIconSet(QIconSet(QPixmap::fromMimeSource("paste.png")));
-          pbAux4_->setText(QString::null);
-          QToolTip::add(pbAux4_, tr("Pegar imagen desde el portapapeles"));
-          QWhatsThis::add(pbAux4_, tr("Pegar imagen desde el portapapeles"));
-          lytButtons->addWidget(pbAux4_);
-          if (showed)
-            disconnect(pbAux4_, SIGNAL(clicked()), this, SLOT(setPixmapFromClipboard()));
-          connect(pbAux4_, SIGNAL(clicked()), this, SLOT(setPixmapFromClipboard()));
         }
 
         if (!pbAux_) {
@@ -1561,60 +1534,6 @@ void FLFieldDB::setPixmap(const QString &filename)
   QCString s;
   QBuffer buffer(s);
 
-  // Silix
-  if (img.width() <= maxPixImages_ && img.height() <= maxPixImages_)
-    pix.convertFromImage(img);
-  else {
-    int newWidth, newHeight;
-    if (img.width() < img.height()) {
-      newHeight = maxPixImages_;
-      newWidth = qRound(newHeight * img.width() / img.height());
-    } else {
-      newWidth = maxPixImages_;
-      newHeight = qRound(newWidth * img.height() / img.width());
-    }
-    pix.convertFromImage(img.scale(newWidth, newHeight, QImage::ScaleMin));
-  }
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
-
-// Silix
-void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const int h)
-{
-  if (pixmap.isNull())
-    return;
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  QImage img = pixmap.convertToImage();
-  if (w != 0 && h != 0)
-    pix.convertFromImage(img.scale(w, h, QImage::ScaleMin));
-  else
     pix.convertFromImage(img);
 
   QApplication::restoreOverrideCursor();
@@ -1638,83 +1557,6 @@ void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const in
     QPixmapCache::insert(s.left(100), pix);
 
   updateValue(QString(s));
-}
-
-// Silix
-void FLFieldDB::setPixmapFromClipboard()
-{
-  QImage img = QApplication::clipboard()->image();
-  if (img.isNull())
-    return;
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  // Silix
-  if (img.width() <= maxPixImages_ && img.height() <= maxPixImages_)
-    pix.convertFromImage(img);
-  else {
-    int newWidth, newHeight;
-    if (img.width() < img.height()) {
-      newHeight = maxPixImages_;
-      newWidth = qRound(newHeight * img.width() / img.height());
-    } else {
-      newWidth = maxPixImages_;
-      newHeight = qRound(newWidth * img.height() / img.width());
-    }
-    pix.convertFromImage(img.scale(newWidth, newHeight, QImage::ScaleMin));
-  }
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
-
-
-
-// Silix
-void FLFieldDB::savePixmap(const QString &filename, const char *format)
-{
-  if (editorImg_) {
-    if (!filename.isEmpty()) {
-      QPixmap pix;
-      QApplication::setOverrideCursor(waitCursor);
-      pix.loadFromData(value().toCString());
-      if (!pix.isNull())
-        if (!pix.save(filename, format))
-          QMessageBox::warning(this, tr("Error"), tr("Error guardando fichero"));
-      QApplication::restoreOverrideCursor();
-    }
-  }
-}
-
-// Silix
-QPixmap FLFieldDB::pixmap()
-{
-  QPixmap pix;
-  pix.loadFromData(value().toCString());
-  return pix;
 }
 
 void FLFieldDB::setFilter(const QString &f)
@@ -2763,99 +2605,6 @@ void FLFieldDB::emitActivatedAccel(int id)
 {
   if (editor_ && editor_->hasFocus()) {
     emit activatedAccel(id);
-  }
-}
-
-// Silix
-void FLFieldDB::setDisabled(const bool b)
-{
-  if (!cursor_)
-    return;
-
-  FLTableMetaData *tMD = cursor_->metadata();
-  if (!tMD)
-    return;
-
-  FLFieldMetaData *field = tMD->field(fieldName_);
-  if (!field)
-    return;
-
-  QColor cTexto;
-  QColor cFondo;
-  if (b) {
-    cTexto = qApp->palette().color(QPalette::Disabled, QColorGroup::Text);
-    cFondo = qApp->palette().color(QPalette::Disabled, QColorGroup::Background);
-  } else {
-    cTexto = qApp->palette().color(QPalette::Active, QColorGroup::Text);
-    if (field->allowNull())
-      cFondo = qApp->palette().color(QPalette::Active, QColorGroup::Base);
-    else
-      cFondo = QColor(255, 233, 173);
-  }
-
-  switch (field->type()) {
-    case QVariant::UInt:
-    case QVariant::Int:
-    case QVariant::Double:
-    case QVariant::String:
-      if (field->hasOptionsList()) {
-        if (editor_ && ::qt_cast<QComboBox *>(editor_)) {
-          ::qt_cast<QComboBox *>(editor_)->setDisabled(b);
-          ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(cFondo);
-          ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-        }
-      } else {
-        if (editor_ && ::qt_cast<FLLineEdit *>(editor_)) {
-          ::qt_cast<FLLineEdit *>(editor_)->setReadOnly(b);
-          ::qt_cast<FLLineEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
-          ::qt_cast<FLLineEdit *>(editor_)->setPaletteForegroundColor(cTexto);
-          ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-          if (::qt_cast<QPushButton *>(pushButtonDB))
-            ::qt_cast<QPushButton *>(pushButtonDB)->setDisabled(b);
-        }
-      }
-      break;
-
-    case FLFieldMetaData::Serial:
-      if (editor_ && ::qt_cast<FLSpinBox *>(editor_)) {
-        ::qt_cast<FLSpinBox *>(editor_)->setDisabled(b);
-      }
-      break;
-
-    case QVariant::Pixmap:
-      if (editorImg_ && ::qt_cast<FLPixmapView *>(editorImg_)) {
-        ::qt_cast<FLPixmapView *>(editorImg_)->setDisabled(b);
-      }
-      break;
-
-    case QVariant::Date:
-      if (editor_ && ::qt_cast<FLDateEdit *>(editor_)) {
-        ::qt_cast<FLDateEdit *>(editor_)->setDisabled(b);
-        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-      }
-      break;
-
-    case QVariant::Time:
-      if (editor_ && ::qt_cast<QTimeEdit *>(editor_)) {
-        ::qt_cast<QTimeEdit *>(editor_)->setDisabled(b);
-        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-      }
-      break;
-
-    case QVariant::StringList:
-      if (editor_ && ::qt_cast<QTextEdit *>(editor_)) {
-        ::qt_cast<QTextEdit *>(editor_)->setReadOnly(b);
-        ::qt_cast<QTextEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
-        ::qt_cast<QTextEdit *>(editor_)->setPaletteForegroundColor(cTexto);
-        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
-      }
-      break;
-
-    case QVariant::Bool:
-      if (editor_ && ::qt_cast<QCheckBox *>(editor_)) {
-        ::qt_cast<QCheckBox *>(editor_)->setDisabled(b);
-      }
-      break;
   }
 }
 

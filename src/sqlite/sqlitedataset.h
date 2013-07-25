@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 #include <dataset.h>
-#include <sqlite3.h>
+#include <sqlite.h>
 
 #include "aqsqliteglobal.h"
 
@@ -47,7 +47,7 @@ namespace dbiplus
   {
   protected:
     /* connect descriptor */
-  sqlite3 *conn;
+    sqlite *conn;
     bool _in_transaction;
     int last_err;
 
@@ -60,22 +60,23 @@ namespace dbiplus
     Dataset *CreateDataset() const;
 
     /* func. returns connection handle with SQLite-server */
-  sqlite3 *getHandle() {  return conn; }
-  
-/* func. returns current status about SQLite-server connection */
-  virtual int status();
-  virtual int setErr(int err_code,const char * qry);
-/* func. returns error message if error occurs */
-  virtual const char *getErrorMsg();
-  
-/* func. connects to database-server */
-  virtual int connect();
-/* func. disconnects from database-server */
-  virtual void disconnect();
-/* func. creates new database */
-  virtual int create();
-/* func. deletes database */
-  virtual int drop();
+    sqlite *getHandle() {
+      return conn;
+    }
+    /* func. returns current status about SQLite-server connection */
+    virtual int status();
+    virtual int setErr(int err_code, const char *qry);
+    /* func. returns error message if error occurs */
+    virtual const char *getErrorMsg();
+
+    /* func. connects to database-server */
+    virtual int connect();
+    /* func. disconnects from database-server */
+    virtual void disconnect();
+    /* func. creates new database */
+    virtual int create();
+    /* func. deletes database */
+    virtual int drop();
 
     virtual long nextid(const char *seq_name);
 
@@ -108,7 +109,7 @@ namespace dbiplus
     bool autorefresh;
     char *errmsg;
 
-  sqlite3* handle();
+    sqlite *handle();
 
     /* Makes direct queries to database */
     virtual void make_query(StringList &_sql);

@@ -393,11 +393,6 @@ protected:
 private:
  
   /**
-  Almacena si se ha activado la bandera SoyGuaca
-  */
-  bool soyGuaca_;
-
-  /**
   Almacena si se ha abierto el formulario con el método FLReportViewer::exec()
   */
   bool loop;

@@ -1,4 +1,3 @@
-PRJ_MODULE      = Advance
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }

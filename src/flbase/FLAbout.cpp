@@ -3,9 +3,7 @@
                          -------------------
 begin                : Sat Jan 26 2002
 copyright            : (C) 2002-2005 by InfoSiAL S.L.
-                           2011 by Gestiweb
 email                : mail@infosial.com 
-                       info@gestiweb.com
 ***************************************************************************/
 /***************************************************************************
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,10 +17,8 @@ email                : mail@infosial.com
  ***************************************************************************/
 
 #include <qlabel.h>
-#include <qclipboard.h>
-#include <qapplication.h> /// qapp
+
 #include "FLAbout.h"
-#include "AQConfig.h"
 
 FLAbout::FLAbout(const QString &v,
                  QWidget *parent,
@@ -37,14 +33,7 @@ FLAbout::FLAbout(const QString &v,
                        "Este software se distribuye \"como está\", <br>"
                        "<b>sin garantías de ninguna clase</b><br>"
                        );
- lblCompilacion->setText(ENB_DATOS_COMP);
+// lblCompilacion->setText(ENB_DATOS_COMP);
 }
 
 FLAbout::~FLAbout() {}
-
-void FLAbout::copy2Clipboard()
-{
-QClipboard *clipboard = QApplication::clipboard();
-clipboard->setText(ENB_DATOS_COMP);
-}
-

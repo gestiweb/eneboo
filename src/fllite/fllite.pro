@@ -45,12 +45,3 @@ IMAGES += images/splashdebugger.png \
 
 
 win32:QMAKE_LFLAGS += -mwindows
-
-win32 { 
-    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
-    INCLUDEPATH += $$ROOT/src/qsa/src/ide
-}
-mac { 
-    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
-    INCLUDEPATH += $$ROOT/src/qsa/src/ide
-}

@@ -421,20 +421,6 @@ public:
   Obtiene el tipo del campo convertido a un tipo equivalente de la clase QVariant
   */
   static QVariant::Type flDecodeType(int fltype);
-  /**
-  Devuelve diferentes opciones de búsqueda para este campo.
-
-  @return lista de las distintas opciones
-  */
-  
-  QStringList searchOptions();
-  /**
-  Establece la lista de opciones para el campo
-
-  @param ol Cadena de texto con la opciones para el campo
-        separada por comas, p.e. "opcion1,opcion2,opcion3"
-  */
-  void setSearchOptions(const QString &ol);
 
 private:
 
@@ -658,11 +644,6 @@ public:
   bool hasOptionsList_;
 
   /**
-  Contiene las distintas opciones de búsqueda
-  */
-  QStringList searchOptions_;
-  
-  /**
   Objeto FLTableMetaData al que pertenece
   */
   FLTableMetaData *mtd_;
@@ -876,11 +857,5 @@ inline FLTableMetaData *FLFieldMetaData::metadata() const
 {
   return d->mtd_;
 }
-
-inline QStringList FLFieldMetaData::searchOptions() 
-{
-  return d->searchOptions_;
-}
-
 
 #endif

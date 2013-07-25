@@ -268,31 +268,6 @@ public:
   static QVariant nextCounter(const QString &name, FLSqlCursor *cursor_);
 
   /**
-  dpinelo: Este método es una extensión de nextCounter pero permitiendo la introducción de una primera
-  secuencia de caracteres. Es útil cuando queremos mantener diversos contadores dentro de una misma tabla.
-  Ejemplo, Tabla Grupo de clientes: Agregamos un campo prefijo, que será una letra: A, B, C, D.
-  Queremos que la numeración de los clientes sea del tipo A00001, o B000023. Con esta función, podremos
-  seguir usando los métodos counter cuando agregamos esa letra.
-  
-  Este metodo devuelve el siguiente valor de un campo tipo contador de una tabla para una serie determinada.
-
-  Este metodo es muy util cuando se insertan registros en los que
-  la referencia es secuencial según una secuencia y no nos acordamos de cual fue el último
-  numero usado. El valor devuelto es un QVariant del tipo de campo es
-  el que se busca la ultima referencia. Lo más aconsejable es que el tipo
-  del campo sea 'String' porque así se le puede dar formato y ser
-  usado para generar un código de barras. De todas formas la función
-  soporta tanto que el campo sea de tipo 'String' como de tipo 'double'.
-
-  @param serie serie que diferencia los contadores
-  @param name Nombre del campo
-  @param cursor_ Cursor a la tabla donde se encuentra el campo.
-  @return Qvariant con el numero siguiente.
-  @author Andrés Otón Urbano.
-	 */
-  static QVariant nextCounter( const QString &serie, const QString & name, FLSqlCursor * cursor_ );
-
-  /**
   Nos devuelve el siguiente valor de la secuencia segun la profundidad indicada por nivel.
   Para explicar el funcionamiento pondremos un ejemplo. Supongamos una secuencia tipo %A-%N.
   %A indica que se coloque en esa posicion una secuencia en letras y %N una secuencia en numero.
@@ -628,16 +603,6 @@ public:
   Uso interno
   */
   static bool execSql(const QString &sql, const QString &connName = "default");
-
-  /**
-  Guarda imagen Pixmap en una ruta determinada.
-
-  @param data Contenido de la imagen en una cadena de caracteres
-  @param filename: Ruta al fichero donde se guardará la imagen
-  @param fmt Indica el formato con el que guardar la imagen
-  @author Silix
-  */
-  static void savePixmap(const QString &data, const QString &filename, const char *format);
 
 private:
 

@@ -20,6 +20,7 @@ email                : mail@infosial.com
 
 #include "FLApplication.h"
 #include "FLAbout.h"
+#include "FLHelpWindow.h"
 #include "FLFormDB.h"
 #include "FLObjectFactory.h"
 #include "FLWidgetAction.h"
@@ -318,12 +319,12 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
     }
     obj->installEventFilter(this);
   }
-  FLApplicationInterface *ap2 = new FLApplicationInterface(this);
+
   switch (evt) {
     case QEvent::KeyPress:
       if (obj == container) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
-        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton)) && ap2->isDebuggerMode()) {
+        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton))) {
           openQSWorkbench();
           return true;
         }
@@ -519,14 +520,8 @@ void FLApplication::init(const QString &n, const QString &callFunction,
     i->addWrapperFactory(new AQSWrapperFactory);
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
-#ifdef FL_DEBUGGER
-    i->setErrorMode( QSInterpreter::AskForDebug );
-#else
     i->setErrorMode( QSInterpreter::Notify );
-#endif
     i->setInteractiveGUI(db()->interactiveGUI());
-  } else {
-    // Failed loading QSA.
   }
 
   if (!callFunction.isEmpty()) {
@@ -565,17 +560,15 @@ void FLApplication::init(const QString &n, const QString &callFunction,
         f->setMainWidget();
         QApplication::setMainWidget(f);
         if (f->mainWidget()) {
-          if (noMax) {
+          if (noMax)
             f->show();
-          } else {
+          else
             f->showMaximized();
-          }
-        } else {
+        } else
           f->close();
         }
       }
     }
-  }
 
   AQ_UNSET_MNGLOADER
   initializing_ = false;
@@ -759,7 +752,7 @@ void FLApplication::initToolBox()
     return;
 
   modulesMenu->clear();
-  FLApplicationInterface *ap2 = new FLApplicationInterface(this);
+
   while (toolBox->count()) {
     QWidget *item = toolBox->item(0);
     if (item) {
@@ -972,16 +965,11 @@ void FLApplication::initToolBox()
   connect(helpIndexAction, SIGNAL(activated()), this, SLOT(helpIndex()));
   helpIndexAction->addTo(helpToolBar);
 
-  FLWidgetAction *aboutAction = new FLWidgetAction(tr("Ayuda"), tr("Acerca de Eneboo"), tr("&Acerca de Eneboo"), QKeySequence(), helpToolBar, "acercaeneboo");
+  FLWidgetAction *aboutAction = new FLWidgetAction(tr("Ayuda"), tr("Acerca de AbanQ"), tr("&Acerca de AbanQ"), QKeySequence(), helpToolBar, "acercaabanq");
   aboutAction->setIconSet(QPixmap::fromMimeSource("about.png"));
   connect(aboutAction, SIGNAL(activated()), this, SLOT(aboutAbanQ()));
   aboutAction->addTo(helpToolBar);
   
-  FLWidgetAction *urlAbanqAction = new FLWidgetAction(tr("Ayuda"), tr("Visita Eneboo.org"), tr("&Visita Eneboo.org"), QKeySequence(), helpToolBar, "visitaeneboo");
-  urlAbanqAction->setIconSet(QPixmap::fromMimeSource("about.png"));
-  connect(urlAbanqAction, SIGNAL(activated()), this, SLOT(urlEneboo()));
-  urlAbanqAction->addTo(helpToolBar);
-
   FLWidgetAction *aboutQt = new FLWidgetAction(tr("Ayuda"), tr("Acerca de Qt"), tr("&Acerca Qt"), QKeySequence(), helpToolBar, "acercaqt");
   aboutQt->setIconSet(QPixmap::fromMimeSource("aboutqt.png"));
   connect(aboutQt, SIGNAL(activated()), this, SLOT(aboutQt()));
@@ -1052,10 +1040,6 @@ void FLApplication::initStatusBar()
     return;
   mw->statusBar()->message(tr("Listo."));
   mw->statusBar()->setSizeGripEnabled(false);
-
-  QLabel *conexion = new QLabel(mw->statusBar());
-  conexion->setText(db()->user() + "@" + db()->database());
-  mw->statusBar()->addWidget(conexion, 0, true);
 }
 
 void FLApplication::initView()
@@ -1290,12 +1274,9 @@ void FLApplication::aboutAbanQ()
 
 void FLApplication::helpIndex()
 {
-  aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.com/pub/contrib/doc/standard/"), 0);
-}
-
-void FLApplication::urlEneboo()
-{
-  aqApp->call("sys.openUrl", QSArgumentList("http://www.eneboo.org/"), 0);
+  FLHelpWindow *help = new FLHelpWindow(AQ_DATA + "/doc/index.html",
+                                        ".", 0, "help viewer");
+  help->show();
 }
 
 void FLApplication::statusHelpMsg(const QString &text)
@@ -2141,7 +2122,8 @@ void FLApplication::reinitP()
 
 void FLApplication::showDocPage(const QString &url)
 {
-  aqApp->call("sys.openUrl", QSArgumentList(url), 0);
+  FLHelpWindow *docPage = new FLHelpWindow(url, ".", 0, "help viewer");
+  docPage->show();
 }
 
 FLWorkspace *FLApplication::workspace() const
@@ -2230,19 +2212,22 @@ void FLApplication::setCaptionMainWidget(const QString &text)
     QWidget *mwi = aqApp->mainWidget();
     if (mwi) {
       QString bd(db()->driverNameToDriverAlias(db()->driverName()));
-     /* mwi->setCaption(db()->database() +
+      mwi->setCaption(db()->database() +
                       " - [ " + lastTextCaption_ + " ] - [" + bd + ":" +
-                      db()->user() + "]");*/
-      mwi->setCaption(QString::fromLatin1("Eneboo " AQ_VERSION) + " - " + lastTextCaption_);
+                      db()->user() + "]");
     }
     return;
   }
 
   AQ_SET_MNGLOADER
 
+  QString bd(db()->driverNameToDriverAlias(db()->driverName()));
   QString descripArea(mngLoader_->idAreaToDescription(mngLoader_->activeIdArea()));
   QString descripModule(mngLoader_->idModuleToDescription(mainWidget_->name()));
-  mainWidget_->setCaption(lastTextCaption_ + " - " + descripArea + " - " + descripModule);
+  mainWidget_->setCaption(db()->database() + " " +
+                          descripArea + "::" + descripModule +
+                          " - [ " + lastTextCaption_ + " ] - [" + bd + ":" +
+                          db()->user() + "]");
 
   AQ_UNSET_MNGLOADER
 }
@@ -2719,7 +2704,7 @@ void FLWorkspace::paintEvent(QPaintEvent *pe)
 
   p.setPen(pColor);
   p.setBrush(pColor);
-  //p.drawRect(dx + 23, 0, 2, dy);
+  p.drawRect(dx + 23, 0, 2, dy);
 
   p.end();
 
@@ -2744,7 +2729,7 @@ void FLWidget::paintEvent(QPaintEvent *pe)
 
   p.setPen(pColor);
   p.setBrush(pColor);
-  //p.drawRect(dx + 23, 0, 2, dy);
+  p.drawRect(dx + 23, 0, 2, dy);
 
   p.end();
 

@@ -109,7 +109,7 @@ void FLDiskCache::clear()
 #ifndef QSDEBUGGER
   QTextCodec *codec = QTextCodec::codecForLocale();
   QString localEncode(codec ? codec->mimeName() : "");
-  QString path(AQ_USRHOME + "/.eneboocache/" + localEncode);
+  QString path(AQ_USRHOME + "/.aqcache/" + localEncode);
   QDir d2(path);
   if (d2.exists()) {
     QStringList lst = d2.entryList("sys*");
@@ -140,29 +140,14 @@ void FLDiskCache::init(FLApplication *app)
   QTextCodec *codec = QTextCodec::codecForLocale();
   QString localEncode(codec ? codec->mimeName() : "");
   if (!app) {
-    aqSetAndCreateDirPath(AQ_USRHOME + "/.eneboocache");
+    aqSetAndCreateDirPath(AQ_USRHOME + "/.aqcache");
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
   } else {
-    if ( app->db()->driverName() != "FLsqlite")
-    aqSetAndCreateDirPath(
-      AQ_USRHOME + "/.eneboocache/" +
-      app->db()->database()
-    );
-    else
-    {
-    // --> Aulla : Reconstruimos un nombre válido para crear el directorio de la caché cuando usamos el driver SQLite
-    QString DBName = app->db()->database();
-    DBName.replace(AQ_DISKCACHE_DIRPATH,""); //Limpiamos el path
-    DBName.replace(".s3db","");//Limpiamos la extensión
-    aqSetAndCreateDirPath(
-      AQ_USRHOME + "/.eneboocache/" +
-      DBName
-    );
-    // <-- Aulla:
-    }
-    
-    
+    QString dbName(app->db()->database());
+    if ( app->db()->driverName() == "FLsqlite")
+      dbName.replace(AQ_DISKCACHE_DIRPATH, "");
+    aqSetAndCreateDirPath( AQ_USRHOME + "/.aqcache/" + dbName);
     if (!localEncode.isEmpty())
       aqSetAndCreateDirPath(AQ_DISKCACHE_DIRPATH + '/' + localEncode);
 

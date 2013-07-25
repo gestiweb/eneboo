@@ -15,7 +15,7 @@
  bajo  los  términos  de  la  Licencia  Pública General de GNU   en  su
  versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
-#include <stdio.h>
+
 #include <qsworkbench.h>
 
 #include "FLFormDB.h"
@@ -318,116 +318,44 @@ void FLFormDB::initMainWidget(QWidget *w)
       acl->process(this);
 
     QWidget *pW = parentWidget();
-    QRect desk;
-    bool parentIsDesktop = true;
     
-    if (!(pW && pW->isA("QWorkspaceChild"))) {
-        desk = QApplication::desktop()->availableGeometry(this);
-        pW = this;
+    if (pW && pW->isA("QWorkspaceChild")) {
+      QRect geo(aqApp->geometryForm(geoName()));
+      if (geo.width() == 9999) {
+        pW->resize(size().expandedTo(mWidget->size()));
+        pW->showMaximized();
+      } else if (geo.width() == 1) {
+        pW->resize(size().expandedTo(mWidget->size()));
+        pW->showMinimized();
+      } else if (geo.isValid()) {
+        QRect desk = QApplication::desktop()->availableGeometry(this);
+        QRect inter = desk.intersect(geo);
+        pW->resize(geo.size());
+        if (inter.width() * inter.height() > (geo.width() * geo.height() / 20))
+          pW->move(geo.topLeft());
+      } else
+        pW->resize(size().expandedTo(mWidget->size()));
     } else {
-        desk = pW->parentWidget()->rect();
-        parentIsDesktop = false;
+      QRect geo(aqApp->geometryForm(geoName()));
+      if (geo.width() == 9999) {
+        resize(size().expandedTo(mWidget->size()));
+        showMaximized();
+      } else if (geo.width() == 1) {
+        resize(size().expandedTo(mWidget->size()));
+        showMinimized();
+      } else if (geo.isValid()) {
+        QRect desk = QApplication::desktop()->availableGeometry(this);
+        QRect inter = desk.intersect(geo);
+        resize(geo.size());
+        if (inter.width() * inter.height() > (geo.width() * geo.height() / 20))
+#if defined(Q_OS_WIN32)
+          setGeometry(geo);
+#else
+          move(geo.topLeft());
+#endif
+      } else
+        resize(size().expandedTo(mWidget->size()));
     }
-
-    QRect geo(aqApp->geometryForm(QObject::name()));
-    pW->show();
-    QSize oSz = mWidget->size();
-    mWidget->updateGeometry();
-    QSize bSz = mWidget->baseSize();
-    QSize SzH = mWidget->sizeHint();
-    int border = 5, border_b = 48;
-    /*
-    qDebug("geo: " + QString::number(geo.width()) + "x"  + QString::number(geo.height()));
-    qDebug("oSz: " + QString::number(oSz.width()) + "x"  + QString::number(oSz.height()));
-    qDebug("bSz: " + QString::number(bSz.width()) + "x"  + QString::number(bSz.height()));
-    qDebug("SzH: " + QString::number(SzH.width()) + "x"  + QString::number(SzH.height()));
-    */
-
-    if (geo.width() < 100 || geo.width()>9000) {
-        // qDebug(" -- reset Form Size and position -- ");
-        geo.setWidth(oSz.width());
-        geo.setHeight(oSz.height());
-        geo.moveCenter(desk.center());
-        
-        if (!parentIsDesktop) {
-            geo.moveTop(desk.top() + border - geo.top()+1);
-        }
-    }
-
-    if (geo.width() < SzH.width()) {
-        // qDebug(" -- geo width too small -- ");
-        geo.setWidth(SzH.width());
-    }
-    if (geo.height() < SzH.height()) {
-        // qDebug(" -- geo height too small -- ");
-        geo.setHeight(SzH.height());
-    }
-    // Exceeds available horizontal area:
-    if (geo.width() > desk.width() - border * 2) {
-        // qDebug(" -- geo width too big -- ");
-        geo.setWidth(desk.width() - border * 2 - 5);
-    }
-    // Exceeds available vertical area:
-    if (geo.height() > desk.height() - border - border_b) {
-        // qDebug(" -- geo height too big -- ");
-        geo.setHeight(desk.height() - border - border_b - 5);
-    }
-    if (parentIsDesktop) {
-        // Invalid position values, re-center
-        if (  geo.right() > 9000
-         || geo.left() < 1
-         || geo.bottom() > 9000
-         || geo.top() < 1 ) {
-            // qDebug(" -- geo invalid position -- ");
-            geo.moveCenter(desk.center());
-        }
-    
-
-        if ( geo.top() < desk.top() + border)  {
-            // qDebug(" -- geo position too high -- ");
-            geo.moveTop(desk.top() + border - geo.top()+1);
-        }
-
-        if ( geo.left() < desk.left() + border) {
-            // qDebug(" -- geo position too left -- ");
-            geo.moveLeft(desk.left() + border - geo.left()+1);
-        }
-
-        if ( geo.bottom() > desk.bottom() - border_b ) {
-            int diff = geo.bottom() - desk.bottom() - border_b;
-            // qDebug(" -- geo position too low -- ");
-            geo.moveTop(-diff-1);
-        }
-
-        if ( geo.right() > desk.right() - border) {
-            int diff = geo.right() - desk.right() - border;
-            // qDebug(" -- geo position too right -- ");
-            geo.moveLeft(-diff-1);
-        }
-
-        // Outside of screen, re-center:
-        if (  geo.right() > desk.right() - border  
-         || geo.left() < desk.left() + border
-         || geo.bottom() > desk.bottom() - border_b
-         || geo.top() < desk.top() + border ) {
-            // qDebug(" -- geo position out of screen -- ");
-            geo.moveCenter(desk.center());
-        }
-    }
-    mWidget->resize(geo.size());
-
-    pW->updateGeometry();
-    QSize tSz= pW->size();
-    QSize tSzH = pW->sizeHint();
-    if (tSz.width() < tSzH.width()) {
-        tSz.setWidth(tSzH.width());
-    }
-    if (tSz.height() < tSzH.height()) {
-        tSz.setHeight(tSzH.height());
-    }
-    pW->resize(tSz.expandedTo(mWidget->size()));
-    
-    pW->move(geo.topLeft());
 
     if (!initFocusWidget_) {
       itf.toFirst();
@@ -457,8 +385,8 @@ void FLFormDB::initMainWidget(QWidget *w)
       }
       if (topWidget != this)
         setFocus();
-    } else setFocus();
-    
+    } else
+      setFocus();
   }
 }
 
@@ -627,12 +555,3 @@ QVariant FLFormDB::exec(const QString &)
   QWidget::show();
   return QVariant();
 }
-
-// Silix
-void FLFormDB::setCaptionWidget(const QString &text) {
-  if (text.isEmpty())
-    return;
-
-  setCaption(text);
-}
-

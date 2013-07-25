@@ -308,7 +308,7 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
     return 0;
 
   bool ck = false;
-  QString n, a, ol, rX, assocBy, assocWith, so;
+  QString n, a, ol, rX, assocBy, assocWith;
   bool aN = true, iPK = true, c = false, iNX = false, uNI = false,
        coun = false, oT = false, vG = true, fullCalc = false, trimm = false;
   int t = QVariant::Int, l = 0, pI = 4, pD = 0;
@@ -459,11 +459,6 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
         no = no.nextSibling();
         continue;
       }
-      if (e.tagName() == "searchoptions") {
-        so = e.text();
-        no = no.nextSibling();
-        continue;
-      }
     }
     no = no.nextSibling();
   }
@@ -475,8 +470,6 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
 
   if (!ol.isEmpty())
     f->setOptionsList(ol);
-  if (!so.isEmpty())
-    f->setSearchOptions(so);
   
   no = field->firstChild();
 
@@ -577,7 +570,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   if (!mtd)
     return 0;
 
-  QString name, a, q, ftsfun;
+  QString name, a, q;
   bool v = true, ed = true, cw = true, dl = false;
 
   QDomNode no = mtd->firstChild();
@@ -625,11 +618,6 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
         no = no.nextSibling();
         continue;
       }
-      if (e.tagName() == "FTSFunction") {
-        ftsfun = e.text();
-        no = no.nextSibling();
-        continue;
-      }
     }
     no = no.nextSibling();
   }
@@ -637,7 +625,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   FLTableMetaData *tmd = new FLTableMetaData(name, a, q);
   FLCompoundKey *cK = 0;
   QStringList assocs;
-  tmd->setFTSFunction(ftsfun);
+
   tmd->setConcurWarn(cw);
   tmd->setDetectLocks(dl);
   no = mtd->firstChild();
@@ -1549,19 +1537,10 @@ QString FLManager::storeLargeValue(FLTableMetaData *mtd, const QString &largeVal
   if (isSystemTable(tableName))
     return QString::null;
 
+    
+  // TODO: Arreglar la migracion de imagenes antiguas al sistema Eneboo  
   QString tableLarge(QString::fromLatin1("fllarge"));
   /*if (!existsTable(tableLarge)) {
-    FLTableMetaData *mtdLarge = new FLTableMetaData(tableLarge, tableLarge);
-    FLFieldMetaData *fieldLarge = new FLFieldMetaData("refkey", "refkey", false, true, QVariant::String, 100);
-    mtdLarge->addFieldMD(fieldLarge);
-    fieldLarge = new FLFieldMetaData("sha", "sha", true, false, QVariant::String, 50);
-    mtdLarge->addFieldMD(fieldLarge);
-    fieldLarge = new FLFieldMetaData("contenido", "contenido", true, false, QVariant::StringList);
-    mtdLarge->addFieldMD(fieldLarge);
-    FLTableMetaData *mtdAux = createTable(mtdLarge);
-    mtd->insertChild(mtdLarge);
-    if (!mtdAux)
-      return QString::null;
   }
 */
   QString sha(FLUtil::sha1(largeValue));

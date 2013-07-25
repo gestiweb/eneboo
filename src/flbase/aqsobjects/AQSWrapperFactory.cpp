@@ -24,15 +24,6 @@
 
 QSWrapperFactory *globalAQSWrapper = 0;
 
-void __aq_baseclass_init_error( 
-    const char * prefix, const char * clname, const char * bclname, 
-    QObject *qo ) 
-{
-  printf("%s base class %s init error: AQS%s  must be initialized with "
-          "a valid %s%s (object was: (%s *) %p)\n", 
-          prefix, bclname, clname, prefix, clname, qo->className(), qo); 
-}
-
 AQSWrapperFactory::AQSWrapperFactory()
 {
   d = new AQSWrapperFactoryPrivate;
@@ -42,10 +33,6 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_GEN_REG_WRAP
 
   //### Remove in AbanQ v3
-#define AQ_REG_COMPAT_FLS(Class) \
-  registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(FLS##Class))
-#define AQ_REG_COMPAT_FLS2(FClass,Class) \
-  registerWrapper(AQ_QUOTEME(FL##FClass), AQ_QUOTEME(FLS##Class))
 #define AQ_REG_COMPAT_FL(Class) \
   registerWrapper(AQ_QUOTEME(FL##Class), AQ_QUOTEME(AQS##Class))
 #define AQ_REG_COMPAT_FL2(FClass,Class) \
@@ -54,15 +41,13 @@ AQSWrapperFactory::AQSWrapperFactory()
   AQ_REG_COMPAT_FL(SqlDatabase);
   AQ_REG_COMPAT_FL(Manager);
   AQ_REG_COMPAT_FL(ManagerModules);
-  AQ_REG_COMPAT_FL(Action); // <- Removed by InfoSial
   AQ_REG_COMPAT_FL(SqlCursor);
   AQ_REG_COMPAT_FL(SqlQuery);
   AQ_REG_COMPAT_FL(FieldDB);
-  AQ_REG_COMPAT_FLS(TableDB);
+  AQ_REG_COMPAT_FL(TableDB);
   AQ_REG_COMPAT_FL(FormDB);
   AQ_REG_COMPAT_FL(FormRecordDB);
   AQ_REG_COMPAT_FL(FormSearchDB);
-  AQ_REG_COMPAT_FLS2(DataTable, DataTableDB);
   AQ_REG_COMPAT_FL2(Action, ActionMD);
   AQ_REG_COMPAT_FL2(RelationMetaData, RelationMD);
   AQ_REG_COMPAT_FL2(FieldMetaData, FieldMD);
@@ -107,12 +92,6 @@ QObject *AQSWrapperFactory::staticCreate(const QString &className, void *ptr)
   AQ_GEN_CRE_WRAP
 
   //### Remove in AbanQ v3
-#define AQ_CRE_COMPAT_FLS(Class) \
-  if (className == AQ_QUOTEME(FL##Class)) \
-    return new FLS##Class(static_cast<QObject *>(ptr))
-#define AQ_CRE_COMPAT_FLS2(FClass,Class) \
-  if (className == AQ_QUOTEME(FL##FClass)) \
-    return new FLS##Class(static_cast<QObject *>(ptr))
 #define AQ_CRE_COMPAT_FL(Class) \
   if (className == AQ_QUOTEME(FL##Class)) { \
     AQS##Class *aqo = new AQS##Class(ptr); \
@@ -254,6 +233,46 @@ QByteArray AQS::compress(QByteArray *ba) const
 QByteArray AQS::uncompress(QByteArray *ba) const
 {
   return ba ? qUncompress(*ba) : QByteArray();
+}
+
+QByteArray AQS::encryptInternal(QByteArray *ba) const
+{
+  if (!ba)
+    return QByteArray();
+
+  AQ_ENC_KEY;
+  AQ_ENC_KEYVI;
+
+  QByteArray key(32);
+  QByteArray vi(32);
+
+  for (int i = 0; i < 32; ++i)
+    key[i] = enckey[i];
+  for (int i = 0; i < 32; ++i)
+    vi[i] = enckeyvi[i];
+
+  QByteArray bac(qCompress(*ba));
+  return aes_256_encrypt(&bac, key, vi);
+}
+
+QByteArray AQS::decryptInternal(QByteArray *ba) const
+{
+  if (!ba)
+    return QByteArray();
+
+  AQ_ENC_KEY;
+  AQ_ENC_KEYVI;
+
+  QByteArray key(32);
+  QByteArray vi(32);
+
+  for (int i = 0; i < 32; ++i)
+    key[i] = enckey[i];
+  for (int i = 0; i < 32; ++i)
+    vi[i] = enckeyvi[i];
+
+  QByteArray bac(aes_256_decrypt(ba, key, vi));
+  return qUncompress(bac);
 }
 
 QString AQS::sha1(QByteArray *ba) const

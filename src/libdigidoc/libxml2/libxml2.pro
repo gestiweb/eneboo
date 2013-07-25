@@ -14,7 +14,7 @@ win32 {
 	CONFIG += dll
 	DLLDESTDIR = $$PREFIX/bin
 	LIBS = -L$$PREFIX/lib -lm -lws2_32
-}
+
 }
 
 mac {

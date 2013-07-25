@@ -33,6 +33,8 @@ odf-gen: Simple API to generate OpenDocument documents.
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <time.h>
+
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -66,6 +68,15 @@ public:
     bool isValid() const 
     {
         return _valid;
+    }
+
+    Color& operator = ( const Color &other )
+    {
+      _red = other._red;
+      _green = other._green;
+      _blue = other._blue;
+      _valid = other._valid;
+      return *this;
     }
 
     std::ostream& operator << ( std::ostream& ostream ) const

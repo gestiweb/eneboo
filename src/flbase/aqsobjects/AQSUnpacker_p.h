@@ -39,8 +39,6 @@ public slots:
   QString getText() const;
   QByteArray getBinary() const;
   QStringList errorMessages() const;
-  QString getVersion() const;
-  void jump();
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -74,15 +72,6 @@ inline QStringList AQSUnpacker::errorMessages() const
 {
   AQ_CALL_RET_V(errorMessages(), QStringList);
 }
-inline QString AQSUnpacker::getVersion() const
-{
-  AQ_CALL_RET_V(getVersion(), QString);
-}
-inline void AQSUnpacker::jump()
-{
-  AQ_CALL_VOID(jump());
-}
-
 //@AQ_END_IMP_PUB_SLOTS@
 
 #endif /* AQSUNPACKER_P_H_ */

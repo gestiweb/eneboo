@@ -27,7 +27,6 @@ email                : mail@infosial.com
 #include "FLSqlDatabase.h"
 #include "FLManager.h"
 #include "FLObjectFactory.h"
-#include "FLSettings.h"
 
 void FLCheckBox::drawButton(QPainter *p)
 {
@@ -77,7 +76,7 @@ FLDataTable::FLDataTable(QWidget *parent, const char *name, bool popup)
   : QDataTable(parent, name),
     rowSelected(-1), colSelected(-1), cursor_(0), readonly_(false),
     editonly_(false), insertonly_(false), persistentFilter_(QString::null),
-    refreshing_(false), refresh_timer_(false), popup_(popup), showAllPixmaps_(false),
+    refreshing_(false), popup_(popup), showAllPixmaps_(false),
     changingNumRows_(false), onlyTable_(false), paintFieldMtd_(0),
     timerViewRepaint_(0)
 {
@@ -698,10 +697,6 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
           chk->animateClick();
       }
 
-      //-->Aulla : Desactiva atajos de teclado de FLTable
-      if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", true))
-      {	
-
         if (ke->key() == Qt::Key_A && !popup_) {
           if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
             cursor_->insertRecord();
@@ -728,7 +723,7 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
             return false;
         }
 
-        if (ke->key() == Key_Delete && !popup_) {
+      if ((ke->key() == Qt::Key_E || ke->key() == Qt::Key_Delete) && !popup_) {
           if (insertonly_)
             return false;
           else if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
@@ -745,8 +740,6 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
           }
         }
       
-      } //<--Aulla : Desactiva atajos de teclado de FLTable
-
       return false;
     }
     break;
@@ -856,18 +849,10 @@ void FLDataTable::contentsMouseDoubleClickEvent(QMouseEvent *e)
 
 void FLDataTable::refresh()
 {
-  if (!cursor_ || !cursor_->aqWasDeleted()) return;
-  if (refreshing_) {
-      if (!refresh_timer_) {
-        QTimer::singleShot(500, this, SLOT(refresh()));
-        refresh_timer_ = true;
-      }
-      return;
-  }
+  if (popup_)
+    QDataTable::refresh();
+  if (!refreshing_ && cursor_  && !cursor_->aqWasDeleted() && cursor_->metadata()) {
   refreshing_ = true;
-  refresh_timer_ = false;
-  if (popup_) QDataTable::refresh();
-  if (cursor_  && cursor_->metadata()) {
     cursor_->setFilter(persistentFilter_);
     FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
     if (sndCursor) {

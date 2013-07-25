@@ -72,14 +72,14 @@ QStringList FLSqlDatabase::driverAliases()
 
 QString FLSqlDatabase::defaultAlias()
 {
-  return "PostgreSQL";
+  return "SQLite";
 }
 
 QString FLSqlDatabase::driverAliasToDriverName(const QString &alias)
 {
   if (alias == "PostgreSQL")
     return "FLQPSQL7";
-  if (alias == "SQLite3")
+  if (alias == "SQLite")
     return "FLsqlite";
   if (alias == "MySQL")
     return "FLQMYSQL4";
@@ -93,7 +93,7 @@ QString FLSqlDatabase::driverNameToDriverAlias(const QString &name)
   if (name == "FLQPSQL7")
     return "PostgreSQL";
   if (name == "FLsqlite")
-    return "SQLite3";
+    return "SQLite";
   if (name == "FLQMYSQL4")
     return "MySQL";
   if (name == "FLQMYSQL4_NO_INNODB")
@@ -105,7 +105,7 @@ bool FLSqlDatabase::needConnOption(const QString &alias, const int connOption)
 {
   if (alias == "PostgreSQL")
     return true;
-  if (alias == "SQLite3")
+  if (alias == "SQLite")
     return false;
   if (alias == "MySQL" || alias == "MySQL_NO_INNODB")
     return true;

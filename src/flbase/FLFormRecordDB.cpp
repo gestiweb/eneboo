@@ -764,23 +764,3 @@ QString FLFormRecordDB::formClassName() const
 {
   return "FormRecordDB";
 }
-
-// Silix
-void FLFormRecordDB::setCaptionWidget(const QString &text) {
-  if (text.isEmpty())
-    return;
-
-  switch (cursor_->modeAccess()) {
-    case FLSqlCursor::INSERT:
-      setCaption(tr("Insertar ") + text);
-      break;
-
-    case FLSqlCursor::EDIT:
-      setCaption(tr("Editar ") + text);
-      break;
-
-    case FLSqlCursor::BROWSE:
-      setCaption(tr("Visualizar ") + text);
-      break;
-  }
-}

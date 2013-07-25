@@ -8,8 +8,8 @@ else {
 
 TEMPLATE = subdirs
 
-CONFIG += warn_off
-CONFIG += ordered
+CONFIG *= warn_off
+CONFIG *= ordered
 
 enable_hoard:SUBDIRS += hoard
 enable_qwt:SUBDIRS += qwt

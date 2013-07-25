@@ -30,16 +30,6 @@ INCLUDEPATH += $$ROOT \
     $$ROOT/src/flmail \
     $$ROOT/src/serialport \
     $$ROOT/src
-
-win32 { 
-    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
-    INCLUDEPATH += $$ROOT/src/qsa/src/ide
-}
-
-mac { 
-    INCLUDEPATH += $$ROOT/src/qsa/src/qsa
-    INCLUDEPATH += $$ROOT/src/qsa/src/ide
-}
 enable_qwt:INCLUDEPATH += $$ROOT/src/qwt/src
 enable_digidoc:INCLUDEPATH += $$ROOT/src/libdigidoc \
     $$ROOT/src/libdigidoc/libxml2 \
@@ -96,6 +86,7 @@ SOURCES += AQApplication.cpp \
     FLObjectFactory.cpp \
     FLFieldDB.cpp \
     FLTableDB.cpp \
+    FLHelpWindow.cpp \
     FLWidgetAction.cpp \
     FLCodBar.cpp \
     FLMemCache.cpp \
@@ -150,6 +141,7 @@ HEADERS += AQGlobal.h \
     FLObjectFactory.h \
     FLFieldDB.h \
     FLTableDB.h \
+    FLHelpWindow.h \
     FLWidgetAction.h \
     FLCodBar.h \
     FLMemCache.h \
@@ -218,7 +210,6 @@ IMAGES += images/infosial.png \
     images/lock.png \
     images/file_open.png \
     images/eraser.png \
-    images/paste.png \
     images/locked.png \
     images/goto.png \
     images/settings.png \
@@ -237,7 +228,6 @@ IMAGES += images/infosial.png \
     images/export.png \
     images/import.png \
     images/fileexport.png \
-    images/image-svg.png \
     images/spreadsheet.png \
     images/folder_update.png \
     images/consola.png \

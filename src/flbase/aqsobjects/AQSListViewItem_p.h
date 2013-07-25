@@ -87,11 +87,8 @@ protected:
     QMap<int, QStringList> candidates;
     candidates[1].append(QString::fromLatin1("QListView*"));
     candidates[1].append(QString::fromLatin1("QListViewItem*"));
-    candidates[1].append(QString::fromLatin1("AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListView*,QListViewItem*"));
-    candidates[2].append(QString::fromLatin1("QListView*,AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListViewItem*,QListViewItem*"));
-    candidates[2].append(QString::fromLatin1("AQListViewItem*,AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListView*,QString"));
     candidates[3].append(QString::fromLatin1("QListView*,QString,QString"));
     candidates[4].append(QString::fromLatin1("QListView*,QString,QString,QString"));
@@ -129,18 +126,10 @@ protected:
       return new QListViewItem(argValue<QListView *>(args[0]));
     if (sgt == QString::fromLatin1("QListViewItem*"))
       return new QListViewItem(argValue<QListViewItem *>(args[0]));
-    if (sgt == QString::fromLatin1("AQListViewItem*"))
-      return new QListViewItem(argValue<QListViewItem *>(args[0]));
     if (sgt == QString::fromLatin1("QListView*,QListViewItem*"))
       return new QListViewItem(argValue<QListView *>(args[0]),
                                argValue<QListViewItem *>(args[1]));
-    if (sgt == QString::fromLatin1("QListView*,AQListViewItem*"))
-      return new QListViewItem(argValue<QListView *>(args[0]),
-                               argValue<QListViewItem *>(args[1]));
     if (sgt == QString::fromLatin1("QListViewItem*,QListViewItem*"))
-      return new QListViewItem(argValue<QListViewItem *>(args[0]),
-                               argValue<QListViewItem *>(args[1]));
-    if (sgt == QString::fromLatin1("AQListViewItem*,AQListViewItem*"))
       return new QListViewItem(argValue<QListViewItem *>(args[0]),
                                argValue<QListViewItem *>(args[1]));
     if (sgt == QString::fromLatin1("QListView*,QString"))
@@ -375,11 +364,8 @@ public:
     QMap<int, QStringList> candidates;
     candidates[1].append(QString::fromLatin1("QListView*"));
     candidates[1].append(QString::fromLatin1("QListViewItem*"));
-    candidates[1].append(QString::fromLatin1("AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListView*,QListViewItem*"));
-    candidates[2].append(QString::fromLatin1("QListView*,AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListViewItem*,QListViewItem*"));
-    candidates[2].append(QString::fromLatin1("AQListViewItem*,AQListViewItem*"));
     candidates[2].append(QString::fromLatin1("QListView*,QString"));
     candidates[3].append(QString::fromLatin1("QListView*,QString,QString"));
     candidates[4].append(QString::fromLatin1("QListView*,QString,QString,QString"));
