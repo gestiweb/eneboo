@@ -24,13 +24,15 @@
 #include <qcolor.h>
 #include <qmap.h>
 
+#include "AQGlobal.h"
+
 /**
  Clase que es una redefinicion de la clase QTable,
  especifica para las necesidades de AbanQ.
 
  @author InfoSiAL S.L.
  */
-class FL_EXPORT FLTable: public QTable {
+class AQ_EXPORT FLTable: public QTable {
 
   Q_OBJECT
 

@@ -297,7 +297,7 @@ void QSCheckData::addError(const QSNode *node, QSErrorCode code,
                            const QString &msg)
 {
   ecodes.append(code);
-  elines.append(node->lineNo());
+  elines.append(node->nodeLineNo());
   emsgs.append(QString::fromLatin1("Error: ") + msg);
 }
 
@@ -310,7 +310,7 @@ void QSCheckData::addWarning(const QSNode *node, QSErrorCode code,
                              const QString &msg)
 {
   ecodes.append(code);
-  elines.append(node->lineNo());
+  elines.append(node->nodeLineNo());
   emsgs.append(QString::fromLatin1("Warning: ") + msg);
 }
 
@@ -393,7 +393,7 @@ void QSScopeNode::check(QSCheckData *c)
   checkStatement(c);
 
   c->leaveBlock();
-  scope = cl;
+  scope_ = cl;
 
   if (cl->numVariables() > c->varBlockCount())
     c->setVarBlockCount(cl->numVariables());
@@ -499,6 +499,13 @@ void QSContinueNode::check(QSCheckData *c)
   if (!ident.isEmpty() && !c->seenLabel(ident))
     c->addError(this, QString::fromLatin1("Unknown label '%1'").arg(ident));
 }
+void QSContinueVoidNode::check(QSCheckData *c)
+{
+  checkIfGlobalAllowed(c);
+  if (!c->inLoop())
+    c->addError(this, QString::fromLatin1("'continue' can only be used inside of iteration"
+                                          " statements"));
+}
 
 void QSBreakNode::check(QSCheckData *c)
 {
@@ -510,6 +517,13 @@ void QSBreakNode::check(QSCheckData *c)
   if (!ident.isEmpty() && !c->seenLabel(ident))
     c->addError(this, QString::fromLatin1("Unknown label '%1'").arg(ident));
 }
+void QSBreakVoidNode::check(QSCheckData *c)
+{
+  checkIfGlobalAllowed(c);
+  if (!c->inLoop() && !c->inSwitch())
+    c->addError(this, QString::fromLatin1("'break' can only be used inside of iteration or "
+                                          "switch statements"));
+}
 
 void QSReturnNode::check(QSCheckData *c)
 {
@@ -517,6 +531,11 @@ void QSReturnNode::check(QSCheckData *c)
     c->addError(this, QString::fromLatin1("Can only return from inside a function"));
   if (value)
     value->check(c);
+}
+void QSReturnVoidNode::check(QSCheckData *c)
+{
+  if (!c->canReturn())
+    c->addError(this, QString::fromLatin1("Can only return from inside a function"));
 }
 
 void QSWithNode::checkStatement(QSCheckData *c)
@@ -790,6 +809,14 @@ void QSFuncExprNode::check(QSCheckData *c)
 void QSClassDefNode::check(QSCheckData *c)
 {
   //     qDebug( "Class noticed: " + c->globalName( ident ) );
+
+  // ### AbanQ
+  if (type && type->identifier() == identifier()) {
+    c->addError(this, QSErrClassBaseInvalid,
+                QString::fromLatin1("Class '%1' has a base class with same identifier '%2'")
+                .arg(identifier()).arg(type->identifier()));
+    return;
+  }
 
   // forward declaration ?
   if (!body) {
@@ -1229,6 +1256,9 @@ void QSRegExpNode::check(QSCheckData *)
 
 void QSResolveNode::check(QSCheckData *c)
 {
+#ifndef AQ_ENABLE_LOOKUPINFO
+  return;
+#else
   if (!c->directLookupEnabled())
     return;
   QSClass *cl = c->currentScope();
@@ -1262,8 +1292,10 @@ void QSResolveNode::check(QSCheckData *c)
     // Due to special handling of block scopes in the global object...
     if (cont == c->env()->globalClass())
       uplvl += blocks;
-    info = new QSLookupInfo(uplvl, member);
+
+    info_ = new QSLookupInfo(uplvl, member);
   }
+#endif
 }
 
 void QSNullNode::check(QSCheckData *)
@@ -1281,6 +1313,10 @@ void QSPostfixNode::check(QSCheckData *c)
 }
 
 
-void QSPropertyNode::check(QSCheckData *)
+void QSPropertyStrNode::check(QSCheckData *)
+{
+}
+
+void QSPropertyNumNode::check(QSCheckData *)
 {
 }

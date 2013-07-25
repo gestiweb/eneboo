@@ -24,6 +24,7 @@ email                : mail@infosial.com
  ***************************************************************************/
 
 #include "FLCodBar.h"
+#include "FLApplication.h"
 #include "barcode.h"
 
 FLCodBar::FLCodBar(barcodeData *data)
@@ -127,14 +128,7 @@ void FLCodBar::createBarcode()
   }
 
   proc = new QProcess();
-#if defined(Q_OS_WIN32)
-
-  proc->addArgument("gswin32c");
-#else
-
-  proc->addArgument("gs");
-#endif
-
+  proc->addArgument(aqApp->gsExecutable());
   proc->addArgument("-q");
   proc->addArgument("-dBATCH");
   proc->addArgument("-dNOPAUSE");

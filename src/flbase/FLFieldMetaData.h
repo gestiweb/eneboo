@@ -23,6 +23,8 @@
 #include <qstring.h>
 #include <qptrlist.h>
 
+#include "AQGlobal.h"
+
 class FLTableMetaData;
 class FLRelationMetaData;
 class FLFieldMetaDataPrivate;
@@ -34,7 +36,7 @@ Esta clase solo tiene sentido cuando es parte de un objeto FLTableMetaData
 
 @author InfoSiAL S.L.
 */
-class FLFieldMetaData
+class AQ_EXPORT FLFieldMetaData : public QShared
 {
 public:
 
@@ -55,6 +57,10 @@ public:
     */
     Check = 300
   };
+
+#ifdef FL_DEBUG
+  static long count_;
+#endif
 
   /**
   constructor.
@@ -87,6 +93,7 @@ public:
                   int pI = 4, int pD = 0, bool iNX = false, bool uNI = false,
                   bool coun = false, const QVariant &defValue = QVariant(), bool oT = false,
                   const QString &rX = QString::null, bool vG = true, bool gen = true, bool iCK = false);
+  FLFieldMetaData(const FLFieldMetaData *other);
 
   /**
   desctructor
@@ -127,6 +134,7 @@ public:
   @return TRUE si es clave primaria, FALSE en caso contrario
   */
   bool isPrimaryKey() const;
+  void setIsPrimaryKey(bool b);
 
   /**
   Obtiene si es clave compuesta.
@@ -251,7 +259,7 @@ public:
   /**
   Tipo de datos lista de relaciones
   */
-  typedef QPtrList < FLRelationMetaData > FLRelationMetaDataList;
+  typedef QPtrList<FLRelationMetaData> FLRelationMetaDataList;
 
   /**
   Añade una relacion con otra tabla para este campo.
@@ -271,28 +279,13 @@ public:
   void addRelationMD(FLRelationMetaData *r);
 
   /**
-  Asigna una lista de relaciones, a la lista de relaciones del campo.
-
-  La lista de relaciones del tipo FLRelationMetaDataList, ya construida,
-  es asignada como la lista de relaciones del campo, en el caso de que
-  ya exista una lista de relaciones para el campo, esta es destruida y
-  sobreescrita por la nueva. La lista pasada a este método pasa a ser
-  propiedad del campo, y él es el encargado de borrarla, por lo tanto no se
-  debe borrar esta lista fuera de la clase. Si la lista que se pretende asignar
-  es nula o vacía este método no hace nada.
-
-  @param rl Lista de relaciones
-  */
-  void setRelationList(FLRelationMetaDataList *rl);
-
-  /**
   Para obtener la lista de definiciones de las relaciones.
 
      No incluye la relacion M1
 
   @return Objeto con la lista de deficiones de la relaciones del campo
   */
-  FLRelationMetaDataList *relationList() const;
+  const FLRelationMetaDataList *relationList() const;
 
   /**
   Para obtener la relacion muchos a uno para este campo.
@@ -302,7 +295,7 @@ public:
   @return Objeto FLRelationMetaData con la descripcion de la relacion
       muchos a uno para este campo
   */
-  FLRelationMetaData *relationM1() const;
+  const FLRelationMetaData *relationM1() const;
 
   /**
   Establece un campo asociado para este campo, y el nombre
@@ -403,6 +396,18 @@ public:
   bool hasOptionsList() const;
 
   /**
+  Ver FLFieldMetaData::fullyCaclulated_
+  */
+  bool fullyCalculated() const;
+  void setFullyCalculated(bool c);
+
+  /**
+  Ver FLFieldMetaData::trimmed_
+  */
+  bool trimed() const;
+  void setTrimed(bool t);
+
+  /**
   Establece el objeto FLTableMetaData al que pertenece
   */
   void setMetadata(FLTableMetaData *mtd);
@@ -416,6 +421,20 @@ public:
   Obtiene el tipo del campo convertido a un tipo equivalente de la clase QVariant
   */
   static QVariant::Type flDecodeType(int fltype);
+  /**
+  Devuelve diferentes opciones de búsqueda para este campo.
+
+  @return lista de las distintas opciones
+  */
+  
+  QStringList searchOptions();
+  /**
+  Establece la lista de opciones para el campo
+
+  @param ol Cadena de texto con la opciones para el campo
+        separada por comas, p.e. "opcion1,opcion2,opcion3"
+  */
+  void setSearchOptions(const QString &ol);
 
 private:
 
@@ -423,6 +442,8 @@ private:
   Privado
   */
   FLFieldMetaDataPrivate *d;
+
+  void copy(const FLFieldMetaData *other);
 
   friend class FLTableMetaData;
   friend class FLTableMetaDataPrivate;
@@ -436,13 +457,19 @@ public:
                          int l, bool c, bool v, bool ed, int pI, int pD,
                          bool iNX, bool uNI, bool coun, const QVariant &defValue, bool oT,
                          const QString &rX, bool vG, bool gen, bool iCK);
+  FLFieldMetaDataPrivate();
 
   ~FLFieldMetaDataPrivate();
 
   /**
+  Limpia la lista de definiciones de relaciones
+  */
+  void clearRelationList();
+
+  /**
   Nombre del campo en la tabla
   */
-  QString name_;
+  QString fieldName_;
 
   /**
   Alias o mote para el campo, usado como
@@ -471,9 +498,23 @@ public:
   int length_;
 
   /**
-  Indica si el campo es calculado
+  Indica si el campo es calculado de forma diferida.
+  Esto indica que el campo se calcula al editar o insertar un registro, en el commit.
   */
   bool calculated_;
+
+  /**
+  Indica si el campo es totalmente calculado.
+  Esto indica que el valor campo del campo es dinámico y se calcula en cada refresco.
+  Un campo totalmente calculado implica que es generado.
+  */
+  bool fullyCalculated_;
+
+  /**
+  Indica que al leer el campo de la base de datos los espacios mas a la derecha
+  son eliminados.
+  */
+  bool trimmed_;
 
   /**
   Indica si el campo es visible
@@ -617,6 +658,11 @@ public:
   bool hasOptionsList_;
 
   /**
+  Contiene las distintas opciones de búsqueda
+  */
+  QStringList searchOptions_;
+  
+  /**
   Objeto FLTableMetaData al que pertenece
   */
   FLTableMetaData *mtd_;
@@ -624,7 +670,7 @@ public:
 
 inline QString FLFieldMetaData::name() const
 {
-  return d->name_;
+  return d->fieldName_;
 }
 
 inline QString FLFieldMetaData::alias() const
@@ -640,6 +686,11 @@ inline bool FLFieldMetaData::allowNull() const
 inline bool FLFieldMetaData::isPrimaryKey() const
 {
   return d->isPrimaryKey_;
+}
+
+inline void FLFieldMetaData::setIsPrimaryKey(bool b)
+{
+  d->isPrimaryKey_ = b;
 }
 
 inline int FLFieldMetaData::type() const
@@ -722,12 +773,12 @@ inline bool FLFieldMetaData::isUnique() const
   return d->isUnique_;
 }
 
-inline FLFieldMetaData::FLRelationMetaDataList *FLFieldMetaData::relationList() const
+inline const FLFieldMetaData::FLRelationMetaDataList *FLFieldMetaData::relationList() const
 {
   return d->relationList_;
 }
 
-inline FLRelationMetaData *FLFieldMetaData::relationM1() const
+inline const FLRelationMetaData *FLFieldMetaData::relationM1() const
 {
   return d->relationM1_;
 }
@@ -794,6 +845,28 @@ inline bool FLFieldMetaData::hasOptionsList() const
   return d->hasOptionsList_;
 }
 
+inline bool FLFieldMetaData::fullyCalculated() const
+{
+  return d->fullyCalculated_;
+}
+
+inline void FLFieldMetaData::setFullyCalculated(bool c)
+{
+  d->fullyCalculated_ = c;
+  if (c)
+    d->generated_ = true;
+}
+
+inline bool FLFieldMetaData::trimed() const
+{
+  return d->trimmed_;
+}
+
+inline void FLFieldMetaData::setTrimed(bool t)
+{
+  d->trimmed_ = t;
+}
+
 inline void FLFieldMetaData::setMetadata(FLTableMetaData *mtd)
 {
   d->mtd_ = mtd;
@@ -803,5 +876,11 @@ inline FLTableMetaData *FLFieldMetaData::metadata() const
 {
   return d->mtd_;
 }
+
+inline QStringList FLFieldMetaData::searchOptions() 
+{
+  return d->searchOptions_;
+}
+
 
 #endif

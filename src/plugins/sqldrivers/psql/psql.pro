@@ -12,6 +12,7 @@ CONFIG += warn_off plugin
 DESTDIR = $$PREFIX/plugins/sqldrivers
 
 DEFINES += FRONTEND WIN32_CLIENT_ONLY
+win32:enable_win64:DEFINES += __ERRCODE_DEFINED_MS
 
 TARGET = qpsql
 

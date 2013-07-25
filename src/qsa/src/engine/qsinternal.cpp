@@ -140,19 +140,22 @@ public:
   }
   ExecutionStack *pop() {
     ExecutionStack *s = prev;
-    delete this;
+    if (this)
+      delete this;
     return s;
   }
   void deallocateNodes() {
 #if QSNODES_ALLOC_DEBUG == 2
     printf("*********************\n");
-    //    QSNode *it = QSNode::firstNode();
+#ifdef AQ_ENABLE_NODELIST
+    //    QSNode *it = QSNode::nodeFirstNode();
     //    while (it) {
     //      printf("%p -- ", it->prev);
     //      it = it->next;
     //    }
     //    printf(" %p\n", it);
-    printf("1 - %p %p %p\n", progNode, firstNode, QSNode::firstNode());
+    printf("1 - %p %p %p\n", progNode, firstNode, QSNode::nodeFirstNode());
+#endif
     if (firstNode)
       printf("1 - firstNode::refs => %d\n", firstNode->refs());
     printf("1 - QSNode::qsNodeCount => %d\n", QSNode::qsNodeCount);
@@ -167,17 +170,25 @@ public:
       delete firstNode;
       firstNode = 0L;
     }
-    firstNode = QSNode::firstNode();
+#ifdef AQ_ENABLE_NODELIST
+    firstNode = QSNode::nodeFirstNode();
+#else
+    firstNode = QSProgramNode::nodeProgLast();
+#endif
 #if QSNODES_ALLOC_DEBUG == 2
-    printf("2 - %p %p %p\n", progNode, firstNode, QSNode::firstNode());
+#ifdef AQ_ENABLE_NODELIST
+    printf("2 - %p %p %p\n", progNode, firstNode, QSNode::nodeFirstNode());
+#endif
     if (firstNode)
       printf("2 - firstNode::refs => %d\n", firstNode->refs());
-    //    it = QSNode::firstNode();
+#ifdef AQ_ENABLE_NODELIST
+    //    it = QSNode::nodeFirstNode();
     //    while (it) {
     //      printf("%p -- ", it->prev);
     //      it = it->next;
     //    }
     //    printf(" %p\n", it);
+#endif
     printf("2 - QSNode::qsNodeCount => %d\n", QSNode::qsNodeCount);
     printf("#####################\n");
 #endif
@@ -303,8 +314,12 @@ void QSEngineImp::clear()
     delete en;
     en = 0;
 
-    setProgNode(QSProgramNode::last());
-    setFirstNode(QSNode::firstNode());
+    setProgNode(QSProgramNode::nodeProgLast());
+#ifdef AQ_ENABLE_NODELIST
+    setFirstNode(QSNode::nodeFirstNode());
+#else
+    setFirstNode(QSProgramNode::nodeProgLast());
+#endif
     stack->deallocateNodes();
 
 #ifdef QSNODES_ALLOC_DEBUG
@@ -312,7 +327,8 @@ void QSEngineImp::clear()
 #endif
 
 #ifndef AQ_NO_GARBAGE_COLLECTION
-    QSNode *n =  QSNode::firstNode();
+#ifdef AQ_ENABLE_NODELIST
+    QSNode *n =  QSNode::nodeFirstNode();
     if (n) {
       QPtrList<QSNode> garbage;
       const QSNode *tmp;
@@ -327,7 +343,7 @@ void QSEngineImp::clear()
         }
       }
       garbage.clear();
-      n =  QSNode::firstNode();
+      n =  QSNode::nodeFirstNode();
       while ((tmp = n)) {
         n = n->next;
         garbage.append(tmp);
@@ -337,6 +353,7 @@ void QSEngineImp::clear()
           delete n;
       }
     }
+#endif
 #ifdef QSNODES_ALLOC_DEBUG
     else
       printf("Can not do garbage collection, first node is null\n");
@@ -405,10 +422,16 @@ bool QSEngineImp::evaluate(const QString &code, const QSObject *thisV,
                               0,
 #endif
                               lineZero);
-    QSNode::setFirstNode(firstNode());
+#ifdef AQ_ENABLE_NODELIST
+    QSNode::setNodeFirstNode(firstNode());
     int parseError = qsyyparse();
-    setFirstNode(QSNode::firstNode());
-    setProgNode(QSProgramNode::last());
+    setFirstNode(QSNode::nodeFirstNode());
+    setProgNode(QSProgramNode::nodeProgLast());
+#else
+    int parseError = qsyyparse();
+    setFirstNode(QSProgramNode::nodeProgLast());
+    setProgNode(QSProgramNode::nodeProgLast());
+#endif
 
     if (parseError || QSLexer::lexer()->lexerState() == QSLexer::Bad) {
       errType = QSErrParseError;

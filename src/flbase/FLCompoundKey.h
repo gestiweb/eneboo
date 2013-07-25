@@ -39,6 +39,7 @@ public:
   constructor
   */
   FLCompoundKey();
+  FLCompoundKey(const FLCompoundKey *other);
 
   /**
   destructor
@@ -65,7 +66,7 @@ public:
 
   @return Objeto con la lista de deficiones de campos de la clave compuesta
   */
-  FLTableMetaData::FLFieldMetaDataList *fieldList() const {
+  const FLTableMetaData::FLFieldMetaDataList *fieldList() const {
     return fieldList_;
   }
 
@@ -75,6 +76,8 @@ private:
   Lista de con los metadatos de los campos que componen la clave
   */
   FLTableMetaData::FLFieldMetaDataList *fieldList_;
+
+  void copy(const FLCompoundKey *other);
 };
 
 #endif

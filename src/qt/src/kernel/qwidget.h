@@ -57,6 +57,10 @@ class QCursor;
 class QWSRegionManager;
 class QStyle;
 
+// ### AbanQ
+class FLFieldDB;
+// ###
+
 class Q_EXPORT QWidget : public QObject, public QPaintDevice
 {
     Q_OBJECT
@@ -691,6 +695,10 @@ private:
     friend class QETWidget;
     friend class QLayout;
 
+    // ### AbanQ
+    friend class FLFieldDB;
+    // ###
+
 private:	// Disabled copy constructor and operator=
 #if defined(Q_DISABLE_COPY)
     QWidget( const QWidget & );
@@ -702,6 +710,10 @@ public: // obsolete functions to dissappear or to become inline in 3.0
     void setPalette( const QPalette &p, bool ) { setPalette( p ); }
 #endif
     void setFont( const QFont &f, bool ) { setFont( f ); }
+
+// ### AbanQ
+   uint aqFirstTabStop : 1;
+// ###
 };
 
 

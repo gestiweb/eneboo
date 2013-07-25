@@ -12,53 +12,95 @@
 #define SMTP_H
 
 #include <qobject.h>
-#include <qstring.h>
+#include <qstringlist.h>
 
-class QSocket;
-class QTextStream;
-class QDns;
+#include "aqmailglobal.h"
 
-class Smtp : public QObject
+class SmtpPrivate;
+
+class AQMAIL_EXPORT Smtp : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    Smtp( const QString &from, const QString &to, const QString &m, const QString & mS = QString::null );
-    ~Smtp();
+  Smtp(const QString &from, const QStringList &rcpts,
+       const QString &m, const QString &mS = QString::null,
+       int port = 25, QObject *parent = 0, const char *name = 0);
+  ~Smtp();
 
-    QString mailServer() {
-        return mailServer_;
-    }
+  QString mailServer() const;
+  int port() const;
+
+  void setUser(const QString &user);
+  QString user() const;
+  void setPassword(const QString &password);
+  QString password() const;
+  void setConnectionType(int ct);
+  int connectionType() const;
+  void setAuthMethod(int method);
+  int authMethod() const;
 
 signals:
-    void status( const QString & );
+  void statusChanged(const QString &, int);
+
+public slots:
+  void init();
 
 private slots:
-    void connectToMailServer( const QString & mS );
-    void dnsLookupHelper();
-    void readyRead();
-    void connected();
+  void connectToMailServer(const QString &mS, int port = 25);
+  void dnsLookupHelper();
+  void readyRead();
+  void connected();
+  void changeStatus(const QString &statusMsg, int stateCode);
+  void connectionClosed();
+  void socketError(int e);
 
 private:
-    enum State {
-        Init,
-        Mail,
-        Rcpt,
-        Data,
-        Body,
-        Quit,
-        Close
-    };
+  friend class SmtpPrivate;
 
-    QString message;
-    QString from;
-    QString rcpt;
-    QSocket *socket;
-    QTextStream * t;
-    int state;
-    QString response;
-    QDns * mxLookup;
-    QString mailServer_;
+
+  enum State {
+    Init,
+    Mail,
+    Rcpt,
+    Data,
+    Body,
+    Quit,
+    Close,
+    SmtpError,
+    Connecting,
+    Connected,
+    MxDnsError,
+    SendOk,
+    SocketError,
+    Composing,
+    Attach,
+    AttachError,
+    ServerError,    // 4xx smtp error
+    ClientError,    // 5xx smtp error
+    StartTTLS,
+    WaitingForSTARTTLS,
+    SendAuthPlain,
+    SendAuthLogin,
+    WaitingForAuthPlain,
+    WaitingForAuthLogin,
+    WaitingForUser,
+    WaitingForPass
+  };
+
+  enum AuthMethod {
+    NoAuth,
+    AuthPlain,
+    AuthLogin
+  };
+
+  enum ConnectionType {
+    TcpConnection,
+    SslConnection,
+    TlsConnection       // STARTTLS
+  };
+
+  SmtpPrivate *d;
 };
 
 #endif

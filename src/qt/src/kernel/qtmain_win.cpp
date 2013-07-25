@@ -34,9 +34,9 @@
 #include "qglobal.h"
 
 #if defined( Q_OS_TEMP ) // same as qapplication_win.cpp
-extern void __cdecl qWinMain( HINSTANCE, HINSTANCE, LPSTR, int, int &, QMemArray<pchar> & );
+extern void __cdecl qWinMain(HINSTANCE, HINSTANCE, LPSTR, int, int &, QMemArray<pchar> &);
 #else
-extern void qWinMain( HINSTANCE, HINSTANCE, LPSTR, int, int &, QMemArray<pchar> & );
+extern void qWinMain(HINSTANCE, HINSTANCE, LPSTR, int, int &, QMemArray<pchar> &);
 #endif
 
 /* for borland and watchcom regular applications defines an entry point named
@@ -51,18 +51,18 @@ extern void qWinMain( HINSTANCE, HINSTANCE, LPSTR, int, int &, QMemArray<pchar> 
    because of this our old version:
    undef main
    int main (int argc,char** argv) {
-        qMain(argc,argv     
+        qMain(argc,argv
    }
    won't work when it is defined at the end of this file since then qMain
    is already defined as extern "C" ...
    So I think this is the best solution atm...
    */
-int qMain( int , char ** );
+int qMain(int , char **);
 #else
 #ifdef Q_OS_TEMP
-extern "C" int __cdecl main( int, char ** ); // hmmmm
+extern "C" int __cdecl main(int, char **);   // hmmmm
 #else
-extern "C" int main( int, char ** );
+extern "C" int main(int, char **);
 #endif
 #endif
 
@@ -73,24 +73,23 @@ extern "C" int main( int, char ** );
 */
 
 #ifdef Q_OS_TEMP
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPWSTR lpCmdParam, int nShowCmd )
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdParam, int nShowCmd)
 #else
 extern "C"
-    int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                          LPSTR lpCmdParam, int nShowCmd )
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdParam, int nShowCmd)
 #endif
 {
-    int argc = 0;
-    QMemArray<pchar> argv( 8 ); // to avoid crash...
+  int argc = 0;
+  QMemArray<pchar> argv(8);   // to avoid crash...
 
-    qWinMain( hInstance, hPrevInstance, lpCmdParam, nShowCmd, argc, argv );
-    int result = main( argc, argv.data() );
-    return result;
+  qWinMain(hInstance, hPrevInstance, lpCmdParam, nShowCmd, argc, argv);
+  int result = main(argc, argv.data());
+  return result;
 }
 
 /* This is imho the only way how to include qtcrtentrypoint without modifying
    official qtmain.pro from TT */
 #if defined (Q_OS_WIN) && defined (Q_CC_GNU)
-#include "../../mkspecs/win32-g++/qtcrtentrypoint.cpp"
+#include "../../mkspecs/win32-g++-cross/qtcrtentrypoint.cpp"
 #endif
+

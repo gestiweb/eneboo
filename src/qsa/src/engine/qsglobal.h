@@ -71,7 +71,7 @@ enum QSEqualsResult {
 #endif
 
 // enable/disable garabage collection
-//#define QSNODES_ALLOC_DEBUG 1
+//#define QSNODES_ALLOC_DEBUG 2
 #define AQ_NO_GARBAGE_COLLECTION
 
 // used until reference counting is 100% safe

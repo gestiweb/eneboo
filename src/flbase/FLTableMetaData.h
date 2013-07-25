@@ -23,6 +23,8 @@
 #include <qdict.h>
 #include <qstringlist.h>
 
+#include "AQGlobal.h"
+
 class FLFieldMetaData;
 class FLRelationMetaData;
 class FLCompoundKey;
@@ -40,11 +42,15 @@ los metadatos de una consulta, ver FLTableMetaData::query().
 
 @author InfoSiAL S.L.
 */
-class FLTableMetaData : public QObject
+class AQ_EXPORT FLTableMetaData : public QObject
 {
   Q_OBJECT
 
 public:
+
+#ifdef FL_DEBUG
+  static long count_;
+#endif
 
   /**
   constructor
@@ -54,6 +60,7 @@ public:
   @param q (Opcional) Nombre de la consulta de la que define sus metadatos
   */
   FLTableMetaData(const QString &n, const QString &a, const QString &q = QString::null);
+  FLTableMetaData(const FLTableMetaData *other);
 
   /**
   destructor
@@ -277,7 +284,7 @@ public:
 
   @return Objeto con la lista de deficiones de campos de la tabla
   */
-  FLFieldMetaDataList *fieldList() const;
+  const FLFieldMetaDataList *fieldList() const;
 
   /**
   Para obtener una cadena con los nombres de los campos separados por comas.
@@ -296,7 +303,7 @@ public:
       que forman dicha clave compuesta, incluido el campo consultado. En el caso
       que el campo consultado no pertenezca a ninguna clave compuesta devuelve 0
   */
-  FLFieldMetaDataList *fieldListOfCompoundKey(const QString &fN) const;
+  const FLFieldMetaDataList *fieldListOfCompoundKey(const QString &fN) const;
 
   /**
   Obtiene una cadena de texto que contiene los nombres de los campos separados por comas.
@@ -331,12 +338,30 @@ public:
   */
   void setDetectLocks(bool b = true);
 
+  /**
+  Establece el nombre de función a llamar para Full Text Search
+  */
+  QString FTSFunction();
+  void setFTSFunction(QString ftsfun);
+
+  /**
+  Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
+  */
+  bool inCache() const;
+
+  /**
+  Establece si lo metadatos están en caché (FLManager::cacheMetaData_)
+  */
+  void setInCache(bool b = true);
+
 private:
 
   /**
   Privado
   */
   FLTableMetaDataPrivate *d;
+
+  void copy(const FLTableMetaData *other);
 };
 
 class FLTableMetaDataPrivate
@@ -344,6 +369,8 @@ class FLTableMetaDataPrivate
 public:
 
   FLTableMetaDataPrivate(const QString &n, const QString &a, const QString &q);
+  FLTableMetaDataPrivate();
+
   ~FLTableMetaDataPrivate();
 
   /**
@@ -366,6 +393,11 @@ public:
   @param  f   Campo objeto cuyo alias se desea formatear
   */
   void formatAlias(FLFieldMetaData *f);
+
+  /**
+  Limpia la lista de definiciones de campos
+  */
+  void clearFieldList();
 
   /**
   Nombre de la tabla
@@ -433,6 +465,16 @@ public:
   Ver también FLSqlDatabase::detectRisksLocks
   */
   bool detectLocks_;
+  
+  /**
+  Indica el nombre de función a llamar para la búsqueda con Full Text Search
+  */
+  QString ftsfun_;
+  
+  /**
+  Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
+  */
+  bool inCache_;
 };
 
 inline void FLTableMetaData::setCompoundKey(FLCompoundKey *cK)
@@ -460,7 +502,7 @@ inline QString FLTableMetaData::query() const
   return d->query_;
 }
 
-inline FLTableMetaData::FLFieldMetaDataList *FLTableMetaData::fieldList() const
+inline const FLTableMetaData::FLFieldMetaDataList *FLTableMetaData::fieldList() const
 {
   return d->fieldList_;
 }
@@ -503,6 +545,29 @@ inline bool FLTableMetaData::detectLocks() const
 inline void FLTableMetaData::setDetectLocks(bool b)
 {
   d->detectLocks_ = b;
+}
+
+inline bool FLTableMetaData::inCache() const
+{
+  return d->inCache_;
+}
+
+inline void FLTableMetaData::setInCache(bool b)
+{
+  d->inCache_ = b;
+}
+
+
+
+inline QString FLTableMetaData::FTSFunction()
+{
+  return d->ftsfun_;
+}
+
+
+inline void FLTableMetaData::setFTSFunction(QString ftsfun)
+{
+  d->ftsfun_ = ftsfun;  
 }
 
 #endif

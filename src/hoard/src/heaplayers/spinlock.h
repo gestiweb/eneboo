@@ -67,7 +67,10 @@ extern "C" unsigned long MyInterlockedExchange (unsigned long * oldval,
 					      unsigned long newval);
 #endif
 
+#ifndef AQ_WIN64
 #undef _WIN32
+#endif
+
 #if defined(_WIN32) && !defined(_WIN64)
 #define _WIN32_WINNT 0x0500
 

@@ -49,13 +49,14 @@ using namespace QS;
 #define QSA_NUMBER_OPTIMIZATION
 #endif
 
+QUICKCORE_EXPORT bool aqQSARunning = false;
 
 #ifdef QSDEBUGGER
-#define QSBREAKPOINT(e) if( !hitStatement( e ) ) return QSObject();
-#define QSABORTPOINT(e) if( abortStatement( e ) ) return QSObject();
+#define QSBREAKPOINT(e) aqQSARunning = true;if( !hitStatement( e ) ) return QSObject();
+#define QSABORTPOINT(e) aqQSARunning = true;if( abortStatement( e ) ) return QSObject();
 #else
-#define QSBREAKPOINT(e)
-#define QSABORTPOINT(e)
+#define QSBREAKPOINT(e) aqQSARunning = true;
+#define QSABORTPOINT(e) aqQSARunning = true;
 #endif
 
 /* Makes the gui responsive while QSA is running. This lets users throw
@@ -69,7 +70,7 @@ using namespace QS;
     QSObject err = env->exception();    \
     int line = QSErrorClass::errorLine(&err);       \
     if( line==-1 )          \
-      QSErrorClass::setErrorLine(&err, lineNo()); \
+      QSErrorClass::setErrorLine(&err, nodeLineNo()); \
   }
 
 /* For convenience and safty when implementing the ref / deref operators.
@@ -138,7 +139,53 @@ using namespace QS;
 #ifdef QSNODES_ALLOC_DEBUG
 uint QSNode::qsNodeCount = 0;
 #endif
-QSNode *QSNode::first = 0;
+#ifdef AQ_ENABLE_NODELIST
+QSNode *QSNode::nodeFirst_ = 0;
+#endif
+
+// ### AbanQ Optimization
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+QSThisNode *perThisNode = 0;
+QSBooleanNode *perTrueNode = 0;
+QSBooleanNode *perFalseNode = 0;
+#endif
+QSThisNode *newThisNode()
+{
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+  if (!perThisNode)
+    perThisNode = new QSThisNode();
+  else
+    perThisNode->ref();
+  return perThisNode;
+#else
+  return new QSThisNode();
+#endif
+}
+QSBooleanNode *newTrueNode()
+{
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+  if (!perTrueNode)
+    perTrueNode = new QSBooleanNode(true);
+  else
+    perTrueNode->ref();
+  return perTrueNode;
+#else
+  return new QSBooleanNode(true);
+#endif
+}
+QSBooleanNode *newFalseNode()
+{
+#ifdef AQ_ENABLE_PERSISTENT_NODES
+  if (!perFalseNode)
+    perFalseNode = new QSBooleanNode(false);
+  else
+    perFalseNode->ref();
+  return perFalseNode;
+#else
+  return new QSBooleanNode(false);
+#endif
+}
+// ### AbanQ Optimization
 
 QSNode::QSNode()
   : refCount(1)
@@ -148,28 +195,32 @@ QSNode::QSNode()
 #endif
 
   Q_ASSERT(QSLexer::lexer());
-  line = QSLexer::lexer()->lineNo();
+  nodeLine_ = QSLexer::lexer()->lineNo();
 
+#ifdef AQ_ENABLE_NODELIST
   // create a list of allocated objects. Makes
   // deleting (even after a parse error) quite easy
   // First node is the last created
-  next = first;
-  prev = 0;
-  if (first)
-    first->prev = this;
-  first = this;
+  nodeNext_ = nodeFirst_;
+  nodePrev_ = 0;
+  if (nodeFirst_)
+    nodeFirst_->nodePrev_ = this;
+  nodeFirst_ = this;
+#endif
 }
 
 QSNode::~QSNode()
 {
   Q_ASSERT(refCount < 1);
 
-  if (next)
-    next->prev = prev;
-  if (prev)
-    prev->next = next;
-  if (this == first)
-    first = next;
+#ifdef AQ_ENABLE_NODELIST
+  if (nodeNext_)
+    nodeNext_->nodePrev_ = nodePrev_;
+  if (nodePrev_)
+    nodePrev_->nodeNext_ = nodeNext_;
+  if (this == nodeFirst_)
+    nodeFirst_ = nodeNext_;
+#endif
 
 #ifdef QSNODES_ALLOC_DEBUG
   --qsNodeCount;
@@ -193,7 +244,7 @@ QSReference QSNode::lhs(QSEnv *env)
 
 QSObject QSNode::throwError(QSEnv *env, ErrorType e, const char *msg) const
 {
-  return env->throwError(e, QString::fromLatin1(msg), lineNo());
+  return env->throwError(e, QString::fromLatin1(msg), nodeLineNo());
 }
 
 #ifdef QSDEBUGGER
@@ -209,7 +260,7 @@ bool QSStatementNode::hitStatement(QSEnv *env)
   Debugger *deb = env->engine()->debugger();
   if (!deb)
     return TRUE;
-  if (deb->hit(lineNo(), breakPoint) &&
+  if (deb->hit(nodeLineNo(), breakPoint) &&
       deb->mode() != Debugger::Stop)
     return TRUE;
   env->setExecutionMode(QSEnv::Normal);
@@ -233,11 +284,13 @@ bool QSNode::setBreakpoint(int id, int line, bool set)
 
 bool QSNode::setBreakpoint(QSNode *firstNode, int id, int line, bool set)
 {
+#ifdef AQ_ENABLE_NODELIST
   while (firstNode) {
     if (firstNode->setBreakpoint(id, line, set) && line >= 0)      // l<0 for all
       return TRUE;
-    firstNode = firstNode->next;
+    firstNode = firstNode->nodeNext_;
   }
+#endif
   return FALSE;
 }
 
@@ -298,18 +351,22 @@ QSObject QSThisNode::rhs(QSEnv *env) const
   return env->thisValue();
 }
 
+#ifdef AQ_ENABLE_LOOKUPINFO
 QSResolveNode::~QSResolveNode()
 {
-  delete info;
-  info = 0;
+  delete info_;
+  info_ = 0;
 }
+#endif
 
 QSObject QSResolveNode::rhs(QSEnv *env) const
 {
   QSA_EVENT_TRIGGER_IMPL
-  if (info) {  // Using direct lookup if possible.
-    return env->getValueDirect(info->member.index(), info->level);
+#ifdef AQ_ENABLE_LOOKUPINFO
+  if (info_) {  // Using direct lookup if possible.
+    return env->getValueDirect(info_->member.index(), info_->level);
   }
+#endif
   QSObject o = env->resolveValue(ident);
   if (o.isValid())
     return o;
@@ -320,11 +377,13 @@ QSObject QSResolveNode::rhs(QSEnv *env) const
 QSReference QSResolveNode::lhs(QSEnv *env)
 {
   QSA_EVENT_TRIGGER_IMPL
-  if (info) {  // Use direct lookup if possible.
-    QSObject base = env->scopeObjectAt(info->level);
-    QSReference ref(base, info->member, base.objectType());
+#ifdef AQ_ENABLE_LOOKUPINFO
+  if (info_) {  // Use direct lookup if possible.
+    QSObject base = env->scopeObjectAt(info_->level);
+    QSReference ref(base, info_->member, base.objectType());
     return ref;
   }
+#endif
   const ScopeChain scope = env->scope();
   ScopeChain::const_iterator it = scope.begin();
   int offset;
@@ -343,7 +402,7 @@ QSReference QSResolveNode::lhs(QSEnv *env)
 
   // identifier not found
   QString msg = QString::fromLatin1("Use of undefined variable %1").arg(ident);
-  env->engine()->warn(msg, lineNo());
+  env->engine()->warn(msg, nodeLineNo());
   mem.setType(QSMember::Identifier);
   mem.setName(ident);
   return QSReference(env->globalObject(), mem, env->globalClass());
@@ -426,15 +485,15 @@ QSObject QSPropertyValueNode::rhs(QSEnv *env) const
 }
 
 // ECMA 11.1.5
-QSObject QSPropertyNode::rhs(QSEnv *env) const
+QSObject QSPropertyStrNode::rhs(QSEnv *env) const
 {
-  QSObject s;
+  QSObject s = env->createString(str);
+  return s;
+}
 
-  if (str.isNull()) {
-    s = env->createString(QSString::from(numeric));
-  } else
-    s = env->createString(str);
-
+QSObject QSPropertyNumNode::rhs(QSEnv *env) const
+{
+  QSObject s = env->createString(QSString::from(numeric));
   return s;
 }
 
@@ -516,7 +575,7 @@ QSReference QSAccessorNode2::lhs(QSEnv *env)
     if (!baseClass || baseClass->name() != "Class") {
       cl = v.resolveMember(baseIdent, &mem, v.objectType(), &offset);
       if (cl) {
-        QSMember *mSuper = mem.super();
+        const QSMember *mSuper = mem.super();
         do {
           if (!mSuper) {
             cl = 0;
@@ -629,7 +688,7 @@ QSObject QSNewExprNode::evaluate(QSEnv *env)
     env->throwError(TypeError,
                     QString::fromLatin1("Cannot instantiate abstract class '%1'")
                     .arg(type->identifier()),
-                    lineNo());
+                    nodeLineNo());
   }
   updateErrorline();
   delete argList;
@@ -669,7 +728,7 @@ QSObject QSFunctionCallNode::rhs(QSEnv *env) const
       .arg(ref.identifier().isEmpty() ? QString::fromLatin1("unknown") : ref.identifier())
       .arg(base.toString())
       .arg(base.objectType() ? base.objectType()->name() : QString::fromLatin1("undefined"));
-    return env->throwError(TypeError, msg, lineNo());
+    return env->throwError(TypeError, msg, nodeLineNo());
   } else if (!mem.isExecutable()) {
     base = cl->fetchValue(&base, mem);
     cl = base.objectType();
@@ -677,7 +736,7 @@ QSObject QSFunctionCallNode::rhs(QSEnv *env) const
       delete argList;
       QString msg =
         QString::fromLatin1("'%1' undefined or not a function").arg(mem.name());
-      return env->throwError(TypeError, msg, lineNo());
+      return env->throwError(TypeError, msg, nodeLineNo());
     }
   }
 
@@ -686,7 +745,7 @@ QSObject QSFunctionCallNode::rhs(QSEnv *env) const
   if (env->stackDepth() > QS_MAX_STACK) {
     qWarning("QSFunctionCallNode::execute() stack overflow");
     delete argList;
-    return env->throwError(RangeError, QString::fromLatin1("Stack overflow"), lineNo());
+    return env->throwError(RangeError, QString::fromLatin1("Stack overflow"), nodeLineNo());
   }
 #endif
 
@@ -705,6 +764,7 @@ QSObject QSFunctionCallNode::rhs(QSEnv *env) const
 #endif
 
   delete argList;
+  aqQSARunning = false;
   return result;
 }
 
@@ -911,7 +971,7 @@ QSObject QSAssignNode::rhs(QSEnv *env) const
     if (!ref.isWritable())
       return env->throwError(ReferenceError,
                              QString::fromLatin1("Left hand side value is not writable"),
-                             lineNo());
+                             nodeLineNo());
     ref.assign(v2);
     updateErrorline();
     return v2;
@@ -920,7 +980,7 @@ QSObject QSAssignNode::rhs(QSEnv *env) const
     if (!ref.isWritable())
       return env->throwError(ReferenceError,
                              QString::fromLatin1("Left hand side value is not writable"),
-                             lineNo());
+                             nodeLineNo());
     QSObject v1 = ref.dereference();
 #ifdef QSA_NUMBER_OPTIMIZATION
     bool isNum = v2.objectType() == env->numberClass()
@@ -1185,10 +1245,10 @@ QSObject QSCommaNode::rhs(QSEnv *env) const
 
 QSObject QSScopeNode::execute(QSEnv *env)
 {
-  if (scope) {
-    scope->activateScope();
+  if (scope_) {
+    scope_->activateScope();
     QSObject result = executeStatement(env);
-    scope->deactivateScope();
+    scope_->deactivateScope();
     return result;
   }
   return executeStatement(env);
@@ -1295,7 +1355,7 @@ QSObject QSForInNode::executeStatement(QSEnv *env)
   if (lexpr) {
     QSReference ref = lexpr->lhs(env);
     if (!ref.isWritable()) {
-      QSObject e = env->throwError(TypeError, QString::fromLatin1("Non-writable index"), lineNo());
+      QSObject e = env->throwError(TypeError, QString::fromLatin1("Non-writable index"), nodeLineNo());
       return e;
     }
     base = ref.base();
@@ -1458,9 +1518,16 @@ QSObject QSContinueNode::execute(QSEnv *env)
     return env->throwError(SyntaxError,
                            QString::fromLatin1("Label %1 not found in containing block")
                            .arg(ident),
-                           lineNo());
+                           nodeLineNo());
   }
   env->setCurrentLabel(ident);
+  return QSObject();
+}
+QSObject QSContinueVoidNode::execute(QSEnv *env)
+{
+  QSBREAKPOINT(env);
+
+  env->setExecutionMode(QSEnv::Continue);
   return QSObject();
 }
 
@@ -1476,9 +1543,16 @@ QSObject QSBreakNode::execute(QSEnv *env)
     return env->throwError(SyntaxError,
                            QString::fromLatin1("Label %1 not found in containing block")
                            .arg(ident),
-                           lineNo());
+                           nodeLineNo());
   }
   env->setCurrentLabel(ident);
+  return QSObject();
+}
+QSObject QSBreakVoidNode::execute(QSEnv *env)
+{
+  QSBREAKPOINT(env);
+
+  env->setExecutionMode(QSEnv::Break);
   return QSObject();
 }
 
@@ -1487,6 +1561,14 @@ QSObject QSReturnNode::execute(QSEnv *env)
 {
   QSBREAKPOINT(env);
   QSObject ret = value ? value->rhs(env) : env->createUndefined();
+  if (!env->isExceptionMode())
+    env->setExecutionMode(QSEnv::ReturnValue);
+  return ret;
+}
+QSObject QSReturnVoidNode::execute(QSEnv *env)
+{
+  QSBREAKPOINT(env);
+  QSObject ret = env->createUndefined();
   if (!env->isExceptionMode())
     env->setExecutionMode(QSEnv::ReturnValue);
   return ret;
@@ -1506,7 +1588,7 @@ QSObject QSWithNode::executeStatement(QSEnv *env)
                                                "was '%1' of type %2")
                            .arg(v.toString())
                            .arg(v.isValid() ? v.typeName() : QString::fromLatin1("invalid")),
-                           lineNo());
+                           nodeLineNo());
   }
   env->pushScope(v);
   QSObject oldThis = env->thisValue();
@@ -1537,7 +1619,7 @@ QSObject QSSwitchNode::execute(QSEnv *env)
   QSObject v = expr->rhs(env);
   QSObject res = block->evalBlock(env, v);
 
-  if (env->isBreakMode() && ls.contains(env->currentLabel())) {
+  if (env->isBreakMode() /*&& ### AbanQ ls.contains(env->currentLabel())*/) {
     env->setExecutionMode(QSEnv::Normal);
     return res;
   } else
@@ -1626,7 +1708,7 @@ QSObject QSLabelNode::execute(QSEnv *env)
   if (env->containsLabel(label)) {
     env->throwError(SyntaxError,
                     QString::fromLatin1("Duplicated label %1").arg(label),
-                    lineNo());
+                    nodeLineNo());
     return QSObject(); // Q: What to return here?
   }
   env->pushLabel(label);
@@ -1645,7 +1727,7 @@ QSObject QSThrowNode::execute(QSEnv *env)
 
   QSObject v = expr->rhs(env);
   if (v.objectType() != env->errorClass())
-    v = env->errorClass()->construct(ThrowError, v.toString(), lineNo());
+    v = env->errorClass()->construct(ThrowError, v.toString(), nodeLineNo());
 
   env->setException(v);
   return QSObject();
@@ -1684,12 +1766,12 @@ QSObject QSFinallyNode::execute(QSEnv *env)
   return block->execute(env);
 }
 
-int QSFunctionBodyNode::count = 0;
+int QSFunctionBodyNode::count_ = 0;
 
 QSFunctionBodyNode::QSFunctionBodyNode(QSSourceElementsNode *s)
   : source(s), scopeDef(0)
 {
-  idx = ++count;
+  idx = ++count_;
 #ifdef QSDEBUGGER
   setLoc(-1, -1);
 #endif
@@ -1759,18 +1841,18 @@ QSObject QSParameterNode::rhs(QSEnv *env) const
 }
 
 
-QSProgramNode *QSProgramNode::prog = 0;
+QSProgramNode *QSProgramNode::nodeProg_ = 0;
 
 QSProgramNode::QSProgramNode(QSSourceElementsNode *s)
   : QSFunctionBodyNode(s)
 {
-  prog = this;
+  nodeProg_ = this;
 }
 
 QSProgramNode::~QSProgramNode()
 {
-  if (prog == this)
-    prog = 0;
+  if (nodeProg_ == this)
+    nodeProg_ = 0;
 }
 
 void QSProgramNode::deleteGlobalStatements()
@@ -1925,7 +2007,7 @@ QSObject QSImportNode::execute(QSEnv *env)
     return QSObject();
   else {
     env->setExecutionMode(QSEnv::Throw);
-    env->throwError(GeneralError, errMsg, lineNo());
+    env->throwError(GeneralError, errMsg, nodeLineNo());
     return QSObject();
   }
 }

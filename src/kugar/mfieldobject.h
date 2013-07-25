@@ -190,6 +190,11 @@ public:
   */
   virtual int draw(FLStylePainter *p);
 
+  /**
+  Run-time type information
+  */
+  virtual int RTTI() const;
+
 private:
 
   /**

@@ -12,7 +12,10 @@
 
 #include "VERSION.h"
 
+#ifndef AQ_WIN64
 #undef _WIN32
+#endif
+
 #if defined(_WIN32)
 DWORD LocalTLABIndex;
 #endif

@@ -30,7 +30,7 @@
 //#define QT_NO_DIRECTPAINTER
 
 // Special widget effects (fading, scrolling)
-//#define QT_NO_EFFECTS
+#define QT_NO_EFFECTS
 
 // Freetype font engine
 //#define QT_NO_FREETYPE

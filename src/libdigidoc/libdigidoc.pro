@@ -7,7 +7,7 @@ else {
 }
 TEMPLATE = lib
 
-CONFIG += warn_off create_prl 
+CONFIG += warn_off create_prl
 !mac:CONFIG += plugin
 CONFIG -= x11 qt
 
@@ -15,7 +15,7 @@ win32 {
 	CONFIG += dll
 	DLLDESTDIR = $$PREFIX/bin
 	DEFINES += BUILDINGDLL
-	LIBS = -L$$PREFIX/lib -lpthreadGCE2 -lm -lqt-mt
+	LIBS = -L$$PREFIX/lib -lpthreadAQ -lm -lqt-mt
 	INCLUDEPATH += $$ROOT/src/qt/src/3rdparty/zlib
 }
 
@@ -24,10 +24,11 @@ DESTDIR = $$PREFIX/lib
 DEFINES += DIGIDOC_DEBUG WITH_SOAPDEFS_H SYSCONFDIR=\"$$PREFIX/share/abanq\" 
 
 mac {
-DEFINES += __FreeBSD__=8
+DEFINES += __FreeBSD__=8 _REENTRANT
 LIBS += -lz 
 
 }
+
 TARGET = libdigidoc
 
 INCLUDEPATH += $$ROOT/src $$ROOT/src/libdigidoc $$ROOT/src/libdigidoc/libxml2 \
@@ -47,3 +48,5 @@ SOURCES += DigiDocConfig.c  DigiDocLib.c  DigiDocObj.c DigiDocPKCS11.c DigiDocEr
 	   DigiDocMem.c DigiDocStack.c DigiDocEnc.c DigiDocEncGen.c DigiDocEncSAXParser.c DigiDocCert.c DigiDocConvert.c DigiDocGen.c \ 
 	   DigiDocVerify.c DigiDocOCSP.c DigiDocDfExtract.c
 
+mac:QMAKE_CFLAGS += -fno-common
+mac:QMAKE_CXXFLAGS += -fno-common

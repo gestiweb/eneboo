@@ -39,8 +39,9 @@ protected:
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   void clear();
-  QString str() const;
-  bool generateOds(const QString &) const;
+  QString str();
+  bool generateOds(const QString &);
+  QString fileNameStream() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -66,13 +67,17 @@ inline void AQSOdsGenerator::clear()
 {
   AQ_CALL_VOID(clear());
 }
-inline QString AQSOdsGenerator::str() const
+inline QString AQSOdsGenerator::str()
 {
   AQ_CALL_RET_V(str(), QString);
 }
-inline bool AQSOdsGenerator::generateOds(const QString &arg0) const
+inline bool AQSOdsGenerator::generateOds(const QString &arg0)
 {
   AQ_CALL_RET_V(generateOds(arg0), bool);
+}
+inline QString AQSOdsGenerator::fileNameStream() const
+{
+  AQ_CALL_RET_V(fileNameStream(), QString);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

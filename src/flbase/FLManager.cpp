@@ -38,12 +38,26 @@
 
 #include "AQConfig.h"
 
+extern QSInterpreter *globalAQSInterpreter;
+
+static inline void throwMsgWarning(FLSqlDatabase *db, const QString &msg)
+{
+  if (!db->qsaExceptions() || !globalAQSInterpreter) {
+    qWarning(msg);
+    return;
+  }
+  if (globalAQSInterpreter->isRunning())
+    globalAQSInterpreter->throwError(msg);
+  else
+    qWarning(msg);
+}
+
 FLManager::FLManager(FLSqlDatabase *db) :
   cacheMetaData_(0),
   cacheAction_(0),
   cacheMetaDataSys_(0),
-  cacheLargeValues_(0),
-  db_(db)
+  db_(db),
+  initCount_(0)
 {
 #ifndef FL_QUICK_CLIENT
   listTables_ = 0;
@@ -66,12 +80,14 @@ void FLManager::loadTables()
   else
     listTables_->clear();
 
-  *listTables_ = db_->dbAux() ->tables();
+  *listTables_ = db_->dbAux()->tables();
 #endif
 }
 
 void FLManager::init()
 {
+  ++initCount_;
+
 #ifndef FL_QUICK_CLIENT
   FLTableMetaData *tmpTMD;
 
@@ -133,22 +149,18 @@ void FLManager::init()
     cacheMetaDataSys_ = new QDict<FLTableMetaData>(277);
     cacheMetaDataSys_->setAutoDelete(true);
   }
-
-  if (!cacheLargeValues_) {
-    cacheLargeValues_ = new QDict<QVariant>(277);
-    cacheLargeValues_->setAutoDelete(true);
-  }
 }
 
 bool FLManager::existsTable(const QString &n, bool cache) const
 {
 #ifndef FL_QUICK_CLIENT
-  if (!db_->dbAux() || n.isEmpty())
+  if (!db_ || !db_->dbAux() || n.isEmpty())
     return false;
-  if (cache && listTables_)
-    return (listTables_->contains(n) ? true : (db_->dbAux() ->tables().contains(n)));
-  else
-    return (db_->dbAux() ->tables().contains(n));
+  if (cache && listTables_) {
+    QStringList::const_iterator it(listTables_->find(n));
+    return ((it != listTables_->constEnd()) ? true : db_->existsTable(n));
+  } else
+    return db_->existsTable(n);
 #else
   return true;
 #endif
@@ -176,11 +188,6 @@ void FLManager::finish()
   if (cacheAction_) {
     delete cacheAction_;
     cacheAction_ = 0;
-  }
-
-  if (cacheLargeValues_) {
-    delete cacheLargeValues_;
-    cacheLargeValues_ = 0;
   }
 }
 
@@ -219,32 +226,6 @@ FLTableMetaData *FLManager::createTable(const QString &n)
 #endif
 }
 
-bool FLManager::checkMetaData(const QString &n)
-{
-#ifndef FL_QUICK_CLIENT
-  QDomDocument doc(n);
-  QDomElement docElem;
-
-  QString mtd1 = db_->managerModules()->contentCached(n + ".mtd");
-  if (!db_->dbAux())
-    return true;
-
-  QString mtd2;
-  QSqlCursor c("flmetadata", true, db_->dbAux());
-  c.setForwardOnly(true);
-  c.setFilter(QString::fromLatin1("tabla='") + n + QString::fromLatin1("'"));
-  c.select();
-  if (c.next())
-    mtd2 = c.value("xml").toString();
-  else
-    return true;
-
-  return !!checkMetaData(mtd1, mtd2);
-#else
-  return true;
-#endif
-}
-
 bool FLManager::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)
 {
   return db_->alterTable(mtd1, mtd2, key);
@@ -255,7 +236,7 @@ bool FLManager::checkMetaData(FLTableMetaData *tmd1, FLTableMetaData *tmd2)
   if (!tmd1 || !tmd2)
     return (tmd1 == tmd2);
 
-  FLTableMetaData::FLFieldMetaDataList *fieldList = tmd1->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = tmd1->fieldList();
   FLFieldMetaData *field1;
   FLFieldMetaData *field2;
 
@@ -267,6 +248,8 @@ bool FLManager::checkMetaData(FLTableMetaData *tmd1, FLTableMetaData *tmd2)
     field2 = tmd2->field(field1->name());
     if (!field2)
       return false;
+    if (field2->isCheck())
+      continue;
     if (field1->type() != field2->type() || field1->allowNull() != field2->allowNull())
       return false;
     if (field1->isUnique() != field2->isUnique() || field1->isIndex() != field2->isIndex())
@@ -285,6 +268,8 @@ bool FLManager::checkMetaData(FLTableMetaData *tmd1, FLTableMetaData *tmd2)
     field2 = tmd1->field(field1->name());
     if (!field2)
       return false;
+    if (field2->isCheck())
+      continue;
     if (field1->type() != field2->type() || field1->allowNull() != field2->allowNull())
       return false;
     if (field1->isUnique() != field2->isUnique() || field1->isIndex() != field2->isIndex())
@@ -300,8 +285,6 @@ bool FLManager::checkMetaData(FLTableMetaData *tmd1, FLTableMetaData *tmd2)
 bool FLManager::alterTable(const QString &n)
 {
 #ifndef FL_QUICK_CLIENT
-  QString mtd(db_->managerModules()->contentCached(n + QString::fromLatin1(".mtd")));
-
   if (!db_->dbAux())
     return false;
 
@@ -309,9 +292,10 @@ bool FLManager::alterTable(const QString &n)
   c.setForwardOnly(true);
   c.setFilter(QString::fromLatin1("tabla='") + n + QString::fromLatin1("'"));
   c.select();
-  if (c.next())
+  if (c.next()) {
+    QString mtd(db_->managerModules()->contentCached(n + QString::fromLatin1(".mtd")));
     return alterTable(c.value("xml").toString(), mtd);
-  else
+  } else
     return false;
 #else
   return true;
@@ -324,8 +308,9 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
     return 0;
 
   bool ck = false;
-  QString n, a, ol, rX, assocBy, assocWith;
-  bool aN = true, iPK = true, c = false, iNX = false, uNI = false, coun = false, oT = false, vG = true;
+  QString n, a, ol, rX, assocBy, assocWith, so;
+  bool aN = true, iPK = true, c = false, iNX = false, uNI = false,
+       coun = false, oT = false, vG = true, fullCalc = false, trimm = false;
   int t = QVariant::Int, l = 0, pI = 4, pD = 0;
   QVariant dV = QVariant();
 
@@ -419,6 +404,16 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "fullycalculated") {
+        fullCalc = (e.text() == "true");
+        no = no.nextSibling();
+        continue;
+      }
+      if (e.tagName() == "trimmed") {
+        trimm = (e.text() == "true");
+        no = no.nextSibling();
+        continue;
+      }
       if (e.tagName() == "visible") {
         v = (e.text() == "true" && v);
         no = no.nextSibling();
@@ -464,16 +459,25 @@ FLFieldMetaData *FLManager::metadataField(QDomElement *field, bool v, bool ed)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "searchoptions") {
+        so = e.text();
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
 
   FLFieldMetaData *f = new FLFieldMetaData(n, FLUtil::translate("MetaData", a), aN, iPK, t, l, c, v, ed, pI, pD, iNX,
                                            uNI, coun, dV, oT, rX, vG, true, ck);
+  f->setFullyCalculated(fullCalc);
+  f->setTrimed(trimm);
 
   if (!ol.isEmpty())
     f->setOptionsList(ol);
-
+  if (!so.isEmpty())
+    f->setSearchOptions(so);
+  
   no = field->firstChild();
 
   while (!no.isNull()) {
@@ -573,7 +577,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   if (!mtd)
     return 0;
 
-  QString name, a, q;
+  QString name, a, q, ftsfun;
   bool v = true, ed = true, cw = true, dl = false;
 
   QDomNode no = mtd->firstChild();
@@ -621,6 +625,11 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "FTSFunction") {
+        ftsfun = e.text();
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
@@ -628,7 +637,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   FLTableMetaData *tmd = new FLTableMetaData(name, a, q);
   FLCompoundKey *cK = 0;
   QStringList assocs;
-
+  tmd->setFTSFunction(ftsfun);
   tmd->setConcurWarn(cw);
   tmd->setDetectLocks(dl);
   no = mtd->firstChild();
@@ -673,93 +682,163 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
     FLSqlQuery *qry = query(q, tmd);
 
     if (qry) {
-      QStringList fL = qry->fieldList();
+      QStringList fL(qry->fieldList());
       QString table, field;
-      QString fields = tmd->fieldsNames();
+      QStringList fields(QStringList::split(',', tmd->fieldsNames()));
+      bool fieldsEmpty = fields.isEmpty();
 
       for (QStringList::Iterator it = fL.begin(); it != fL.end(); ++it) {
         table = (*it).section('.', 0, 0);
         field = (*it).section('.', 1, 1);
 
-        if (table == name || fields.contains(field.lower()))
+        if (!fieldsEmpty && table == name && fields.find(field.lower()) != fields.end())
           continue;
 
         FLTableMetaData *mtdAux = metadata(table, true);
         if (mtdAux) {
           FLFieldMetaData *fmtdAux = mtdAux->field(field);
           if (fmtdAux) {
-            int typeAux = fmtdAux->type();
-            if (typeAux == FLFieldMetaData::Serial)
-              typeAux = QVariant::UInt;
-            tmd->addFieldMD(new FLFieldMetaData(field, fmtdAux->alias(), true, false, typeAux, fmtdAux->length(),
-                                                false, fmtdAux->visible(), fmtdAux->editable(), fmtdAux->partInteger(),
-                                                fmtdAux->partDecimal(), false, false, false, QVariant(), false,
-                                                QString::null, fmtdAux->visibleGrid(), true, false));
+            bool isForeignKey = false;
+            if (fmtdAux->isPrimaryKey() && table != name) {
+              isForeignKey = true;
+              fmtdAux = new FLFieldMetaData(fmtdAux);
+              fmtdAux->setIsPrimaryKey(false);
+              fmtdAux->setEditable(false);
+            }
+            // ###
+            bool newRef = !isForeignKey;
+            QString fmtdAuxName(fmtdAux->name().lower());
+            if (!fmtdAuxName.contains(".")) {
+              QStringList fieldsAux(QStringList::split(',', tmd->fieldsNames()));
+              if (fieldsAux.find(fmtdAuxName) != fieldsAux.end()) {
+                if (!isForeignKey)
+                  fmtdAux = new FLFieldMetaData(fmtdAux);
+                fmtdAux->setName(table + QString::fromLatin1(".") + field);
+                newRef = false;
+              }
+            }
+            if (newRef)
+              fmtdAux->ref();
+            // ###
+            tmd->addFieldMD(fmtdAux);
           }
         }
       }
-
       qry->deleteLater();
     }
   }
 
-  FLAccessControlLists *acl = aqApp ->acl();
+  FLAccessControlLists *acl = aqApp->acl();
   if (acl)
     acl->process(tmd);
   return tmd;
 }
 
-void FLManager::cleanupMetaData()
+FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
 {
-#ifndef FL_QUICK_CLIENT
-  if (!existsTable("flfiles") || !existsTable("flmetadata"))
-    return;
-
-  QSqlQuery q(QString::null, db_->dbAux());
-  QSqlCursor c("flmetadata", true, db_->dbAux());
-  QSqlRecord *buffer;
-  QString table;
-
-  q.setForwardOnly(true);
-  c.setForwardOnly(true);
-
-  if (!dictKeyMetaData_) {
-    dictKeyMetaData_ = new QDict<QString> (277);
-    dictKeyMetaData_->setAutoDelete(true);
-  } else
-    dictKeyMetaData_->clear();
-
-  loadTables();
-  db_->managerModules()->loadKeyFiles();
-  db_->managerModules()->loadAllIdModules();
-  db_->managerModules()->loadIdAreas();
-
-  q.exec("SELECT tabla,xml FROM flmetadata");
-  while (q.next())
-    dictKeyMetaData_->replace(q.value(0).toString(), new QString(q.value(1).toString()));
-
-  q.exec("SELECT nombre,sha FROM flfiles WHERE nombre LIKE '%.mtd'");
-  while (q.next()) {
-    table = q.value(0).toString();
-    table = table.replace(".mtd", "");
-    if (!existsTable(table))
-      createTable(table);
-    FLTableMetaData *tmd = metadata(table);
-    if (!tmd)
-      qWarning("FLManager::cleanupMetaData "
-               + QApplication::tr("No se ha podido crear los metadatos para la tabla %1").arg(table));
-    c.select("tabla='" + table + "'");
-    if (c.next()) {
-      buffer = c.primeUpdate();
-      buffer->setValue("xml", q.value(1).toString());
-      c.update();
-    }
-    dictKeyMetaData_->replace(table, new QString(q.value(1).toString()));
+#ifdef QSDEBUGGER
+  FLTableMetaData *ret = metadataDev(n, quick);
+  if (!quick && ret && aqApp->consoleShown() &&
+      !ret->isQuery() && db_->mismatchedTable(n, ret)) {
+    QString msg(QApplication::tr(
+                  "La estructura de los metadatos de la tabla '%1' y su "
+                  "estructura interna en la base de datos no coinciden. "
+                  "Debe regenerar la base de datos."
+                ));
+    throwMsgWarning(db_, msg.arg(n));
   }
+  return ret;
+#else
+  if (n.isEmpty() || !db_->dbAux())
+    return 0;
+
+  FLTableMetaData *ret = 0;
+  FLAccessControlLists *acl = 0;
+  QString key(n);
+  QString stream;
+  bool isSysTable = (n.left(3) == "sys" || isSystemTable(n));
+
+  if (!isSysTable) {
+    stream = db_->managerModules()->contentCached(
+               n + QString::fromLatin1(".mtd"), &key
+             );
+    if (stream.isEmpty()) {
+#ifdef FL_DEBUG
+      qWarning("FLManager : " +
+               QApplication::tr("Error al cargar los metadatos para la tabla %1")
+               .arg(n));
+#endif
+      return 0;
+    }
+    if (key.isEmpty())
+      key = n;
+  }
+
+  if (cacheMetaData_ && !isSysTable)
+    ret = cacheMetaData_->find(key);
+  else if (cacheMetaDataSys_ && isSysTable)
+    ret = cacheMetaDataSys_->find(key);
+
+  if (!ret) {
+    if (isSysTable) {
+      stream = db_->managerModules()->contentCached(
+                 n + QString::fromLatin1(".mtd")
+               );
+      if (stream.isEmpty()) {
+#ifdef FL_DEBUG
+        qWarning("FLManager : " +
+                 QApplication::tr("Error al cargar los metadatos para la tabla %1")
+                 .arg(n));
+#endif
+        return 0;
+      }
+    }
+
+    QDomDocument doc(n);
+    if (!FLUtil::domDocumentSetContent(doc, stream)) {
+#ifdef FL_DEBUG
+      qWarning("FLManager : " +
+               QApplication::tr("Error al cargar los metadatos para la tabla %1")
+               .arg(n));
+#endif
+      return 0;
+    }
+
+    QDomElement docElem = doc.documentElement();
+    ret = metadata(&docElem, quick);
+    if (!ret)
+      return 0;
+    if (cacheMetaData_ && !isSysTable && !ret->isQuery()) {
+      ret->setInCache();
+      cacheMetaData_->insert(key, ret);
+    } else if (cacheMetaDataSys_ && isSysTable) {
+      ret->setInCache();
+      cacheMetaDataSys_->insert(key, ret);
+    }
+  } else
+    acl = aqApp->acl();
+
+  if (!ret->fieldsNamesUnlock().isEmpty())
+    ret = new FLTableMetaData(ret);
+
+  if (acl)
+    acl->process(ret);
+
+  if (!quick && !isSysTable && aqApp->consoleShown() &&
+      !ret->isQuery() && db_->mismatchedTable(n, ret)) {
+    QString msg(QApplication::tr(
+                  "La estructura de los metadatos de la tabla '%1' y su "
+                  "estructura interna en la base de datos no coinciden. "
+                  "Debe regenerar la base de datos."
+                ));
+    throwMsgWarning(db_, msg.arg(n));
+  }
+
+  return ret;
 #endif
 }
 
-FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
+FLTableMetaData *FLManager::metadataDev(const QString &n, bool quick)
 {
   if (n.isEmpty() || !db_->dbAux())
     return 0;
@@ -767,13 +846,15 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
   FLTableMetaData *ret = 0;
   QDomDocument doc(n);
   QDomElement docElem;
-
   QString key;
   QString *dictKey = 0;
-  QString stream = db_->managerModules()->contentCached(n + QString::fromLatin1(".mtd"), &key);
+  QString stream;
   bool newTable = false;
   bool notSysTable = n.left(3) != "sys" && !isSystemTable(n);
+  bool readStream = (notSysTable && !quick);
 
+  if (readStream)
+    stream = db_->managerModules()->contentCached(n + QString::fromLatin1(".mtd"), &key);
   if (!notSysTable)
     dictKey = new QString(n);
 
@@ -862,7 +943,9 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
       ret = cacheMetaDataSys_->find(*dictKey);
     }
     if (ret) {
-      FLAccessControlLists *acl = aqApp ->acl();
+      if (!ret->fieldsNamesUnlock().isEmpty())
+        ret = new FLTableMetaData(ret);
+      FLAccessControlLists *acl = aqApp->acl();
       if (acl)
         acl->process(ret);
       if (quick)
@@ -870,6 +953,9 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
       return ret;
     }
   }
+
+  if (!readStream)
+    stream = db_->managerModules()->contentCached(n + QString::fromLatin1(".mtd"), &key);
 
   if (!FLUtil::domDocumentSetContent(doc, stream)) {
 #ifdef FL_DEBUG
@@ -886,11 +972,14 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
 
   docElem = doc.documentElement();
   ret = metadata(&docElem, quick);
-  if (dictKey &&
-      (!notSysTable || (!ret->isQuery() && ret->fieldsNamesUnlock().isEmpty()))) {
+  if (!ret)
+    return 0;
+  if (dictKey && (!notSysTable || !ret->isQuery())) {
     if (cacheMetaData_ && notSysTable) {
+      ret->setInCache();
       cacheMetaData_->insert(*dictKey, ret);
     } else if (cacheMetaDataSys_ && !notSysTable) {
+      ret->setInCache();
       cacheMetaDataSys_->insert(*dictKey, ret);
     }
     if (quick)
@@ -899,8 +988,60 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
     else
       delete dictKey;
 #endif
+    if (!ret->fieldsNamesUnlock().isEmpty())
+      ret = new FLTableMetaData(ret);
   }
   return ret;
+}
+
+void FLManager::cleanupMetaData()
+{
+#ifndef FL_QUICK_CLIENT
+  if (!existsTable("flfiles") || !existsTable("flmetadata"))
+    return;
+
+  QSqlQuery q(QString::null, db_->dbAux());
+  QSqlCursor c("flmetadata", true, db_->dbAux());
+  QSqlRecord *buffer;
+  QString table;
+
+  q.setForwardOnly(true);
+  c.setForwardOnly(true);
+
+  if (!dictKeyMetaData_) {
+    dictKeyMetaData_ = new QDict<QString> (277);
+    dictKeyMetaData_->setAutoDelete(true);
+  } else
+    dictKeyMetaData_->clear();
+
+  loadTables();
+  db_->managerModules()->loadKeyFiles();
+  db_->managerModules()->loadAllIdModules();
+  db_->managerModules()->loadIdAreas();
+
+  q.exec("SELECT tabla,xml FROM flmetadata");
+  while (q.next())
+    dictKeyMetaData_->replace(q.value(0).toString(), new QString(q.value(1).toString()));
+
+  q.exec("SELECT nombre,sha FROM flfiles WHERE nombre LIKE '%.mtd'");
+  while (q.next()) {
+    table = q.value(0).toString();
+    table = table.replace(".mtd", "");
+    if (!existsTable(table))
+      createTable(table);
+    FLTableMetaData *tmd = metadata(table);
+    if (!tmd)
+      qWarning("FLManager::cleanupMetaData "
+               + QApplication::tr("No se ha podido crear los metadatos para la tabla %1").arg(table));
+    c.select("tabla='" + table + "'");
+    if (c.next()) {
+      buffer = c.primeUpdate();
+      buffer->setValue("xml", q.value(1).toString());
+      c.update();
+    }
+    dictKeyMetaData_->replace(table, new QString(q.value(1).toString()));
+  }
+#endif
 }
 
 FLGroupByQuery *FLManager::queryGroup(QDomElement *group)
@@ -1099,6 +1240,20 @@ FLAction *FLManager::action(const QString &n)
 
     if (!e.isNull()) {
       if (e.tagName() == "action") {
+
+        QDomNodeList nl(e.elementsByTagName("name"));
+        if (nl.count() == 0) {
+          qWarning("Debe indicar la etiqueta <name> en acción '%s'", n.latin1());
+          no = no.nextSibling();
+          continue;
+        } else {
+          QDomElement it(nl.item(0).toElement());
+          if (it.text() != n) {
+            no = no.nextSibling();
+            continue;
+          }
+        }
+
         QDomNode no2 = e.firstChild();
 
         while (!no2.isNull()) {
@@ -1138,18 +1293,32 @@ FLAction *FLManager::action(const QString &n)
               continue;
             }
             if (e2.tagName() == "caption") {
-              a->setCaption(e2.text());
+              QString txt(e2.text());
+              if (txt.contains("QT_TRANSLATE_NOOP")) {
+                txt = txt.mid(30, txt.length() - 32);
+                txt = FLUtil::translate("MetaData", txt);
+              }
+              a->setCaption(txt);
               no2 = no2.nextSibling();
               continue;
             }
             if (e2.tagName() == "description") {
-                if (a->caption() =="")
-                    a->setCaption(e2.text());
-                no2 = no2.nextSibling();
-                continue;
+              QString txt(e2.text());
+              if (txt.contains("QT_TRANSLATE_NOOP")) {
+                txt = txt.mid(30, txt.length() - 32);
+                txt = FLUtil::translate("MetaData", txt);
+              }
+              if (a->caption() =="") a->setDescription(txt);
+              no2 = no2.nextSibling();
+              continue;
             }
             if (e2.tagName() == "alias") {
-              a->setCaption(e2.text());
+              QString txt(e2.text());
+              if (txt.contains("QT_TRANSLATE_NOOP")) {
+                txt = txt.mid(30, txt.length() - 32);
+                txt = FLUtil::translate("MetaData", txt);
+              }
+              a->setCaption(txt);
               no2 = no2.nextSibling();
               continue;
             }
@@ -1210,9 +1379,14 @@ QString FLManager::formatAssignValueLike(FLFieldMetaData *fMD, const QVariant &v
     return "1 = 1";
 
   FLTableMetaData *mtd = fMD->metadata();
-  QString fieldName(fMD->name());
+  if (!mtd)
+    return formatAssignValueLike(fMD->name(), fMD->type(), v, upper);
 
-  if (mtd && mtd->isQuery()) {
+  if (fMD->isPrimaryKey())
+    return formatAssignValueLike(mtd->primaryKey(true), fMD->type(), v, upper);
+
+  QString fieldName(fMD->name());
+  if (mtd->isQuery() && !fieldName.contains(".")) {
     QString prefixTable(mtd->name());
     FLSqlQuery *qry = query(mtd->query());
 
@@ -1277,9 +1451,14 @@ QString FLManager::formatAssignValue(FLFieldMetaData *fMD, const QVariant &v, co
     return "1 = 1";
 
   FLTableMetaData *mtd = fMD->metadata();
-  QString fieldName(fMD->name());
+  if (!mtd)
+    return formatAssignValue(fMD->name(), fMD->type(), v, upper);
 
-  if (mtd && mtd->isQuery()) {
+  if (fMD->isPrimaryKey())
+    return formatAssignValue(mtd->primaryKey(true), fMD->type(), v, upper);
+
+  QString fieldName(fMD->name());
+  if (mtd->isQuery() && !fieldName.contains(".")) {
     QString prefixTable(mtd->name());
     FLSqlQuery *qry = query(mtd->query());
 
@@ -1415,11 +1594,6 @@ QVariant FLManager::fetchLargeValue(const QString &refKey) const
   if (refKey.left(3) != "RK@")
     return QVariant();
 
-  QString sha(refKey.section('@', 2, 2));
-  QVariant *cachedV = cacheLargeValues_->find(sha);
-  if (cachedV)
-    return QVariant(*cachedV);
-
   QString tableLarge(QString::fromLatin1("fllarge"));
   if (!existsTable(tableLarge))
     return QVariant();
@@ -1429,8 +1603,6 @@ QVariant FLManager::fetchLargeValue(const QString &refKey) const
                     QString::fromLatin1(" WHERE refkey='") + refKey + QString::fromLatin1("'")) &&
       qryLarge.next()) {
     QVariant v(qryLarge.value(0));
-    if (v.isValid())
-      cacheLargeValues_->insert(sha, new QVariant(v));
     return v;
   }
   return QVariant();

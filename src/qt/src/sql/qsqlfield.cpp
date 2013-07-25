@@ -187,6 +187,8 @@ void QSqlField::setValue( const QVariant& value )
 {
     if ( isReadOnly() )
 	return;
+    if ( val.type() != d->type )
+        val.cast( d->type );
     if ( value.type() != d->type ) {
 	if ( !val.canCast( d->type ) )
 	     qWarning("QSqlField::setValue: %s cannot cast from %s to %s",

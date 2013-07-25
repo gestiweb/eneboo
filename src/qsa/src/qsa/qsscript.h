@@ -45,10 +45,7 @@ public:
 
   QString name() const;
   QString code() const;
-  // ### AbanQ
-  QObject *context() const {
-    return context_;
-  }
+  QObject *context() const;
 
   void setCode(const QString &code);
   void addCode(const QString &code);
@@ -80,9 +77,6 @@ signals:
 
 private:
   QSScriptPrivate *d;
-
-  // ### AbanQ
-  QObject *context_;
 };
 
 #endif

@@ -20,20 +20,22 @@ email                : mail@infosial.com
 #include "FLSqlDatabase.h"
 
 #ifdef FL_DEBUG
-FL_EXPORT long FLSqlSavePoint::countRefSavePoint = 0;
+AQ_EXPORT long FLSqlSavePoint::countRefSavePoint = 0;
 #endif
 
-FLSqlSavePoint::FLSqlSavePoint( int id ) : id_( id ), opInfos( 0 ) {
+FLSqlSavePoint::FLSqlSavePoint(int id) : id_(id), opInfos(0)
+{
   opInfos = new QPtrStack < opInfo >;
-  opInfos->setAutoDelete( true );
+  opInfos->setAutoDelete(true);
 
 #ifdef FL_DEBUG
   countRefSavePoint++;
 #endif
 }
 
-FLSqlSavePoint::~FLSqlSavePoint() {
-  if ( opInfos ) {
+FLSqlSavePoint::~FLSqlSavePoint()
+{
+  if (opInfos) {
     opInfos->clear();
     delete opInfos;
   }
@@ -43,23 +45,25 @@ FLSqlSavePoint::~FLSqlSavePoint() {
 #endif
 }
 
-void FLSqlSavePoint::clear() {
+void FLSqlSavePoint::clear()
+{
   opInfos->clear();
 }
 
-void FLSqlSavePoint::undo() {
-  opInfo * opInf;
-  while ( !opInfos->isEmpty() ) {
+void FLSqlSavePoint::undo()
+{
+  opInfo *opInf;
+  while (!opInfos->isEmpty()) {
     opInf = opInfos->pop();
-    switch ( opInf->op ) {
+    switch (opInf->op) {
       case 0:
-        undoInsert( opInf );
+        undoInsert(opInf);
         break;
       case 1:
-        undoEdit( opInf );
+        undoEdit(opInf);
         break;
       case 2:
-        undoDel( opInf );
+        undoDel(opInf);
         break;
     }
     delete opInf;
@@ -67,89 +71,98 @@ void FLSqlSavePoint::undo() {
   clear();
 }
 
-void FLSqlSavePoint::saveInsert( const QString & primaryKey, QSqlRecord * buffer, FLSqlCursor * cursor ) {
-  if ( !cursor || !buffer )
+void FLSqlSavePoint::saveInsert(const QString &primaryKey, QSqlRecord *buffer, FLSqlCursor *cursor)
+{
+  if (!cursor || !buffer)
     return ;
-  opInfos->push( new opInfo( primaryKey, 0, QSqlRecord( *buffer ), cursor->at(), cursor->sort(), cursor->filter(),
-                             static_cast<QSqlCursor *>( cursor ) ->name(), cursor ) );
+  opInfos->push(new opInfo(primaryKey, 0, QSqlRecord(*buffer), cursor->at(), cursor->sort(), cursor->filter(),
+                           static_cast<QSqlCursor *>(cursor)->name(), cursor));
 }
 
-void FLSqlSavePoint::saveEdit( const QString & primaryKey, QSqlRecord * buffer, FLSqlCursor * cursor ) {
-  if ( !cursor || !buffer )
+void FLSqlSavePoint::saveEdit(const QString &primaryKey, QSqlRecord *buffer, FLSqlCursor *cursor)
+{
+  if (!cursor || !buffer)
     return ;
-  opInfos->push( new opInfo( primaryKey, 1, QSqlRecord( *buffer ), cursor->at(), cursor->sort(), cursor->filter(),
-                             static_cast<QSqlCursor *>( cursor ) ->name(), cursor ) );
+  opInfos->push(new opInfo(primaryKey, 1, QSqlRecord(*buffer), cursor->at(), cursor->sort(), cursor->filter(),
+                           static_cast<QSqlCursor *>(cursor)->name(), cursor));
 }
 
-void FLSqlSavePoint::saveDel( const QString & primaryKey, QSqlRecord * buffer, FLSqlCursor * cursor ) {
-  if ( !cursor || !buffer )
+void FLSqlSavePoint::saveDel(const QString &primaryKey, QSqlRecord *buffer, FLSqlCursor *cursor)
+{
+  if (!cursor || !buffer)
     return ;
-  opInfos->push( new opInfo( primaryKey, 2, QSqlRecord( *buffer ), cursor->at(), cursor->sort(), cursor->filter(),
-                             static_cast<QSqlCursor *>( cursor ) ->name(), cursor ) );
+  opInfos->push(new opInfo(primaryKey, 2, QSqlRecord(*buffer), cursor->at(), cursor->sort(), cursor->filter(),
+                           static_cast<QSqlCursor *>(cursor)->name(), cursor));
 }
 
-void FLSqlSavePoint::undoInsert( const opInfo * opInf ) {
-  FLSqlCursor * cursor_ = opInf->cursor;
+void FLSqlSavePoint::undoInsert(const opInfo *opInf)
+{
+  FLSqlCursor *cursor_ = opInf->cursor;
   bool owner = false;
-  if ( !cursor_ ) {
-    cursor_ = new FLSqlCursor( opInf->name );
-    cursor_->setForwardOnly( true );
+  if (!cursor_) {
+    cursor_ = new FLSqlCursor(opInf->name);
+    cursor_->setForwardOnly(true);
     owner = true;
   }
-  if ( !cursor_ )
-    return ;
-  QString valuePrimaryKey = opInf->buffer.value( opInf->primaryKey ).toString();
-  cursor_->QSqlCursor::select( opInf->primaryKey + "='" + valuePrimaryKey + "'" );
-  if ( cursor_->QSqlCursor::next() ) {
-    cursor_->QSqlCursor::primeDelete();
-    cursor_->QSqlCursor::del();
+  if (!cursor_)
+    return;
+  if (opInf->buffer.contains(opInf->primaryKey) &&
+      !opInf->buffer.isNull(opInf->primaryKey)) {
+    QString valuePrimaryKey = opInf->buffer.value(opInf->primaryKey).toString();
+    bool ok = cursor_->QSqlCursor::select(opInf->primaryKey + "='" + valuePrimaryKey + "'");
+    if (ok && cursor_->QSqlCursor::next()) {
+      cursor_->QSqlCursor::primeDelete();
+      cursor_->QSqlCursor::del();
+    }
   }
-  if ( !owner ) {
-    cursor_->QSqlCursor::select( opInf->filter, opInf->sort );
-    cursor_->QSqlCursor::seek( opInf->at );
+  if (!owner) {
+    cursor_->QSqlCursor::select(opInf->filter, opInf->sort);
+    cursor_->QSqlCursor::seek(opInf->at);
   } else
     delete cursor_;
 }
 
-void FLSqlSavePoint::undoEdit( const opInfo * opInf ) {
-  FLSqlCursor * cursor_ = opInf->cursor;
+void FLSqlSavePoint::undoEdit(const opInfo *opInf)
+{
+  FLSqlCursor *cursor_ = opInf->cursor;
   bool owner = false;
-  if ( !cursor_ ) {
-    cursor_ = new FLSqlCursor( opInf->name );
-    cursor_->setForwardOnly( true );
+  if (!cursor_) {
+    cursor_ = new FLSqlCursor(opInf->name);
+    cursor_->setForwardOnly(true);
     owner = true;
   }
-  if ( !cursor_ )
+  if (!cursor_)
     return ;
-  QString valuePrimaryKey = opInf->buffer.value( opInf->primaryKey ).toString();
-  cursor_->QSqlCursor::select( opInf->primaryKey + "='" + valuePrimaryKey + "'" );
-  if ( cursor_->QSqlCursor::next() ) {
-    QSqlRecord * buf = cursor_->QSqlCursor::primeUpdate();
+  QString valuePrimaryKey = opInf->buffer.value(opInf->primaryKey).toString();
+  bool ok = cursor_->QSqlCursor::select(opInf->primaryKey + "='" + valuePrimaryKey + "'");
+  if (ok && cursor_->QSqlCursor::next()) {
+    QSqlRecord *buf = cursor_->QSqlCursor::primeUpdate();
     *buf = opInf->buffer;
     cursor_->QSqlCursor::update();
   }
-  if ( !owner ) {
-    cursor_->QSqlCursor::select( opInf->filter, opInf->sort );
-    cursor_->QSqlCursor::seek( opInf->at );
+  if (!owner) {
+    cursor_->QSqlCursor::select(opInf->filter, opInf->sort);
+    cursor_->QSqlCursor::seek(opInf->at);
   } else
     delete cursor_;
 }
 
-void FLSqlSavePoint::undoDel( const opInfo * opInf ) {
-  FLSqlCursor * cursor_ = opInf->cursor;
+void FLSqlSavePoint::undoDel(const opInfo *opInf)
+{
+  FLSqlCursor *cursor_ = opInf->cursor;
   bool owner = false;
-  if ( !cursor_ ) {
-    cursor_ = new FLSqlCursor( opInf->name );
+  if (!cursor_) {
+    cursor_ = new FLSqlCursor(opInf->name);
     owner = true;
   }
-  if ( !cursor_ )
+  if (!cursor_)
     return ;
-  QSqlRecord * buf = cursor_->QSqlCursor::primeInsert();
+  QSqlRecord *buf = cursor_->QSqlCursor::primeInsert();
   *buf = opInf->buffer;
   cursor_->QSqlCursor::insert();
-  if ( !owner ) {
-    cursor_->QSqlCursor::select( opInf->filter, opInf->sort );
-    cursor_->QSqlCursor::seek( opInf->at );
+  if (!owner) {
+    cursor_->QSqlCursor::select(opInf->filter, opInf->sort);
+    cursor_->QSqlCursor::seek(opInf->at);
   } else
     delete cursor_;
 }

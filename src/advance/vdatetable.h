@@ -25,13 +25,15 @@
 #include <qlineedit.h>
 #include <qdatetime.h>
 
+#include "aqadvglobal.h"
+
 /**
 * A table containing month names. It is used to pick a month directly.
 * @internal
 * @version $Id: vdatetable.h,v 1.2 2002/04/04 11:01:45 bryanbr Exp $
 * @author Tim Gilman, Mirko Boehm
 */
-class VDateInternalMonthPicker: public QGridView {
+class AQADV_EXPORT VDateInternalMonthPicker: public QGridView {
 	Q_OBJECT
 
 protected:
@@ -103,7 +105,7 @@ private:
 * @version $Id: vdatetable.h,v 1.2 2002/04/04 11:01:45 bryanbr Exp $
 * @author Tim Gilman, Mirko Boehm
 */
-class VDateInternalYearSelector: public QLineEdit {
+class AQADV_EXPORT VDateInternalYearSelector: public QLineEdit {
 	Q_OBJECT
 
 protected:
@@ -131,7 +133,7 @@ private:
  * @author Tim Gilman, Mirko Boehm
  * @version $Id: vdatetable.h,v 1.2 2002/04/04 11:01:45 bryanbr Exp $
  */
-class VPopupFrame: public QFrame {
+class AQADV_EXPORT VPopupFrame: public QFrame {
 	Q_OBJECT
 
 protected:
@@ -198,7 +200,7 @@ private:
 	VPopupFramePrivate *d;
 };
 
-class VDateValidator: public QValidator {
+class AQADV_EXPORT VDateValidator: public QValidator {
 public:
 	VDateValidator( QWidget * parent = 0, const char *name = 0 );
 	virtual State validate( QString &, int & ) const;
@@ -206,7 +208,7 @@ public:
 	State date( const QString &, QDate & ) const;
 };
 
-class VDateTable: public QGridView {
+class AQADV_EXPORT VDateTable: public QGridView {
 	Q_OBJECT
 
 public:

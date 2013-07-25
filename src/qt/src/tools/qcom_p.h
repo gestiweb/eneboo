@@ -267,7 +267,7 @@ private:	   \
     QtULong qtrefcount;   \
 public:		   \
     ulong addRef() {return qtrefcount++;} \
-    ulong release() {if(!--qtrefcount){delete this;return 0;}return qtrefcount;}
+    ulong release() {if(!--qtrefcount){if (this) delete this;return 0;}return qtrefcount;}
 
 #ifndef Q_EXPORT_COMPONENT
 #if defined(QT_THREAD_SUPPORT)

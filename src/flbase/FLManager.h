@@ -41,7 +41,7 @@ mediante objetos FLTableMetaData de una tabla dada.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLManager
+class AQ_EXPORT FLManager
 {
 
   friend class FLSqlDatabase;
@@ -95,6 +95,7 @@ public:
   @return Un objeto FLTableMetaData con los metadatos de la tabla solicitada
   */
   FLTableMetaData *metadata(const QString &n, bool quick = false);
+  FLTableMetaData *metadataDev(const QString &n, bool quick = false);
 
   /**
   Para obtener una consulta de la base de datos, a partir de un fichero XML.
@@ -130,23 +131,6 @@ public:
   @return TRUE si existe la tabla, FALSE en caso contrario
   */
   bool existsTable(const QString &n, bool cache = true) const;
-
-  /**
-  Comprueba si los metadatos definidos actualmente para una tabla en un fichero .mtd,
-  difieren de los que tiene actualmente esa tabla en la base de datos (difieren con
-  la copia que se tiene actualmente de ellos).
-
-  Cuando se realizan modificaciones en la definición
-  de una tabla, es probable que esa tabla ya exista en la base de datos. Con este
-  método podemos determinar posteriormente si lo metadatos definidos actualmente
-  difieren de los de la tabla existente en la base de datos.
-
-  @param n Nombre de la tabla a comprobar
-  @return TRUE si los metadatos que hemos definido en FLManager::metadata()
-      para una tabla (nuevos) son iguales a los metadatos de la tabla que tenemos
-      en la base de datos (viejos), y FALSE en caso contrario
-  */
-  bool checkMetaData(const QString &n);
 
   /**
   Esta función es esencialmente igual a la anterior, se proporciona por conveniencia.
@@ -392,6 +376,13 @@ public:
   */
   QVariant fetchLargeValue(const QString &refKey) const;
 
+  /**
+  Uso interno. Indica el número de veces que se ha llamado a FLManager::init().
+  */
+  int initCount() const {
+    return initCount_;
+  }
+
 private:
 
 #ifndef FL_QUICK_CLIENT
@@ -422,14 +413,14 @@ private:
   QDict<FLTableMetaData> *cacheMetaDataSys_;
 
   /**
-  Caché de valores grandes de campos
-  */
-  QDict<QVariant> *cacheLargeValues_;
-
-  /**
   Base de datos a utilizar por el manejador
   */
   FLSqlDatabase *db_;
+
+  /**
+  Indica el número de veces que se ha llamado a FLManager::init()
+  */
+  int initCount_;
 };
 
 #endif

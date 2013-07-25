@@ -370,7 +370,7 @@ int QClipboardINCRTransaction::x11Event(XEvent *event)
 	// INCR transaction finished...
 	XChangeProperty(QPaintDevice::x11AppDisplay(), window, property, target, format,
 			PropModeReplace, (uchar *) data.data(), 0);
-       	delete this;
+       	if (this) delete this;
     }
 
     return 1;

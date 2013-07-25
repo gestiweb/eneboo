@@ -17,6 +17,7 @@ win32 {
 	DLLDESTDIR = $$PREFIX/bin
 	LIBS = -L$$PREFIX/lib -lm
 }
+enable_win64:DEFINES += _UWIN
 
 DESTDIR = $$PREFIX/lib
 

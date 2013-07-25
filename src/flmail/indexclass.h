@@ -68,12 +68,14 @@
 
 #include <qptrlist.h>
 
+#include "aqmailglobal.h"
+
 class MimePart;
 class QDataStream;
 class QString;
 class MailFolder;
 
-class IndexClass
+class AQMAIL_EXPORT IndexClass
 {
     friend QDataStream& operator>>(QDataStream &, IndexClass &);
     friend QDataStream& operator<<(QDataStream &, IndexClass &);
@@ -143,10 +145,10 @@ private:
     QString _id;
     QString _parentID;
     QString _messageID;
-    long _descriptorOffset;
-    long _descriptorLength;
-    long _uniblockOffset;
-    long _uniblockLength;
+    Q_LONG _descriptorOffset;
+    Q_LONG _descriptorLength;
+    Q_LONG _uniblockOffset;
+    Q_LONG _uniblockLength;
     QPtrList<MimePart> _partList;
     int _multipartOnly;
     int _unreadMark;

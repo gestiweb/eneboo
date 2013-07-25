@@ -1158,6 +1158,10 @@ Calidae S.L. &lt;erp@calidae.com&gt;</string>
 <slots>
     <slot>copy2Clipboard()</slot>
 </slots>
+<includes>
+    <include location="global" impldecl="in declaration">AQGlobal.h</include>
+</includes>
 <exportmacro>FL_EXPORT</exportmacro>
+<exportmacro>AQ_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

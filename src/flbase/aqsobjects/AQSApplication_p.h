@@ -22,6 +22,7 @@
 #include "AQSObject_p.h"
 #include "AQSSqlDatabase_p.h"
 #include "AQApplication.h"
+#include "AQSCursor_p.h"
 
 class AQSApplication : public AQSObject
 {
@@ -51,7 +52,8 @@ public slots:
   int colorSpec();
   void setColorSpec(int);
   QCursor *overrideCursor();
-  void setOverrideCursor(const QCursor &, bool = FALSE);
+  void setOverrideCursor(QCursor *, bool = FALSE);
+  void setOverrideCursor(AQSCursor *, bool = FALSE);
   void restoreOverrideCursor();
   bool hasGlobalMouseTracking();
   void setGlobalMouseTracking(bool);
@@ -109,10 +111,26 @@ public slots:
   void activateModule(const QString &);
   void execMainScript(const QString &);
   void aboutAbanQ();
-  void staticLoaderSetup();
   void chooseFont();
+  void showStyles();
   void setDatabaseLockDetection(bool = true, int = 30000, int = -1, bool = true, const QString& = QString::null, const QString& = QString::null);
   QString commaSeparator() const;
+  void setNotifyBeginTransaction(bool = true);
+  void setNotifyEndTransaction(bool = true);
+  void setNotifyRollbackTransaction(bool = true);
+  bool notifyBeginTransaction() const;
+  bool notifyEndTransaction() const;
+  bool notifyRollbackTransaction() const;
+  AQApplication *self();
+  void staticLoaderSetup();
+  void openQSWorkbench();
+  QSWorkbench *workbench() const;
+  void showConsole();
+  bool consoleShown() const;
+  void generalExit(bool = true);
+  void setProxyDesktop(QWidget *);
+  void startTimerIdle();
+  void stopTimerIdle();
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -202,9 +220,13 @@ inline QCursor *AQSApplication::overrideCursor()
 {
   AQ_CALL_RET(overrideCursor());
 }
-inline void AQSApplication::setOverrideCursor(const QCursor &arg0,  bool arg1)
+inline void AQSApplication::setOverrideCursor(QCursor *arg0,  bool arg1)
 {
-  AQ_CALL_VOID(setOverrideCursor(arg0, arg1));
+  AQ_CALL_VOID(setOverrideCursor(*arg0, arg1));
+}
+inline void AQSApplication::setOverrideCursor(AQSCursor *arg0,  bool arg1)
+{
+  AQ_CALL_VOID(setOverrideCursor(*arg0, arg1));
 }
 inline void AQSApplication::restoreOverrideCursor()
 {
@@ -436,14 +458,14 @@ inline void AQSApplication::aboutAbanQ()
 {
   AQ_CALL_VOID(aboutAbanQ());
 }
-inline void AQSApplication::staticLoaderSetup()
-{
-   AQ_CALL_VOID(staticLoaderSetup());
-}
 
 inline void AQSApplication::chooseFont()
 {
   AQ_CALL_VOID(chooseFont());
+}
+inline void AQSApplication::showStyles()
+{
+  AQ_CALL_VOID(showStyles());
 }
 inline void AQSApplication::setDatabaseLockDetection(bool arg0,  int arg1,  int arg2,  bool arg3,  const QString &arg4,  const QString &arg5)
 {
@@ -452,6 +474,70 @@ inline void AQSApplication::setDatabaseLockDetection(bool arg0,  int arg1,  int 
 inline QString AQSApplication::commaSeparator() const
 {
   AQ_CALL_RET_V(commaSeparator(), QString);
+}
+inline void AQSApplication::setNotifyBeginTransaction(bool arg0)
+{
+  AQ_CALL_VOID(setNotifyBeginTransaction(arg0));
+}
+inline void AQSApplication::setNotifyEndTransaction(bool arg0)
+{
+  AQ_CALL_VOID(setNotifyEndTransaction(arg0));
+}
+inline void AQSApplication::setNotifyRollbackTransaction(bool arg0)
+{
+  AQ_CALL_VOID(setNotifyRollbackTransaction(arg0));
+}
+inline bool AQSApplication::notifyBeginTransaction() const
+{
+  AQ_CALL_RET_V(notifyBeginTransaction(), bool);
+}
+inline bool AQSApplication::notifyEndTransaction() const
+{
+  AQ_CALL_RET_V(notifyEndTransaction(), bool);
+}
+inline bool AQSApplication::notifyRollbackTransaction() const
+{
+  AQ_CALL_RET_V(notifyRollbackTransaction(), bool);
+}
+inline AQApplication *AQSApplication::self()
+{
+  AQ_CALL_RET(self());
+}
+inline void AQSApplication::staticLoaderSetup()
+{
+  AQ_CALL_VOID(staticLoaderSetup());
+}
+inline void AQSApplication::openQSWorkbench()
+{
+  AQ_CALL_VOID(openQSWorkbench());
+}
+inline QSWorkbench *AQSApplication::workbench() const
+{
+  AQ_CALL_RET(workbench());
+}
+inline void AQSApplication::showConsole()
+{
+  AQ_CALL_VOID(showConsole());
+}
+inline bool AQSApplication::consoleShown() const
+{
+  AQ_CALL_RET_V(consoleShown(), bool);
+}
+inline void AQSApplication::generalExit(bool arg0)
+{
+  AQ_CALL_VOID(generalExit(arg0));
+}
+inline void AQSApplication::setProxyDesktop(QWidget *arg0)
+{
+  AQ_CALL_VOID(setProxyDesktop(arg0));
+}
+inline void AQSApplication::startTimerIdle()
+{
+  AQ_CALL_VOID(startTimerIdle());
+}
+inline void AQSApplication::stopTimerIdle()
+{
+  AQ_CALL_VOID(stopTimerIdle());
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

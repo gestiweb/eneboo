@@ -1,8 +1,8 @@
 /***************************************************************************
  AQS_g.h
  -------------------
- begin                : 30/12/2011
- copyright            : (C) 2003-2011 by InfoSiAL S.L.
+ begin                : 19/06/2013
+ copyright            : (C) 2003-2013 by InfoSiAL S.L.
  email                : mail@infosial.com
  ***************************************************************************/
 /***************************************************************************
@@ -58,6 +58,7 @@
 #include "AQSComboTableItem_p.h"
 #include "AQSCompilerQSA_p.h"
 #include "AQSContextMenuEvent_p.h"
+#include "AQSCursor_p.h"
 #include "AQSCustomEvent_p.h"
 #include "AQSDataStream_p.h"
 #include "AQSDataTableDB_p.h"
@@ -162,6 +163,7 @@
 #include "AQSPicture_p.h"
 #include "AQSPixmap_p.h"
 #include "AQSPointArray_p.h"
+#include "AQSPoint_p.h"
 #include "AQSPopupMenu_p.h"
 #include "AQSPrinter_p.h"
 #include "AQSProcess_p.h"
@@ -174,12 +176,14 @@
 #include "AQSReportEngine_p.h"
 #include "AQSReportViewer_p.h"
 #include "AQSResizeEvent_p.h"
+#include "AQSScrollBar_p.h"
 #include "AQSScrollView_p.h"
 #include "AQSSEditor_p.h"
 #include "AQSSettings_p.h"
 #include "AQSShowEvent_p.h"
 #include "AQSSignalMapper_p.h"
 #include "AQSSInterpreter_p.h"
+#include "AQSSmtpClient_p.h"
 #include "AQSSocketNotifier_p.h"
 #include "AQSSpinBox_p.h"
 #include "AQSSplitter_p.h"
@@ -188,6 +192,7 @@
 #include "AQSSqlDatabase_p.h"
 #include "AQSSqlError_p.h"
 #include "AQSSqlQuery_p.h"
+#include "AQSSqlSelectCursor_p.h"
 #include "AQSSScript_p.h"
 #include "AQSStatusBar_p.h"
 #include "AQSStoredDrag_p.h"
@@ -262,6 +267,7 @@
          AQ_REG_WRAP(ComboTableItem); \
          AQ_REG_WRAP_AQOBJECT(CompilerQSA); \
          AQ_REG_WRAP(ContextMenuEvent); \
+         AQ_REG_WRAP(Cursor); \
          AQ_REG_WRAP(CustomEvent); \
          AQ_REG_WRAP(DataStream); \
          AQ_REG_WRAP_AQOBJECT(DataTableDB); \
@@ -368,6 +374,7 @@
          AQ_REG_WRAP(Picture); \
          AQ_REG_WRAP(Pixmap); \
          AQ_REG_WRAP(PointArray); \
+         AQ_REG_WRAP(Point); \
          AQ_REG_WRAP(PopupMenu); \
          AQ_REG_WRAP(Printer); \
          AQ_REG_WRAP(Process); \
@@ -380,11 +387,13 @@
          AQ_REG_WRAP_AQOBJECT(ReportEngine); \
          AQ_REG_WRAP_AQOBJECT(ReportViewer); \
          AQ_REG_WRAP(ResizeEvent); \
+         AQ_REG_WRAP(ScrollBar); \
          AQ_REG_WRAP(ScrollView); \
          AQ_REG_WRAP(SEditor); \
          AQ_REG_WRAP_AQOBJECT(Settings); \
          AQ_REG_WRAP(ShowEvent); \
          AQ_REG_WRAP(SignalMapper); \
+         AQ_REG_WRAP_AQOBJECT(SmtpClient); \
          AQ_REG_WRAP(SocketNotifier); \
          AQ_REG_WRAP(SpinBox); \
          AQ_REG_WRAP(Splitter); \
@@ -392,6 +401,7 @@
          AQ_REG_WRAP_AQOBJECT(SqlDatabase); \
          AQ_REG_WRAP(SqlError); \
          AQ_REG_WRAP_AQOBJECT(SqlQuery); \
+         AQ_REG_WRAP(SqlSelectCursor); \
          AQ_REG_WRAP(SScript); \
          AQ_REG_WRAP(StatusBar); \
          AQ_REG_WRAP(StoredDrag); \
@@ -466,6 +476,7 @@
          AQ_CRE_WRAP_VOIDPTR(ComboTableItem); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(CompilerQSA); \
          AQ_CRE_WRAP_VOIDPTR(ContextMenuEvent); \
+         AQ_CRE_WRAP_VOIDPTR(Cursor); \
          AQ_CRE_WRAP_VOIDPTR(CustomEvent); \
          AQ_CRE_WRAP_VOIDPTR(DataStream); \
          AQ_CRE_WRAP_AQOBJECT(DataTableDB); \
@@ -572,6 +583,7 @@
          AQ_CRE_WRAP_VOIDPTR(Picture); \
          AQ_CRE_WRAP_VOIDPTR(Pixmap); \
          AQ_CRE_WRAP_VOIDPTR(PointArray); \
+         AQ_CRE_WRAP_VOIDPTR(Point); \
          AQ_CRE_WRAP_OBJECT(PopupMenu); \
          AQ_CRE_WRAP_VOIDPTR(Printer); \
          AQ_CRE_WRAP_OBJECT(Process); \
@@ -584,11 +596,13 @@
          AQ_CRE_WRAP_AQOBJECT(ReportEngine); \
          AQ_CRE_WRAP_AQOBJECT(ReportViewer); \
          AQ_CRE_WRAP_VOIDPTR(ResizeEvent); \
+         AQ_CRE_WRAP_OBJECT(ScrollBar); \
          AQ_CRE_WRAP_OBJECT(ScrollView); \
          AQ_CRE_WRAP_OBJECT(SEditor); \
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(Settings); \
          AQ_CRE_WRAP_VOIDPTR(ShowEvent); \
          AQ_CRE_WRAP_OBJECT(SignalMapper); \
+         AQ_CRE_WRAP_AQOBJECT(SmtpClient); \
          AQ_CRE_WRAP_OBJECT(SocketNotifier); \
          AQ_CRE_WRAP_OBJECT(SpinBox); \
          AQ_CRE_WRAP_OBJECT(Splitter); \
@@ -596,6 +610,7 @@
          AQ_CRE_WRAP_VOIDPTR_AQOBJECT(SqlDatabase); \
          AQ_CRE_WRAP_VOIDPTR(SqlError); \
          AQ_CRE_WRAP_AQOBJECT(SqlQuery); \
+         AQ_CRE_WRAP_VOIDPTR(SqlSelectCursor); \
          AQ_CRE_WRAP_OBJECT(SScript); \
          AQ_CRE_WRAP_OBJECT(StatusBar); \
          AQ_CRE_WRAP_OBJECT(StoredDrag); \
@@ -670,6 +685,7 @@
          AQ_REG_CLASS(ComboTableItem); \
          AQ_REG_CLASS_AQOBJECT(CompilerQSA); \
          AQ_REG_CLASS(ContextMenuEvent); \
+         AQ_REG_CLASS(Cursor); \
          AQ_REG_CLASS(CustomEvent); \
          AQ_REG_CLASS(DataStream); \
          AQ_REG_CLASS_AQOBJECT(DataTableDB); \
@@ -773,6 +789,7 @@
          AQ_REG_CLASS(Picture); \
          AQ_REG_CLASS(Pixmap); \
          AQ_REG_CLASS(PointArray); \
+         AQ_REG_CLASS(Point); \
          AQ_REG_CLASS(PopupMenu); \
          AQ_REG_CLASS(Printer); \
          AQ_REG_CLASS(Process); \
@@ -785,17 +802,20 @@
          AQ_REG_CLASS_AQOBJECT(ReportEngine); \
          AQ_REG_CLASS_AQOBJECT(ReportViewer); \
          AQ_REG_CLASS(ResizeEvent); \
+         AQ_REG_CLASS(ScrollBar); \
          AQ_REG_CLASS(ScrollView); \
          AQ_REG_CLASS(SEditor); \
          AQ_REG_CLASS_AQOBJECT(Settings); \
          AQ_REG_CLASS(ShowEvent); \
          AQ_REG_CLASS(SignalMapper); \
+         AQ_REG_CLASS_AQOBJECT(SmtpClient); \
          AQ_REG_CLASS(SocketNotifier); \
          AQ_REG_CLASS(SpinBox); \
          AQ_REG_CLASS(Splitter); \
          AQ_REG_CLASS_AQOBJECT(SqlCursor); \
          AQ_REG_CLASS(SqlError); \
          AQ_REG_CLASS_AQOBJECT(SqlQuery); \
+         AQ_REG_CLASS(SqlSelectCursor); \
          AQ_REG_CLASS(StatusBar); \
          AQ_REG_CLASS(StoredDrag); \
          AQ_REG_CLASS(TabBar); \
@@ -869,6 +889,7 @@
          AQ_CRE_VOIDPTR(ComboTableItem); \
          AQ_CRE_VOIDPTR_AQOBJECT(CompilerQSA); \
          AQ_CRE_VOIDPTR(ContextMenuEvent); \
+         AQ_CRE_VOIDPTR(Cursor); \
          AQ_CRE_VOIDPTR(CustomEvent); \
          AQ_CRE_VOIDPTR(DataStream); \
          AQ_CRE_AQWIDGET(DataTableDB); \
@@ -972,6 +993,7 @@
          AQ_CRE_VOIDPTR(Picture); \
          AQ_CRE_VOIDPTR(Pixmap); \
          AQ_CRE_VOIDPTR(PointArray); \
+         AQ_CRE_VOIDPTR(Point); \
          AQ_CRE_WIDGET(PopupMenu); \
          AQ_CRE_VOIDPTR(Printer); \
          AQ_CRE_OBJECT(Process); \
@@ -984,17 +1006,20 @@
          AQ_CRE_AQOBJECT(ReportEngine); \
          AQ_CRE_AQWIDGET(ReportViewer); \
          AQ_CRE_VOIDPTR(ResizeEvent); \
+         AQ_CRE_WIDGET(ScrollBar); \
          AQ_CRE_WIDGET(ScrollView); \
          AQ_CRE_WIDGET(SEditor); \
          AQ_CRE_VOIDPTR_AQOBJECT(Settings); \
          AQ_CRE_VOIDPTR(ShowEvent); \
          AQ_CRE_OBJECT(SignalMapper); \
+         AQ_CRE_AQOBJECT(SmtpClient); \
          AQ_CRE_OBJECT(SocketNotifier); \
          AQ_CRE_WIDGET(SpinBox); \
          AQ_CRE_WIDGET(Splitter); \
          AQ_CRE_AQOBJECT(SqlCursor); \
          AQ_CRE_VOIDPTR(SqlError); \
          AQ_CRE_AQOBJECT(SqlQuery); \
+         AQ_CRE_VOIDPTR(SqlSelectCursor); \
          AQ_CRE_WIDGET(StatusBar); \
          AQ_CRE_OBJECT(StoredDrag); \
          AQ_CRE_WIDGET(TabBar); \

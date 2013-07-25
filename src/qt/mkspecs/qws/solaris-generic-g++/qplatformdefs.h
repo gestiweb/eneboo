@@ -1,0 +1,1 @@
+../../solaris-g++/qplatformdefs.h

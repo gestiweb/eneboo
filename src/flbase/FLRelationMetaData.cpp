@@ -18,6 +18,10 @@ email                : mail@infosial.com
 
 #include "FLRelationMetaData.h"
 
+#ifdef FL_DEBUG
+AQ_EXPORT long FLRelationMetaData::count_ = 0;
+#endif
+
 FLRelationMetaDataPrivate::FLRelationMetaDataPrivate(const QString &fT, const QString &fF, int rC,
                                                      bool dC, bool uC, bool cI)
   : foreignTable_(fT.lower()), foreignField_(fF.lower()), cardinality_(rC),
@@ -26,12 +30,40 @@ FLRelationMetaDataPrivate::FLRelationMetaDataPrivate(const QString &fT, const QS
 }
 
 FLRelationMetaData::FLRelationMetaData(const QString &fT, const QString &fF, int rC, bool dC,
-                                       bool uC, bool cI) : d(0)
+                                       bool uC, bool cI) : QShared()
 {
+#ifdef FL_DEBUG
+  ++count_;
+#endif
   d = new FLRelationMetaDataPrivate(fT, fF, rC, dC, uC, cI);
+}
+
+FLRelationMetaData::FLRelationMetaData(const FLRelationMetaData *other)
+{
+#ifdef FL_DEBUG
+  ++count_;
+#endif
+  d = new FLRelationMetaDataPrivate;
+  copy(other);
 }
 
 FLRelationMetaData::~FLRelationMetaData()
 {
+#ifdef FL_DEBUG
+  --count_;
+#endif
   delete d;
+}
+
+void FLRelationMetaData::copy(const FLRelationMetaData *other)
+{
+  if (other == this)
+    return;
+  d->field_ = other->d->field_;
+  d->foreignTable_ = other->d->foreignTable_;
+  d->foreignField_ = other->d->foreignField_;
+  d->cardinality_ = other->d->cardinality_;
+  d->deleteCascade_ = other->d->deleteCascade_;
+  d->updateCascade_ = other->d->updateCascade_;
+  d->checkIn_ = other->d->checkIn_;
 }

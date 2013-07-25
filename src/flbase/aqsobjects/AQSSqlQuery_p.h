@@ -60,8 +60,10 @@ public slots:
   void showDebug();
   int size() const;
   void setForwardOnly(bool);
+  bool isForwardOnly() const;
   QSqlError *lastError() const;
   QString lastQuery() const;
+  int at() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -192,6 +194,10 @@ inline void AQSSqlQuery::setForwardOnly(bool arg0)
 {
   AQ_CALL_VOID(setForwardOnly(arg0));
 }
+inline bool AQSSqlQuery::isForwardOnly() const
+{
+  AQ_CALL_RET_V(isForwardOnly(), bool);
+}
 inline QSqlError *AQSSqlQuery::lastError() const
 {
   AQ_CALL_RET_PTR(lastError(), QSqlError);
@@ -199,6 +205,10 @@ inline QSqlError *AQSSqlQuery::lastError() const
 inline QString AQSSqlQuery::lastQuery() const
 {
   AQ_CALL_RET_V(lastQuery(), QString);
+}
+inline int AQSSqlQuery::at() const
+{
+  AQ_CALL_RET_V(at(), int);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

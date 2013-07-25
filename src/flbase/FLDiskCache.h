@@ -25,6 +25,8 @@
 #include <qtextstream.h>
 #include <qstringlist.h>
 
+#include "AQGlobal.h"
+
 #define AQ_DISKCACHE_INS      FLDiskCache::insert
 #define AQ_DISKCACHE_FIND     FLDiskCache::find
 #define AQ_DISKCACHE_CLR      FLDiskCache::clear
@@ -34,7 +36,7 @@
 class FLApplication;
 class AQApplication;
 
-class FLDiskCache
+class AQ_EXPORT FLDiskCache
 {
 public:
 
@@ -50,6 +52,11 @@ public:
   static bool find(const QString &key, QString &str);
 
   /**
+  Igual que la anterior pero para contenido binario
+  */
+  static bool find(const QString &key, QByteArray &ba);
+
+  /**
   Inserta en caché un contenido asignándole una clave
 
   @param key Clave asignada
@@ -57,6 +64,11 @@ public:
   @return TRUE si la inserción tubo éxito, FALSE en caso contrario
   */
   static bool insert(const QString &key, const QString &str);
+
+  /**
+  Igual que la anterior pero para contenido binario
+  */
+  static bool insert(const QString &key, const QByteArray &ba);
 
   /**
   Limpia completamente todo el contenido de la caché

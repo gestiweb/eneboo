@@ -50,7 +50,8 @@ unsigned long QuickCoreInterfaceImpl::addRef()
 unsigned long QuickCoreInterfaceImpl::release()
 {
     if ( !--ref ) {
-	delete this;
+	if (this)
+	  delete this;
 	return 0;
     }
     return ref;

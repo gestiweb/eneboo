@@ -916,3 +916,59 @@ xsltprocMemory(const char *xsltStr, int sizeXslt,
   xmlSubstituteEntitiesDefault(oldEnt);
   return(0);
 }
+
+int
+xsltprocMemoryFile(const char *xsltStr, int sizeXslt,
+                   const char *filename,
+                   char **out, int *len)
+{
+  xsltStylesheetPtr cur = NULL;
+  xmlDocPtr xsltDoc, xmlDoc, res;
+
+  int oldDtd = xmlLoadExtDtdDefaultValue;
+  int oldEnt = xmlSubstituteEntitiesDefault(1);
+  xmlLoadExtDtdDefaultValue = 1;
+
+  params[nbparams] = NULL;
+  xsltDoc = xmlReadMemory(xsltStr, sizeXslt, NULL, encoding, options);
+  cur = xsltParseStylesheetDoc(xsltDoc);
+  xmlDoc = xmlReadFile(filename, encoding, options);
+  res = xsltApplyStylesheet(cur, xmlDoc, params);
+  xsltSaveResultToString(out, len, res, cur);
+
+  xsltFreeStylesheet(cur);
+  xmlFreeDoc(res);
+  xmlFreeDoc(xmlDoc);
+
+  xmlLoadExtDtdDefaultValue = oldDtd;
+  xmlSubstituteEntitiesDefault(oldEnt);
+  return(0);
+}
+
+int
+xsltprocFile(const char *xsltStr, int sizeXslt,
+                   const char *filename,
+                   const char *output)
+{
+  xsltStylesheetPtr cur = NULL;
+  xmlDocPtr xsltDoc, xmlDoc, res;
+
+  int oldDtd = xmlLoadExtDtdDefaultValue;
+  int oldEnt = xmlSubstituteEntitiesDefault(1);
+  xmlLoadExtDtdDefaultValue = 1;
+
+  params[nbparams] = NULL;
+  xsltDoc = xmlReadMemory(xsltStr, sizeXslt, NULL, encoding, options);
+  cur = xsltParseStylesheetDoc(xsltDoc);
+  xmlDoc = xmlReadFile(filename, encoding, options);
+  res = xsltApplyStylesheet(cur, xmlDoc, params);
+  xsltSaveResultToFilename(output, res, cur, 0);
+
+  xsltFreeStylesheet(cur);
+  xmlFreeDoc(res);
+  xmlFreeDoc(xmlDoc);
+
+  xmlLoadExtDtdDefaultValue = oldDtd;
+  xmlSubstituteEntitiesDefault(oldEnt);
+  return(0);
+}

@@ -10,6 +10,8 @@ PRJ_MODULE = QWT
 include( qwtconfig.pri )
 TEMPLATE = subdirs
 
+CONFIG += ordered
+
 SUBDIRS = \
     src
 

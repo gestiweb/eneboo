@@ -15,12 +15,16 @@
 
 #include "mreportengine.h"
 #include "mreportviewer.h"
+#include "mpagecollection.h"
 #include "mutil.h"
 
 #include "posprinter.h"
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACX)
 #include "psprinter.h"
 #endif
+
+#include "FLDiskCache.h"
+#include "AQOds.h"
 
 /** Constructor */
 MReportEngine::MReportEngine(QObject *parent) :
@@ -458,6 +462,589 @@ MReportSection *MReportEngine::findAddOnFooter(int level)
   return 0;
 }
 
+class AQNullPaintDevice : public QPaintDevice
+{
+public:
+  AQNullPaintDevice() : QPaintDevice(QInternal::ExternalDevice) {}
+
+protected:
+  bool cmd(int, QPainter *, QPDevCmdParam *) {
+    return true;
+  }
+};
+
+class AQPointKey
+{
+public:
+  AQPointKey() {}
+  AQPointKey(const AQPointKey &p) : p_(p.p_) {}
+  AQPointKey(const QPoint &p) : p_(p) {}
+  AQPointKey &operator=(const AQPointKey &p) {
+    p_ = p.p_;
+    return *this;
+  }
+  bool operator<(const AQPointKey &p) const {
+    if (p_.y() < p.p_.y())
+      return true;
+    if (p_.y() > p.p_.y())
+      return false;
+    if (p_.x() < p.p_.x())
+      return true;
+    return false;
+  }
+  QPoint p() const {
+    return p_;
+  }
+private:
+  QPoint p_;
+};
+
+class AQPaintItem
+{
+public:
+  AQPaintItem() {}
+
+  QRect r;
+  QRect rr;
+  QString str;
+  QPixmap pix;
+  QFont fnt;
+  QPen pen;
+  QBrush brush;
+  QColor bgColor;
+  Q_INT16 tf;
+};
+
+#define AQ_ODSCELL_WIDTH  80.0
+#define AQ_ODSCELL_HEIGHT 15.0
+
+QRect mapToOdsCell(const QRect &r)
+{
+  QRect ret;
+  if (r.x() <= AQ_ODSCELL_WIDTH)
+    ret.setX(0);
+  else
+    ret.setX(r.x() / AQ_ODSCELL_WIDTH);
+  if (r.y() <= AQ_ODSCELL_HEIGHT)
+    ret.setY(0);
+  else
+    ret.setY(r.y() / AQ_ODSCELL_HEIGHT);
+  int w = qRound(double(r.width()) / AQ_ODSCELL_WIDTH);
+  if (w == 0)
+    w = 1;
+  ret.setWidth(w);
+  int h = qRound(double(r.height()) / AQ_ODSCELL_HEIGHT);
+  if (h == 0)
+    h = 1;
+  ret.setHeight(h);
+  return ret;
+}
+
+bool MReportEngine::execPage(QPainter *painter, QDataStream &s, uint nrecords,
+                             AQPaintItemMap &map)
+{
+  Q_UINT8 c;
+  Q_UINT8 tiny_len;
+  Q_INT32 len;
+  Q_INT16 i_16, i1_16, i2_16;
+  Q_INT8  i_8;
+  Q_UINT32  ul;
+  QCString  str1;
+  QString str;
+  QPoint  p, p1, p2;
+  QRect r;
+  QPointArray a;
+  QColor  color;
+  QFont font;
+  QPen  pen;
+  QBrush  brush;
+  QRegion rgn;
+  QWMatrix  matrix;
+  bool handled;
+  int chkRow = 0;
+
+  while (nrecords-- && !s.eof()) {
+    handled = true;
+    s >> c;
+    s >> tiny_len;
+    if (tiny_len == 255)
+      s >> len;
+    else
+      len = tiny_len;
+
+    if ((chkRow = (nrecords / 4) % 40) == 0)
+      emit signalRenderStatus(nrecords / 4);
+    if (cancelRender)
+      return false;
+
+    switch (c) {
+      case QPaintDevice::PdcNOP:
+        break;
+      case QPaintDevice::PdcDrawPoint:
+        s >> p;
+        //painter->drawPoint(p);
+        break;
+      case QPaintDevice::PdcMoveTo:
+        s >> p;
+        //painter->moveTo(p);
+        break;
+      case QPaintDevice::PdcLineTo:
+        s >> p;
+        //painter->lineTo(p);
+        break;
+      case QPaintDevice::PdcDrawLine:
+        s >> p1 >> p2;
+        //painter->drawLine(p1, p2);
+        break;
+      case QPaintDevice::PdcDrawRect:
+        s >> r;
+        //painter->drawRect(r);
+        break;
+      case QPaintDevice::PdcDrawRoundRect:
+        s >> r >> i1_16 >> i2_16;
+        //painter->drawRoundRect(r, i1_16, i2_16);
+        break;
+      case QPaintDevice::PdcDrawEllipse:
+        s >> r;
+        //painter->drawEllipse(r);
+        break;
+      case QPaintDevice::PdcDrawArc:
+        s >> r >> i1_16 >> i2_16;
+        //painter->drawArc(r, i1_16, i2_16);
+        break;
+      case QPaintDevice::PdcDrawPie:
+        s >> r >> i1_16 >> i2_16;
+        //painter->drawPie(r, i1_16, i2_16);
+        break;
+      case QPaintDevice::PdcDrawChord:
+        s >> r >> i1_16 >> i2_16;
+        //painter->drawChord(r, i1_16, i2_16);
+        break;
+      case QPaintDevice::PdcDrawLineSegments:
+        s >> a;
+        //painter->drawLineSegments(a);
+        break;
+      case QPaintDevice::PdcDrawPolyline:
+        s >> a;
+        //painter->drawPolyline(a);
+        break;
+      case QPaintDevice::PdcDrawPolygon:
+        s >> a >> i_8;
+        //painter->drawPolygon(a, i_8);
+        break;
+      case QPaintDevice::PdcDrawCubicBezier:
+        s >> a;
+        //painter->drawCubicBezier(a);
+        break;
+      case QPaintDevice::PdcDrawText:
+        s >> p >> str1;
+        //qWarning("PdcDrawText %d %d %s", p.x(), p.y(), (const char *)str1);
+        //painter->drawText(p, str1);
+        handled = false;
+        break;
+      case QPaintDevice::PdcDrawTextFormatted:
+        s >> r >> i_16 >> str1;
+        //qWarning("PdcDrawTextFormatted %d %d %s", r.x(), r.y(), (const char *)str1);
+        //painter->drawText(r, i_16, str1);
+        handled = false;
+        break;
+      case QPaintDevice::PdcDrawText2:
+        s >> p >> str;
+        //qWarning("PdcDrawText2 %d %d %s", p.x(), p.y(), str.latin1());
+        //painter->drawText(p, str);
+        handled = false;
+        break;
+      case QPaintDevice::PdcDrawText2Formatted: {
+        s >> r >> i_16 >> str;
+        const QWMatrix &wm = painter->worldMatrix();
+        //QRect rr = wm.mapRect(r);
+        //qWarning("PdcDrawText2Formatted %d %d %d %d %s", rr.x(), rr.y(), rr.width(), rr.height(), str.latin1());
+        AQPaintItem item;
+        item.rr = wm.mapRect(r);
+        item.r = mapToOdsCell(item.rr);
+        item.str = str;
+        item.tf = i_16;
+        item.bgColor = painter->backgroundColor();
+        item.brush = painter->brush();
+        item.fnt = painter->font();
+        item.pen = painter->pen();
+        QPoint pKey(item.rr.x(), item.r.y());
+        map.insert(AQPointKey(pKey), item);
+        //painter->drawText(r, i_16, str);
+      }
+      break;
+      case QPaintDevice::PdcDrawPixmap: {
+        QPixmap pixmap;
+        s >> r >> pixmap;
+        const QWMatrix &wm = painter->worldMatrix();
+        //QRect rr = wm.mapRect(r);
+        //qWarning("PdcDrawPixmap %d %d %d %d", rr.x(), rr.y(), rr.width(), rr.height());
+        AQPaintItem item;
+        item.rr = wm.mapRect(r);
+        item.r = mapToOdsCell(item.rr);
+        item.str = "Pixmap";
+        item.bgColor = painter->backgroundColor();
+        item.pix = pixmap;
+        QPoint pKey(item.rr.x(), item.r.y());
+        map.insert(AQPointKey(pKey), item);
+        //painter->drawPixmap(r, pixmap);
+      }
+      break;
+      case QPaintDevice::PdcDrawImage: {
+        QImage image;
+        s >> r >> image;
+        //const QWMatrix &wm = painter->worldMatrix();
+        //QRect rr = wm.mapRect(r);
+        //qWarning("PdcDrawImage %d %d %d %d", rr.x(), rr.y(), rr.width(), rr.height());
+        //painter->drawImage(r, image);
+        handled = false;
+      }
+      break;
+      case QPaintDevice::PdcBegin:
+        s >> ul;
+        if (!execPage(painter, s, ul, map))
+          return false;
+        break;
+      case QPaintDevice::PdcEnd:
+        if (nrecords == 0)
+          return true;
+        break;
+      case QPaintDevice::PdcSave:
+        s >> str;
+        //qWarning("PdcSave");
+        painter->save(str);
+        break;
+      case QPaintDevice::PdcRestore:
+        //qWarning("PdcRestore");
+        painter->restore();
+        break;
+      case QPaintDevice::PdcSetBkColor:
+        s >> color;
+        painter->setBackgroundColor(color);
+        break;
+      case QPaintDevice::PdcSetBkMode:
+        s >> i_8;
+        painter->setBackgroundMode((Qt::BGMode)i_8);
+        break;
+      case QPaintDevice::PdcSetROP:
+        s >> i_8;
+        painter->setRasterOp((Qt::RasterOp)i_8);
+        break;
+      case QPaintDevice::PdcSetBrushOrigin:
+        s >> p;
+        painter->setBrushOrigin(p);
+        break;
+      case QPaintDevice::PdcSetFont:
+        s >> font;
+        painter->setFont(font);
+        break;
+      case QPaintDevice::PdcSetPen:
+        s >> pen;
+        painter->setPen(pen);
+        break;
+      case QPaintDevice::PdcSetBrush:
+        s >> brush;
+        painter->setBrush(brush);
+        break;
+      case QPaintDevice::PdcSetTabStops:
+        s >> i_16;
+        //painter->setTabStops(i_16);
+        break;
+      case QPaintDevice::PdcSetTabArray:
+        s >> i_16;
+        //if (i_16 == 0) {
+        //  painter->setTabArray(0);
+        //} else {
+        //  int *ta = new int[i_16];
+        //  for (int i = 0; i < i_16; i++) {
+        //    s >> i1_16;
+        //    ta[i] = i1_16;
+        //  }
+        //  painter->setTabArray(ta);
+        //  delete [] ta;
+        //}
+        break;
+      case QPaintDevice::PdcSetVXform:
+        s >> i_8;
+        //qWarning("PdcSetVXform");
+        painter->setViewXForm(i_8);
+        break;
+      case QPaintDevice::PdcSetWindow:
+        s >> r;
+        //qWarning("PdcSetWindow");
+        painter->setWindow(r);
+        break;
+      case QPaintDevice::PdcSetViewport:
+        s >> r;
+        //qWarning("PdcSetViewport");
+        painter->setViewport(r);
+        break;
+      case QPaintDevice::PdcSetWXform:
+        s >> i_8;
+        //qWarning("PdcSetWXform");
+        painter->setWorldXForm(i_8);
+        break;
+      case QPaintDevice::PdcSetWMatrix:
+        s >> matrix >> i_8;
+        //qWarning("PdcSetWMatrix %f %f", matrix.dx(), matrix.dy());
+        painter->setWorldMatrix(matrix, i_8);
+        break;
+      case QPaintDevice::PdcSaveWMatrix:
+        //qWarning("PdcSaveWMatrix");
+        painter->saveWorldMatrix();
+        break;
+      case QPaintDevice::PdcRestoreWMatrix:
+        //qWarning("PdcRestoreWMatrix");
+        painter->restoreWorldMatrix();
+        break;
+      case QPaintDevice::PdcSetClip:
+        s >> i_8;
+        painter->setClipping(i_8);
+        break;
+      case QPaintDevice::PdcSetClipRegion:
+        s >> rgn >> i_8;
+        painter->setClipRegion(rgn, (QPainter::CoordinateMode)i_8);
+        break;
+      default:
+        qWarning("mreporengine.cpp execPage: Invalid command %d", c);
+        if (len)
+          s.device()->at(s.device()->at() + len);
+    }
+    if (!handled)
+      qWarning("Command not handled cmd:%d len:%d", c, len);
+  }
+  return false;
+}
+
+#define AQ_ODS_ROWS_LIMIT 64000
+
+static inline int precisionPartDecimal(const QString &str)
+{
+  QChar comma = aqApp->commaSeparator();
+  int posComma = str.findRev(comma);
+  if (posComma == -1)
+    return 0;
+  QString strAux(str.stripWhiteSpace());
+  QString partDecimal = strAux.right(strAux.length() - posComma - 1);
+  int prec = partDecimal.length();
+  while (prec > 0) {
+    QCharRef ch = partDecimal.at(prec - 1);
+    if (ch.isDigit() && ch != '0')
+      break;
+    --prec;
+  }
+  return prec;
+}
+
+void MReportEngine::exportToOds(MPageCollection *pages)
+{
+  AQOdsGenerator odsGen;
+  AQOdsSpreadSheet spreadsheet(odsGen);
+
+  QValueList<AQPaintItemMap> mapList;
+  uint totalRecords = 0;
+  AQNullPaintDevice *nullPdev = new AQNullPaintDevice;
+  QPainter *painter = new QPainter;
+  int curIdx = pages->getCurrentIndex();
+  double yOffset = 0;
+  AQPaintItemMap map;
+  bool dirtyMap = false;
+
+  painter->begin(nullPdev);
+  for (int i = 0; i < pages->pageCount(); ++i) {
+    QPicture *pg = pages->getPageAt(i);
+    QByteArray ba(pg->size() + sizeof(Q_UINT32));
+
+    {
+      QDataStream sWrite(ba, IO_WriteOnly);
+      sWrite << (*pg);
+    }
+
+    QDataStream sRead(ba, IO_ReadOnly);
+    sRead.device()->at(14);
+    sRead.setVersion(5);
+
+    Q_UINT8  c, clen;
+    Q_UINT32 nrecords;
+    sRead >> c >> clen;
+
+    Q_INT32 dummy;
+    sRead >> dummy >> dummy >> dummy >> dummy;
+    sRead >> nrecords;
+
+    if (!execPage(painter, sRead, nrecords, map))
+      return;
+
+    AQPaintItemMap::const_iterator itAux = map.end();
+    --itAux;
+
+    if ((*itAux).r.y() >= AQ_ODS_ROWS_LIMIT) {
+      mapList.append(map);
+      map.clear();
+      painter->resetXForm();
+      yOffset = 0;
+      dirtyMap = false;
+    } else {
+      painter->translate(0, (*itAux).rr.y() - yOffset);
+      yOffset = (*itAux).rr.y();
+      dirtyMap = true;
+    }
+  }
+  if (dirtyMap)
+    mapList.append(map);
+  totalRecords += map.size();
+  painter->end();
+
+  pages->setCurrentPage(curIdx);
+  delete painter;
+  delete nullPdev;
+
+  uint rowCount = records.length() / 2;
+  if (rowCount == 0)
+    rowCount = 1;
+  uint relSteps = totalRecords / rowCount + 1;
+  uint step = 0;
+  uint nPage = 1;
+
+  QValueList<AQPaintItemMap>::const_iterator itList;
+  for (itList = mapList.begin(); itList != mapList.end(); ++itList, ++nPage) {
+    uint nRow = 0;
+    uint nCol = 0;
+    uint curNRow = 0;
+    uint curNCol = 0;
+    AQOdsRow *curRow = 0;
+    AQOdsSheet sheet(spreadsheet, QString("Pag.%1").arg(nPage));
+
+    AQPaintItemMap map = *(itList);
+    AQPaintItemMap::const_iterator it;
+    for (it = map.begin(); it != map.end(); ++it, ++step) {
+      if ((step % relSteps) == 0)
+        emit signalRenderStatus((step / relSteps) % rowCount);
+      if (cancelRender)
+        return;
+
+      QRect cell = (*it).r;
+
+      if (curNRow > cell.y())
+        qWarning("** MReportEngine::exportToOds curNRow > cell.y()");
+
+      if (curRow && curNRow < cell.y()) {
+        curRow->close();
+        delete curRow;
+        curRow = 0;
+        ++nRow;
+      }
+
+      curNRow = cell.y();
+      for (; nRow < curNRow; ++nRow) {
+        AQOdsRow row(sheet);
+        row.coveredCell();
+        row.close();
+      }
+
+      if (!curRow) {
+        curRow = new AQOdsRow(sheet);
+        curNCol = 0;
+        nCol = 0;
+      }
+
+      if (curNCol > cell.x())
+        qWarning("** MReportEngine::exportToOds curNCol > cell.x()");
+
+      curNCol = cell.x();
+      for (; nCol < curNCol; ++nCol)
+        curRow->coveredCell();
+
+      QString str((*it).str);
+      if (!str.isEmpty()) {
+        QPixmap pix = (*it).pix;
+        if (pix.isNull()) {
+          curRow->addBgColor(AQOdsColor((*it).bgColor.rgb()));
+          QPen pen = (*it).pen;
+          curRow->addFgColor(AQOdsColor(pen.color().rgb()));
+
+          Q_INT16 tf = (*it).tf;
+          if (tf & QPainter::AlignHCenter)
+            curRow->opIn(AQOdsStyle(Style::ALIGN_CENTER));
+          else if (tf & QPainter::AlignLeft)
+            curRow->opIn(AQOdsStyle(Style::ALIGN_LEFT));
+          else
+            curRow->opIn(AQOdsStyle(Style::ALIGN_RIGHT));
+
+          QFont fnt = (*it).fnt;
+          if (fnt.bold())
+            curRow->opIn(AQOdsStyle(Style::TEXT_BOLD));
+          if (fnt.italic())
+            curRow->opIn(AQOdsStyle(Style::TEXT_ITALIC));
+          if (fnt.underline())
+            curRow->opIn(AQOdsStyle(Style::TEXT_UNDERLINE));
+
+          int prec = precisionPartDecimal(str);
+          if (prec > 0) {
+            curRow->setFixedPrecision(prec);
+            bool ok = false;
+            double val = aqApp->localeSystem().toDouble(str, &ok);
+            if (ok)
+              curRow->opIn(val, cell.width(), cell.height());
+            else
+              curRow->opIn(str, cell.width(), cell.height());
+          } else
+            curRow->opIn(str, cell.width(), cell.height());
+        } else {
+          QString pixName(QString("pix%1_").arg(pix.serialNumber()));
+          QString pixFileName(AQ_DISKCACHE_DIRPATH + '/' + pixName +
+                              QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                              QString::fromLatin1(".png"));
+          pix.save(pixFileName, "PNG");
+          curRow->opIn(AQOdsImage(pixName,
+                                  AQOdsCentimeters(double((*it).rr.width()) / 100.0 * 2.54),
+                                  AQOdsCentimeters(double((*it).rr.height()) / 100.0 * 2.54),
+                                  AQOdsCentimeters(0),
+                                  AQOdsCentimeters(0),
+                                  pixFileName));
+          cell.setWidth(1);
+        }
+      } else
+        curRow->coveredCell();
+
+      nCol += cell.width();
+
+      //      printf("curNRow:%d nRow:%d curNCol:%d nCol:%d (%d %d %d %d) (%d %d %d %d) %s\n",
+      //             curNRow,
+      //             nRow,
+      //             curNCol,
+      //             nCol,
+      //             (*it).rr.y(),
+      //             (*it).rr.x(),
+      //             (*it).rr.height(),
+      //             (*it).rr.width(),
+      //             cell.y(),
+      //             cell.x(),
+      //             cell.height(),
+      //             cell.width(),
+      //             (*it).str.latin1());
+    }
+
+    if (curRow) {
+      curRow->close();
+      delete curRow;
+      curRow = 0;
+    }
+
+    sheet.close();
+  }
+
+  spreadsheet.close();
+
+  QString fileName(AQ_DISKCACHE_DIRPATH + QString::fromLatin1("/report_") +
+                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                   QString::fromLatin1(".ods"));
+  odsGen.generateOds(fileName);
+  aqApp->call("sys.openUrl", QSArgumentList(fileName), 0);
+
+  emit signalRenderStatus(rowCount);
+}
+
 /** Renders the report as a page collection - the caller
  * is responsible for de-allocating the returned
  * collection
@@ -474,8 +1061,9 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
   bool append = flags & MReportEngine::Append;
   cancelRender = false;
   currRecord_ = 0;
-  csvData_ = QString::null;
   p->setStyleName(styleName_);
+
+  emit signalRenderStatus(1);
 
   // Create the page collection
   QPicture *currentPage = 0;
@@ -490,10 +1078,12 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
       lastPageFound = true;
       currentPage = pages->getLastPage();
       p->painter()->end();
-      currentPageCopy = new QPicture(*currentPage);
-      p->painter()->begin(currentPage);
-      currentPageCopy->play(p->painter());
-      delete currentPageCopy;
+      if (currentPage) {
+        currentPageCopy = new QPicture(*currentPage);
+        p->painter()->begin(currentPage);
+        currentPageCopy->play(p->painter());
+        delete currentPageCopy;
+      }
     }
   }
 
@@ -510,7 +1100,7 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
   // Create the first page
   if (!lastPageFound)
     startPage(pages);
-  unsigned int rowCount = records.length();
+  uint rowCount = records.length();
 
   if (rowCount <= 1)
     rowCount = 2;
@@ -532,7 +1122,6 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
   pages->setPageOrientation(pageOrientation);
   pages->setPrintToPos(printToPos);
   pages->setPageMargins(topMargin, leftMargin, bottomMargin, rightMargin);
-
 
   fillRecords_ = false;
 
@@ -750,21 +1339,7 @@ void MReportEngine::drawDetail(MPageCollection *pages, int level, uint &currReco
             currX = leftMargin;
             currY += sectionHeight;
           }
-
-          MReportSection *rS = findDetail(level + 1);
-          if (!rS) {
-            for (uint i = 0; i <= level; i++) {
-              rS = findDetailHeader(i);
-              if (rS)
-                csvData_ += rS->csvData();
-              rS = findDetail(i);
-              if (rS)
-                csvData_ += rS->csvData();
-            }
-            csvData_ += "\n";
-          }
         }
-
         ++currRecord;
       } else {
         drawDetail(pages, currLevel, currRecord);
@@ -798,6 +1373,71 @@ void MReportEngine::drawDetail(MPageCollection *pages, int level, uint &currReco
   if (footer && currRecord < records.count())
     if (footer->newPage())
       newPage(pages);
+}
+
+void MReportEngine::updateCsvData(int level, uint &currRecord, QString &csvData)
+{
+  MReportSection *detail = findDetail(level);
+  if (!detail)
+    return;
+
+  QString detailValue;
+  int currLevel = level;
+  int chkRow = 0;
+
+  do {
+    QDomNode record = records.item(currRecord);
+    if (record.nodeType() == QDomNode::ElementNode) {
+      if (currLevel == level) {
+        if ((chkRow = (currRecord / 2) % 20) == 0)
+          emit signalRenderStatus(currRecord / 2);
+
+        QDomNamedNodeMap fields = record.attributes();
+        reserveSizeForCalcFields(&fields, level);
+
+        QDomNode record = records.item(currRecord);
+        QDomNode *ptrRecord = &record;
+
+        setFieldValues(&fields, level, detail, ptrRecord);
+
+        if (detail->mustBeDrawed(ptrRecord)) {
+          detail->setCalcFieldData(0, 0, ptrRecord, fillRecords_);
+
+          MReportSection *rS = findDetail(level + 1);
+          if (!rS) {
+            for (uint i = 0; i <= level; i++) {
+              rS = findDetailHeader(i);
+              if (rS)
+                csvData += rS->csvData();
+              rS = findDetail(i);
+              if (rS)
+                csvData += rS->csvData();
+            }
+            csvData += "\n";
+          }
+        }
+        ++currRecord;
+      } else {
+        updateCsvData(currLevel, currRecord, csvData);
+      }
+
+      if (currRecord < records.count()) {
+        record = records.item(currRecord);
+        QDomNamedNodeMap fields = record.attributes();
+        detailValue = fields.namedItem("level").nodeValue();
+        currLevel = detailValue.toInt();
+      }
+    }
+  } while (level <= currLevel && currRecord < records.count());
+}
+
+QString MReportEngine::csvData()
+{
+  QString csvData;
+  uint nRecord = 0;
+  updateCsvData(0, nRecord, csvData);
+  emit signalRenderStatus(records.length() / 2);
+  return csvData;
 }
 
 bool MReportEngine::canDrawDetailHeader(uint level, uint currRecord, uint yPos)
@@ -1141,20 +1781,20 @@ void MReportEngine::drawReportFooter(MPageCollection *pages)
 QSize MReportEngine::getPageMetrics(int size, int orientation)
 {
   QSize ps;
+
   // Set the page size
   if ((QPrinter::PageSize) size >= QPrinter::Custom) {
-    size = QPrinter::Custom;
     ps.setWidth(customWidthMM / 25.4 * 78.);
     ps.setHeight(customHeightMM / 25.4 * 78.);
     return ps;
   }
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACX)
   if (!printToPos) {
     PSPrinter *printer = new PSPrinter(PSPrinter::HighResolution);
     printer->setFullPage(true);
-    printer->setPageSize((PSPrinter::PageSize) size);
     printer->setOrientation((PSPrinter::Orientation) orientation);
+    printer->setPageSize((PSPrinter::PageSize) size);
     QPaintDeviceMetrics pdm(printer);
     ps.setWidth(pdm.widthMM() / 25.4 * 78.);
     ps.setHeight(pdm.heightMM() / 25.4 * 78.);
@@ -1166,13 +1806,12 @@ QSize MReportEngine::getPageMetrics(int size, int orientation)
     ps.setHeight(pdm.heightMM() / 25.4 * 78.);
     delete printer;
   }
-
 #else
   if (!printToPos) {
     QPrinter *printer = new QPrinter(QPrinter::HighResolution);
     printer->setFullPage(true);
-    printer->setPageSize((QPrinter::PageSize) size);
     printer->setOrientation((QPrinter::Orientation) orientation);
+    printer->setPageSize((QPrinter::PageSize) size);
     QPaintDeviceMetrics pdm(printer);
     ps.setWidth(pdm.widthMM() / 25.4 * 78.);
     ps.setHeight(pdm.heightMM() / 25.4 * 78.);
@@ -1184,7 +1823,6 @@ QSize MReportEngine::getPageMetrics(int size, int orientation)
     ps.setHeight(pdm.heightMM() / 25.4 * 78.);
     delete printer;
   }
-
 #endif
 
   return ps;
@@ -1198,7 +1836,7 @@ void MReportEngine::setReportAttributes(QDomNode *report)
 
   pageSize = attributes.namedItem("PageSize").nodeValue().toInt();
   if ((QPrinter::PageSize) pageSize > QPrinter::Custom)
-    pageSize = QPrinter::Custom;
+    pageSize = QPrinter::CustomOld;
   pageOrientation = attributes.namedItem("PageOrientation").nodeValue().toInt();
   topMargin = attributes.namedItem("TopMargin").nodeValue().toInt();
   bottomMargin = attributes.namedItem("BottomMargin").nodeValue().toInt();

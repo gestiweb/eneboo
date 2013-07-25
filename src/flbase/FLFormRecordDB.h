@@ -47,8 +47,6 @@ class FLFormRecordDB: public FLFormDB
 {
   Q_OBJECT
 
-  friend class FLFormRecordDBInterface;
-
 public:
 
   /**
@@ -67,13 +65,6 @@ public:
   destructor
   */
   ~FLFormRecordDB();
-
-  /**
-  Establece el cursor que debe utilizar el formulario.
-
-  @param c Cursor con el que trabajar
-  */
-  void setCursor(FLSqlCursor *c);
 
   /**
   Reimplementado, añade un widget como principal del formulario
@@ -95,12 +86,37 @@ public:
   */
   void setCaptionWidget(const QString &text);
 
+  /**
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
+  */
+  QString formClassName() const;
+
 protected:
 
   /**
   Inicialización
   */
   void initForm();
+
+  /**
+  Nombre interno del formulario
+  */
+  QString formName() const;
+
+  /**
+  Une la interfaz de script al objeto del formulario
+  */
+  void bindIface();
+
+  /**
+  Desune la interfaz de script al objeto del formulario
+  */
+  void unbindIface();
+
+  /**
+  Indica si la interfaz de script está unida al objeto formulario
+  */
+  bool isIfaceBind() const;
 
   /**
   Captura evento cerrar
@@ -188,7 +204,7 @@ public slots:
   /**
   Invoca a la función "init()" del script asociado al formulario
   */
-  void initScript();
+  bool initScript();
 
   /**
   Se activa al pulsar el boton aceptar
@@ -196,7 +212,7 @@ public slots:
   virtual void accept();
 
   /**
-  Se activa al pulsar el boton aceptar y contninuar
+  Se activa al pulsar el boton aceptar y continuar
   */
   virtual void acceptContinue();
 
@@ -204,6 +220,11 @@ public slots:
   Se activa al pulsar el botón cancelar
   */
   virtual void reject();
+
+  /**
+  Devuelve el script asociado al formulario
+  */
+  virtual QSScript *script() const;
 
 protected slots:
 
@@ -235,19 +256,9 @@ protected slots:
 private:
 
   /**
-  Indica si se han aceptado los cambios
-  */
-  bool accepted;
-
-  /**
   Indica si se debe mostrar el botón Aceptar y Continuar
   */
   bool showAcceptContinue_;
-
-  /**
-  Interface para scripts
-  */
-  FLFormRecordDBInterface *iface;
 
   /**
   Indica que se está intentando aceptar los cambios

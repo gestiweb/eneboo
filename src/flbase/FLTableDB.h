@@ -30,6 +30,8 @@
 #include <qprogressdialog.h>
 #include "FLWidgetTableDB.h"
 
+#include "AQGlobal.h"
+
 class FLSqlCursor;
 class FLDataTable;
 class FLFieldMetaData;
@@ -47,20 +49,26 @@ de sus padres o antecesor a un objeto FLFormDB.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLTableDB: public FLWidgetTableDB {
+class AQ_EXPORT FLTableDB: public FLWidgetTableDB
+{
 
   Q_OBJECT
 
-  Q_PROPERTY( QString tableName READ tableName WRITE setTableName )
-  Q_PROPERTY( QString foreignField READ foreignField WRITE setForeignField )
-  Q_PROPERTY( QString fieldRelation READ fieldRelation WRITE setFieldRelation )
-  Q_PROPERTY( bool checkColumnEnabled READ checkColumnEnabled WRITE setCheckColumnEnabled )
-  Q_PROPERTY( QString aliasCheckColumn READ aliasCheckColumn WRITE setAliasCheckColumn )
-  Q_PROPERTY( bool findHidden READ findHidden WRITE setFindHidden )
-  Q_PROPERTY( bool filterHidden READ filterHidden WRITE setFilterHidden )
-  Q_PROPERTY( bool showAllPixmaps READ showAllPixmaps WRITE setShowAllPixmaps )
-  Q_PROPERTY( QString functionGetColor READ functionGetColor WRITE setFunctionGetColor )
-  
+  Q_PROPERTY(QString tableName READ tableName WRITE setTableName)
+  Q_PROPERTY(QString foreignField READ foreignField WRITE setForeignField)
+  Q_PROPERTY(QString fieldRelation READ fieldRelation WRITE setFieldRelation)
+  Q_PROPERTY(bool checkColumnEnabled READ checkColumnEnabled WRITE setCheckColumnEnabled)
+  Q_PROPERTY(QString aliasCheckColumn READ aliasCheckColumn WRITE setAliasCheckColumn)
+  Q_PROPERTY(bool findHidden READ findHidden WRITE setFindHidden)
+  Q_PROPERTY(bool filterHidden READ filterHidden WRITE setFilterHidden)
+  Q_PROPERTY(bool showAllPixmaps READ showAllPixmaps WRITE setShowAllPixmaps)
+  Q_PROPERTY(QString functionGetColor READ functionGetColor WRITE setFunctionGetColor)
+  Q_PROPERTY(bool onlyTable READ onlyTable WRITE setOnlyTable)
+  Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
+  Q_PROPERTY(bool editOnly READ editOnly WRITE setEditOnly)
+  Q_PROPERTY(bool insertOnly READ insertOnly WRITE setInsertOnly)
+  Q_PROPERTY(bool autoSortColumn READ autoSortColumn WRITE setAutoSortColumn)
+
   friend class FLTableDBInterface;
   friend class FLFormDB;
 
@@ -69,12 +77,12 @@ public:
   /**
   constructor
   */
-  FLTableDB( QWidget * parent = 0, const char *name = 0 );
+  FLTableDB(QWidget *parent = 0, const char *name = 0);
 
   /**
   Obtiene el componente tabla de registros
   */
-  FLDataTable * tableRecords();
+  FLDataTable *tableRecords();
 
   /**
   Para obtener el cursor utilizado por el componente.
@@ -95,7 +103,7 @@ public:
 
   @param fT Nombre de la tabla asociada
   */
-  void setTableName( const QString & fT );
+  void setTableName(const QString &fT);
 
   /**
   Para obtener el nombre del campo foráneo.
@@ -109,7 +117,7 @@ public:
 
   @param fN Nombre del campo
   */
-  void setForeignField( const QString & fN );
+  void setForeignField(const QString &fN);
 
   /**
   Para obtener el nombre del campo relacionado.
@@ -123,27 +131,36 @@ public:
 
   @param fN Nombre del campo
   */
-  void setFieldRelation( const QString & fN );
+  void setFieldRelation(const QString &fN);
 
   /**
   Establece si el componente esta en modo solo lectura o no.
   */
-  void setReadOnly( const bool mode );
+  void setReadOnly(const bool mode);
+  bool readOnly() const {
+    return reqReadOnly_;
+  }
 
   /**
   Establece si el componente esta en modo solo edición o no.
   */
-  void setEditOnly( const bool mode );
+  void setEditOnly(const bool mode);
+  bool editOnly() const {
+    return reqEditOnly_;
+  }
 
   /**
   Establece el componente a sólo inserción o no.
   */
-  void setInsertOnly( const bool mode );
+  void setInsertOnly(const bool mode);
+  bool insertOnly() const {
+    return reqInsertOnly_;
+  }
 
   /**
   Establece el filtro inicial de búsqueda
   */
-  void setInitSearch( const QString & iS ) {
+  void setInitSearch(const QString &iS) {
     initSearch_ = iS;
   }
 
@@ -152,7 +169,7 @@ public:
 
   @param fields Lista de los nombres de los campos ordenada según se desea que aparezcan en la tabla de izquierda a derecha
   */
-  void setOrderCols( QStringList & fields );
+  void setOrderCols(QStringList &fields);
 
   /**
   Devuelve la lista de los campos ordenada por sus columnas en la tabla de izquierda a derecha
@@ -164,7 +181,7 @@ public:
 
   @param f Sentencia Where que establece el filtro
   */
-  void setFilter( const QString &f );
+  void setFilter(const QString &f);
 
   /**
   Devuelve el filtro de la tabla
@@ -190,7 +207,7 @@ public:
 
   El cambio de estado no será efectivo hasta el siguiente refresh.
   */
-  void setCheckColumnEnabled( bool b );
+  void setCheckColumnEnabled(bool b);
 
   /**
   Obiente el texto de la etiqueta de encabezado para la columna de selección
@@ -202,7 +219,7 @@ public:
 
   El cambio del texto de la etiqueta no será efectivo hasta el próximo refresh
   */
-  void setAliasCheckColumn( const QString & t );
+  void setAliasCheckColumn(const QString &t);
 
   /**
   Obtiene si el marco de búsqueda está oculto
@@ -214,7 +231,7 @@ public:
 
   @param  h TRUE lo oculta, FALSE lo muestra
   */
-  void setFindHidden( bool h );
+  void setFindHidden(bool h);
 
   /**
   Obtiene si el marco para conmutar entre datos y filtro está oculto
@@ -226,7 +243,7 @@ public:
 
   @param  h TRUE lo oculta, FALSE lo muestra
   */
-  void setFilterHidden( bool h );
+  void setFilterHidden(bool h);
 
   /**
   Ver FLTableDB::showAllPixmaps_
@@ -236,7 +253,7 @@ public:
   /**
   Ver FLTableDB::showAllPixmaps_
   */
-  void setShowAllPixmaps( bool s );
+  void setShowAllPixmaps(bool s);
 
   /**
   Ver FLTableDB::functionGetColor_
@@ -246,19 +263,43 @@ public:
   /**
   Ver FLTableDB::functionGetColor_
   */
-  void setFunctionGetColor( const QString & f );
+  void setFunctionGetColor(const QString &f);
+
+  /**
+    Asigna el nombre de función a llamar cuando cambia el filtro.
+  */  
+  void setFilterRecordsFunction( QString fn) {
+    tableDB_filterRecords_functionName_ = fn;
+  }
+  /**
+  Ver FLTableDB::onlyTable_
+  */
+  void setOnlyTable(bool on = true);
+  bool onlyTable() const {
+    return reqOnlyTable_;
+  }
+  
+  /**
+  Ver FLTableDB::autoSortColumn_
+  */
+  void setAutoSortColumn(bool on = true) {
+    autoSortColumn_ = on;
+  }
+  bool autoSortColumn() const {
+    return autoSortColumn_;
+  }
   
 protected:
 
   /**
   Filtro de eventos
   */
-  bool eventFilter( QObject * obj, QEvent * ev );
+  bool eventFilter(QObject *obj, QEvent *ev);
 
   /**
   Captura evento mostrar
   */
-  void showEvent( QShowEvent * e );
+  void showEvent(QShowEvent *e);
 
 private:
 
@@ -303,7 +344,7 @@ private:
   Para obtener la enumeración correspondiente a una condición para el filtro a partir de
   su literal
   */
-  FLTableDB::CondType decodeCondType( const QString & strCondType ) const;
+  FLTableDB::CondType decodeCondType(const QString &strCondType) const;
 
   /**
   Construye la claúsula de filtro en SQL a partir del contenido de los valores
@@ -324,7 +365,7 @@ private:
   /**
   Componente para visualizar los registros
   */
-  FLDataTable * tableRecords_;
+  FLDataTable *tableRecords_;
 
   /**
   Nombre de la tabla a la que esta asociado este componente.
@@ -391,6 +432,13 @@ private:
   FLFieldMetaData *sortField_;
 
   /**
+  Almacena los metadatos del campo por el que está actualmente ordenada la tabla en segunda instancia
+
+  @author Silix - dpinelo
+   */
+  FLFieldMetaData *sortField2_;
+
+  /**
   Crónometro interno
   */
   QTimer *timer;
@@ -426,9 +474,42 @@ private:
   int sortColumn_;
 
   /**
+  Indica el número de columna por la que ordenar los registros
+
+  @author Silix - dpinelo
+  */
+  int sortColumn2_;
+
+  /**
+  Indica el número de columna por la que ordenar los registros
+
+  @author Silix
+  */
+  int sortColumn3_;
+
+  /**
   Indica el sentido ascendente o descendente del la ordenacion actual de los registros
   */
   bool orderAsc_;
+
+  /**
+  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
+
+  @author Silix - dpinelo
+  */
+  bool orderAsc2_;
+
+  /**
+  Indica el sentido ascendente o descendente del la ordenacion actual de los registros
+
+  @author Silix
+  */
+  bool orderAsc3_;
+
+  /**
+  Indica si se debe establecer automáticamente la primera columna como de ordenación
+  */
+  bool autoSortColumn_;
 
   /**
   Almacena la última claúsula de filtro aplicada en el refresco
@@ -465,7 +546,7 @@ private:
   De esta forma si utilizamos un mismo formulario para varias acciones, p.e. master.ui, podemos controlar
   si usamos distintas funciones de obtener color para cada acción (distintos nombres de formularios) o
   una única función común para todas las acciones.
-  
+
   Ej. Estableciendo 'tdbGetColor' si el componente se inicializa en el formulario maestro de clientes,
   se utilizará 'formclientes.tdbGetColor', si se inicializa en el fomulario maestro de proveedores, se
   utilizará 'formproveedores.tdbGetColor', etc... Si establecemos 'flfactppal.tdbGetColor' siempre se llama a
@@ -501,18 +582,26 @@ private:
   Si alguno de los valores del array es vacio "", entonces se utilizarán los colores o estilos establecidos por defecto.
   */
   QString functionGetColor_;
-  
+
+  /**
+  Indica que no se realicen operaciones con la base de datos (abrir formularios). Modo "sólo tabla".
+  */
+  bool onlyTable_;
+  bool reqOnlyTable_;
+
   /**
   Editor falso
   */
-  QWidget * fakeEditor_;
+  QWidget *fakeEditor_;
+  
+  QString tableDB_filterRecords_functionName_;
 
 public slots:
 
   /**
   Actualiza el conjunto de registros.
   */
-  void refresh( const bool refreshHead = false, const bool refreshData = false );
+  void refresh(const bool refreshHead = false, const bool refreshData = false);
 
   /**
   Actualiza el conjunto de registros con un retraso.
@@ -522,7 +611,7 @@ public slots:
 
   @param msec Cantidad de tiempo del lapsus, en milisegundos.
   */
-  void refreshDelayed( int msec = 50, const bool refreshData = true );
+  void refreshDelayed(int msec = 50, const bool refreshData = true);
 
   /**
   Invoca al método FLSqlCursor::insertRecord()
@@ -563,15 +652,24 @@ public slots:
   @author viernes@xmarts.com.mx
   @author InfoSiAL, S.L.
   */
-  void putFirstCol( const QString & c );
+  void putFirstCol(const QString &c);
+
+  /**
+  Coloca la columna como segunda pasando el nombre del campo.
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol( const QString & c );
 
   /**
   Mueve una columna de un campo origen a la columna de otro campo destino
 
   @param  from  Nombre del campo de la columna de origen
   @param  to    Nombre del campo de la columna de destino
+  @param  firstSearch dpinelo: Indica si se mueven columnas teniendo en cuenta que esta función
+          se ha llamado o no, desde el combo principal de búsqueda y filtrado
   */
-  void moveCol( const QString & from, const QString & to );
+  void moveCol( const QString & from, const QString & to, bool firstSearch = true );
 
   /**
   Inicia el cursor segun este campo sea de la tabla origen o de
@@ -587,7 +685,7 @@ public slots:
   /**
   Redefinida por conveniencia
   */
-  void setEnabled( bool );
+  void setEnabled(bool);
 
   /**
   Establece el ancho de una columna
@@ -595,12 +693,12 @@ public slots:
   @param  field Nombre del campo de la base de datos correspondiente a la columna
   @param  w     Ancho de la columna
   */
-  void setColumnWidth( const QString & field, int w );
+  void setColumnWidth(const QString &field, int w);
 
   /**
   @return Ancho de la columna
   */
-  int columnWidth( int c );
+  int columnWidth(int c);
 
   /**
   Establece el alto de una fila
@@ -608,19 +706,26 @@ public slots:
   @param  row Número de orden de la fila, empezando en 0
   @param  h   Alto de la fila
   */
-  void setRowHeight( int row, int h );
+  void setRowHeight(int row, int h);
 
   /**
   @return Alto de la fila
   */
-  int rowHeight( int row );
+  int rowHeight(int row);
 
   /**
   Exporta a una hoja de cálculo ODS y la visualiza
   */
   void exportToOds();
 
-protected slots:
+  /**
+  Conmuta el sentido de la ordenación de los registros de la tabla, de ascendente a descendente y
+  viceversa. Los registros siempre se ordenan por la primera columna.
+  Si la propiedad autoSortColumn es TRUE.
+  */
+  void switchSortOrder(int col = 0);
+
+// protected slots:
 
   /**
   Coloca la columna indicada como primera.
@@ -634,7 +739,14 @@ protected slots:
   @param c Numero de la columna en la tabla, esta columna intercambia
        su posion con la primera columna
   */
-  void putFirstCol( int c );
+  void putFirstCol(int c);
+
+  /**
+  Coloca la columna indicada como segunda.
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol( int c );
 
   /**
   Mueve una columna desde una posicion origen a otra posicion destino.
@@ -642,7 +754,7 @@ protected slots:
   @param  from  Posicion de la columna de origen
   @param  to    Posicion de la columna de destino
   */
-  void moveCol( int from, int to );
+  void moveCol( int from, int to, bool firstSearch = true);
 
   /**
   Filtra los registros de la tabla utilizando el primer campo, según el patrón dado.
@@ -652,23 +764,21 @@ protected slots:
 
   @param p Cadena de caracteres con el patrón de filtrado
   */
-  void filterRecords( const QString & p );
+  void filterRecords(const QString &p);
 
-  /**
-  Conmuta el sentido de la ordenación de los registros de la tabla, de ascendente a descendente y
-  viceversa. Los registros siempre se ordenan por la primera columna.
-  */
-  void switchSortOrder( int );
-
+  // void switchSortOrder( int col ); // AbanQ 2.5 agrego esta funcion
+  void setSortOrder(int ascending);
+  bool isSortOrderAscending();
+  
   /**
   Activa la tabla de datos
   */
-  void activeTabData( bool );
+  void activeTabData(bool);
 
   /**
   Activa la tabla de filtro
   */
-  void activeTabFilter( bool );
+  void activeTabFilter(bool);
 
   /**
   Limpia e inicializa el filtro
@@ -678,19 +788,24 @@ protected slots:
 signals:
 
   /**
+  Señal emitida cuando se refresca por cambio de filtro
+  */
+  void refreshed();
+
+  /**
   Señal emitida cuando se establece si el componente es o no de solo lectura.
   */
-  void readOnlyChanged( bool );
+  void readOnlyChanged(bool);
 
   /**
   Señal emitida cuando se establece si el componente es o no de solo edición.
   */
-  void editOnlyChanged( bool );
+  void editOnlyChanged(bool);
 
   /**
   Señal emitida cuando se establece si el componente es o no de solo inserción.
   */
-  void insertOnlyChanged( bool );
+  void insertOnlyChanged(bool);
 
   /**
   Señal emitida cuando se establece cambia el registro seleccionado.

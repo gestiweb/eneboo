@@ -58,18 +58,21 @@
 class QObjectPrivate : public QPtrVector<QObjectUserData>
 {
 public:
-    QObjectPrivate( uint s ) : QPtrVector<QObjectUserData>(s){ setAutoDelete( TRUE ); }
+  QObjectPrivate(uint s) : QPtrVector<QObjectUserData>(s) {
+    setAutoDelete(TRUE);
+  }
 };
 #else
-class QObjectPrivate {
+class QObjectPrivate
+{
 }
 #endif
 
 class QSenderObjectList : public QObjectList, public QShared
 {
 public:
-    QSenderObjectList() : currentSender( 0 ) { }
-    QObject *currentSender;
+  QSenderObjectList() : currentSender(0) { }
+  QObject *currentSender;
 };
 
 /*!
@@ -169,13 +172,14 @@ public:
 // Internal for QObject::connect() and QObject::disconnect()
 //
 
-static inline bool isIdentChar( char x )
-{						// Avoid bug in isalnum
-    return x == '_' || (x >= '0' && x <= '9') ||
-	 (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
+static inline bool isIdentChar(char x)
+{
+  // Avoid bug in isalnum
+  return x == '_' || (x >= '0' && x <= '9') ||
+         (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
 }
 
-static inline bool isSpace( char x )
+static inline bool isSpace(char x)
 {
 #if defined(Q_CC_BOR)
   /*
@@ -183,54 +187,54 @@ static inline bool isSpace( char x )
     isspace() usually works, but not here.
     This implementation is sufficient for our internal use: rmWS()
   */
-    return (uchar) x <= 32;
+  return (uchar) x <= 32;
 #else
-    return isspace( (uchar) x );
+  return isspace((uchar) x);
 #endif
 }
 
-static QCString qt_rmWS( const char *s )
+static QCString qt_rmWS(const char *s)
 {
-    QCString result( qstrlen(s)+1 );
-    char *d = result.data();
-    char last = 0;
-    while( *s && isSpace(*s) )			// skip leading space
-	s++;
-    while ( *s ) {
-	while ( *s && !isSpace(*s) )
-	    last = *d++ = *s++;
-	while ( *s && isSpace(*s) )
-	    s++;
-	if ( *s && isIdentChar(*s) && isIdentChar(last) )
-	    last = *d++ = ' ';
-    }
-    *d = '\0';
-    result.truncate( (int)(d - result.data()) );
-    int void_pos = result.find("(void)");
-    if ( void_pos >= 0 )
-	result.remove( void_pos+1, (uint)strlen("void") );
-    return result;
+  QCString result(qstrlen(s) + 1);
+  char *d = result.data();
+  char last = 0;
+  while (*s && isSpace(*s))      // skip leading space
+    s++;
+  while (*s) {
+    while (*s && !isSpace(*s))
+      last = *d++ = *s++;
+    while (*s && isSpace(*s))
+      s++;
+    if (*s && isIdentChar(*s) && isIdentChar(last))
+      last = *d++ = ' ';
+  }
+  *d = '\0';
+  result.truncate((int)(d - result.data()));
+  int void_pos = result.find("(void)");
+  if (void_pos >= 0)
+    result.remove(void_pos + 1, (uint)strlen("void"));
+  return result;
 }
 
 
 // Event functions, implemented in qapplication_xxx.cpp
 
-int   qStartTimer( int interval, QObject *obj );
-bool  qKillTimer( int id );
-bool  qKillTimer( QObject *obj );
+int   qStartTimer(int interval, QObject *obj);
+bool  qKillTimer(int id);
+bool  qKillTimer(QObject *obj);
 
-static void removeObjFromList( QObjectList *objList, const QObject *obj,
-			       bool single=FALSE )
+static void removeObjFromList(QObjectList *objList, const QObject *obj,
+                              bool single = FALSE)
 {
-    if ( !objList )
-	return;
-    int index = objList->findRef( obj );
-    while ( index >= 0 ) {
-	objList->remove();
-	if ( single )
-	    return;
-	index = objList->findNextRef( obj );
-    }
+  if (!objList)
+    return;
+  int index = objList->findRef(obj);
+  while (index >= 0) {
+    objList->remove();
+    if (single)
+      return;
+    index = objList->findNextRef(obj);
+  }
 }
 
 
@@ -243,27 +247,27 @@ static void removeObjFromList( QObjectList *objList, const QObject *obj,
     Returns 0 if there is no such child.
 
     \code
-	QListBox *c = (QListBox *) qt_find_obj_child( myWidget, "QListBox",
-						      "my list box" );
-	if ( c )
-	    c->insertItem( "another string" );
+  QListBox *c = (QListBox *) qt_find_obj_child( myWidget, "QListBox",
+                  "my list box" );
+  if ( c )
+      c->insertItem( "another string" );
     \endcode
 */
 
-void *qt_find_obj_child( QObject *parent, const char *type, const char *name )
+void *qt_find_obj_child(QObject *parent, const char *type, const char *name)
 {
-    const QObjectList *list = parent->children();
-    if ( list ) {
-	QObjectListIt it( *list );
-	QObject *obj;
-	while ( (obj = it.current()) ) {
-	    ++it;
-	    if ( qstrcmp(name,obj->name()) == 0 &&
-		 obj->inherits(type) )
-		return obj;
-	}
+  const QObjectList *list = parent->children();
+  if (list) {
+    QObjectListIt it(*list);
+    QObject *obj;
+    while ((obj = it.current())) {
+      ++it;
+      if (qstrcmp(name, obj->name()) == 0 &&
+          obj->inherits(type))
+        return obj;
     }
-    return 0;
+  }
+  return 0;
 }
 
 
@@ -272,40 +276,40 @@ void *qt_find_obj_child( QObject *parent, const char *type, const char *name )
 /*
   Preliminary signal spy
  */
-Q_EXPORT QObject* qt_preliminary_signal_spy = 0;
-static QObject* qt_spy_signal_sender = 0;
+Q_EXPORT QObject *qt_preliminary_signal_spy = 0;
+static QObject *qt_spy_signal_sender = 0;
 
-static void qt_spy_signal( QObject* sender, int signal, QUObject* o )
+static void qt_spy_signal(QObject *sender, int signal, QUObject *o)
 {
-    QMetaObject* mo = sender->metaObject();
-    while ( mo && signal - mo->signalOffset() < 0 )
-	mo = mo->superClass();
-    if ( !mo )
-	return;
-    const QMetaData* sigData = mo->signal( signal - mo->signalOffset() );
-    if ( !sigData )
-	return;
-    QCString s;
-    mo = sender->metaObject();
-    while ( mo ) {
-	s.sprintf( "%s_%s", mo->className(), sigData->name );
-	int slot = qt_preliminary_signal_spy->metaObject()->findSlot( s, TRUE );
-	if ( slot >= 0 ) {
+  QMetaObject *mo = sender->metaObject();
+  while (mo && signal - mo->signalOffset() < 0)
+    mo = mo->superClass();
+  if (!mo)
+    return;
+  const QMetaData *sigData = mo->signal(signal - mo->signalOffset());
+  if (!sigData)
+    return;
+  QCString s;
+  mo = sender->metaObject();
+  while (mo) {
+    s.sprintf("%s_%s", mo->className(), sigData->name);
+    int slot = qt_preliminary_signal_spy->metaObject()->findSlot(s, TRUE);
+    if (slot >= 0) {
 #ifdef QT_THREAD_SUPPORT
-	    // protect access to qt_spy_signal_sender
-	    void * const address = &qt_spy_signal_sender;
-	    QMutexLocker locker( qt_global_mutexpool ?
-				 qt_global_mutexpool->get( address ) : 0 );
+      // protect access to qt_spy_signal_sender
+      void *const address = &qt_spy_signal_sender;
+      QMutexLocker locker(qt_global_mutexpool ?
+                          qt_global_mutexpool->get(address) : 0);
 #endif // QT_THREAD_SUPPORT
 
-	    QObject* old_sender = qt_spy_signal_sender;
-	    qt_spy_signal_sender = sender;
-	    qt_preliminary_signal_spy->qt_invoke( slot, o );
-	    qt_spy_signal_sender = old_sender;
-	    break;
-	}
-	mo = mo->superClass();
+      QObject *old_sender = qt_spy_signal_sender;
+      qt_spy_signal_sender = sender;
+      qt_preliminary_signal_spy->qt_invoke(slot, o);
+      qt_spy_signal_sender = old_sender;
+      break;
     }
+    mo = mo->superClass();
+  }
 }
 
 /*
@@ -313,7 +317,7 @@ static void qt_spy_signal( QObject* sender, int signal, QUObject* o )
  */
 #endif // QT_NO_PRELIMINARY_SIGNAL_SPY
 
-static QObjectList* object_trees = 0;
+static QObjectList *object_trees = 0;
 
 #ifdef QT_THREAD_SUPPORT
 static QMutex *obj_trees_mutex = 0;
@@ -321,40 +325,40 @@ static QMutex *obj_trees_mutex = 0;
 
 static void cleanup_object_trees()
 {
-    delete object_trees;
-    object_trees = 0;
+  delete object_trees;
+  object_trees = 0;
 #ifdef QT_THREAD_SUPPORT
-    delete obj_trees_mutex;
-    obj_trees_mutex = 0;
+  delete obj_trees_mutex;
+  obj_trees_mutex = 0;
 #endif
 }
 
 static void ensure_object_trees()
 {
-    object_trees = new QObjectList;
-    qAddPostRoutine( cleanup_object_trees );
+  object_trees = new QObjectList;
+  qAddPostRoutine(cleanup_object_trees);
 }
 
-static void insert_tree( QObject* obj )
+static void insert_tree(QObject *obj)
 {
 #ifdef QT_THREAD_SUPPORT
-    if ( !obj_trees_mutex )
-	obj_trees_mutex = new QMutex();
-    QMutexLocker locker( obj_trees_mutex );
+  if (!obj_trees_mutex)
+    obj_trees_mutex = new QMutex();
+  QMutexLocker locker(obj_trees_mutex);
 #endif
-    if ( !object_trees )
-	ensure_object_trees();
-    object_trees->insert(0, obj );
+  if (!object_trees)
+    ensure_object_trees();
+  object_trees->insert(0, obj);
 }
 
-static void remove_tree( QObject* obj )
+static void remove_tree(QObject *obj)
 {
-    if ( object_trees ) {
+  if (object_trees) {
 #ifdef QT_THREAD_SUPPORT
-	QMutexLocker locker( obj_trees_mutex );
+    QMutexLocker locker(obj_trees_mutex);
 #endif
-	object_trees->removeRef( obj );
-    }
+    object_trees->removeRef(obj);
+  }
 }
 
 
@@ -383,32 +387,32 @@ static void remove_tree( QObject* obj )
     \sa parent(), name(), child(), queryList()
 */
 
-QObject::QObject( QObject *parent, const char *name )
-    :
-    isSignal( FALSE ),				// assume not a signal object
-    isWidget( FALSE ), 				// assume not a widget object
-    pendTimer( FALSE ),				// no timers yet
-    blockSig( FALSE ),      			// not blocking signals
-    wasDeleted( FALSE ),       			// double-delete catcher
-    isTree( FALSE ), 				// no tree yet
-    objname( name ? qstrdup(name) : 0 ),        // set object name
-    parentObj( 0 ),				// no parent yet. It is set by insertChild()
-    childObjects( 0 ), 				// no children yet
-    connections( 0 ),				// no connections yet
-    senderObjects( 0 ),        			// no signals connected yet
-    eventFilters( 0 ), 				// no filters installed
-    postedEvents( 0 ), 				// no events posted
-    d( 0 )
+QObject::QObject(QObject *parent, const char *name)
+  :
+  isSignal(FALSE),         // assume not a signal object
+  isWidget(FALSE),           // assume not a widget object
+  pendTimer(FALSE),          // no timers yet
+  blockSig(FALSE),             // not blocking signals
+  wasDeleted(FALSE),               // double-delete catcher
+  isTree(FALSE),           // no tree yet
+  objname(name ? qstrdup(name) : 0),          // set object name
+  parentObj(0),          // no parent yet. It is set by insertChild()
+  childObjects(0),           // no children yet
+  connections(0),          // no connections yet
+  senderObjects(0),                // no signals connected yet
+  eventFilters(0),           // no filters installed
+  postedEvents(0),           // no events posted
+  d(0)
 {
-    if ( !metaObj )				// will create object dict
-	(void) staticMetaObject();
+  if (!metaObj)          // will create object dict
+    (void) staticMetaObject();
 
-    if ( parent ) {				// add object to parent
-	parent->insertChild( this );
-    } else {
-	insert_tree( this );
-	isTree = TRUE;
-    }
+  if (parent) {          // add object to parent
+    parent->insertChild(this);
+  } else {
+    insert_tree(this);
+    isTree = TRUE;
+  }
 }
 
 
@@ -434,74 +438,73 @@ QObject::QObject( QObject *parent, const char *name )
 
 QObject::~QObject()
 {
-    if ( wasDeleted ) {
+  if (wasDeleted) {
 #if defined(QT_DEBUG)
-	qWarning( "Double QObject deletion detected." );
+    qWarning("Double QObject deletion detected.");
 #endif
-	return;
+    return;
+  }
+  wasDeleted = 1;
+  blockSig = 0; // unblock signals to keep QGuardedPtr happy
+  emit destroyed(this);
+  emit destroyed();
+  if (objname)
+    delete [](char *)objname;
+  objname = 0;
+  if (pendTimer)         // might be pending timers
+    qKillTimer(this);
+  QApplication::removePostedEvents(this);
+  if (isTree) {
+    remove_tree(this);     // remove from global root list
+    isTree = FALSE;
+  }
+  if (parentObj)         // remove it from parent object
+    parentObj->removeChild(this);
+  register QObject *obj;
+  if (senderObjects) {       // disconnect from senders
+    QSenderObjectList *tmp = senderObjects;
+    senderObjects = 0;
+    obj = tmp->first();
+    while (obj) {          // for all senders...
+      obj->disconnect(this);
+      obj = tmp->next();
     }
-    wasDeleted = 1;
-    blockSig = 0; // unblock signals to keep QGuardedPtr happy
-    emit destroyed( this );
-    emit destroyed();
-    if ( objname )
-	delete [] (char*)objname;
-    objname = 0;
-    if ( pendTimer )				// might be pending timers
-	qKillTimer( this );
-    QApplication::removePostedEvents( this );
-    if ( isTree ) {
-	remove_tree( this );		// remove from global root list
-	isTree = FALSE;
+    if (tmp->deref())
+      delete tmp;
+  }
+  if (connections) {       // disconnect receivers
+    for (int i = 0; i < (int) connections->size(); i++) {
+      QConnectionList *clist = (*connections)[i]; // for each signal...
+      if (!clist)
+        continue;
+      register QConnection *c;
+      QConnectionListIt cit(*clist);
+      while ((c = cit.current())) { // for each connected slot...
+        ++cit;
+        if ((obj = c->object()))
+          removeObjFromList(obj->senderObjects, this);
+      }
     }
-    if ( parentObj )				// remove it from parent object
-	parentObj->removeChild( this );
-    register QObject *obj;
-    if ( senderObjects ) {			// disconnect from senders
-	QSenderObjectList *tmp = senderObjects;
-	senderObjects = 0;
-	obj = tmp->first();
-	while ( obj ) {				// for all senders...
-	    obj->disconnect( this );
-	    obj = tmp->next();
-	}
-	if ( tmp->deref() )
-	    delete tmp;
+    delete connections;
+    connections = 0;
+  }
+  if (eventFilters) {
+    delete eventFilters;
+    eventFilters = 0;
+  }
+  if (childObjects) {        // delete children objects
+    QObjectListIt it(*childObjects);
+    while ((obj = it.current())) {
+      ++it;
+      obj->parentObj = 0;
+      childObjects->removeRef(obj);
+      delete obj;
     }
-    if ( connections ) {			// disconnect receivers
-	for ( int i = 0; i < (int) connections->size(); i++ ) {
-	    QConnectionList* clist = (*connections)[i]; // for each signal...
-	    if ( !clist )
-		continue;
-	    register QConnection *c;
-	    QConnectionListIt cit(*clist);
-	    while( (c=cit.current()) ) {	// for each connected slot...
-		++cit;
-		if ( (obj=c->object()) )
-		    removeObjFromList( obj->senderObjects, this );
-	    }
-	}
-	delete connections;
-	connections = 0;
-    }
-    if ( eventFilters ) {
-	delete eventFilters;
-	eventFilters = 0;
-    }
-    if ( childObjects ) {			// delete children objects
-	QObjectListIt it(*childObjects);
-	while ( (obj=it.current()) ) {
-	    ++it;
-	    obj->parentObj = 0;
-	    childObjects->removeRef( obj );
-	    delete obj;
-	}
-	delete childObjects;
-    }
+    delete childObjects;
+  }
 
-    delete d;
+  delete d;
 }
-
 
 /*!
     \fn QMetaObject *QObject::metaObject() const
@@ -546,9 +549,9 @@ QObject::~QObject()
   \sa inherits() metaObject()
 */
 
-bool QObject::isA( const char *clname ) const
+bool QObject::isA(const char *clname) const
 {
-    return qstrcmp( clname, className() ) == 0;
+  return qstrcmp(clname, className()) == 0;
 }
 
 /*!
@@ -560,15 +563,15 @@ bool QObject::isA( const char *clname ) const
 
     Example:
     \code
-	QTimer *t = new QTimer;         // QTimer inherits QObject
-	t->inherits( "QTimer" );        // returns TRUE
-	t->inherits( "QObject" );       // returns TRUE
-	t->inherits( "QButton" );       // returns FALSE
+  QTimer *t = new QTimer;         // QTimer inherits QObject
+  t->inherits( "QTimer" );        // returns TRUE
+  t->inherits( "QObject" );       // returns TRUE
+  t->inherits( "QButton" );       // returns FALSE
 
-	// QScrollBar inherits QWidget and QRangeControl
-	QScrollBar *s = new QScrollBar( 0 );
-	s->inherits( "QWidget" );       // returns TRUE
-	s->inherits( "QRangeControl" ); // returns FALSE
+  // QScrollBar inherits QWidget and QRangeControl
+  QScrollBar *s = new QScrollBar( 0 );
+  s->inherits( "QWidget" );       // returns TRUE
+  s->inherits( "QRangeControl" ); // returns FALSE
     \endcode
 
     (\l QRangeControl is not a QObject.)
@@ -576,9 +579,9 @@ bool QObject::isA( const char *clname ) const
     \sa isA(), metaObject()
 */
 
-bool QObject::inherits( const char *clname ) const
+bool QObject::inherits(const char *clname) const
 {
-    return metaObject()->inherits( clname );
+  return metaObject()->inherits(clname);
 }
 
 /*!
@@ -589,17 +592,17 @@ bool QObject::inherits( const char *clname ) const
 
     \sa inherits()
 */
-void *qt_inheritedBy( QMetaObject *superClass, const QObject *object )
+void *qt_inheritedBy(QMetaObject *superClass, const QObject *object)
 {
-    if (!object)
-	return 0;
-    register QMetaObject *mo = object->metaObject();
-    while (mo) {
-	if (mo == superClass)
-	    return (void*)object;
-	mo = mo->superClass();
-    }
+  if (!object)
     return 0;
+  register QMetaObject *mo = object->metaObject();
+  while (mo) {
+    if (mo == superClass)
+      return (void *)object;
+    mo = mo->superClass();
+  }
+  return 0;
 }
 
 /*!
@@ -621,27 +624,27 @@ void *qt_inheritedBy( QMetaObject *superClass, const QObject *object )
     for unnamed objects, you can call name( 0 ).
 
     \code
-	qDebug( "MyClass::setPrecision(): (%s) invalid precision %f",
-		name(), newPrecision );
+  qDebug( "MyClass::setPrecision(): (%s) invalid precision %f",
+    name(), newPrecision );
     \endcode
 
     \sa className(), child(), queryList()
 */
 
-const char * QObject::name() const
+const char *QObject::name() const
 {
-    // If you change the name here, the builder will be broken
-    return objname ? objname : "unnamed";
+  // If you change the name here, the builder will be broken
+  return objname ? objname : "unnamed";
 }
 
 /*!
     Sets the object's name to \a name.
 */
-void QObject::setName( const char *name )
+void QObject::setName(const char *name)
 {
-    if ( objname )
-	delete [] (char*) objname;
-    objname = name ? qstrdup(name) : 0;
+  if (objname)
+    delete [](char *) objname;
+  objname = name ? qstrdup(name) : 0;
 }
 
 /*!
@@ -651,9 +654,9 @@ void QObject::setName( const char *name )
     does not have a name.
 */
 
-const char * QObject::name( const char * defaultName ) const
+const char *QObject::name(const char *defaultName) const
 {
-    return objname ? objname : defaultName;
+  return objname ? objname : defaultName;
 }
 
 
@@ -670,27 +673,27 @@ const char * QObject::name( const char * defaultName ) const
     more than one, the first one found is retured; if you need all of
     them, use queryList().
 */
-QObject* QObject::child( const char *objName, const char *inheritsClass,
-			 bool recursiveSearch )
+QObject *QObject::child(const char *objName, const char *inheritsClass,
+                        bool recursiveSearch)
 {
-    const QObjectList *list = children();
-    if ( !list )
-	return 0;
+  const QObjectList *list = children();
+  if (!list)
+    return 0;
 
-    bool onlyWidgets = ( inheritsClass && qstrcmp( inheritsClass, "QWidget" ) == 0 );
-    QObjectListIt it( *list );
-    QObject *obj;
-    while ( ( obj = it.current() ) ) {
-	++it;
-	if ( onlyWidgets ) {
-	    if ( obj->isWidgetType() && ( !objName || qstrcmp( objName, obj->name() ) == 0 ) )
-		break;
-	} else if ( ( !inheritsClass || obj->inherits(inheritsClass) ) && ( !objName || qstrcmp( objName, obj->name() ) == 0 ) )
-	    break;
-	if ( recursiveSearch && (obj = obj->child( objName, inheritsClass, recursiveSearch ) ) )
-	    break;
-    }
-    return obj;
+  bool onlyWidgets = (inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0);
+  QObjectListIt it(*list);
+  QObject *obj;
+  while ((obj = it.current())) {
+    ++it;
+    if (onlyWidgets) {
+      if (obj->isWidgetType() && (!objName || qstrcmp(objName, obj->name()) == 0))
+        break;
+    } else if ((!inheritsClass || obj->inherits(inheritsClass)) && (!objName || qstrcmp(objName, obj->name()) == 0))
+      break;
+    if (recursiveSearch && (obj = obj->child(objName, inheritsClass, recursiveSearch)))
+      break;
+  }
+  return obj;
 }
 
 /*!
@@ -725,39 +728,39 @@ QObject* QObject::child( const char *objName, const char *inheritsClass,
     QApplication::postEvent(), QWidget::event()
 */
 
-bool QObject::event( QEvent *e )
+bool QObject::event(QEvent *e)
 {
 #if defined(QT_CHECK_NULL)
-    if ( e == 0 )
-	qWarning( "QObject::event: Null events are not permitted" );
+  if (e == 0)
+    qWarning("QObject::event: Null events are not permitted");
 #endif
-    if ( eventFilters ) {			// try filters
-	if ( activate_filters(e) )		// stopped by a filter
-	    return TRUE;
-    }
+  if (eventFilters) {        // try filters
+    if (activate_filters(e))     // stopped by a filter
+      return TRUE;
+  }
 
-    switch ( e->type() ) {
+  switch (e->type()) {
     case QEvent::Timer:
-	timerEvent( (QTimerEvent*)e );
-	return TRUE;
+      timerEvent((QTimerEvent *)e);
+      return TRUE;
 
     case QEvent::ChildInserted:
     case QEvent::ChildRemoved:
-	childEvent( (QChildEvent*)e );
-	return TRUE;
+      childEvent((QChildEvent *)e);
+      return TRUE;
 
     case QEvent::DeferredDelete:
-	delete this;
-	return TRUE;
+      if (this) delete this;
+      return TRUE;
 
     default:
-	if ( e->type() >= QEvent::User ) {
-	    customEvent( (QCustomEvent*) e );
-	    return TRUE;
-	}
-	break;
-    }
-    return FALSE;
+      if (e->type() >= QEvent::User) {
+        customEvent((QCustomEvent *) e);
+        return TRUE;
+      }
+      break;
+  }
+  return FALSE;
 }
 
 /*!
@@ -770,7 +773,7 @@ bool QObject::event( QEvent *e )
     \sa startTimer(), killTimer(), killTimers(), event()
 */
 
-void QObject::timerEvent( QTimerEvent * )
+void QObject::timerEvent(QTimerEvent *)
 {
 }
 
@@ -795,7 +798,7 @@ void QObject::timerEvent( QTimerEvent * )
     If you change state based on \c ChildInserted events, call
     QWidget::constPolish(), or do
     \code
-	QApplication::sendPostedEvents( this, QEvent::ChildInserted );
+  QApplication::sendPostedEvents( this, QEvent::ChildInserted );
     \endcode
     in functions that depend on the state. One notable example is
     QWidget::sizeHint().
@@ -803,7 +806,7 @@ void QObject::timerEvent( QTimerEvent * )
     \sa event(), QChildEvent
 */
 
-void QObject::childEvent( QChildEvent * )
+void QObject::childEvent(QChildEvent *)
 {
 }
 
@@ -815,7 +818,7 @@ void QObject::childEvent( QChildEvent * )
 
     \sa event(), QCustomEvent
 */
-void QObject::customEvent( QCustomEvent * )
+void QObject::customEvent(QCustomEvent *)
 {
 }
 
@@ -880,9 +883,9 @@ void QObject::customEvent( QCustomEvent * )
     \sa installEventFilter()
 */
 
-bool QObject::eventFilter( QObject * /* watched */, QEvent * /* e */ )
+bool QObject::eventFilter(QObject * /* watched */, QEvent * /* e */)
 {
-    return FALSE;
+  return FALSE;
 }
 
 
@@ -892,20 +895,20 @@ bool QObject::eventFilter( QObject * /* watched */, QEvent * /* e */ )
   This function is normally called from QObject::event() or QWidget::event().
 */
 
-bool QObject::activate_filters( QEvent *e )
+bool QObject::activate_filters(QEvent *e)
 {
-    if ( !eventFilters )			// no event filter
-	return FALSE;
-    QObjectListIt it( *eventFilters );
-    register QObject *obj = it.current();
-    while ( obj ) {				// send to all filters
-	++it;					//   until one returns TRUE
-	if ( obj->eventFilter(this,e) ) {
-	    return TRUE;
-	}
-	obj = it.current();
+  if (!eventFilters)       // no event filter
+    return FALSE;
+  QObjectListIt it(*eventFilters);
+  register QObject *obj = it.current();
+  while (obj) {          // send to all filters
+    ++it;         //   until one returns TRUE
+    if (obj->eventFilter(this, e)) {
+      return TRUE;
     }
-    return FALSE;				// don't do anything with it
+    obj = it.current();
+  }
+  return FALSE;       // don't do anything with it
 }
 
 
@@ -928,9 +931,9 @@ bool QObject::activate_filters( QEvent *e )
     for this object have been blocked.
 */
 
-void QObject::blockSignals( bool block )
+void QObject::blockSignals(bool block)
 {
-    blockSig = block;
+  blockSig = block;
 }
 
 
@@ -960,25 +963,25 @@ void QObject::blockSignals( bool block )
     \code
     class MyObject : public QObject
     {
-	Q_OBJECT
+  Q_OBJECT
     public:
-	MyObject( QObject *parent = 0, const char *name = 0 );
+  MyObject( QObject *parent = 0, const char *name = 0 );
 
     protected:
-	void timerEvent( QTimerEvent * );
+  void timerEvent( QTimerEvent * );
     };
 
     MyObject::MyObject( QObject *parent, const char *name )
-	: QObject( parent, name )
+  : QObject( parent, name )
     {
-	startTimer( 50 );    // 50-millisecond timer
-	startTimer( 1000 );  // 1-second timer
-	startTimer( 60000 ); // 1-minute timer
+  startTimer( 50 );    // 50-millisecond timer
+  startTimer( 1000 );  // 1-second timer
+  startTimer( 60000 ); // 1-minute timer
     }
 
     void MyObject::timerEvent( QTimerEvent *e )
     {
-	qDebug( "timer event, id %d", e->timerId() );
+  qDebug( "timer event, id %d", e->timerId() );
     }
     \endcode
 
@@ -994,10 +997,10 @@ void QObject::blockSignals( bool block )
         QEventLoop::aboutToBlock()
 */
 
-int QObject::startTimer( int interval )
+int QObject::startTimer(int interval)
 {
-    pendTimer = TRUE;				// set timer flag
-    return qStartTimer( interval, (QObject *)this );
+  pendTimer = TRUE;       // set timer flag
+  return qStartTimer(interval, (QObject *)this);
 }
 
 /*!
@@ -1009,9 +1012,9 @@ int QObject::startTimer( int interval )
     \sa timerEvent(), startTimer(), killTimers()
 */
 
-void QObject::killTimer( int id )
+void QObject::killTimer(int id)
 {
-    qKillTimer( id );
+  qKillTimer(id);
 }
 
 /*!
@@ -1027,41 +1030,41 @@ void QObject::killTimer( int id )
 
 void QObject::killTimers()
 {
-    qKillTimer( this );
+  qKillTimer(this);
 }
 
-static void objSearch( QObjectList *result,
-		       QObjectList *list,
-		       const char  *inheritsClass,
-		       bool onlyWidgets,
-		       const char  *objName,
-		       QRegExp	   *rx,
-		       bool	    recurse )
+static void objSearch(QObjectList *result,
+                      QObjectList *list,
+                      const char  *inheritsClass,
+                      bool onlyWidgets,
+                      const char  *objName,
+                      QRegExp     *rx,
+                      bool     recurse)
 {
-    if ( !list || list->isEmpty() )		// nothing to search
-	return;
-    QObject *obj = list->first();
-    while ( obj ) {
-	bool ok = TRUE;
-	if ( onlyWidgets )
-	    ok = obj->isWidgetType();
-	else if ( inheritsClass && !obj->inherits(inheritsClass) )
-	    ok = FALSE;
-	if ( ok ) {
-	    if ( objName )
-		ok = ( qstrcmp(objName,obj->name()) == 0 );
+  if (!list || list->isEmpty())      // nothing to search
+    return;
+  QObject *obj = list->first();
+  while (obj) {
+    bool ok = TRUE;
+    if (onlyWidgets)
+      ok = obj->isWidgetType();
+    else if (inheritsClass && !obj->inherits(inheritsClass))
+      ok = FALSE;
+    if (ok) {
+      if (objName)
+        ok = (qstrcmp(objName, obj->name()) == 0);
 #ifndef QT_NO_REGEXP
-	    else if ( rx )
-		ok = ( rx->search(QString::fromLatin1(obj->name())) != -1 );
+      else if (rx)
+        ok = (rx->search(QString::fromLatin1(obj->name())) != -1);
 #endif
-	}
-	if ( ok )				// match!
-	    result->append( obj );
-	if ( recurse && obj->children() )
-	    objSearch( result, (QObjectList *)obj->children(), inheritsClass,
-		       onlyWidgets, objName, rx, recurse );
-	obj = list->next();
     }
+    if (ok)          // match!
+      result->append(obj);
+    if (recurse && obj->children())
+      objSearch(result, (QObjectList *)obj->children(), inheritsClass,
+                onlyWidgets, objName, rx, recurse);
+    obj = list->next();
+  }
 }
 
 /*!
@@ -1111,7 +1114,7 @@ static void objSearch( QObjectList *result,
 */
 const QObjectList *QObject::objectTrees()
 {
-    return object_trees;
+  return object_trees;
 }
 
 
@@ -1147,9 +1150,9 @@ const QObjectList *QObject::objectTrees()
     QObject *obj;
 
     while ( (obj = it.current()) != 0 ) {
-	// for each found object...
-	++it;
-	((QButton*)obj)->setEnabled( FALSE );
+  // for each found object...
+  ++it;
+  ((QButton*)obj)->setEnabled( FALSE );
     }
     delete l; // delete the list, not the objects
     \endcode
@@ -1165,26 +1168,26 @@ const QObjectList *QObject::objectTrees()
     \sa child() children(), parent(), inherits(), name(), QRegExp
 */
 
-QObjectList *QObject::queryList( const char *inheritsClass,
-				 const char *objName,
-				 bool regexpMatch,
-				 bool recursiveSearch ) const
+QObjectList *QObject::queryList(const char *inheritsClass,
+                                const char *objName,
+                                bool regexpMatch,
+                                bool recursiveSearch) const
 {
-    QObjectList *list = new QObjectList;
-    Q_CHECK_PTR( list );
-    bool onlyWidgets = ( inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0 );
+  QObjectList *list = new QObjectList;
+  Q_CHECK_PTR(list);
+  bool onlyWidgets = (inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0);
 #ifndef QT_NO_REGEXP
-    if ( regexpMatch && objName ) {		// regexp matching
-	QRegExp rx(QString::fromLatin1(objName));
-	objSearch( list, (QObjectList *)children(), inheritsClass, onlyWidgets,
-		   0, &rx, recursiveSearch );
-    } else
+  if (regexpMatch && objName) {      // regexp matching
+    QRegExp rx(QString::fromLatin1(objName));
+    objSearch(list, (QObjectList *)children(), inheritsClass, onlyWidgets,
+              0, &rx, recursiveSearch);
+  } else
 #endif
-	{
-	objSearch( list, (QObjectList *)children(), inheritsClass, onlyWidgets,
-		   objName, 0, recursiveSearch );
-    }
-    return list;
+  {
+    objSearch(list, (QObjectList *)children(), inheritsClass, onlyWidgets,
+              objName, 0, recursiveSearch);
+  }
+  return list;
 }
 
 /*! \internal
@@ -1193,17 +1196,17 @@ QObjectList *QObject::queryList( const char *inheritsClass,
   \a signal, or 0 if nothing is connected to it.
 */
 
-QConnectionList *QObject::receivers( const char* signal ) const
+QConnectionList *QObject::receivers(const char *signal) const
 {
-    if ( connections && signal ) {
-	if ( *signal == '2' ) {			// tag == 2, i.e. signal
-	    QCString s = qt_rmWS( signal+1 );
-	    return receivers( metaObject()->findSignal( (const char*)s, TRUE ) );
-	} else {
-	    return receivers( metaObject()->findSignal(signal, TRUE ) );
-	}
+  if (connections && signal) {
+    if (*signal == '2') {        // tag == 2, i.e. signal
+      QCString s = qt_rmWS(signal + 1);
+      return receivers(metaObject()->findSignal((const char *)s, TRUE));
+    } else {
+      return receivers(metaObject()->findSignal(signal, TRUE));
     }
-    return 0;
+  }
+  return 0;
 }
 
 /*! \internal
@@ -1212,26 +1215,26 @@ QConnectionList *QObject::receivers( const char* signal ) const
   signal, or 0 if nothing is connected to it.
 */
 
-QConnectionList *QObject::receivers( int signal ) const
+QConnectionList *QObject::receivers(int signal) const
 {
 #ifndef QT_NO_PRELIMINARY_SIGNAL_SPY
-    if ( qt_preliminary_signal_spy && signal >= 0 ) {
-	if ( !connections ) {
-	    QObject* that = (QObject*) this;
-	    that->connections = new QSignalVec( signal+1 );
-	    that->connections->setAutoDelete( TRUE );
-	}
-	if ( !connections->at( signal ) ) {
-	    QConnectionList* clist = new QConnectionList;
-	    clist->setAutoDelete( TRUE );
-	    connections->insert( signal, clist );
-	    return clist;
-	}
+  if (qt_preliminary_signal_spy && signal >= 0) {
+    if (!connections) {
+      QObject *that = (QObject *) this;
+      that->connections = new QSignalVec(signal + 1);
+      that->connections->setAutoDelete(TRUE);
     }
+    if (!connections->at(signal)) {
+      QConnectionList *clist = new QConnectionList;
+      clist->setAutoDelete(TRUE);
+      connections->insert(signal, clist);
+      return clist;
+    }
+  }
 #endif
-    if ( connections && signal >= 0 )
-	return connections->at( signal );
-    return 0;
+  if (connections && signal >= 0)
+    return connections->at(signal);
+  return 0;
 }
 
 
@@ -1246,36 +1249,36 @@ QConnectionList *QObject::receivers( int signal ) const
     \sa removeChild(), QWidget::reparent()
 */
 
-void QObject::insertChild( QObject *obj )
+void QObject::insertChild(QObject *obj)
 {
-    if ( obj->isTree ) {
-	remove_tree( obj );
-	obj->isTree = FALSE;
-    }
-    if ( obj->parentObj && obj->parentObj != this ) {
+  if (obj->isTree) {
+    remove_tree(obj);
+    obj->isTree = FALSE;
+  }
+  if (obj->parentObj && obj->parentObj != this) {
 #if defined(QT_CHECK_STATE)
-	if ( obj->parentObj != this && obj->isWidgetType() )
-	    qWarning( "QObject::insertChild: Cannot reparent a widget, "
-		     "use QWidget::reparent() instead" );
+    if (obj->parentObj != this && obj->isWidgetType())
+      qWarning("QObject::insertChild: Cannot reparent a widget, "
+               "use QWidget::reparent() instead");
 #endif
-	obj->parentObj->removeChild( obj );
-    }
+    obj->parentObj->removeChild(obj);
+  }
 
-    if ( !childObjects ) {
-	childObjects = new QObjectList;
-	Q_CHECK_PTR( childObjects );
-    } else if ( obj->parentObj == this ) {
+  if (!childObjects) {
+    childObjects = new QObjectList;
+    Q_CHECK_PTR(childObjects);
+  } else if (obj->parentObj == this) {
 #if defined(QT_CHECK_STATE)
-	qWarning( "QObject::insertChild: Object %s::%s already in list",
-		 obj->className(), obj->name( "unnamed" ) );
+    qWarning("QObject::insertChild: Object %s::%s already in list",
+             obj->className(), obj->name("unnamed"));
 #endif
-	return;
-    }
-    obj->parentObj = this;
-    childObjects->append( obj );
+    return;
+  }
+  obj->parentObj = this;
+  childObjects->append(obj);
 
-    QChildEvent *e = new QChildEvent( QEvent::ChildInserted, obj );
-    QApplication::postEvent( this, e );
+  QChildEvent *e = new QChildEvent(QEvent::ChildInserted, obj);
+  QApplication::postEvent(this, e);
 }
 
 /*!
@@ -1288,23 +1291,23 @@ void QObject::insertChild( QObject *obj )
     \sa insertChild(), QWidget::reparent()
 */
 
-void QObject::removeChild( QObject *obj )
+void QObject::removeChild(QObject *obj)
 {
-    if ( childObjects && childObjects->removeRef(obj) ) {
-	obj->parentObj = 0;
-	if ( !obj->wasDeleted ) {
-	    insert_tree( obj );			// it's a root object now
-	    obj->isTree = TRUE;
-	}
-	if ( childObjects->isEmpty() ) {
-	    delete childObjects;		// last child removed
-	    childObjects = 0;			// reset children list
-	}
-
-	// remove events must be sent, not posted!!!
-	QChildEvent ce( QEvent::ChildRemoved, obj );
-	QApplication::sendEvent( this, &ce );
+  if (childObjects && childObjects->removeRef(obj)) {
+    obj->parentObj = 0;
+    if (!obj->wasDeleted) {
+      insert_tree(obj);        // it's a root object now
+      obj->isTree = TRUE;
     }
+    if (childObjects->isEmpty()) {
+      delete childObjects;    // last child removed
+      childObjects = 0;     // reset children list
+    }
+
+    // remove events must be sent, not posted!!!
+    QChildEvent ce(QEvent::ChildRemoved, obj);
+    QApplication::sendEvent(this, &ce);
+  }
 }
 
 
@@ -1331,33 +1334,33 @@ void QObject::removeChild( QObject *obj )
     \code
     class KeyPressEater : public QObject
     {
-	...
+  ...
     protected:
-	bool eventFilter( QObject *o, QEvent *e );
+  bool eventFilter( QObject *o, QEvent *e );
     };
 
     bool KeyPressEater::eventFilter( QObject *o, QEvent *e )
     {
-	if ( e->type() == QEvent::KeyPress ) {
-	    // special processing for key press
-	    QKeyEvent *k = (QKeyEvent *)e;
-	    qDebug( "Ate key press %d", k->key() );
-	    return TRUE; // eat event
-	} else {
-	    // standard event processing
-	    return FALSE;
-	}
+  if ( e->type() == QEvent::KeyPress ) {
+      // special processing for key press
+      QKeyEvent *k = (QKeyEvent *)e;
+      qDebug( "Ate key press %d", k->key() );
+      return TRUE; // eat event
+  } else {
+      // standard event processing
+      return FALSE;
+  }
     }
     \endcode
 
     And here's how to install it on two widgets:
     \code
-	KeyPressEater *keyPressEater = new KeyPressEater( this );
-	QPushButton *pushButton = new QPushButton( this );
-	QListView *listView = new QListView( this );
+  KeyPressEater *keyPressEater = new KeyPressEater( this );
+  QPushButton *pushButton = new QPushButton( this );
+  QListView *listView = new QListView( this );
 
-	pushButton->installEventFilter( keyPressEater );
-	listView->installEventFilter( keyPressEater );
+  pushButton->installEventFilter( keyPressEater );
+  listView->installEventFilter( keyPressEater );
     \endcode
 
     The QAccel class, for example, uses this technique to intercept
@@ -1370,22 +1373,22 @@ void QObject::removeChild( QObject *obj )
     \sa removeEventFilter(), eventFilter(), event()
 */
 
-void QObject::installEventFilter( const QObject *obj )
+void QObject::installEventFilter(const QObject *obj)
 {
-    if ( !obj )
-	return;
-    if ( eventFilters ) {
-	int c = eventFilters->findRef( obj );
-	if ( c >= 0 )
-	    eventFilters->take( c );
-	disconnect( obj, SIGNAL(destroyed(QObject*)),
-		    this, SLOT(cleanupEventFilter(QObject*)) );
-    } else {
-	eventFilters = new QObjectList;
-	Q_CHECK_PTR( eventFilters );
-    }
-    eventFilters->insert( 0, obj );
-    connect( obj, SIGNAL(destroyed(QObject*)), this, SLOT(cleanupEventFilter(QObject*)) );
+  if (!obj)
+    return;
+  if (eventFilters) {
+    int c = eventFilters->findRef(obj);
+    if (c >= 0)
+      eventFilters->take(c);
+    disconnect(obj, SIGNAL(destroyed(QObject *)),
+               this, SLOT(cleanupEventFilter(QObject *)));
+  } else {
+    eventFilters = new QObjectList;
+    Q_CHECK_PTR(eventFilters);
+  }
+  eventFilters->insert(0, obj);
+  connect(obj, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupEventFilter(QObject *)));
 }
 
 /*!
@@ -1401,16 +1404,16 @@ void QObject::installEventFilter( const QObject *obj )
     \sa installEventFilter(), eventFilter(), event()
 */
 
-void QObject::removeEventFilter( const QObject *obj )
+void QObject::removeEventFilter(const QObject *obj)
 {
-    if ( eventFilters && eventFilters->removeRef(obj) ) {
-	if ( eventFilters->isEmpty() ) {	// last event filter removed
-	    delete eventFilters;
-	    eventFilters = 0;			// reset event filter list
-	}
-	disconnect( obj,  SIGNAL(destroyed(QObject*)),
-		    this, SLOT(cleanupEventFilter(QObject*)) );
+  if (eventFilters && eventFilters->removeRef(obj)) {
+    if (eventFilters->isEmpty()) {   // last event filter removed
+      delete eventFilters;
+      eventFilters = 0;     // reset event filter list
     }
+    disconnect(obj,  SIGNAL(destroyed(QObject *)),
+               this, SLOT(cleanupEventFilter(QObject *)));
+  }
 }
 
 
@@ -1420,86 +1423,90 @@ void QObject::removeEventFilter( const QObject *obj )
 
 #if defined(QT_CHECK_RANGE)
 
-static bool check_signal_macro( const QObject *sender, const char *signal,
-				const char *func, const char *op )
+static bool check_signal_macro(const QObject *sender, const char *signal,
+                               const char *func, const char *op)
 {
-    int sigcode = (int)(*signal) - '0';
-    if ( sigcode != QSIGNAL_CODE ) {
-	if ( sigcode == QSLOT_CODE )
-	    qWarning( "QObject::%s: Attempt to %s non-signal %s::%s",
-		     func, op, sender->className(), signal+1 );
-	else
-	    qWarning( "QObject::%s: Use the SIGNAL macro to %s %s::%s",
-		     func, op, sender->className(), signal );
-	return FALSE;
-    }
-    return TRUE;
-}
-
-static bool check_member_code( int code, const QObject *object,
-			       const char *member, const char *func )
-{
-    if ( code != QSLOT_CODE && code != QSIGNAL_CODE ) {
-	qWarning( "QObject::%s: Use the SLOT or SIGNAL macro to "
-		 "%s %s::%s", func, func, object->className(), member );
-	return FALSE;
-    }
-    return TRUE;
-}
-
-static void err_member_notfound( int code, const QObject *object,
-				 const char *member, const char *func )
-{
-    const char *type = 0;
-    switch ( code ) {
-	case QSLOT_CODE:   type = "slot";   break;
-	case QSIGNAL_CODE: type = "signal"; break;
-    }
-    if ( strchr(member,')') == 0 )		// common typing mistake
-	qWarning( "QObject::%s: Parentheses expected, %s %s::%s",
-		 func, type, object->className(), member );
+  int sigcode = (int)(*signal) - '0';
+  if (sigcode != QSIGNAL_CODE) {
+    if (sigcode == QSLOT_CODE)
+      qWarning("QObject::%s: Attempt to %s non-signal %s::%s",
+               func, op, sender->className(), signal + 1);
     else
-	qWarning( "QObject::%s: No such %s %s::%s",
-		 func, type, object->className(), member );
+      qWarning("QObject::%s: Use the SIGNAL macro to %s %s::%s",
+               func, op, sender->className(), signal);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static bool check_member_code(int code, const QObject *object,
+                              const char *member, const char *func)
+{
+  if (code != QSLOT_CODE && code != QSIGNAL_CODE) {
+    qWarning("QObject::%s: Use the SLOT or SIGNAL macro to "
+             "%s %s::%s", func, func, object->className(), member);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static void err_member_notfound(int code, const QObject *object,
+                                const char *member, const char *func)
+{
+  const char *type = 0;
+  switch (code) {
+    case QSLOT_CODE:
+      type = "slot";
+      break;
+    case QSIGNAL_CODE:
+      type = "signal";
+      break;
+  }
+  if (strchr(member, ')') == 0)    // common typing mistake
+    qWarning("QObject::%s: Parentheses expected, %s %s::%s",
+             func, type, object->className(), member);
+  else
+    qWarning("QObject::%s: No such %s %s::%s",
+             func, type, object->className(), member);
 }
 
 
-static void err_info_about_objects( const char * func,
-				    const QObject * sender,
-				    const QObject * receiver )
+static void err_info_about_objects(const char *func,
+                                   const QObject *sender,
+                                   const QObject *receiver)
 {
-    const char * a = sender->name(), * b = receiver->name();
-    if ( a )
-	qWarning( "QObject::%s:  (sender name:   '%s')", func, a );
-    if ( b )
-	qWarning( "QObject::%s:  (receiver name: '%s')", func, b );
+  const char *a = sender->name(), * b = receiver->name();
+  if (a)
+    qWarning("QObject::%s:  (sender name:   '%s')", func, a);
+  if (b)
+    qWarning("QObject::%s:  (receiver name: '%s')", func, b);
 }
 
-static void err_info_about_candidates( int code,
-				       const QMetaObject* mo,
-				       const char* member,
-				       const char *func	)
+static void err_info_about_candidates(int code,
+                                      const QMetaObject *mo,
+                                      const char *member,
+                                      const char *func)
 {
-    if ( strstr(member,"const char*") ) {
-	// porting help
-	QCString newname = member;
-	int p;
-	while ( (p=newname.find("const char*")) >= 0 ) {
-	    newname.replace(p, 11, "const QString&");
-	}
-	const QMetaData *rm = 0;
-	switch ( code ) {
-	case QSLOT_CODE:
-	    rm = mo->slot( mo->findSlot( newname, TRUE ), TRUE );
-	    break;
-	case QSIGNAL_CODE:
-	    rm = mo->signal( mo->findSignal( newname, TRUE ), TRUE );
-	    break;
-	}
-	if ( rm ) {
-	    qWarning("QObject::%s:  Candidate: %s", func, newname.data());
-	}
+  if (strstr(member, "const char*")) {
+    // porting help
+    QCString newname = member;
+    int p;
+    while ((p = newname.find("const char*")) >= 0) {
+      newname.replace(p, 11, "const QString&");
     }
+    const QMetaData *rm = 0;
+    switch (code) {
+      case QSLOT_CODE:
+        rm = mo->slot(mo->findSlot(newname, TRUE), TRUE);
+        break;
+      case QSIGNAL_CODE:
+        rm = mo->signal(mo->findSignal(newname, TRUE), TRUE);
+        break;
+    }
+    if (rm) {
+      qWarning("QObject::%s:  Candidate: %s", func, newname.data());
+    }
+  }
 }
 
 
@@ -1525,28 +1532,28 @@ static void err_info_about_candidates( int code,
 const QObject *QObject::sender()
 {
 #ifndef QT_NO_PRELIMINARY_SIGNAL_SPY
-    if ( this == qt_preliminary_signal_spy ) {
+  if (this == qt_preliminary_signal_spy) {
 #  ifdef QT_THREAD_SUPPORT
-	// protect access to qt_spy_signal_sender
-	void * const address = &qt_spy_signal_sender;
-	QMutexLocker locker( qt_global_mutexpool ?
-			     qt_global_mutexpool->get( address ) : 0 );
+    // protect access to qt_spy_signal_sender
+    void *const address = &qt_spy_signal_sender;
+    QMutexLocker locker(qt_global_mutexpool ?
+                        qt_global_mutexpool->get(address) : 0);
 #  endif // QT_THREAD_SUPPORT
-	return qt_spy_signal_sender;
-    }
+    return qt_spy_signal_sender;
+  }
 #endif
-    if ( senderObjects &&
-	 senderObjects->currentSender &&
-	 /*
-	  * currentSender may be a dangling pointer in case the object
-	  * it was pointing to was destructed from inside a slot. Thus
-	  * verify it still is contained inside the senderObjects list
-	  * which gets cleaned on both destruction and disconnect.
-	  */
+  if (senderObjects &&
+      senderObjects->currentSender &&
+      /*
+       * currentSender may be a dangling pointer in case the object
+       * it was pointing to was destructed from inside a slot. Thus
+       * verify it still is contained inside the senderObjects list
+       * which gets cleaned on both destruction and disconnect.
+       */
 
-	 senderObjects->findRef( senderObjects->currentSender ) != -1 )
-	return senderObjects->currentSender;
-    return 0;
+      senderObjects->findRef(senderObjects->currentSender) != -1)
+    return senderObjects->currentSender;
+  return 0;
 }
 
 
@@ -1564,7 +1571,7 @@ const QObject *QObject::sender()
     \sa connect(), disconnectNotify()
 */
 
-void QObject::connectNotify( const char * )
+void QObject::connectNotify(const char *)
 {
 }
 
@@ -1581,7 +1588,7 @@ void QObject::connectNotify( const char * )
     \sa disconnect(), connectNotify()
 */
 
-void QObject::disconnectNotify( const char * )
+void QObject::disconnectNotify(const char *)
 {
 }
 
@@ -1598,30 +1605,30 @@ void QObject::disconnectNotify( const char * )
 
     \omit
     TRUE:  "signal(<anything>)", "member()"
-    TRUE:  "signal(a,b,c)",	 "member(a,b,c)"
-    TRUE:  "signal(a,b,c)",	 "member(a,b)", "member(a)" etc.
-    FALSE: "signal(const a)",	 "member(a)"
-    FALSE: "signal(a)",		 "member(const a)"
-    FALSE: "signal(a)",		 "member(b)"
-    FALSE: "signal(a)",		 "member(a,b)"
+    TRUE:  "signal(a,b,c)",  "member(a,b,c)"
+    TRUE:  "signal(a,b,c)",  "member(a,b)", "member(a)" etc.
+    FALSE: "signal(const a)",  "member(a)"
+    FALSE: "signal(a)",    "member(const a)"
+    FALSE: "signal(a)",    "member(b)"
+    FALSE: "signal(a)",    "member(a,b)"
     \endomit
 */
 
-bool QObject::checkConnectArgs( const char    *signal,
-				const QObject *,
-				const char    *member )
+bool QObject::checkConnectArgs(const char    *signal,
+                               const QObject *,
+                               const char    *member)
 {
-    const char *s1 = signal;
-    const char *s2 = member;
-    while ( *s1++ != '(' ) { }			// scan to first '('
-    while ( *s2++ != '(' ) { }
-    if ( *s2 == ')' || qstrcmp(s1,s2) == 0 )	// member has no args or
-	return TRUE;				//   exact match
-    int s1len = qstrlen(s1);
-    int s2len = qstrlen(s2);
-    if ( s2len < s1len && qstrncmp(s1,s2,s2len-1)==0 && s1[s2len-1]==',' )
-	return TRUE;				// member has less args
-    return FALSE;
+  const char *s1 = signal;
+  const char *s2 = member;
+  while (*s1++ != '(') { }       // scan to first '('
+  while (*s2++ != '(') { }
+  if (*s2 == ')' || qstrcmp(s1, s2) == 0)  // member has no args or
+    return TRUE;        //   exact match
+  int s1len = qstrlen(s1);
+  int s2len = qstrlen(s2);
+  if (s2len < s1len && qstrncmp(s1, s2, s2len - 1) == 0 && s1[s2len - 1] == ',')
+    return TRUE;        // member has less args
+  return FALSE;
 }
 
 /*!
@@ -1629,11 +1636,11 @@ bool QObject::checkConnectArgs( const char    *signal,
     unnecessary whitespace.
 */
 
-QCString QObject::normalizeSignalSlot( const char *signalSlot )
+QCString QObject::normalizeSignalSlot(const char *signalSlot)
 {
-    if ( !signalSlot )
-	return QCString();
-    return  qt_rmWS( signalSlot );
+  if (!signalSlot)
+    return QCString();
+  return  qt_rmWS(signalSlot);
 }
 
 
@@ -1675,21 +1682,21 @@ QCString QObject::normalizeSignalSlot( const char *signalSlot )
     \code
     class MyWidget : public QWidget
     {
-	Q_OBJECT
+  Q_OBJECT
     public:
-	MyWidget();
+  MyWidget();
 
     signals:
-	void myUsefulSignal();
+  void myUsefulSignal();
 
     private:
-	QPushButton *aButton;
+  QPushButton *aButton;
     };
 
     MyWidget::MyWidget()
     {
-	aButton = new QPushButton( this );
-	connect( aButton, SIGNAL(clicked()), SIGNAL(myUsefulSignal()) );
+  aButton = new QPushButton( this );
+  connect( aButton, SIGNAL(clicked()), SIGNAL(myUsefulSignal()) );
     }
     \endcode
 
@@ -1716,167 +1723,167 @@ QCString QObject::normalizeSignalSlot( const char *signalSlot )
     \sa disconnect()
 */
 
-bool QObject::connect( const QObject *sender,	const char *signal,
-		       const QObject *receiver, const char *member )
+bool QObject::connect(const QObject *sender,  const char *signal,
+                      const QObject *receiver, const char *member)
 {
 #if defined(QT_CHECK_NULL)
-    if ( sender == 0 || receiver == 0 || signal == 0 || member == 0 ) {
-	qWarning( "QObject::connect: Cannot connect %s::%s to %s::%s",
-		 sender ? sender->className() : "(null)",
-		 signal ? signal+1 : "(null)",
-		 receiver ? receiver->className() : "(null)",
-		 member ? member+1 : "(null)" );
-	return FALSE;
-    }
+  if (sender == 0 || receiver == 0 || signal == 0 || member == 0) {
+    qWarning("QObject::connect: Cannot connect %s::%s to %s::%s",
+             sender ? sender->className() : "(null)",
+             signal ? signal + 1 : "(null)",
+             receiver ? receiver->className() : "(null)",
+             member ? member + 1 : "(null)");
+    return FALSE;
+  }
 #endif
-    QMetaObject *smeta = sender->metaObject();
+  QMetaObject *smeta = sender->metaObject();
 
 #if defined(QT_CHECK_RANGE)
-    if ( !check_signal_macro( sender, signal, "connect", "bind" ) )
-	return FALSE;
+  if (!check_signal_macro(sender, signal, "connect", "bind"))
+    return FALSE;
 #endif
-    QCString nw_signal(signal);			// Assume already normalized
-    ++signal;					// skip member type code
+  QCString nw_signal(signal);     // Assume already normalized
+  ++signal;         // skip member type code
 
-    int signal_index = smeta->findSignal( signal, TRUE );
-    if ( signal_index < 0 ) {			// normalize and retry
-	nw_signal = qt_rmWS( signal-1 );	// remove whitespace
-	signal = nw_signal.data()+1;		// skip member type code
-	signal_index = smeta->findSignal( signal, TRUE );
-    }
+  int signal_index = smeta->findSignal(signal, TRUE);
+  if (signal_index < 0) {        // normalize and retry
+    nw_signal = qt_rmWS(signal - 1); // remove whitespace
+    signal = nw_signal.data() + 1;  // skip member type code
+    signal_index = smeta->findSignal(signal, TRUE);
+  }
 
-    if ( signal_index < 0  ) {			// no such signal
+  if (signal_index < 0) {        // no such signal
 #if defined(QT_CHECK_RANGE)
-	err_member_notfound( QSIGNAL_CODE, sender, signal, "connect" );
-	err_info_about_candidates( QSIGNAL_CODE, smeta, signal, "connect" );
-	err_info_about_objects( "connect", sender, receiver );
+    err_member_notfound(QSIGNAL_CODE, sender, signal, "connect");
+    err_info_about_candidates(QSIGNAL_CODE, smeta, signal, "connect");
+    err_info_about_objects("connect", sender, receiver);
 #endif
-	return FALSE;
-    }
-    const QMetaData *sm = smeta->signal( signal_index, TRUE );
-    signal = sm->name;				// use name from meta object
+    return FALSE;
+  }
+  const QMetaData *sm = smeta->signal(signal_index, TRUE);
+  signal = sm->name;        // use name from meta object
 
-    int membcode = member[0] - '0';		// get member code
+  int membcode = member[0] - '0';   // get member code
 
-    QObject *s = (QObject *)sender;		// we need to change them
-    QObject *r = (QObject *)receiver;		//   internally
+  QObject *s = (QObject *)sender;   // we need to change them
+  QObject *r = (QObject *)receiver;   //   internally
 
 #if defined(QT_CHECK_RANGE)
-    if ( !check_member_code( membcode, r, member, "connect" ) )
-	return FALSE;
+  if (!check_member_code(membcode, r, member, "connect"))
+    return FALSE;
 #endif
-    member++;					// skip code
+  member++;         // skip code
 
-    QCString nw_member ;
-    QMetaObject *rmeta = r->metaObject();
-    int member_index = -1;
-    switch ( membcode ) {			// get receiver member
-	case QSLOT_CODE:
-	    member_index = rmeta->findSlot( member, TRUE );
-	    if ( member_index < 0 ) {		// normalize and retry
-		nw_member = qt_rmWS(member);	// remove whitespace
-		member = nw_member;
-		member_index = rmeta->findSlot( member, TRUE );
-	    }
-	    break;
-	case QSIGNAL_CODE:
-	    member_index = rmeta->findSignal( member, TRUE );
-	    if ( member_index < 0 ) {		// normalize and retry
-		nw_member = qt_rmWS(member);	// remove whitespace
-		member = nw_member;
-		member_index = rmeta->findSignal( member, TRUE );
-	    }
-	    break;
-    }
-    if ( member_index < 0  ) {
+  QCString nw_member ;
+  QMetaObject *rmeta = r->metaObject();
+  int member_index = -1;
+  switch (membcode) {        // get receiver member
+    case QSLOT_CODE:
+      member_index = rmeta->findSlot(member, TRUE);
+      if (member_index < 0) {      // normalize and retry
+        nw_member = qt_rmWS(member);  // remove whitespace
+        member = nw_member;
+        member_index = rmeta->findSlot(member, TRUE);
+      }
+      break;
+    case QSIGNAL_CODE:
+      member_index = rmeta->findSignal(member, TRUE);
+      if (member_index < 0) {      // normalize and retry
+        nw_member = qt_rmWS(member);  // remove whitespace
+        member = nw_member;
+        member_index = rmeta->findSignal(member, TRUE);
+      }
+      break;
+  }
+  if (member_index < 0) {
 #if defined(QT_CHECK_RANGE)
-	err_member_notfound( membcode, r, member, "connect" );
-	err_info_about_candidates( membcode, rmeta, member, "connect" );
-	err_info_about_objects( "connect", sender, receiver );
+    err_member_notfound(membcode, r, member, "connect");
+    err_info_about_candidates(membcode, rmeta, member, "connect");
+    err_info_about_objects("connect", sender, receiver);
 #endif
-	return FALSE;
-    }
+    return FALSE;
+  }
 #if defined(QT_CHECK_RANGE)
-    if ( !s->checkConnectArgs(signal,receiver,member) ) {
-	qWarning( "QObject::connect: Incompatible sender/receiver arguments"
-		 "\n\t%s::%s --> %s::%s",
-		 s->className(), signal,
-		 r->className(), member );
-	return FALSE;
-    } else {
-	const QMetaData *rm = membcode == QSLOT_CODE ?
-			      rmeta->slot( member_index, TRUE ) :
-			      rmeta->signal( member_index, TRUE );
-	if ( rm ) {
-	    int si = 0;
-	    int ri = 0;
-	    while ( si < sm->method->count && ri < rm->method->count ) {
-		if ( sm->method->parameters[si].inOut == QUParameter::Out )
-		    si++;
-		else if ( rm->method->parameters[ri].inOut == QUParameter::Out )
-		    ri++;
-		else if ( !QUType::isEqual( sm->method->parameters[si++].type,
-					    rm->method->parameters[ri++].type ) ) {
-		    if ( ( QUType::isEqual( sm->method->parameters[si-1].type, &static_QUType_ptr )
-			 && QUType::isEqual( rm->method->parameters[ri-1].type, &static_QUType_varptr ) )
-			|| ( QUType::isEqual( sm->method->parameters[si-1].type, &static_QUType_varptr )
-			     && QUType::isEqual( rm->method->parameters[ri-1].type, &static_QUType_ptr ) ) )
-			continue; // varptr got introduced in 3.1 and is binary compatible with ptr
-		    qWarning( "QObject::connect: Incompatible sender/receiver marshalling"
-			      "\n\t%s::%s --> %s::%s",
-			      s->className(), signal,
-			      r->className(), member );
-		    return FALSE;
-		}
-	    }
-	}
+  if (!s->checkConnectArgs(signal, receiver, member)) {
+    qWarning("QObject::connect: Incompatible sender/receiver arguments"
+             "\n\t%s::%s --> %s::%s",
+             s->className(), signal,
+             r->className(), member);
+    return FALSE;
+  } else {
+    const QMetaData *rm = membcode == QSLOT_CODE ?
+                          rmeta->slot(member_index, TRUE) :
+                          rmeta->signal(member_index, TRUE);
+    if (rm) {
+      int si = 0;
+      int ri = 0;
+      while (si < sm->method->count && ri < rm->method->count) {
+        if (sm->method->parameters[si].inOut == QUParameter::Out)
+          si++;
+        else if (rm->method->parameters[ri].inOut == QUParameter::Out)
+          ri++;
+        else if (!QUType::isEqual(sm->method->parameters[si++].type,
+                                  rm->method->parameters[ri++].type)) {
+          if ((QUType::isEqual(sm->method->parameters[si - 1].type, &static_QUType_ptr)
+               && QUType::isEqual(rm->method->parameters[ri - 1].type, &static_QUType_varptr))
+              || (QUType::isEqual(sm->method->parameters[si - 1].type, &static_QUType_varptr)
+                  && QUType::isEqual(rm->method->parameters[ri - 1].type, &static_QUType_ptr)))
+            continue; // varptr got introduced in 3.1 and is binary compatible with ptr
+          qWarning("QObject::connect: Incompatible sender/receiver marshalling"
+                   "\n\t%s::%s --> %s::%s",
+                   s->className(), signal,
+                   r->className(), member);
+          return FALSE;
+        }
+      }
     }
+  }
 #endif
-    connectInternal( sender, signal_index, receiver, membcode, member_index );
-    s->connectNotify( nw_signal );
-    return TRUE;
+  connectInternal(sender, signal_index, receiver, membcode, member_index);
+  s->connectNotify(nw_signal);
+  return TRUE;
 }
 
 /*! \internal */
 
-void QObject::connectInternal( const QObject *sender, int signal_index, const QObject *receiver,
-			       int membcode, int member_index )
+void QObject::connectInternal(const QObject *sender, int signal_index, const QObject *receiver,
+                              int membcode, int member_index)
 {
-    QObject *s = (QObject*)sender;
-    QObject *r = (QObject*)receiver;
+  QObject *s = (QObject *)sender;
+  QObject *r = (QObject *)receiver;
 
-    if ( !s->connections ) {			// create connections lookup table
-	s->connections = new QSignalVec( signal_index+1 );
-	Q_CHECK_PTR( s->connections );
-	s->connections->setAutoDelete( TRUE );
-    }
+  if (!s->connections) {       // create connections lookup table
+    s->connections = new QSignalVec(signal_index + 1);
+    Q_CHECK_PTR(s->connections);
+    s->connections->setAutoDelete(TRUE);
+  }
 
-    QConnectionList *clist = s->connections->at( signal_index );
-    if ( !clist ) {				// create receiver list
-	clist = new QConnectionList;
-	Q_CHECK_PTR( clist );
-	clist->setAutoDelete( TRUE );
-	s->connections->insert( signal_index, clist );
-    }
+  QConnectionList *clist = s->connections->at(signal_index);
+  if (!clist) {          // create receiver list
+    clist = new QConnectionList;
+    Q_CHECK_PTR(clist);
+    clist->setAutoDelete(TRUE);
+    s->connections->insert(signal_index, clist);
+  }
 
-    QMetaObject *rmeta = r->metaObject();
-    const QMetaData *rm = 0;
+  QMetaObject *rmeta = r->metaObject();
+  const QMetaData *rm = 0;
 
-    switch ( membcode ) {			// get receiver member
-	case QSLOT_CODE:
-	    rm = rmeta->slot( member_index, TRUE );
-	    break;
-	case QSIGNAL_CODE:
-	    rm = rmeta->signal( member_index, TRUE );
-	    break;
-    }
+  switch (membcode) {        // get receiver member
+    case QSLOT_CODE:
+      rm = rmeta->slot(member_index, TRUE);
+      break;
+    case QSIGNAL_CODE:
+      rm = rmeta->signal(member_index, TRUE);
+      break;
+  }
 
-    QConnection *c = new QConnection( r, member_index, rm ? rm->name : "qt_invoke", membcode );
-    Q_CHECK_PTR( c );
-    clist->append( c );
-    if ( !r->senderObjects )			// create list of senders
-	r->senderObjects = new QSenderObjectList;
-    r->senderObjects->append( s );		// add sender to list
+  QConnection *c = new QConnection(r, member_index, rm ? rm->name : "qt_invoke", membcode);
+  Q_CHECK_PTR(c);
+  clist->append(c);
+  if (!r->senderObjects)       // create list of senders
+    r->senderObjects = new QSenderObjectList;
+  r->senderObjects->append(s);     // add sender to list
 }
 
 
@@ -1957,174 +1964,174 @@ void QObject::connectInternal( const QObject *sender, int signal_index, const QO
     \sa connect()
 */
 
-bool QObject::disconnect( const QObject *sender,   const char *signal,
-			  const QObject *receiver, const char *member )
+bool QObject::disconnect(const QObject *sender,   const char *signal,
+                         const QObject *receiver, const char *member)
 {
 #if defined(QT_CHECK_NULL)
-    if ( sender == 0 || (receiver == 0 && member != 0) ) {
-	qWarning( "QObject::disconnect: Unexpected null parameter" );
-	return FALSE;
+  if (sender == 0 || (receiver == 0 && member != 0)) {
+    qWarning("QObject::disconnect: Unexpected null parameter");
+    return FALSE;
+  }
+#endif
+  if (!sender->connections)        // no connected signals
+    return FALSE;
+  QObject *s = (QObject *)sender;
+  QObject *r = (QObject *)receiver;
+  int member_index = -1;
+  int membcode = -1;
+  QCString nw_member;
+  if (member) {
+    membcode = member[0] - '0';
+#if defined(QT_CHECK_RANGE)
+    if (!check_member_code(membcode, r, member, "disconnect"))
+      return FALSE;
+#endif
+    ++member;
+    QMetaObject *rmeta = r->metaObject();
+
+    switch (membcode) {        // get receiver member
+      case QSLOT_CODE:
+        member_index = rmeta->findSlot(member, TRUE);
+        if (member_index < 0) {      // normalize and retry
+          nw_member = qt_rmWS(member);  // remove whitespace
+          member = nw_member;
+          member_index = rmeta->findSlot(member, TRUE);
+        }
+        break;
+      case QSIGNAL_CODE:
+        member_index = rmeta->findSignal(member, TRUE);
+        if (member_index < 0) {      // normalize and retry
+          nw_member = qt_rmWS(member);  // remove whitespace
+          member = nw_member;
+          member_index = rmeta->findSignal(member, TRUE);
+        }
+        break;
     }
-#endif
-    if ( !sender->connections )			// no connected signals
-	return FALSE;
-    QObject *s = (QObject *)sender;
-    QObject *r = (QObject *)receiver;
-    int member_index = -1;
-    int membcode = -1;
-    QCString nw_member;
-    if ( member ) {
-	membcode = member[0] - '0';
+    if (member_index < 0) {      // no such member
 #if defined(QT_CHECK_RANGE)
-	if ( !check_member_code( membcode, r, member, "disconnect" ) )
-	    return FALSE;
+      err_member_notfound(membcode, r, member, "disconnect");
+      err_info_about_candidates(membcode, rmeta, member, "connect");
+      err_info_about_objects("disconnect", sender, receiver);
 #endif
-	++member;
-	QMetaObject *rmeta = r->metaObject();
+      return FALSE;
+    }
+  }
 
-	switch ( membcode ) {			// get receiver member
-	case QSLOT_CODE:
-	    member_index = rmeta->findSlot( member, TRUE );
-	    if ( member_index < 0 ) {		// normalize and retry
-		nw_member = qt_rmWS(member);	// remove whitespace
-		member = nw_member;
-		member_index = rmeta->findSlot( member, TRUE );
-	    }
-	    break;
-	case QSIGNAL_CODE:
-	    member_index = rmeta->findSignal( member, TRUE );
-	    if ( member_index < 0 ) {		// normalize and retry
-		nw_member = qt_rmWS(member);	// remove whitespace
-		member = nw_member;
-		member_index = rmeta->findSignal( member, TRUE );
-	    }
-	    break;
-	}
-	if ( member_index < 0 ) {		// no such member
+  if (signal == 0) {       // any/all signals
+    if (disconnectInternal(s, -1, r, membcode, member_index))
+      s->disconnectNotify(0);
+    else
+      return FALSE;
+  } else {          // specific signal
 #if defined(QT_CHECK_RANGE)
-	    err_member_notfound( membcode, r, member, "disconnect" );
-	    err_info_about_candidates( membcode, rmeta, member, "connect" );
-	    err_info_about_objects( "disconnect", sender, receiver );
+    if (!check_signal_macro(s, signal, "disconnect", "unbind"))
+      return FALSE;
 #endif
-	    return FALSE;
-	}
+    QCString nw_signal(signal);   // Assume already normalized
+    ++signal;       // skip member type code
+
+    QMetaObject *smeta = s->metaObject();
+    if (!smeta)          // no meta object
+      return FALSE;
+    int signal_index = smeta->findSignal(signal, TRUE);
+    if (signal_index < 0) {      // normalize and retry
+      nw_signal = qt_rmWS(signal - 1); // remove whitespace
+      signal = nw_signal.data() + 1; // skip member type code
+      signal_index = smeta->findSignal(signal, TRUE);
+    }
+    if (signal_index < 0) {
+#if defined(QT_CHECK_RANGE)
+      qWarning("QObject::disconnect: No such signal %s::%s",
+               s->className(), signal);
+#endif
+      return FALSE;
     }
 
-    if ( signal == 0 ) {			// any/all signals
-	if ( disconnectInternal( s, -1, r, membcode, member_index ) )
-	    s->disconnectNotify( 0 );
-	else
-	    return FALSE;
-    } else {					// specific signal
-#if defined(QT_CHECK_RANGE)
-	if ( !check_signal_macro( s, signal, "disconnect", "unbind" ) )
-	    return FALSE;
-#endif
-	QCString nw_signal(signal);		// Assume already normalized
-	++signal;				// skip member type code
-
-	QMetaObject *smeta = s->metaObject();
-	if ( !smeta )				// no meta object
-	    return FALSE;
-	int signal_index = smeta->findSignal( signal, TRUE );
-	if ( signal_index < 0 ) {		// normalize and retry
-	    nw_signal = qt_rmWS( signal-1 );	// remove whitespace
-	    signal = nw_signal.data()+1;	// skip member type code
-	    signal_index = smeta->findSignal( signal, TRUE );
-	}
-	if ( signal_index < 0 ) {
-#if defined(QT_CHECK_RANGE)
-		qWarning( "QObject::disconnect: No such signal %s::%s",
-			 s->className(), signal );
-#endif
-		return FALSE;
-	}
-
-	/* compatibility and safety: If a receiver has several slots
-	 * with the same name, disconnect them all*/
-	bool res = FALSE;
-	if ( membcode == QSLOT_CODE && r ) {
-	    QMetaObject * rmeta = r->metaObject();
-	    do {
-		int mi = rmeta->findSlot( member );
-		if ( mi != -1 )
-		    res |= disconnectInternal( s, signal_index, r, membcode,  mi );
-	    } while ( (rmeta = rmeta->superClass()) );
-	} else {
-	    res = disconnectInternal( s, signal_index, r, membcode,  member_index );
-	}
-	if ( res )
-	    s->disconnectNotify( nw_signal );
-	return res;
+    /* compatibility and safety: If a receiver has several slots
+     * with the same name, disconnect them all*/
+    bool res = FALSE;
+    if (membcode == QSLOT_CODE && r) {
+      QMetaObject *rmeta = r->metaObject();
+      do {
+        int mi = rmeta->findSlot(member);
+        if (mi != -1)
+          res |= disconnectInternal(s, signal_index, r, membcode,  mi);
+      } while ((rmeta = rmeta->superClass()));
+    } else {
+      res = disconnectInternal(s, signal_index, r, membcode,  member_index);
     }
-    return TRUE;
+    if (res)
+      s->disconnectNotify(nw_signal);
+    return res;
+  }
+  return TRUE;
 }
 
 /*! \internal */
 
-bool QObject::disconnectInternal( const QObject *sender, int signal_index,
-		  const QObject *receiver, int membcode, int member_index )
+bool QObject::disconnectInternal(const QObject *sender, int signal_index,
+                                 const QObject *receiver, int membcode, int member_index)
 {
-    QObject *s = (QObject*)sender;
-    QObject *r = (QObject*)receiver;
+  QObject *s = (QObject *)sender;
+  QObject *r = (QObject *)receiver;
 
-    if ( !s->connections )
-	return FALSE;
+  if (!s->connections)
+    return FALSE;
 
-    bool success = FALSE;
-    QConnectionList *clist;
-    register QConnection *c;
-    if ( signal_index == -1 ) {
-	for ( int i = 0; i < (int) s->connections->size(); i++ ) {
-	    clist = (*s->connections)[i]; // for all signals...
-	    if ( !clist )
-		continue;
-	    c = clist->first();
-	    while ( c ) {			// for all receivers...
-		if ( r == 0 ) {			// remove all receivers
-		    removeObjFromList( c->object()->senderObjects, s );
-		    success = TRUE;
-		    c = clist->next();
-		} else if ( r == c->object() &&
-			    ( member_index == -1 ||
-			      member_index == c->member() && c->memberType() == membcode ) ) {
-		    removeObjFromList( c->object()->senderObjects, s, TRUE );
-		    success = TRUE;
-		    clist->remove();
-		    c = clist->current();
-		} else {
-		    c = clist->next();
-		}
-	    }
-	    if ( r == 0 )			// disconnect all receivers
-		s->connections->insert( i, 0 );
-	}
-    } else {
-	clist = s->connections->at( signal_index );
-	if ( !clist )
-	    return FALSE;
-
-	c = clist->first();
-	while ( c ) {				// for all receivers...
-	    if ( r == 0 ) {			// remove all receivers
-		removeObjFromList( c->object()->senderObjects, s, TRUE );
-		success = TRUE;
-		c = clist->next();
-	    } else if ( r == c->object() &&
-			( member_index == -1 ||
-			  member_index == c->member() && c->memberType() == membcode ) ) {
-		removeObjFromList( c->object()->senderObjects, s, TRUE );
-		success = TRUE;
-		clist->remove();
-		c = clist->current();
-	    } else {
-		c = clist->next();
-	    }
-	}
-	if ( r == 0 )				// disconnect all receivers
-	    s->connections->insert( signal_index, 0 );
+  bool success = FALSE;
+  QConnectionList *clist;
+  register QConnection *c;
+  if (signal_index == -1) {
+    for (int i = 0; i < (int) s->connections->size(); i++) {
+      clist = (*s->connections)[i]; // for all signals...
+      if (!clist)
+        continue;
+      c = clist->first();
+      while (c) {        // for all receivers...
+        if (r == 0) {        // remove all receivers
+          removeObjFromList(c->object()->senderObjects, s);
+          success = TRUE;
+          c = clist->next();
+        } else if (r == c->object() &&
+                   (member_index == -1 ||
+                    member_index == c->member() && c->memberType() == membcode)) {
+          removeObjFromList(c->object()->senderObjects, s, TRUE);
+          success = TRUE;
+          clist->remove();
+          c = clist->current();
+        } else {
+          c = clist->next();
+        }
+      }
+      if (r == 0)        // disconnect all receivers
+        s->connections->insert(i, 0);
     }
-    return success;
+  } else {
+    clist = s->connections->at(signal_index);
+    if (!clist)
+      return FALSE;
+
+    c = clist->first();
+    while (c) {          // for all receivers...
+      if (r == 0) {        // remove all receivers
+        removeObjFromList(c->object()->senderObjects, s, TRUE);
+        success = TRUE;
+        c = clist->next();
+      } else if (r == c->object() &&
+                 (member_index == -1 ||
+                  member_index == c->member() && c->memberType() == membcode)) {
+        removeObjFromList(c->object()->senderObjects, s, TRUE);
+        success = TRUE;
+        clist->remove();
+        c = clist->current();
+      } else {
+        c = clist->next();
+      }
+    }
+    if (r == 0)          // disconnect all receivers
+      s->connections->insert(signal_index, 0);
+  }
+  return success;
 }
 
 /*!
@@ -2160,7 +2167,7 @@ bool QObject::disconnectInternal( const QObject *sender, int signal_index,
 */
 void QObject::deleteLater()
 {
-    QApplication::postEvent( this, new QEvent( QEvent::DeferredDelete) );
+  QApplication::postEvent(this, new QEvent(QEvent::DeferredDelete));
 }
 
 /*!
@@ -2169,9 +2176,9 @@ void QObject::deleteLater()
     object, \a obj, is destroyed, we want to remove its event filter.
 */
 
-void QObject::cleanupEventFilter(QObject* obj)
+void QObject::cleanupEventFilter(QObject *obj)
 {
-    removeEventFilter( obj );
+  removeEventFilter(obj);
 }
 
 
@@ -2192,7 +2199,7 @@ void QObject::cleanupEventFilter(QObject* obj)
     so will probably result in crashes or other undesirable behavior.
 
     \sa trUtf8() QApplication::translate()
-	\link i18n.html Internationalization with Qt\endlink
+  \link i18n.html Internationalization with Qt\endlink
 */
 
 /*!
@@ -2213,87 +2220,87 @@ void QObject::cleanupEventFilter(QObject* obj)
     \sa tr() QApplication::translate()
 */
 
-static QMetaObjectCleanUp cleanUp_Qt = QMetaObjectCleanUp( "QObject", &QObject::staticMetaObject );
+static QMetaObjectCleanUp cleanUp_Qt = QMetaObjectCleanUp("QObject", &QObject::staticMetaObject);
 
-QMetaObject* QObject::staticQtMetaObject()
+QMetaObject *QObject::staticQtMetaObject()
 {
-    static QMetaObject* qtMetaObject = 0;
-    if ( qtMetaObject )
-	return qtMetaObject;
-
-#ifndef QT_NO_PROPERTIES
-    static const QMetaEnum::Item enum_0[] = {
-	{ "AlignLeft",  (int) Qt::AlignLeft },
-	{ "AlignRight",  (int) Qt::AlignRight },
-	{ "AlignHCenter",  (int) Qt::AlignHCenter },
-	{ "AlignTop",  (int) Qt::AlignTop },
-	{ "AlignBottom",  (int) Qt::AlignBottom },
-	{ "AlignVCenter",  (int) Qt::AlignVCenter },
-	{ "AlignCenter", (int) Qt::AlignCenter },
-	{ "AlignAuto", (int) Qt::AlignAuto },
-	{ "AlignJustify", (int) Qt::AlignJustify },
-	{ "WordBreak", (int) Qt::WordBreak }
-    };
-
-    static const QMetaEnum::Item enum_1[] = {
-	{ "Horizontal", (int) Qt::Horizontal },
-	{ "Vertical", (int) Qt::Vertical }
-    };
-
-    static const QMetaEnum::Item enum_2[] = {
-	{ "PlainText", (int) Qt::PlainText },
-	{ "RichText", (int) Qt::RichText },
-	{ "AutoText", (int) Qt::AutoText },
-	{ "LogText", (int) Qt::LogText }
-    };
-
-    static const QMetaEnum::Item enum_3[] = {
-	{ "NoBackground",  (int) Qt::NoBackground },
-	{ "PaletteForeground",  (int) Qt::PaletteForeground },
-	{ "PaletteButton",  (int) Qt::PaletteButton },
-	{ "PaletteLight",  (int) Qt::PaletteLight },
-	{ "PaletteMidlight",  (int) Qt::PaletteMidlight },
-	{ "PaletteDark",  (int) Qt::PaletteDark },
-	{ "PaletteMid",  (int) Qt::PaletteMid },
-	{ "PaletteText",  (int) Qt::PaletteText },
-	{ "PaletteBrightText",  (int) Qt::PaletteBrightText },
-	{ "PaletteBase",  (int) Qt::PaletteBase },
-	{ "PaletteBackground",  (int) Qt::PaletteBackground },
-	{ "PaletteShadow",  (int) Qt::PaletteShadow },
-	{ "PaletteHighlight",  (int) Qt::PaletteHighlight },
-	{ "PaletteHighlightedText",  (int) Qt::PaletteHighlightedText },
-	{ "PaletteButtonText",  (int) Qt::PaletteButtonText },
-	{ "PaletteLink", (int) Qt::PaletteLink },
-	{ "PaletteLinkVisited", (int) Qt::PaletteLinkVisited }
-    };
-
-    static const QMetaEnum::Item enum_4[] = {
-	{ "TextDate", (int) Qt::TextDate },
-	{ "ISODate", (int) Qt::ISODate },
-	{ "LocalDate", (int) Qt::LocalDate }
-    };
-
-
-    static const QMetaEnum enum_tbl[] = {
-	{ "Alignment", 10, enum_0, TRUE },
-	{ "Orientation", 2, enum_1, FALSE },
-	{ "TextFormat", 4, enum_2, FALSE },
-	{ "BackgroundMode", 17, enum_3, FALSE },
-	{ "DateFormat", 3, enum_4, FALSE }
-    };
-#endif
-
-    qtMetaObject = new QMetaObject( "Qt", 0,
-			  0, 0,
-			  0, 0,
-#ifndef QT_NO_PROPERTIES
-			  0, 0,
-			  enum_tbl, 5,
-#endif
-			  0, 0 );
-    cleanUp_Qt.setMetaObject( qtMetaObject );
-
+  static QMetaObject *qtMetaObject = 0;
+  if (qtMetaObject)
     return qtMetaObject;
+
+#ifndef QT_NO_PROPERTIES
+  static const QMetaEnum::Item enum_0[] = {
+    { "AlignLeft", (int) Qt::AlignLeft },
+    { "AlignRight", (int) Qt::AlignRight },
+    { "AlignHCenter", (int) Qt::AlignHCenter },
+    { "AlignTop", (int) Qt::AlignTop },
+    { "AlignBottom", (int) Qt::AlignBottom },
+    { "AlignVCenter", (int) Qt::AlignVCenter },
+    { "AlignCenter", (int) Qt::AlignCenter },
+    { "AlignAuto", (int) Qt::AlignAuto },
+    { "AlignJustify", (int) Qt::AlignJustify },
+    { "WordBreak", (int) Qt::WordBreak }
+  };
+
+  static const QMetaEnum::Item enum_1[] = {
+    { "Horizontal", (int) Qt::Horizontal },
+    { "Vertical", (int) Qt::Vertical }
+  };
+
+  static const QMetaEnum::Item enum_2[] = {
+    { "PlainText", (int) Qt::PlainText },
+    { "RichText", (int) Qt::RichText },
+    { "AutoText", (int) Qt::AutoText },
+    { "LogText", (int) Qt::LogText }
+  };
+
+  static const QMetaEnum::Item enum_3[] = {
+    { "NoBackground", (int) Qt::NoBackground },
+    { "PaletteForeground", (int) Qt::PaletteForeground },
+    { "PaletteButton", (int) Qt::PaletteButton },
+    { "PaletteLight", (int) Qt::PaletteLight },
+    { "PaletteMidlight", (int) Qt::PaletteMidlight },
+    { "PaletteDark", (int) Qt::PaletteDark },
+    { "PaletteMid", (int) Qt::PaletteMid },
+    { "PaletteText", (int) Qt::PaletteText },
+    { "PaletteBrightText", (int) Qt::PaletteBrightText },
+    { "PaletteBase", (int) Qt::PaletteBase },
+    { "PaletteBackground", (int) Qt::PaletteBackground },
+    { "PaletteShadow", (int) Qt::PaletteShadow },
+    { "PaletteHighlight", (int) Qt::PaletteHighlight },
+    { "PaletteHighlightedText", (int) Qt::PaletteHighlightedText },
+    { "PaletteButtonText", (int) Qt::PaletteButtonText },
+    { "PaletteLink", (int) Qt::PaletteLink },
+    { "PaletteLinkVisited", (int) Qt::PaletteLinkVisited }
+  };
+
+  static const QMetaEnum::Item enum_4[] = {
+    { "TextDate", (int) Qt::TextDate },
+    { "ISODate", (int) Qt::ISODate },
+    { "LocalDate", (int) Qt::LocalDate }
+  };
+
+
+  static const QMetaEnum enum_tbl[] = {
+    { "Alignment", 10, enum_0, TRUE },
+    { "Orientation", 2, enum_1, FALSE },
+    { "TextFormat", 4, enum_2, FALSE },
+    { "BackgroundMode", 17, enum_3, FALSE },
+    { "DateFormat", 3, enum_4, FALSE }
+  };
+#endif
+
+  qtMetaObject = new QMetaObject("Qt", 0,
+                                 0, 0,
+                                 0, 0,
+#ifndef QT_NO_PROPERTIES
+                                 0, 0,
+                                 enum_tbl, 5,
+#endif
+                                 0, 0);
+  cleanUp_Qt.setMetaObject(qtMetaObject);
+
+  return qtMetaObject;
 }
 
 /*!
@@ -2303,88 +2310,88 @@ QMetaObject* QObject::staticQtMetaObject()
     types. All other combinations are generated by the meta object
     compiler.
   */
-void QObject::activate_signal( int signal )
+void QObject::activate_signal(int signal)
 {
 #ifndef QT_NO_PRELIMINARY_SIGNAL_SPY
-    if ( qt_preliminary_signal_spy ) {
-	if ( !signalsBlocked() && signal >= 0 &&
-	     ( !connections || !connections->at( signal ) ) ) {
-	    QUObject o[1];
-	    qt_spy_signal( this, signal, o );
-	    return;
-	}
+  if (qt_preliminary_signal_spy) {
+    if (!signalsBlocked() && signal >= 0 &&
+        (!connections || !connections->at(signal))) {
+      QUObject o[1];
+      qt_spy_signal(this, signal, o);
+      return;
     }
+  }
 #endif
 
-    if ( !connections || signalsBlocked() || signal < 0 )
-	return;
-    QConnectionList *clist = connections->at( signal );
-    if ( !clist )
-	return;
-    QUObject o[1];
-    activate_signal( clist, o );
+  if (!connections || signalsBlocked() || signal < 0)
+    return;
+  QConnectionList *clist = connections->at(signal);
+  if (!clist)
+    return;
+  QUObject o[1];
+  activate_signal(clist, o);
 }
 
 /*! \internal */
 
-void QObject::activate_signal( QConnectionList *clist, QUObject *o )
+void QObject::activate_signal(QConnectionList *clist, QUObject *o)
 {
-    if ( !clist )
-	return;
+  if (!clist)
+    return;
 
 #ifndef QT_NO_PRELIMINARY_SIGNAL_SPY
-    if ( qt_preliminary_signal_spy )
-	qt_spy_signal( this, connections->findRef( clist), o );
+  if (qt_preliminary_signal_spy)
+    qt_spy_signal(this, connections->findRef(clist), o);
 #endif
 
-    QObject *object;
-    QSenderObjectList* sol;
-    QObject* oldSender = 0;
-    QConnection *c;
-    if ( clist->count() == 1 ) { // save iterator
-	c = clist->first();
-	object = c->object();
-	sol = object->senderObjects;
-	if ( sol ) {
-	    oldSender = sol->currentSender;
-	    sol->ref();
-	    sol->currentSender = this;
-	}
-	if ( c->memberType() == QSIGNAL_CODE )
-	    object->qt_emit( c->member(), o );
-	else
-	    object->qt_invoke( c->member(), o );
-	if ( sol ) {
-	    sol->currentSender = oldSender;
-	    if ( sol->deref() )
-		delete sol;
-	}
-    } else {
-	QConnection *cd = 0;
-	QConnectionListIt it(*clist);
-	while ( (c=it.current()) ) {
-	    ++it;
-	    if ( c == cd )
-		continue;
-	    cd = c;
-	    object = c->object();
-	    sol = object->senderObjects;
-	    if ( sol ) {
-		oldSender = sol->currentSender;
-		sol->ref();
-		sol->currentSender = this;
-	    }
-	    if ( c->memberType() == QSIGNAL_CODE )
-		object->qt_emit( c->member(), o );
-	    else
-		object->qt_invoke( c->member(), o );
-	    if (sol ) {
-		sol->currentSender = oldSender;
-		if ( sol->deref() )
-		    delete sol;
-	    }
-	}
+  QObject *object;
+  QSenderObjectList *sol;
+  QObject *oldSender = 0;
+  QConnection *c;
+  if (clist->count() == 1) {   // save iterator
+    c = clist->first();
+    object = c->object();
+    sol = object->senderObjects;
+    if (sol) {
+      oldSender = sol->currentSender;
+      sol->ref();
+      sol->currentSender = this;
     }
+    if (c->memberType() == QSIGNAL_CODE)
+      object->qt_emit(c->member(), o);
+    else
+      object->qt_invoke(c->member(), o);
+    if (sol) {
+      sol->currentSender = oldSender;
+      if (sol->deref())
+        delete sol;
+    }
+  } else {
+    QConnection *cd = 0;
+    QConnectionListIt it(*clist);
+    while ((c = it.current())) {
+      ++it;
+      if (c == cd)
+        continue;
+      cd = c;
+      object = c->object();
+      sol = object->senderObjects;
+      if (sol) {
+        oldSender = sol->currentSender;
+        sol->ref();
+        sol->currentSender = this;
+      }
+      if (c->memberType() == QSIGNAL_CODE)
+        object->qt_emit(c->member(), o);
+      else
+        object->qt_invoke(c->member(), o);
+      if (sol) {
+        sol->currentSender = oldSender;
+        if (sol->deref())
+          delete sol;
+      }
+    }
+  }
 }
 
 /*!
@@ -2408,89 +2415,89 @@ void QObject::activate_signal( QConnectionList *clist, QUObject *o )
 */
 
 #ifndef QT_NO_PRELIMINARY_SIGNAL_SPY
-#define ACTIVATE_SIGNAL_WITH_PARAM(FNAME,TYPE)				      \
-void QObject::FNAME( int signal, TYPE param )				      \
-{									      \
+#define ACTIVATE_SIGNAL_WITH_PARAM(FNAME,TYPE)              \
+  void QObject::FNAME( int signal, TYPE param )             \
+  {                       \
     if ( qt_preliminary_signal_spy ) { \
-	if ( !signalsBlocked() && signal >= 0 && \
-	     ( !connections || !connections->at( signal ) ) ) { \
-	    QUObject o[2];							      \
-	    static_QUType_##TYPE.set( o+1, param );					      \
-	    qt_spy_signal( this, signal, o ); \
-	    return; \
-	} \
+      if ( !signalsBlocked() && signal >= 0 && \
+           ( !connections || !connections->at( signal ) ) ) { \
+        QUObject o[2];                    \
+        static_QUType_##TYPE.set( o+1, param );               \
+        qt_spy_signal( this, signal, o ); \
+        return; \
+      } \
     } \
-    if ( !connections || signalsBlocked() || signal < 0 )		      \
-	return;								      \
-    QConnectionList *clist = connections->at( signal );			      \
-    if ( !clist )							      \
-	return;								      \
-    QUObject o[2];							      \
-    static_QUType_##TYPE.set( o+1, param );					      \
-    activate_signal( clist, o );					      \
-}
+    if ( !connections || signalsBlocked() || signal < 0 )         \
+      return;                     \
+    QConnectionList *clist = connections->at( signal );           \
+    if ( !clist )                   \
+      return;                     \
+    QUObject o[2];                    \
+    static_QUType_##TYPE.set( o+1, param );               \
+    activate_signal( clist, o );                \
+  }
 #else
-#define ACTIVATE_SIGNAL_WITH_PARAM(FNAME,TYPE)				      \
-void QObject::FNAME( int signal, TYPE param )				      \
-{									      \
-    if ( !connections || signalsBlocked() || signal < 0 )		      \
-	return;								      \
-    QConnectionList *clist = connections->at( signal );			      \
-    if ( !clist )							      \
-	return;								      \
-    QUObject o[2];							      \
-    static_QUType_##TYPE.set( o+1, param );					      \
-    activate_signal( clist, o );					      \
-}
+#define ACTIVATE_SIGNAL_WITH_PARAM(FNAME,TYPE)              \
+  void QObject::FNAME( int signal, TYPE param )             \
+  {                       \
+    if ( !connections || signalsBlocked() || signal < 0 )         \
+      return;                     \
+    QConnectionList *clist = connections->at( signal );           \
+    if ( !clist )                   \
+      return;                     \
+    QUObject o[2];                    \
+    static_QUType_##TYPE.set( o+1, param );               \
+    activate_signal( clist, o );                \
+  }
 
 #endif
 // We don't want to duplicate too much text so...
 
-ACTIVATE_SIGNAL_WITH_PARAM( activate_signal, int )
-ACTIVATE_SIGNAL_WITH_PARAM( activate_signal, double )
-ACTIVATE_SIGNAL_WITH_PARAM( activate_signal, QString )
-ACTIVATE_SIGNAL_WITH_PARAM( activate_signal_bool, bool )
+ACTIVATE_SIGNAL_WITH_PARAM(activate_signal, int)
+ACTIVATE_SIGNAL_WITH_PARAM(activate_signal, double)
+ACTIVATE_SIGNAL_WITH_PARAM(activate_signal, QString)
+ACTIVATE_SIGNAL_WITH_PARAM(activate_signal_bool, bool)
 
 
 /*****************************************************************************
   QObject debugging output routines.
  *****************************************************************************/
 
-static void dumpRecursive( int level, QObject *object )
+static void dumpRecursive(int level, QObject *object)
 {
 #if defined(QT_DEBUG)
-    if ( object ) {
-	QString buf;
-	buf.fill( '\t', level/2 );
-	if ( level % 2 )
-	    buf += "    ";
-	const char *name = object->name();
-	QString flags="";
-	if ( qApp->focusWidget() == object )
-	    flags += 'F';
-	if ( object->isWidgetType() ) {
-	    QWidget * w = (QWidget *)object;
-	    if ( w->isVisible() ) {
-		QString t( "<%1,%2,%3,%4>" );
-		flags += t.arg(w->x()).arg(w->y()).arg(w->width()).arg(w->height());
-	    } else {
-		flags += 'I';
-	    }
-	}
-	qDebug( "%s%s::%s %s", (const char*)buf, object->className(), name,
-	    flags.latin1() );
-	if ( object->children() ) {
-	    QObjectListIt it(*object->children());
-	    QObject * c;
-	    while ( (c=it.current()) != 0 ) {
-		++it;
-		dumpRecursive( level+1, c );
-	    }
-	}
+  if (object) {
+    QString buf;
+    buf.fill('\t', level / 2);
+    if (level % 2)
+      buf += "    ";
+    const char *name = object->name();
+    QString flags = "";
+    if (qApp->focusWidget() == object)
+      flags += 'F';
+    if (object->isWidgetType()) {
+      QWidget *w = (QWidget *)object;
+      if (w->isVisible()) {
+        QString t("<%1,%2,%3,%4>");
+        flags += t.arg(w->x()).arg(w->y()).arg(w->width()).arg(w->height());
+      } else {
+        flags += 'I';
+      }
     }
+    qDebug("%s%s::%s %s", (const char *)buf, object->className(), name,
+           flags.latin1());
+    if (object->children()) {
+      QObjectListIt it(*object->children());
+      QObject *c;
+      while ((c = it.current()) != 0) {
+        ++it;
+        dumpRecursive(level + 1, c);
+      }
+    }
+  }
 #else
-    Q_UNUSED( level )
-    Q_UNUSED( object )
+  Q_UNUSED(level)
+  Q_UNUSED(object)
 #endif
 }
 
@@ -2504,7 +2511,7 @@ static void dumpRecursive( int level, QObject *object )
 
 void QObject::dumpObjectTree()
 {
-    dumpRecursive( 0, this );
+  dumpRecursive(0, this);
 }
 
 /*!
@@ -2519,41 +2526,41 @@ void QObject::dumpObjectTree()
 void QObject::dumpObjectInfo()
 {
 #if defined(QT_DEBUG)
-    qDebug( "OBJECT %s::%s", className(), name( "unnamed" ) );
-    int n = 0;
-    qDebug( "  SIGNALS OUT" );
-    if ( connections ) {
-	QConnectionList *clist;
-	for ( uint i = 0; i < connections->size(); i++ ) {
-	    if ( ( clist = connections->at( i ) ) ) {
-		qDebug( "\t%s", metaObject()->signal( i, TRUE )->name );
-		n++;
-		register QConnection *c;
-		QConnectionListIt cit(*clist);
-		while ( (c=cit.current()) ) {
-		    ++cit;
-		    qDebug( "\t  --> %s::%s %s", c->object()->className(),
-			    c->object()->name( "unnamed" ), c->memberName() );
-		}
-	    }
-	}
+  qDebug("OBJECT %s::%s", className(), name("unnamed"));
+  int n = 0;
+  qDebug("  SIGNALS OUT");
+  if (connections) {
+    QConnectionList *clist;
+    for (uint i = 0; i < connections->size(); i++) {
+      if ((clist = connections->at(i))) {
+        qDebug("\t%s", metaObject()->signal(i, TRUE)->name);
+        n++;
+        register QConnection *c;
+        QConnectionListIt cit(*clist);
+        while ((c = cit.current())) {
+          ++cit;
+          qDebug("\t  --> %s::%s %s", c->object()->className(),
+                 c->object()->name("unnamed"), c->memberName());
+        }
+      }
     }
-    if ( n == 0 )
-	qDebug( "\t<None>" );
+  }
+  if (n == 0)
+    qDebug("\t<None>");
 
-    qDebug( "  SIGNALS IN" );
-    n = 0;
-    if ( senderObjects ) {
-	QObject *sender = senderObjects->first();
-	while ( sender ) {
-	    qDebug( "\t%s::%s",
-		   sender->className(), sender->name( "unnamed" ) );
-	    n++;
-	    sender = senderObjects->next();
-	}
+  qDebug("  SIGNALS IN");
+  n = 0;
+  if (senderObjects) {
+    QObject *sender = senderObjects->first();
+    while (sender) {
+      qDebug("\t%s::%s",
+             sender->className(), sender->name("unnamed"));
+      n++;
+      sender = senderObjects->next();
     }
-    if ( n == 0 )
-	qDebug( "\t<None>" );
+  }
+  if (n == 0)
+    qDebug("\t<None>");
 #endif
 }
 
@@ -2570,49 +2577,49 @@ void QObject::dumpObjectInfo()
 
     \sa property(), metaObject(), QMetaObject::propertyNames(), QMetaObject::property()
 */
-bool QObject::setProperty( const char *name, const QVariant& value )
+bool QObject::setProperty(const char *name, const QVariant &value)
 {
-    if ( !value.isValid() )
-	return FALSE;
+  if (!value.isValid())
+    return FALSE;
 
-    QVariant v = value;
+  QVariant v = value;
 
-    QMetaObject* meta = metaObject();
-    if ( !meta )
-	return FALSE;
-    int id = meta->findProperty( name, TRUE );
-    const QMetaProperty* p = meta->property( id, TRUE );
-    if ( !p || !p->isValid() || !p->writable() ) {
-	qWarning( "%s::setProperty( \"%s\", value ) failed: property invalid, read-only or does not exist",
-		  className(), name );
-	return FALSE;
+  QMetaObject *meta = metaObject();
+  if (!meta)
+    return FALSE;
+  int id = meta->findProperty(name, TRUE);
+  const QMetaProperty *p = meta->property(id, TRUE);
+  if (!p || !p->isValid() || !p->writable()) {
+    qWarning("%s::setProperty( \"%s\", value ) failed: property invalid, read-only or does not exist",
+             className(), name);
+    return FALSE;
+  }
+
+  if (p->isEnumType()) {
+    if (v.type() == QVariant::String || v.type() == QVariant::CString) {
+      if (p->isSetType()) {
+        QString s = value.toString();
+        // QStrList does not support split, use QStringList for that.
+        QStringList l = QStringList::split('|', s);
+        QStrList keys;
+        for (QStringList::Iterator it = l.begin(); it != l.end(); ++it)
+          keys.append((*it).stripWhiteSpace().latin1());
+        v = QVariant(p->keysToValue(keys));
+      } else {
+        v = QVariant(p->keyToValue(value.toCString().data()));
+      }
+    } else if (v.type() != QVariant::Int && v.type() != QVariant::UInt) {
+      return FALSE;
     }
+    return qt_property(id, 0, &v);
+  }
 
-    if ( p->isEnumType() ) {
-	if ( v.type() == QVariant::String || v.type() == QVariant::CString ) {
-	    if ( p->isSetType() ) {
-		QString s = value.toString();
-		// QStrList does not support split, use QStringList for that.
-		QStringList l = QStringList::split( '|', s );
-		QStrList keys;
-		for ( QStringList::Iterator it = l.begin(); it != l.end(); ++it )
-		    keys.append( (*it).stripWhiteSpace().latin1() );
-		v = QVariant( p->keysToValue( keys ) );
-	    } else {
-		v = QVariant( p->keyToValue( value.toCString().data() ) );
-	    }
-	} else if ( v.type() != QVariant::Int && v.type() != QVariant::UInt ) {
-	    return FALSE;
-	}
-	return qt_property( id, 0, &v );
-    }
-
-    QVariant::Type type = (QVariant::Type)(p->flags >> 24);
-    if ( type == QVariant::Invalid )
-	type = QVariant::nameToType( p->type() );
-    if ( type != QVariant::Invalid && !v.canCast( type ) )
-	return FALSE;
-    return qt_property( id, 0, &v );
+  QVariant::Type type = (QVariant::Type)(p->flags >> 24);
+  if (type == QVariant::Invalid)
+    type = QVariant::nameToType(p->type());
+  if (type != QVariant::Invalid && !v.canCast(type))
+    return FALSE;
+  return qt_property(id, 0, &v);
 }
 
 /*!
@@ -2626,22 +2633,22 @@ bool QObject::setProperty( const char *name, const QVariant& value )
     \sa setProperty(), QVariant::isValid(), metaObject(),
     QMetaObject::propertyNames(), QMetaObject::property()
 */
-QVariant QObject::property( const char *name ) const
+QVariant QObject::property(const char *name) const
 {
-    QVariant v;
-    QMetaObject* meta = metaObject();
-    if ( !meta )
-	return v;
-    int id = meta->findProperty( name, TRUE );
-    const QMetaProperty* p = meta->property( id, TRUE );
-    if ( !p || !p->isValid() ) {
-	qWarning( "%s::property( \"%s\" ) failed: property invalid or does not exist",
-		  className(), name );
-	return v;
-    }
-    QObject* that = (QObject*) this; // moc ensures constness for the qt_property call
-    that->qt_property( id, 1, &v );
+  QVariant v;
+  QMetaObject *meta = metaObject();
+  if (!meta)
     return v;
+  int id = meta->findProperty(name, TRUE);
+  const QMetaProperty *p = meta->property(id, TRUE);
+  if (!p || !p->isValid()) {
+    qWarning("%s::property( \"%s\" ) failed: property invalid or does not exist",
+             className(), name);
+    return v;
+  }
+  QObject *that = (QObject *) this; // moc ensures constness for the qt_property call
+  that->qt_property(id, 1, &v);
+  return v;
 }
 
 #endif // QT_NO_PROPERTIES
@@ -2651,8 +2658,8 @@ QVariant QObject::property( const char *name ) const
  */
 uint QObject::registerUserData()
 {
-    static int user_data_registration = 0;
-    return user_data_registration++;
+  static int user_data_registration = 0;
+  return user_data_registration++;
 }
 
 /*!\internal
@@ -2663,22 +2670,22 @@ QObjectUserData::~QObjectUserData()
 
 /*!\internal
  */
-void QObject::setUserData( uint id, QObjectUserData* data)
+void QObject::setUserData(uint id, QObjectUserData *data)
 {
-    if ( !d )
-	d = new QObjectPrivate( id+1 );
-    if ( id >= d->size() )
-	d->resize( id+1 );
-    d->insert( id, data );
+  if (!d)
+    d = new QObjectPrivate(id + 1);
+  if (id >= d->size())
+    d->resize(id + 1);
+  d->insert(id, data);
 }
 
 /*!\internal
  */
-QObjectUserData* QObject::userData( uint id ) const
+QObjectUserData *QObject::userData(uint id) const
 {
-    if ( d && id < d->size() )
-	return d->at( id );
-    return 0;
+  if (d && id < d->size())
+    return d->at(id);
+  return 0;
 }
 
 #endif // QT_NO_USERDATA

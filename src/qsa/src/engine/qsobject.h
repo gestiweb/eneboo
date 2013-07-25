@@ -365,16 +365,20 @@ class QUICKCORE_EXPORT QSShared : public QShared
 {
   friend class QSEnv;
 public:
-  QSShared() : next(0), prev(0) { }
-  virtual ~QSShared() { }
+  QSShared() : next(0), prev(0), deleted_(false) { }
+  virtual ~QSShared() { deleted_ = true; }
   virtual void invalidate() { }
   bool isConnected() const {
     return next != 0 || prev != 0;
   }
-
+  bool deleted() const {
+    return deleted_;
+  }
+  
 private:
   QSShared *next;
   QSShared *prev;
+  bool deleted_;
 };
 
 class QUICKCORE_EXPORT QSWritable : public QSShared

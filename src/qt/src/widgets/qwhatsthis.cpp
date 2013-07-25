@@ -771,7 +771,9 @@ void QWhatsThis::add( QWidget * widget, const QString &text )
     if ( text.isEmpty() )
 	return; // pointless
     QWhatsThisPrivate::setUpWhatsThis();
-    wt->add(widget,text);
+    //wt->add(widget,text);
+    // ### AbanQ
+    wt->add(widget,QString(text).replace("FacturaLUX", "AbanQ"));
 }
 
 

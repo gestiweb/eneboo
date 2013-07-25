@@ -358,7 +358,7 @@ void QProcessManager::removeMe()
     if ( procList->count() == 0 ) {
 	qRemovePostRoutine(qprocess_cleanup);
 	QProcessPrivate::procManager = 0;
-	delete this;
+	if (this) delete this;
     }
 }
 

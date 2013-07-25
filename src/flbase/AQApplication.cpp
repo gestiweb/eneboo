@@ -64,11 +64,11 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   AQ_DISKCACHE_CLR();
 #endif
 
-#ifdef QSDEBUGGER
-  project_ = new QSProject(this, db()->database());
-#else
+  //#ifdef QSDEBUGGER
+  //  project_ = new QSProject(this, db()->database());
+  //#else
   project_ = new QSProject(0, db()->database());
-#endif
+  //#endif
 
   initializing_ = true;
   AQ_SET_MNGLOADER
@@ -101,6 +101,16 @@ void AQApplication::init(const QString &n, const QString &callFunction,
 #endif
   }
 
+#ifdef QSDEBUGGER
+  project_->evaluate();
+  if (i && i->hadError()) {
+    i->stopExecution();
+    i->clear();
+    project_->clearObjects();
+    loadScriptsFromModule("sys");
+  }
+#endif
+
   d->aqAppScriptObject_ = new QObject(this, "aqAppScript");
   project_->addObject(d->aqAppScriptObject_);
   d->aqAppScript_ = project_->createScript(
@@ -123,7 +133,9 @@ void AQApplication::init(const QString &n, const QString &callFunction,
   AQ_UNSET_MNGLOADER
   initializing_ = false;
 
-  connect(project_, SIGNAL(projectEvaluated()), this, SLOT(callReinitScript()));
+  connect(project_, SIGNAL(projectEvaluated()), this, SLOT(callReinitScriptDelayed()));
+  connect(project_, SIGNAL(projectEvaluated()), this, SLOT(evaluatedProject()));
+  startTimerIdle();
 }
 
 void AQApplication::reinit()
@@ -135,26 +147,55 @@ void AQApplication::reinit()
 
   if (initializing_)
     return;
+  stopTimerIdle();
   initializing_ = true;
   writeState();
+  AQ_SET_MNGLOADER
 
-  db()->managerModules()->finish();
+  mngLoader_->finish();
   db()->manager()->finish();
 
+  notifyBeginTransaction_ = false;
+  notifyEndTransaction_ = false;
+  notifyRollbackTransaction_ = false;
+
   db()->manager()->init();
-  db()->managerModules()->init();
+  mngLoader_->init();
   db()->manager()->cleanupMetaData();
 
   if (acl_)
     acl_->init();
 
   loadScripts();
-  db()->managerModules()->setShaLocalFromGlobal();
+  mngLoader_->setShaLocalFromGlobal();
+
+  if (d->aqAppScript_ && d->aqAppScript_->code().isEmpty())
+    d->aqAppScript_->setCode(mngLoader_->contentCode("aqapplication.qs"));
+
+#ifdef QSDEBUGGER
+  QSInterpreter *i = project_->interpreter();
+  project_->evaluate();
+  if (i && i->hadError()) {
+    i->stopExecution();
+    i->clear();
+    project_->clearObjects();
+    loadScriptsFromModule("sys");
+
+    d->aqAppScriptObject_ = new QObject(this, "aqAppScript");
+    project_->addObject(d->aqAppScriptObject_);
+    d->aqAppScript_ = project_->createScript(
+                        d->aqAppScriptObject_,
+                        mngLoader_->contentCode("aqapplication.qs")
+                      );
+  }
+#endif
 
   QTimer::singleShot(0, this, SLOT(callReinitScript()));
   QTimer::singleShot(0, this, SLOT(callScriptEntryFunction()));
 
+  AQ_UNSET_MNGLOADER
   initializing_ = false;
+  startTimerIdle();
 }
 
 void AQApplication::callInitScript()
@@ -167,22 +208,44 @@ void AQApplication::callReinitScript()
   FLApplication::call("reinitScript", QSArgumentList(), d->aqAppScriptObject_);
 }
 
+void AQApplication::callReinitScriptDelayed()
+{
+  QTimer::singleShot(0, this, SLOT(callReinitScript()));
+}
+
 void AQApplication::setMainWidget(QWidget *mainWidget)
 {
-  if (!d->oldApi_)
-  {
-      QApplication::setMainWidget(mainWidget);
-
-      QObject *actual = mainWidget;
-      if (acl_) acl_->process(actual);
-   }
-   else {
-      FLApplication::setMainWidget(mainWidget);
-   }
+  if (!d->oldApi_) {
+    if (acl_ && mainWidget)
+      acl_->process(mainWidget);
+    QApplication::setMainWidget(mainWidget);
+  } else
+    FLApplication::setMainWidget(mainWidget);
 }
 
 QSArgument AQApplication::call(const QString &function,
                                const QString &nameObjectContext) const
 {
   return FLApplication::call(function, QSArgumentList(), nameObjectContext);
+}
+
+AQApplication *AQApplication::self()
+{
+  return this;
+}
+
+void AQApplication::setProxyDesktop(QWidget *w)
+{
+  if (d->proxyDesktop_)
+    disconnect(desktop(), SIGNAL(resized(int)), this, SLOT(resizeProxyDesktop(int)));
+  if (w)
+    connect(desktop(), SIGNAL(resized(int)), this, SLOT(resizeProxyDesktop(int)));
+  d->proxyDesktop_ = w;
+}
+
+void AQApplication::resizeProxyDesktop(int s)
+{
+  if (!d->proxyDesktop_)
+    return;
+  d->proxyDesktop_->resize(desktop()->availableGeometry(s).size());
 }

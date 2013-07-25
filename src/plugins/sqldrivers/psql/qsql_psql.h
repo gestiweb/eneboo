@@ -55,8 +55,6 @@
 #define QSQL_PSQL_H
 
 #include <qdict.h>
-#include <qsqlresult.h>
-#include <qsqldriver.h>
 #include <qmessagebox.h>
 #include <qptrvector.h>
 #include <libpq-fe.h>
@@ -77,7 +75,9 @@
 #define Q_EXPORT_SQLDRIVER_PSQL Q_EXPORT
 #endif
 
+class QPSQLCacheInfoPrivate;
 class QPSQLPrivate;
+class QPSQLResultPrivate;
 class QPSQLDriver;
 class QSqlRecordInfo;
 
@@ -100,7 +100,8 @@ public:
     Version83 = 14,
     Version84 = 15,
     Version9  = 16,
-    Version91 = 17
+    Version91 = 17,
+    Version92 = 18
   };
 
   QPSQLDriver(QObject *parent = 0, const char *name = 0);
@@ -112,6 +113,7 @@ public:
   void close();
   QSqlQuery createQuery() const;
   QStringList tables(const QString &user) const;
+  bool existsTable(const QString &n) const;
   QSqlIndex primaryIndex(const QString &tablename) const;
   QSqlRecord record(const QString &tablename) const;
   QSqlRecord record(const QSqlQuery &query) const;
@@ -130,7 +132,7 @@ public:
 
   bool tryConnect(const QString &db, const QString &user = QString::null,
                   const QString &password = QString::null, const QString &host = QString::null, int port = -1);
-  QString sqlCreateTable(FLTableMetaData *tmd);
+  QString sqlCreateTable(const FLTableMetaData *tmd);
   QString formatValueLike(int t, const QVariant &v, const bool upper = false);
   QString formatValue(int t, const QVariant &v, const bool upper = false);
   QVariant nextSerialVal(const QString &table, const QString &field);
@@ -140,11 +142,16 @@ public:
   bool savePoint(const QString &n);
   bool releaseSavePoint(const QString &n);
   bool rollbackSavePoint(const QString &n);
+  bool canOverPartition();
   QStringList rowsLockeds(const QString &table, const QString &primaryKeyValue = QString::null);
   QStringList locksStatus();
   QStringList detectLocks();
   QStringList detectRisksLocks(const QString &table = QString::null, const QString &primaryKeyValue = QString::null);
   bool regenTable(const QString &n, FLTableMetaData *tmd);
+  QString md5TuplesState() const;
+  QString md5TuplesStateTable(const QString &table) const;
+  bool mismatchedTable(const QString &table,
+                       const FLTableMetaData *tmd) const;
   int backendId() const;
 
 private slots:
@@ -161,7 +168,7 @@ private:
 
   QSqlIndex primaryIndex2(const QString &tablename) const;
   QSqlRecord record2(const QString &tablename) const;
-  QSqlRecord record(FLTableMetaData *mtd) const;
+  QSqlRecord record(const FLTableMetaData *mtd) const;
   bool constraintExists(const QString &name) const;
   bool alterTable(FLTableMetaData *newMTD);
   QSqlRecordInfo recordInfo2(const QString &tablename) const;
@@ -172,11 +179,14 @@ private:
   static QDict < bool > * dictIndexes;
 #endif
   void init();
+  bool mismatchedTable(const QString &table1, const QString &table2) const;
+
   Protocol pro;
   QPSQLPrivate *d;
+  QPSQLCacheInfoPrivate *cInfo;
 };
 
-class QPSQLResult : public QSqlResult
+class QPSQLResult : public FLSqlResult
 {
 
   friend class QPSQLDriver;
@@ -206,8 +216,9 @@ private:
   void closeCursor();
   bool openCursor();
   void cleanupCache();
+  bool isCursorValid() const;
   int currentSize;
-  QPSQLPrivate *d;
+  QPSQLResultPrivate *d;
 
   static int cursorCounter;
 };

@@ -47,7 +47,11 @@
 **      Willmann-Bell, Inc
 **      Richmond, Virginia (USA)
 */
+
+#if defined(AQ_WIN64)
 #include "os.h"
+#endif
+
 #include "sqliteInt.h"
 #include <ctype.h>
 #include <stdlib.h>

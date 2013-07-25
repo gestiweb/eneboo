@@ -43,7 +43,7 @@ pulsar la tecla Intro) y Cancelar aborta la operación.
 
 @author InfoSiAL S.L.
 */
-class FLFormSearchDB: public FLFormDB
+class FLFormSearchDB : public FLFormDB
 {
   Q_OBJECT
 
@@ -99,7 +99,7 @@ public:
   @param n Nombre del un campo del cursor del formulario
   @return El valor del campo si se acepta, o QVariant::Invalid si se cancela
   */
-  QVariant exec(const QString &n = QString::null);
+  virtual QVariant exec(const QString &n = QString::null);
 
   /**
   Aplica un filtro al cursor
@@ -107,11 +107,9 @@ public:
   void setFilter(const QString &f);
 
   /**
-  Devuelve si se ha aceptado el formulario
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
   */
-  bool accepted() {
-    return accepted_;
-  }
+  QString formClassName() const;
 
   /**
   Establece el título de la ventana.
@@ -124,9 +122,9 @@ public:
 protected:
 
   /**
-  Inicialización
+  Nombre interno del formulario
   */
-  void initForm();
+  QString geoName() const;
 
   /**
   Captura evento cerrar
@@ -143,12 +141,12 @@ public slots:
   /**
   Invoca a la función "init()" del script asociado al formulario
   */
-  void initScript();
+  bool initScript();
 
   /**
   Redefinida por conveniencia
   */
-  void hide();
+  virtual void hide();
 
   /**
   Se activa al pulsar el boton aceptar
@@ -160,6 +158,11 @@ public slots:
   */
   virtual void reject();
 
+  /**
+  Redefinida por conveniencia
+  */
+  virtual void show();
+
 private:
 
   /**
@@ -168,14 +171,10 @@ private:
   bool loop;
 
   /**
-  Almacena que se aceptado, es decir NO se ha pulsado, botón cancelar
+  Uso interno
   */
-  bool accepted_;
-
-  /**
-  Interface para scripts
-  */
-  FLFormSearchDBInterface *iface;
+  bool acceptingRejecting_;
+  bool inExec_;
 };
 
 #endif

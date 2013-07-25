@@ -36,7 +36,7 @@ filtro del cursor,
 nombre del cursor (de la tabla),
 cursor asociado.
 */
-class FL_EXPORT opInfo : public QObject {
+class AQ_EXPORT opInfo : public QObject {
   Q_OBJECT
 public:
   opInfo() : QObject( 0 ) {}
@@ -100,7 +100,7 @@ Ejemplo:
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLSqlSavePoint {
+class AQ_EXPORT FLSqlSavePoint {
 
 public:
 

@@ -27,6 +27,8 @@
 #include <qcheckbox.h>
 
 class FLSqlCursor;
+class FLFieldMetaData;
+class FLTableMetaData;
 
 /**
 Clase que es una redefinicion de la clase QDataTable,
@@ -37,6 +39,12 @@ especifica para las necesidades de AbanQ.
 class FLDataTable: public QDataTable
 {
   Q_OBJECT
+
+  Q_PROPERTY(QString functionGetColor READ functionGetColor WRITE setFunctionGetColor)
+  Q_PROPERTY(bool onlyTable READ onlyTable WRITE setOnlyTable)
+  Q_PROPERTY(bool aqReadOnly READ flReadOnly WRITE setFLReadOnly)
+  Q_PROPERTY(bool editOnly READ editOnly WRITE setEditOnly)
+  Q_PROPERTY(bool insertOnly READ insertOnly WRITE setInsertOnly)
 
 public:
 
@@ -72,16 +80,25 @@ public:
   Establece la tabla a sólo lectura o no
   */
   void setFLReadOnly(const bool mode);
+  bool flReadOnly() const {
+    return readonly_;
+  }
 
   /**
   Establece la tabla a sólo edición o no
   */
   void setEditOnly(const bool mode);
+  bool editOnly() const {
+    return editonly_;
+  }
 
   /**
   Establece la tabla a sólo insercion o no
   */
   void setInsertOnly(const bool mode);
+  bool insertOnly() const {
+    return insertonly_;
+  }
 
   /**
   Obtiene la lista con las claves primarias de los registros seleccionados por chequeo
@@ -111,11 +128,27 @@ public:
   void setFunctionGetColor(const QString &f) {
     functionGetColor_ = f;
   }
+  QString functionGetColor() const {
+    return functionGetColor_;
+  }
+
+  /**
+  Ver FLDataTable::onlyTable_
+  */
+  void setOnlyTable(bool on = true);
+  bool onlyTable() const {
+    return onlyTable_;
+  }
 
   /**
   Redefinida por conveniencia
   */
   int indexOf(uint i) const;
+
+  /**
+  @return El nombre del campo en la tabla de una columna dada
+  */
+  QString fieldName(int col) const;
 
 protected:
 
@@ -157,6 +190,11 @@ protected:
   */
   void handleError(const QSqlError &);
 
+  /**
+  Redefinida por conveniencia
+  */
+  void drawContents(QPainter *p, int cx, int cy, int cw, int ch);
+
 private:
 
   /**
@@ -192,18 +230,13 @@ private:
   /**
   Texto del último campo dibujado en la tabla
   */
-  QString lastTextPainted;
-
-  /**
-  Brochas para el color resaltado de filas
-  */
-  QBrush bu_;
+  QString lastTextPainted_;
 
   /**
   Pixmap precargados
   */
-  QPixmap ok;
-  QPixmap no;
+  QPixmap pixOk_;
+  QPixmap pixNo_;
 
   /**
   Lista con las claves primarias de los registros seleccionados por chequeo
@@ -219,6 +252,7 @@ private:
   Indicador para evitar refrescos anidados
   */
   bool refreshing_;
+  bool refresh_timer_;
 
   /**
   Indica si el componente es emergente ( su padre es un widget del tipo Popup )
@@ -239,6 +273,24 @@ private:
   Nombre de la función de script a invocar para obtener el color de las filas y celdas
   */
   QString functionGetColor_;
+
+  /**
+  Indica que no se realicen operaciones con la base de datos (abrir formularios). Modo "sólo tabla".
+  */
+  bool onlyTable_;
+
+  /** Uso interno */
+  bool changingNumRows_;
+  void syncNumRows();
+
+  /** Uso interno */
+  bool getCellStyle(QBrush &brush, QPen &pen,
+                    QSqlField *field, FLFieldMetaData *fieldTMD,
+                    int row, bool selected, const QColorGroup &cg);
+  QString paintFieldName_;
+  FLFieldMetaData *paintFieldMtd_;
+  FLFieldMetaData *paintFieldMtd(const QString &f, FLTableMetaData *t);
+  QTimer *timerViewRepaint_;
 
 public slots:
 
@@ -284,6 +336,11 @@ protected slots:
   Activado cuando se hace click en el chequeo de la columna de selección
   */
   void setChecked(bool on);
+
+  /** Uso interno */
+  void delayedViewportRepaint();
+  void repaintViewportSlot();
+  void cursorDestroyed(QObject *);
 
 signals:
 

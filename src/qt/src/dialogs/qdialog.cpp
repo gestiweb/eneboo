@@ -436,7 +436,7 @@ int QDialog::exec()
 
     int res = result();
 
-    if ( destructiveClose )
+    if ( destructiveClose && this )
 	delete this;
 
     return res;

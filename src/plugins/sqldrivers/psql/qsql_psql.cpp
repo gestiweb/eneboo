@@ -84,6 +84,8 @@ email                : mail@infosial.com
 #define LIMIT_RESULT 99
 #endif
 
+//#define AQ_MD5_CHECK
+
 int QPSQLResult::cursorCounter = 0;
 
 #ifndef FL_QUICK_CLIENT
@@ -119,45 +121,77 @@ public:
   PGresult *result_;
 };
 
+class QPSQLCacheInfoPrivate
+{
+public:
+  QPSQLCacheInfoPrivate()
+    : mngInitCount(0) {}
+
+  void clear() {
+    cache.clear();
+    cacheIdx.clear();
+  }
+
+  int mngInitCount;
+  QMap<QString, QSqlRecordInfo> cache;
+  QMap<QString, QSqlIndex> cacheIdx;
+};
+
 class QPSQLPrivate
 {
-
 public:
-
   QPSQLPrivate();
-
-  PGconn *connection;
   PGresult *result;
-  FLPGresult *flresult;
+  PGconn *connection;
   bool isUtf8;
-  QString qry;
-  QString idCursor;
   int idConn;
-  bool closeCursor;
-  QCache < FLPGresult > * cachedResults;
-  int currentResult;
   bool checkLock;
   bool activeCreateIndex;
+  bool isResult;
 #ifdef FL_DEBUG
-  QDict < QString > * dictPendCursors;
+  QDict<QString> *dictPendCursors;
 #endif
 };
 
 QPSQLPrivate::QPSQLPrivate()
-  : connection(0),
-    result(0),
-    flresult(0),
+  : result(0),
+    connection(0),
     isUtf8(false),
     idConn(0),
-    closeCursor(false),
-    cachedResults(0),
-    currentResult(0),
     checkLock(true),
-    activeCreateIndex(false)
+    activeCreateIndex(false),
+    isResult(false)
 #ifdef FL_DEBUG
     , dictPendCursors(0)
 #endif
 {
+}
+
+class QPSQLResultPrivate : public QPSQLPrivate
+{
+public:
+  QPSQLResultPrivate();
+
+  FLPGresult *flresult;
+  QString qry;
+  QString idCursor;
+  bool closeCursor;
+  QCache<FLPGresult> *cachedResults;
+  int currentResult;
+#ifdef AQ_MD5_CHECK
+  QString md5Tuples_;
+  QString executedQuery_;
+#endif
+};
+
+QPSQLResultPrivate::QPSQLResultPrivate()
+  : QPSQLPrivate(),
+    flresult(0),
+    closeCursor(false),
+    cachedResults(0),
+    currentResult(0)
+{
+  isResult = true;
 }
 
 class QPSQLDriverExtension : public QSqlDriverExtension
@@ -187,29 +221,88 @@ public:
   QPSQLOpenExtension(QPSQLDriver *dri) : QSqlOpenExtension(), driver(dri) {}
   ~QPSQLOpenExtension() {}
 
-  bool open(const QString &db, const QString &user, const QString &password, const QString &host, int port, const QString &connOpts);
+  bool open(const QString &db, const QString &user, const QString &password,
+            const QString &host, int port, const QString &connOpts);
 
 private:
 
   QPSQLDriver *driver;
 };
 
-bool QPSQLOpenExtension::open(const QString &db, const QString &user, const QString &password, const QString &host, int port, const QString &connOpts)
+bool QPSQLOpenExtension::open(const QString &db, const QString &user, const QString &password,
+                              const QString &host, int port, const QString &connOpts)
 {
   return driver->open(db, user, password, host, port, connOpts);
 }
 
-static QSqlError qMakeError(const QString &err, int type, const QPSQLPrivate *p)
+static QString aqMsgErrorResult(PGresult *result)
 {
-  const char *s = PQerrorMessage(p->connection);
-  QString msg = "\n";
+  const char *s = PQresultErrorMessage(result);
+  QString msg;
+  QTextCodec *tc = QTextCodec::codecForName("ISO8859-15");
+  int slen = qstrlen(s);
+  if (tc->heuristicContentMatch(s, slen) >= slen)
+    msg = QString::fromLatin1(s);
+  else
+    msg = QString::fromUtf8(s);
+  return msg;
+}
+
+static QString aqMsgErrorConn(PGconn *connection)
+{
+  const char *s = PQerrorMessage(connection);
+  QString msg;
   QTextCodec *tc = QTextCodec::codecForName("ISO8859-15");
   int slen = qstrlen(s);
   if (tc->heuristicContentMatch(s, slen) >= slen)
     msg += QString::fromLatin1(s);
   else
     msg += QString::fromUtf8(s);
-  return QSqlError("QPSQL: " + err, msg, type);
+  return msg;
+}
+
+static QSqlError qMakeError(const QString &err, int type,
+                            const QPSQLPrivate *p,
+                            const QString &qry = QString::null,
+                            PGresult *result = 0)
+{
+  QString timeStamp('[' + QDateTime::currentDateTime().toString("ddMMyyyyhhmmss") + "] ");
+
+  QString msg(aqMsgErrorConn(p->connection).stripWhiteSpace());
+  QString origMsg(msg);
+  if (result) {
+    QString msgRes(aqMsgErrorResult(result).stripWhiteSpace());
+    if (!msgRes.isEmpty()) {
+      if (msg.isEmpty()) {
+        msg = msgRes;
+        origMsg = msgRes;
+      } else if (msgRes != msg) {
+        msg += '\n' + timeStamp + msgRes;
+        origMsg += '\n' + msgRes;
+      }
+    }
+  }
+
+  QString msgQ(qry.stripWhiteSpace());
+  if (p->isResult) {
+    const QPSQLResultPrivate *d = static_cast<const QPSQLResultPrivate *>(p);
+    if (!d->qry.isEmpty()) {
+      QString dQry(d->qry.stripWhiteSpace());
+      if (msgQ.isEmpty())
+        msgQ = dQry;
+      else if (msgQ != dQry)
+        msgQ += '\n' + timeStamp + dQry;
+    }
+  }
+
+  if (!err.isEmpty())
+    qWarning(timeStamp + err.stripWhiteSpace());
+  if (!msg.isEmpty())
+    qWarning(timeStamp + msg);
+  if (!msgQ.isEmpty())
+    qWarning(timeStamp + msgQ);
+
+  return QSqlError("QPSQL: " + err, origMsg, type);
 }
 
 static QVariant::Type qDecodePSQLType(int t)
@@ -279,9 +372,10 @@ static QVariant::Type qDecodePSQLType(int t)
   return type;
 }
 
-QPSQLResult::QPSQLResult(const QPSQLDriver *db, const QPSQLPrivate *p) : QSqlResult(db), currentSize(-1)
+QPSQLResult::QPSQLResult(const QPSQLDriver *db, const QPSQLPrivate *p)
+  : FLSqlResult(db), currentSize(-1)
 {
-  d = new QPSQLPrivate();
+  d = new QPSQLResultPrivate();
   d->connection = p->connection;
   d->isUtf8 = p->isUtf8;
   d->idConn = p->idConn;
@@ -300,6 +394,30 @@ QPSQLResult::~QPSQLResult()
 PGresult *QPSQLResult::result()
 {
   return d->result;
+}
+
+bool QPSQLResult::isCursorValid() const
+{
+  PGresult *result = 0;
+  QString q(
+    QString("select name from pg_cursors where upper(name)='%1'")
+    .arg(d->idCursor.upper())
+  );
+
+  if (d->isUtf8) {
+    result = PQexec(d->connection, q.utf8());
+  } else {
+    result = PQexec(d->connection, q.local8Bit());
+  }
+
+  int status = PQresultStatus(result);
+  int tup = 0;
+
+  if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK)
+    tup = PQntuples(result);
+
+  PQclear(result);
+  return (tup > 0);
 }
 
 bool QPSQLResult::openCursor()
@@ -332,9 +450,9 @@ bool QPSQLResult::openCursor()
     }
 
     int status = PQresultStatus(result);
-    PQclear(result);
 
     if (status == PGRES_COMMAND_OK) {
+      PQclear(result);
       q = "FETCH FORWARD " + QString::number(LIMIT_RESULT) + " FROM " + d->idCursor;
       if (d->isUtf8) {
         result = PQexec(d->connection, q.utf8().data());
@@ -342,6 +460,15 @@ bool QPSQLResult::openCursor()
         result = PQexec(d->connection, q.local8Bit().data());
       }
       status = PQresultStatus(result);
+    } else {
+      setLastError(
+        qMakeError(QApplication::tr("No se ha podido declarar el cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, q, result)
+      );
+      PQclear(result);
+      cleanupCache();
+      d->closeCursor = false;
+      return false;
     }
 
     if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK) {
@@ -349,14 +476,15 @@ bool QPSQLResult::openCursor()
       d->result = result;
       d->flresult = new FLPGresult(result);
       if (!isForwardOnly()) {
-        d->cachedResults = new QCache < FLPGresult >(20, 41);
+        d->cachedResults = new QCache<FLPGresult>(20, 41);
         d->cachedResults->setAutoDelete(true);
       }
       return true;
     } else {
-      setLastError(qMakeError(QApplication::tr("La consulta a la base de datos ha fallado"), QSqlError::Statement, d));
-      //qWarning(QString(PQresultErrorMessage(result)) + "\n" + q + "\n");
-      fprintf(stderr, "%s\n%s\n", PQresultErrorMessage(result), q.latin1());
+      setLastError(
+        qMakeError(QApplication::tr("No se han podido extraer registros del cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, q, result)
+      );
       PQclear(result);
       cleanupCache();
     }
@@ -368,13 +496,20 @@ bool QPSQLResult::openCursor()
 
 void QPSQLResult::closeCursor()
 {
-  if (!d->idCursor.isEmpty() && d->closeCursor) {
-    QString q = "CLOSE " + d->idCursor;
+  if (!d->idCursor.isEmpty() && d->closeCursor && isCursorValid()) {
+    QString q("CLOSE " + d->idCursor);
     PGresult *result = 0;
     if (d->isUtf8) {
       result = PQexec(d->connection, q.utf8().data());
     } else {
       result = PQexec(d->connection, q.local8Bit().data());
+    }
+    int status = PQresultStatus(result);
+    if (status != PGRES_COMMAND_OK) {
+      //setLastError(
+      qMakeError(QApplication::tr("No se ha podido cerrar el cursor %1")
+                 .arg(d->idCursor), QSqlError::Statement, d, q, result);
+      //);
     }
     PQclear(result);
 #ifdef FL_DEBUG
@@ -397,6 +532,10 @@ void QPSQLResult::cleanupCache()
   d->flresult = 0;
   d->cachedResults = 0;
   d->currentResult = 0;
+#ifdef AQ_MD5_CHECK
+  d->executedQuery_ = QString::null;
+  d->md5Tuples_ = QString::null;
+#endif
 }
 
 void QPSQLResult::cleanup()
@@ -423,8 +562,13 @@ bool QPSQLResult::nextResult(int i)
     d->flresult = flres;
     d->currentResult = currentResult;
   } else {
+
+    if (!isCursorValid())
+      return (reset(d->qry) && fetch(i));
+
     PGresult *result = 0;
-    int status = PGRES_COMMAND_OK, moveRows = 0;
+    int status = PGRES_COMMAND_OK;
+    int moveRows = 0;
     QString q;
     if (!isForwardOnly()) {
       q = "MOVE ABSOLUTE " + QString::number(currentResult * LIMIT_RESULT) + " FROM " + d->idCursor;
@@ -434,17 +578,20 @@ bool QPSQLResult::nextResult(int i)
         result = PQexec(d->connection, q.local8Bit().data());
       }
       status = PQresultStatus(result);
-      moveRows = PQntuples(result);
-      PQclear(result);
-      if (status != PGRES_COMMAND_OK)
-        return false;
-    } else {
-      if (currentResult < d->currentResult) {
-#ifdef FL_DEBUG
-        qWarning("QPSQLResult : " + QApplication::tr("Esta consulta sólo puede posicionarse hacia adelante."));
-#endif
+      if (status != PGRES_COMMAND_OK) {
+        //setLastError(
+        qMakeError(QApplication::tr("No se ha podido mover a una posición del cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, q, result);
+        //);
+        PQclear(result);
         return false;
       }
+      moveRows = PQntuples(result);
+      PQclear(result);
+    } else if (currentResult < d->currentResult) {
+      qWarning(QApplication::tr("Esta consulta sólo puede posicionarse hacia adelante (isForwardOnly)"));
+      qWarning(d->qry);
+      return false;
     }
 
     if (status == PGRES_COMMAND_OK) {
@@ -458,7 +605,7 @@ bool QPSQLResult::nextResult(int i)
       if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK) {
         if (status == PGRES_TUPLES_OK) {
           int fetchedRows = PQntuples(result);
-          if (fetchedRows < LIMIT_RESULT) {
+          if (fetchedRows > 0 && fetchedRows < LIMIT_RESULT) {
             currentSize = (currentResult * LIMIT_RESULT) + fetchedRows + moveRows;
             if (currentResult == 0 || isForwardOnly()) {
               closeCursor();
@@ -479,6 +626,10 @@ bool QPSQLResult::nextResult(int i)
           return false;
         }
       } else {
+        //setLastError(
+        qMakeError(QApplication::tr("No se han podido extraer registros del cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, q, result);
+        //);
         PQclear(result);
         return false;
       }
@@ -508,9 +659,10 @@ bool QPSQLResult::fetch(int i)
   if (at() == i)
     return true;
 
-  if (!d->idCursor.isEmpty())
+  if (!d->idCursor.isEmpty()) {
     if (!nextResult(i))
       return false;
+  }
 
   if (i >= currentSize)
     return false;
@@ -720,7 +872,7 @@ bool QPSQLResult::isNull(int field)
 void QPSQLResult::calcSize()
 {
   if (isSelect() && !d->qry.isEmpty()) {
-    if (!d->idCursor.isEmpty() && !isForwardOnly()) {
+    if (!d->idCursor.isEmpty() && !isForwardOnly() && isCursorValid()) {
       PGresult *result = 0;
       QString qr = "MOVE ALL FROM " + d->idCursor;
       if (d->isUtf8) {
@@ -736,27 +888,34 @@ void QPSQLResult::calcSize()
       } else {
         result = PQexec(d->connection, qr.local8Bit());
       }
+      int status = PQresultStatus(result);
+      if (status != PGRES_COMMAND_OK) {
+        //setLastError(
+        qMakeError(QApplication::tr("No se ha podido calcular el tamaño del cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, qr, result);
+        //);
+      }
       PQclear(result);
     } else {
-      QString qryNoOrder = d->qry;
-      qryNoOrder.replace(QRegExp("ORDER BY.*ASC"), "");
-      qryNoOrder.replace(QRegExp("ORDER BY.*DESC"), "");
-      qryNoOrder.replace(QRegExp("ORDER BY.*$"), "");
-      qryNoOrder.replace(QRegExp("ORDER BY.*;"), ";");
-      qryNoOrder.replace(QRegExp("ORDER BY.*LIMIT"), "LIMIT");
-      qryNoOrder.replace(QRegExp("ORDER BY.*OFFSET"), "OFFSET");
-      qryNoOrder.replace(QRegExp("ORDER BY.*FOR"), "FOR");
-
-      qryNoOrder.replace(QRegExp("order by.*ASC"), "");
-      qryNoOrder.replace(QRegExp("order by.*DESC"), "");
-      qryNoOrder.replace(QRegExp("order by.*$"), "");
-      qryNoOrder.replace(QRegExp("order by.*;"), ";");
-      qryNoOrder.replace(QRegExp("order by.*limit"), "limit");
-      qryNoOrder.replace(QRegExp("order by.*offset"), "offset");
-      qryNoOrder.replace(QRegExp("order by.*for"), "for");
+      //      QString qryNoOrder = d->qry;
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*ASC"), "");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*DESC"), "");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*$"), "");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*;"), ";");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*LIMIT"), "LIMIT");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*OFFSET"), "OFFSET");
+      //      qryNoOrder.replace(QRegExp("ORDER BY.*FOR"), "FOR");
+      //
+      //      qryNoOrder.replace(QRegExp("order by.*ASC"), "");
+      //      qryNoOrder.replace(QRegExp("order by.*DESC"), "");
+      //      qryNoOrder.replace(QRegExp("order by.*$"), "");
+      //      qryNoOrder.replace(QRegExp("order by.*;"), ";");
+      //      qryNoOrder.replace(QRegExp("order by.*limit"), "limit");
+      //      qryNoOrder.replace(QRegExp("order by.*offset"), "offset");
+      //      qryNoOrder.replace(QRegExp("order by.*for"), "for");
 
       PGresult *result = 0;
-      QString qr("select count(*) from ( " + qryNoOrder + " ) as cursize");
+      QString qr("select count(*) from ( " + d->qry + " ) as cursize");
       if (d->isUtf8) {
         result = PQexec(d->connection, qr.utf8());
       } else {
@@ -767,8 +926,13 @@ void QPSQLResult::calcSize()
         QString val(PQgetvalue(result, 0, 0));
         currentSize = val.toInt();
         PQclear(result);
-      } else
+      } else {
+        //setLastError(
+        qMakeError(QApplication::tr("No se ha podido calcular el tamaño del cursor %1")
+                   .arg(d->idCursor), QSqlError::Statement, d, qr, result);
+        //);
         PQclear(result);
+      }
     }
   } else
     currentSize = -1;
@@ -778,12 +942,27 @@ bool QPSQLResult::reset(const QString &query)
 {
   if (query.isEmpty())
     return false;
-  const QSqlDriver *dr = driver();
+  const FLSqlDriver *dr = ::qt_cast<const FLSqlDriver *>(driver());
   if (!dr || !dr->isOpen() || dr->isOpenError())
     return false;
 
+#ifdef AQ_MD5_CHECK
+  if (isSelect() && query == d->executedQuery_ &&
+      !(d->closeCursor && isForwardOnly())) {
+    QString oldMd5(d->md5Tuples_);
+    d->md5Tuples_ = dr->md5TuplesState();
+    if ((!oldMd5.isEmpty() || !d->md5Tuples_.isEmpty()) &&
+        oldMd5 == d->md5Tuples_) {
+      setAt(QSql::BeforeFirst);
+      setActive(true);
+      return true;
+    }
+  }
+#endif
+
   QString q(query.stripWhiteSpace());
-  q.replace("=;", "= NULL;");
+  // ###
+  //q.replace("=;", "= NULL;");
   while (q.endsWith(";"))
     q.truncate(q.length() - 1);
 
@@ -792,7 +971,9 @@ bool QPSQLResult::reset(const QString &query)
   bool forUpdate = false;
 
   if (qUpper.left(7).contains("SELECT")) {
-    forUpdate = qUpper.endsWith("FOR UPDATE") || qUpper.endsWith("NOWAIT");
+    forUpdate = qUpper.endsWith("FOR UPDATE") ||
+                qUpper.endsWith("FOR SHARE") ||
+                qUpper.endsWith("NOWAIT");
     if (!forUpdate && !qUpper.contains(" LIMIT "))
       qLimit += " LIMIT " + QString::number(LIMIT_RESULT + 1);
   }
@@ -808,6 +989,10 @@ bool QPSQLResult::reset(const QString &query)
 
   int status = PQresultStatus(d->result);
   if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK) {
+#ifdef AQ_MD5_CHECK
+    d->executedQuery_ = query;
+    d->md5Tuples_ = dr->md5TuplesState();
+#endif
     if (status == PGRES_TUPLES_OK) {
       currentSize = PQntuples(d->result);
       setSelect(true);
@@ -818,10 +1003,10 @@ bool QPSQLResult::reset(const QString &query)
       return true;
     }
   } else {
-    QString msgError = PQresultErrorMessage(d->result);
-    setLastError(qMakeError(QApplication::tr("La consulta a la base de datos ha fallado"), QSqlError::Statement, d));
-    //qWarning("QPSQLResult::reset: " + msgError + "\n" + q + "\n");
-    fprintf(stderr, "%s\n%s\n", msgError.latin1(), q.latin1());
+    setLastError(
+      qMakeError(QApplication::tr("La consulta a la base de datos ha fallado"),
+                 QSqlError::Statement, d, qLimit, d->result)
+    );
     cleanupCache();
     return false;
   }
@@ -852,10 +1037,7 @@ int QPSQLResult::numRowsAffected()
 
 static inline bool setEncodingUtf8(PGconn *connection)
 {
-  PGresult *result = PQexec(connection, "SET CLIENT_ENCODING TO 'UNICODE'");
-  int status = PQresultStatus(result);
-  PQclear(result);
-  return status == PGRES_COMMAND_OK;
+  return (PQsetClientEncoding(connection, "UNICODE") == 0);
 }
 
 static inline void setDatestyle(PGconn *connection)
@@ -881,6 +1063,22 @@ static inline bool setByteaOutputEscape(PGconn *connection)
 static inline bool setTransactionReadCommited(PGconn *connection)
 {
   PGresult *result = PQexec(connection, "SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED READ WRITE");
+  int status = PQresultStatus(result);
+  PQclear(result);
+  return status == PGRES_COMMAND_OK;
+}
+
+static inline bool setSeqScanOn(PGconn *connection)
+{
+  PGresult *result = PQexec(connection, "SET enable_seqscan=on");
+  int status = PQresultStatus(result);
+  PQclear(result);
+  return status == PGRES_COMMAND_OK;
+}
+
+static inline bool setSortOn(PGconn *connection)
+{
+  PGresult *result = PQexec(connection, "SET enable_sort=on");
   int status = PQresultStatus(result);
   PQclear(result);
   return status == PGRES_COMMAND_OK;
@@ -925,7 +1123,9 @@ static inline QPSQLDriver::Protocol getPSQLVersion(PGconn *connection)
       } else if (vMaj == 9) {
         if (vMin < 1)
           return QPSQLDriver::Version9;
-        return QPSQLDriver::Version91;
+        else if (vMin < 2)
+          return QPSQLDriver::Version91;
+        return QPSQLDriver::Version92;
       }
       return QPSQLDriver::Version7;
     }
@@ -935,6 +1135,19 @@ static inline QPSQLDriver::Protocol getPSQLVersion(PGconn *connection)
   }
 
   return QPSQLDriver::Version7;
+}
+
+static inline QString oidToTableName(PGconn *connection, Oid oid)
+{
+  if (oid == InvalidOid)
+    return QString::null;
+  QString ret;
+  PGresult *result = PQexec(connection, "select relname from pg_class where oid=" + QString::number(oid));
+  int status = PQresultStatus(result);
+  if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK)
+    ret = PQgetvalue(result, 0, 0);
+  PQclear(result);
+  return ret;
 }
 
 QPSQLDriver::QPSQLDriver(QObject *parent, const char *name) :
@@ -963,6 +1176,7 @@ void QPSQLDriver::init()
   qSqlOpenExtDict()->insert(this, new QPSQLOpenExtension(this));
 
   d = new QPSQLPrivate();
+  cInfo = new QPSQLCacheInfoPrivate();
 }
 
 QPSQLDriver::~QPSQLDriver()
@@ -970,6 +1184,7 @@ QPSQLDriver::~QPSQLDriver()
   if (d->connection)
     PQfinish(d->connection);
   delete d;
+  delete cInfo;
   if (!qSqlDriverExtDict()->isEmpty()) {
     QSqlDriverExtension *ext = qSqlDriverExtDict()->take(this);
     delete ext;
@@ -1038,7 +1253,10 @@ bool QPSQLDriver::open(const QString &db, const QString &user, const QString &pa
 
   d->connection = PQconnectdb(connectString.local8Bit().data());
   if (PQstatus(d->connection) == CONNECTION_BAD) {
-    setLastError(qMakeError(QApplication::tr("No se puede conectar a la base de datos"), QSqlError::Connection, d));
+    setLastError(
+      qMakeError(QApplication::tr("No se puede conectar a la base de datos"),
+                 QSqlError::Connection, d)
+    );
     setOpenError(true);
     return false;
   }
@@ -1059,6 +1277,10 @@ bool QPSQLDriver::open(const QString &db, const QString &user, const QString &pa
   setTransactionReadCommited(d->connection);
   if (pro >= QPSQLDriver::Version9)
     setByteaOutputEscape(d->connection);
+  if (pro >= QPSQLDriver::Version81) {
+    setSeqScanOn(d->connection);
+    setSortOn(d->connection);
+  }
 
   setOpen(true);
   setOpenError(false);
@@ -1066,17 +1288,18 @@ bool QPSQLDriver::open(const QString &db, const QString &user, const QString &pa
   return true;
 }
 
-bool QPSQLDriver::tryConnect(const QString &db, const QString &user, const QString &password, const QString &host, int port)
+bool QPSQLDriver::tryConnect(const QString &db, const QString &user, const QString &password,
+                             const QString &host, int port)
 {
-  if (!open("template1", user, password, host, port, QString::null)) {
+  if (!open("template1", user, password, host, port, db_->connectOptions())) {
     if (lastError().text().contains("template1"))
-      QMessageBox::critical(0, tr("Conexión fallida"),
-                            tr("La base de datos template1 no existe."), QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"),
+                     tr("La base de datos template1 no existe."));
     else
-      QMessageBox::critical(0, tr("Conexión fallida"),
-                            tr("No se pudo conectar con la base de datos %1.").arg(db), QMessageBox::Ok, 0, 0);
-    QMessageBox::critical(0, tr("Error"), QString(lastError().driverText()) + "\n" +
-                          QString(lastError().databaseText()), QMessageBox::Ok, 0, 0);
+      msgBoxCritical(tr("Conexión fallida"),
+                     tr("No se pudo conectar con la base de datos %1.").arg(db));
+    msgBoxCritical(tr("Error"), QString(lastError().driverText()) + "\n" +
+                   QString(lastError().databaseText()));
     return false;
   }
   close();
@@ -1084,41 +1307,40 @@ bool QPSQLDriver::tryConnect(const QString &db, const QString &user, const QStri
   setLastError(QSqlError());
 
   if (protocol() < QPSQLDriver::Version74) {
-    QMessageBox::warning(0, tr("Conexión fallida"),
-                         tr("La versión de PostgreSQL es inferior a la 7.4.\nSe necesita PostgreSQL 7.4 o superior."),
-                         QMessageBox::Ok, 0, 0);
+    msgBoxCritical(tr("Conexión fallida"),
+                   tr("La versión de PostgreSQL es inferior a la 7.4.\nSe necesita PostgreSQL 7.4 o superior."));
     close();
     setOpenError(true);
     return false;
   }
 
-  if (!open(db, user, password, host, port, QString::null)) {
+  if (!open(db, user, password, host, port, db_->connectOptions())) {
     if (lastError().type() == QSqlError::Connection) {
-      if (lastError().text().contains(db)) {
+      if (db_->interactiveGUI() && lastError().text().contains(db)) {
         int res = QMessageBox::question(0, tr("Crear base de datos"), tr("La base de datos %1 no existe. ¿Quiere crearla?").arg(db),
                                         QMessageBox::Yes, QMessageBox::No);
         if (res == QMessageBox::Yes) {
           close();
           setOpenError(false);
           setLastError(QSqlError());
-          open("template1", user, password, host, port, QString::null);
+          open("template1", user, password, host, port, db_->connectOptions());
           QSqlQuery *qry = new QSqlQuery(new QPSQLResult(this, d));
           qry->exec("CREATE DATABASE " + db + " WITH ENCODING = 'UNICODE';");
           if (lastError().type() != QSqlError::None) {
-            QMessageBox::critical(0, tr("Creación fallida"), tr("No se pudo crear la base de datos %1.").arg(db), QMessageBox::Ok, 0, 0);
-            QMessageBox::critical(0, tr("Error"), QString(lastError().driverText()) + "\n" +
-                                  QString(lastError().databaseText()), QMessageBox::Ok, 0, 0);
+            msgBoxCritical(tr("Creación fallida"), tr("No se pudo crear la base de datos %1.").arg(db));
+            msgBoxCritical(tr("Error"), QString(lastError().driverText()) + "\n" +
+                           QString(lastError().databaseText()));
             delete qry;
             return false;
           } else {
             close();
             setOpenError(false);
             setLastError(QSqlError());
-            if (!open(db, user, password, host, port, QString::null)) {
-              QMessageBox::critical(0, tr("Conexión fallida"),
-                                    tr("La base de datos %1 ha sido creada, pero no se pudo realizar la conexión.").arg(db), QMessageBox::Ok, 0, 0);
-              QMessageBox::critical(0, tr("Error"), QString(lastError().driverText()) + "\n" +
-                                    QString(lastError().databaseText()), QMessageBox::Ok, 0, 0);
+            if (!open(db, user, password, host, port, db_->connectOptions())) {
+              msgBoxCritical(tr("Conexión fallida"),
+                             tr("La base de datos %1 ha sido creada, pero no se pudo realizar la conexión.").arg(db));
+              msgBoxCritical(tr("Error"), QString(lastError().driverText()) + "\n" +
+                             QString(lastError().databaseText()));
               delete qry;
               return false;
             }
@@ -1128,9 +1350,9 @@ bool QPSQLDriver::tryConnect(const QString &db, const QString &user, const QStri
       }
 
       if (lastError().type() != QSqlError::None) {
-        QMessageBox::critical(0, tr("Conexión fallida"), tr("No se pudo conectar con la base de datos %1.").arg(db), QMessageBox::Ok, 0, 0);
-        QMessageBox::critical(0, tr("Error"), QString(lastError().driverText()) + "\n" +
-                              QString(lastError().databaseText()), QMessageBox::Ok, 0, 0);
+        msgBoxCritical(tr("Conexión fallida"), tr("No se pudo conectar con la base de datos %1.").arg(db));
+        msgBoxCritical(tr("Error"), QString(lastError().driverText()) + "\n" +
+                       QString(lastError().databaseText()));
         return false;
       }
     }
@@ -1142,7 +1364,7 @@ bool QPSQLDriver::tryConnect(const QString &db, const QString &user, const QStri
   return true;
 }
 
-QString QPSQLDriver::sqlCreateTable(FLTableMetaData *tmd)
+QString QPSQLDriver::sqlCreateTable(const FLTableMetaData *tmd)
 {
 #ifndef FL_QUICK_CLIENT
   if (!tmd)
@@ -1153,7 +1375,7 @@ QString QPSQLDriver::sqlCreateTable(FLTableMetaData *tmd)
   QString seq;
 
   FLFieldMetaData *field;
-  FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = tmd->fieldList();
 
   unsigned int unlocks = 0;
   QDictIterator<FLFieldMetaData> it(*fieldList);
@@ -1383,7 +1605,8 @@ QVariant QPSQLDriver::nextSerialVal(const QString &table, const QString &field)
 
 int QPSQLDriver::atFrom(FLSqlCursor *cur)
 {
-#ifndef FL_QUICK_CLIENT
+#if 0
+  //#ifndef FL_QUICK_CLIENT
   if (cur && cur->metadata() && !cur->metadata()->isQuery() && cur->sort().count() > 1) {
     d->checkLock = false;
     d->activeCreateIndex = true;
@@ -1411,11 +1634,28 @@ bool QPSQLDriver::constraintExists(const QString &name) const
   return q.exec(sql.arg(name)) && q.size() > 0;
 }
 
+static inline bool hasCheckColumn(const FLTableMetaData *mtd)
+{
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = mtd->fieldList();
+  if (!fieldList)
+    return false;
+  FLFieldMetaData *field = 0;
+  QDictIterator<FLFieldMetaData> it(*fieldList);
+  while ((field = it.current()) != 0) {
+    if (field->isCheck() || field->name().endsWith("_check_column"))
+      return true;
+    ++it;
+  }
+  return false;
+}
+
 bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
 {
+  if (hasCheckColumn(newMTD))
+    return false;
   FLTableMetaData *oldMTD = newMTD;
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
   QString renameOld(oldMTD->name().left(6) + "alteredtable" + QDateTime::currentDateTime().toString("ddhhssz"));
-  FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
   FLFieldMetaData *oldField = 0;
 
   db_->dbAux()->transaction();
@@ -1431,6 +1671,8 @@ bool QPSQLDriver::alterTable(FLTableMetaData *newMTD)
 
   QDictIterator<FLFieldMetaData> it(*fieldList);
   while ((oldField = it.current()) != 0) {
+    if (oldField->isCheck())
+      return false;
     ++it;
     if (oldField->isUnique()) {
       constraintName = oldMTD->name() + "_" + oldField->name() + "_key";
@@ -1594,6 +1836,9 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
   if (oldMTD && oldMTD->isQuery())
     return true;
 
+  if (oldMTD && hasCheckColumn(oldMTD))
+    return false;
+
   if (!FLUtil::domDocumentSetContent(doc, mtd2)) {
 #ifdef FL_DEBUG
     qWarning("FLManager::alterTable : " + QApplication::tr("Error al cargar los metadatos."));
@@ -1604,6 +1849,9 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
     docElem = doc.documentElement();
     newMTD = db_->manager()->metadata(&docElem, true);
   }
+
+  if (newMTD && hasCheckColumn(newMTD))
+    return false;
 
   if (!oldMTD)
     oldMTD = newMTD;
@@ -1665,7 +1913,7 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
-  FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fieldList = oldMTD->fieldList();
   FLFieldMetaData *oldField = 0;
 
   if (!fieldList) {
@@ -1724,9 +1972,12 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
+  QStringList fieldsNamesOld;
   QDictIterator<FLFieldMetaData> it(*fieldList);
   while ((oldField = it.current()) != 0) {
     ++it;
+    if (newMTD->field(oldField->name()))
+      fieldsNamesOld.append(oldField->name());
     if (oldField->isUnique()) {
       constraintName = oldMTD->name() + "_" + oldField->name() + "_key";
       if (constraintExists(constraintName) &&
@@ -1769,13 +2020,6 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
-  QSqlCursor oldCursor(renameOld, true, db_->dbAux());
-  oldCursor.setMode(QSqlCursor::ReadOnly);
-  oldCursor.select();
-  int totalSteps = oldCursor.size();
-  QProgressDialog progress(QApplication::tr("Reestructurando registros para %1...").arg(newMTD->alias()), 0, totalSteps, qApp->focusWidget(), 0, true);
-  progress.setCaption(QApplication::tr("Tabla modificada"));
-
   fieldList = newMTD->fieldList();
 
   if (!fieldList) {
@@ -1802,115 +2046,142 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
     return false;
   }
 
-  int step = 0;
-  QSqlRecord *newBuffer;
-  FLFieldMetaData *newField = 0;
-  QPtrList<QSqlRecord> listRecords;
-  listRecords.setAutoDelete(true);
-  QSqlRecord newBufferInfo(recordInfo2(newMTD->name()).toRecord());
-  QPtrVector<FLFieldMetaData> vectorFields(fieldList->count() * 2);
-  QMap<int, QVariant> defValues;
-  QVariant v;
-
-  QDictIterator<FLFieldMetaData> it2(*fieldList);
-  while ((newField = it2.current()) != 0) {
-    ++it2;
-    oldField = oldMTD->field(newField->name());
-    if (!oldField || !oldCursor.field(oldField->name())) {
-      if (!oldField)
-        oldField = newField;
-      if (newField->type() != FLFieldMetaData::Serial) {
-        v = newField->defaultValue();
-        v.cast(FLFieldMetaData::flDecodeType(newField->type()));
-        defValues.insert(step, v);
-      }
+  bool ok = false;
+  if (!force && !fieldsNamesOld.isEmpty()) {
+    QString sel(fieldsNamesOld.join(","));
+    QString inSql("INSERT INTO " + newMTD->name() + "(" + sel + ")" +
+                  " SELECT " + sel + " FROM " + renameOld);
+    qWarning(inSql);
+    ok = q.exec(inSql);
+    if (!ok) {
+      db_->dbAux()->rollback();
+      if ((oldMTD != newMTD) && oldMTD)
+        delete oldMTD;
+      if (newMTD)
+        delete newMTD;
+      return alterTable2(mtd1, mtd2, key, true);
     }
-    vectorFields.insert(step++, newField);
-    vectorFields.insert(step++, oldField);
   }
 
-  step = 0;
-  bool ok = true;
-  while (oldCursor.next()) {
-    newBuffer = new QSqlRecord(newBufferInfo);
+  if (!ok) {
+    QSqlCursor oldCursor(renameOld, true, db_->dbAux());
+    oldCursor.setMode(QSqlCursor::ReadOnly);
+    oldCursor.select();
+    int totalSteps = oldCursor.size();
+    QProgressDialog progress(QApplication::tr("Reestructurando registros para %1...").arg(newMTD->alias()), 0,
+                             totalSteps, qApp->focusWidget(), 0, true);
+    progress.setCaption(QApplication::tr("Tabla modificada"));
 
-    for (uint i = 0; i < vectorFields.size();) {
-      if (defValues.contains(i)) {
-        v = defValues[i];
-        newField = vectorFields[i++];
-        oldField = vectorFields[i++];
-      } else {
-        newField = vectorFields[i++];
-        oldField = vectorFields[i++];
-        v = oldCursor.value(newField->name());
-        if ((!oldField->allowNull() || !newField->allowNull()) &&
-            (v.isNull() || !v.isValid()) && newField->type() != FLFieldMetaData::Serial) {
-          QVariant defVal(newField->defaultValue());
-          if (!defVal.isNull() && defVal.isValid())
-            v = defVal;
-        }
-        if (v.isValid() && !v.isNull() && !v.cast(newBuffer->value(newField->name()).type())) {
-#ifdef FL_DEBUG
-          qWarning("FLManager::alterTable : " +
-                   QApplication::tr("Los tipos del campo %1 no son compatibles. Se introducirá un valor nulo.")
-                   .arg(newField->name()));
-#endif
-        }
-      }
+    int step = 0;
+    QSqlRecord *newBuffer;
+    FLFieldMetaData *newField = 0;
+    QPtrList<QSqlRecord> listRecords;
+    listRecords.setAutoDelete(true);
+    QSqlRecord newBufferInfo(recordInfo2(newMTD->name()).toRecord());
+    QPtrVector<FLFieldMetaData> vectorFields(fieldList->count() * 2);
+    QMap<int, QVariant> defValues;
+    QVariant v;
 
-      if (!v.isNull() && newField->type() == QVariant::String && newField->length() > 0)
-        v = v.toString().left(newField->length());
-
-      if ((!oldField->allowNull() || !newField->allowNull()) && (v.isNull() || !v.isValid())) {
-        switch (oldField->type()) {
-          case FLFieldMetaData::Serial:
-            v = nextSerialVal(newMTD->name(), newField->name()).toUInt();
-            break;
-          case QVariant::Int:
-          case QVariant::UInt:
-          case QVariant::Bool:
-          case FLFieldMetaData::Unlock:
-            v =  int(0);
-            break;
-          case QVariant::Double:
-            v = double(0.0);
-            break;
-          case QVariant::Time:
-            v = QTime::currentTime();
-            break;
-          case QVariant::Date:
-            v = QDate::currentDate();
-            break;
-          default:
-            v = QString("NULL").left(newField->length());
-            break;
+    QDictIterator<FLFieldMetaData> it2(*fieldList);
+    while ((newField = it2.current()) != 0) {
+      ++it2;
+      oldField = oldMTD->field(newField->name());
+      if (!oldField || !oldCursor.field(oldField->name())) {
+        if (!oldField)
+          oldField = newField;
+        if (newField->type() != FLFieldMetaData::Serial) {
+          v = newField->defaultValue();
+          v.cast(FLFieldMetaData::flDecodeType(newField->type()));
+          defValues.insert(step, v);
         }
       }
-
-      newBuffer->setValue(newField->name(), v);
+      vectorFields.insert(step++, newField);
+      vectorFields.insert(step++, oldField);
     }
 
-    listRecords.append(newBuffer);
-    if (listRecords.count() >= LIMIT_RESULT) {
-      step += LIMIT_RESULT;
-      progress.setProgress(step);
+    step = 0;
+    ok = true;
+    while (oldCursor.next()) {
+      newBuffer = new QSqlRecord(newBufferInfo);
 
-      if (!insertMulti(newMTD->name(), &listRecords)) {
-        ok = false;
-        listRecords.clear();
-        break;
+      for (uint i = 0; i < vectorFields.size();) {
+        if (defValues.contains(i)) {
+          v = defValues[i];
+          newField = vectorFields[i++];
+          oldField = vectorFields[i++];
+        } else {
+          newField = vectorFields[i++];
+          oldField = vectorFields[i++];
+          v = oldCursor.value(newField->name());
+          if ((!oldField->allowNull() || !newField->allowNull()) &&
+              (v.isNull() || !v.isValid()) && newField->type() != FLFieldMetaData::Serial) {
+            QVariant defVal(newField->defaultValue());
+            if (!defVal.isNull() && defVal.isValid())
+              v = defVal;
+          }
+          if (v.isValid() && !v.isNull() && !v.cast(newBuffer->value(newField->name()).type())) {
+#ifdef FL_DEBUG
+            qWarning("FLManager::alterTable : " +
+                     QApplication::tr("Los tipos del campo %1 no son compatibles. Se introducirá un valor nulo.")
+                     .arg(newField->name()));
+#endif
+          }
+        }
+
+        if (!v.isNull() && newField->type() == QVariant::String && newField->length() > 0)
+          v = v.toString().left(newField->length());
+
+        if ((!oldField->allowNull() || !newField->allowNull()) && (v.isNull() || !v.isValid())) {
+          switch (oldField->type()) {
+            case FLFieldMetaData::Serial:
+              v = nextSerialVal(newMTD->name(), newField->name()).toUInt();
+              break;
+            case QVariant::Int:
+            case QVariant::UInt:
+            case QVariant::Bool:
+            case FLFieldMetaData::Unlock:
+              v =  int(0);
+              break;
+            case QVariant::Double:
+              v = double(0.0);
+              break;
+            case QVariant::Time:
+              v = QTime::currentTime();
+              break;
+            case QVariant::Date:
+              v = QDate::currentDate();
+              break;
+            default:
+              v = QString("NULL").left(newField->length());
+              break;
+          }
+        }
+
+        newBuffer->setValue(newField->name(), v);
       }
+
+      listRecords.append(newBuffer);
+      if (listRecords.count() >= LIMIT_RESULT) {
+        step += LIMIT_RESULT;
+        progress.setProgress(step);
+
+        if (!insertMulti(newMTD->name(), &listRecords)) {
+          ok = false;
+          listRecords.clear();
+          break;
+        }
+        listRecords.clear();
+      }
+    }
+
+    if (listRecords.count() > 0) {
+      if (!insertMulti(newMTD->name(), &listRecords))
+        ok = false;
       listRecords.clear();
     }
-  }
 
-  if (listRecords.count() > 0) {
-    if (!insertMulti(newMTD->name(), &listRecords))
-      ok = false;
-    listRecords.clear();
+    progress.setProgress(totalSteps);
   }
-
-  progress.setProgress(totalSteps);
 
   if ((oldMTD != newMTD) && oldMTD)
     delete oldMTD;
@@ -1946,6 +2217,8 @@ bool QPSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const QS
 
   if (force && ok)
     q.exec("DROP TABLE " + renameOld + " CASCADE");
+
+  return true;
 #else
 
   return true;
@@ -2005,9 +2278,9 @@ int QPSQLDriver::insertMulti(const QString &tablename, QPtrList<QSqlRecord> * re
 
   QSqlQuery qry(QString::null, db_->dbAux());
   if (!qry.exec(str) || qry.lastError().type() != QSqlError::None) {
-    QMessageBox::critical(0, "Error",
-                          QString(qry.lastError().driverText()) + "\n" +
-                          QString(qry.lastError().databaseText()), QMessageBox::Ok, 0, 0);
+    msgBoxCritical(tr("Error"),
+                   QString(qry.lastError().driverText()) + "\n" +
+                   QString(qry.lastError().databaseText()));
     return 0;
   }
 
@@ -2052,13 +2325,15 @@ bool QPSQLDriver::beginTransaction()
 #ifdef QT_CHECK_RANGE
     qWarning("QPSQLDriver::beginTransaction: Database not open");
 #endif
-
     return false;
   }
   PGresult *res = PQexec(d->connection, "BEGIN");
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo iniciar transacción"),
+                 QSqlError::Transaction, d, "BEGIN", res)
+    );
     PQclear(res);
-    setLastError(qMakeError(QApplication::tr("No se pudo iniciar transacción"), QSqlError::Transaction, d));
     return false;
   }
   PQclear(res);
@@ -2071,13 +2346,16 @@ bool QPSQLDriver::commitTransaction()
 #ifdef QT_CHECK_RANGE
     qWarning("QPSQLDriver::commitTransaction: Database not open");
 #endif
-
     return false;
   }
+
   PGresult *res = PQexec(d->connection, "COMMIT");
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo aceptar la transacción"),
+                 QSqlError::Transaction, d, "COMMIT", res)
+    );
     PQclear(res);
-    setLastError(qMakeError(QApplication::tr("No se pudo aceptar la transacción"), QSqlError::Transaction, d));
     return false;
   }
   PQclear(res);
@@ -2090,12 +2368,15 @@ bool QPSQLDriver::rollbackTransaction()
 #ifdef QT_CHECK_RANGE
     qWarning("QPSQLDriver::rollbackTransaction: Database not open");
 #endif
-
     return false;
   }
+
   PGresult *res = PQexec(d->connection, "ROLLBACK");
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
-    setLastError(qMakeError(QApplication::tr("No se pudo deshacer la transacción"), QSqlError::Transaction, d));
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo deshacer la transacción"),
+                 QSqlError::Transaction, d, "ROLLBACK", res)
+    );
     PQclear(res);
     return false;
   }
@@ -2135,6 +2416,22 @@ QStringList QPSQLDriver::tables(const QString &typeName) const
   return tl;
 }
 
+bool QPSQLDriver::existsTable(const QString &n) const
+{
+  if (!isOpen())
+    return false;
+
+  QSqlQuery *t = new QSqlQuery(new QPSQLResult(this, d));
+  t->setForwardOnly(true);
+
+  bool ok = t->exec("select relname from pg_class where relname = '" + n + "'");
+  if (ok)
+    ok = t->next();
+
+  delete t;
+  return ok;
+}
+
 QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const
 {
   QSqlIndex idx(tablename);
@@ -2165,6 +2462,7 @@ QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
     case QPSQLDriver::Version91:
+    case QPSQLDriver::Version92:
       stmt = "select pg_att1.attname, pg_att1.atttypid::int, pg_cl.relname "
              "from pg_attribute pg_att1, pg_attribute pg_att2, pg_class pg_cl, pg_index pg_ind "
              "where lower(pg_cl.relname) = '%1_pkey' "
@@ -2189,6 +2487,16 @@ QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const
 
 QSqlIndex QPSQLDriver::primaryIndex(const QString &tablename) const
 {
+  FLManager *mng = db_->manager();
+  if (mng->initCount() == cInfo->mngInitCount) {
+    QMap<QString, QSqlIndex>::const_iterator it(cInfo->cacheIdx.find(tablename));
+    if (it != cInfo->cacheIdx.end())
+      return *it;
+  } else {
+    cInfo->mngInitCount = mng->initCount();
+    cInfo->clear();
+  }
+
   QSqlIndex idx(tablename);
   if (!isOpen())
     return idx;
@@ -2202,13 +2510,14 @@ QSqlIndex QPSQLDriver::primaryIndex(const QString &tablename) const
     return primaryIndex2(tablename);
   }
   docElem = doc.documentElement();
-  FLTableMetaData *mtd = db_->manager()->metadata(&docElem, true);
+  FLTableMetaData *mtd = mng->metadata(&docElem, true);
   if (!mtd)
     return primaryIndex2(tablename);
   idx.append(QSqlField(mtd->primaryKey(), FLFieldMetaData::flDecodeType(mtd->fieldType(mtd->primaryKey()))));
   idx.setName(tablename.lower() + "_pkey");
 
   delete mtd;
+  cInfo->cacheIdx.replace(tablename, idx);
   return idx;
 }
 
@@ -2243,6 +2552,7 @@ QSqlRecord QPSQLDriver::record2(const QString &tablename) const
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
     case QPSQLDriver::Version91:
+    case QPSQLDriver::Version92:
       stmt = "select pg_attribute.attname, pg_attribute.atttypid::int "
              "from pg_class, pg_attribute "
              "where lower(pg_class.relname) = '%1' "
@@ -2263,10 +2573,10 @@ QSqlRecord QPSQLDriver::record2(const QString &tablename) const
   return fil;
 }
 
-QSqlRecord QPSQLDriver::record(FLTableMetaData *mtd) const
+QSqlRecord QPSQLDriver::record(const FLTableMetaData *mtd) const
 {
   QSqlRecord fil;
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
 
   if (!fl || fl->isEmpty())
     return record2(mtd->name());
@@ -2297,7 +2607,7 @@ QSqlRecord QPSQLDriver::record(const QString &tablename) const
   if (!mtd)
     return record2(tablename);
 
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return record2(tablename);
@@ -2377,6 +2687,7 @@ QSqlRecordInfo QPSQLDriver::recordInfo2(const QString &tablename) const
     case QPSQLDriver::Version84:
     case QPSQLDriver::Version9:
     case QPSQLDriver::Version91:
+    case QPSQLDriver::Version92:
       stmt = "select pg_attribute.attname, pg_attribute.atttypid::int, pg_attribute.attnotnull, "
              "pg_attribute.attlen, pg_attribute.atttypmod, pg_attrdef.adsrc "
              "from pg_class, pg_attribute "
@@ -2448,6 +2759,16 @@ QSqlRecordInfo QPSQLDriver::recordInfo2(const QString &tablename) const
 
 QSqlRecordInfo QPSQLDriver::recordInfo(const QString &tablename) const
 {
+  FLManager *mng = db_->manager();
+  if (mng->initCount() == cInfo->mngInitCount) {
+    QMap<QString, QSqlRecordInfo>::const_iterator it(cInfo->cache.find(tablename));
+    if (it != cInfo->cache.end())
+      return *it;
+  } else {
+    cInfo->mngInitCount = mng->initCount();
+    cInfo->clear();
+  }
+
   QSqlRecordInfo info;
   if (!isOpen())
     return info;
@@ -2462,10 +2783,10 @@ QSqlRecordInfo QPSQLDriver::recordInfo(const QString &tablename) const
     return recordInfo2(tablename);
   }
   docElem = doc.documentElement();
-  FLTableMetaData *mtd = db_->manager()->metadata(&docElem, true);
+  FLTableMetaData *mtd = mng->metadata(&docElem, true);
   if (!mtd)
     return recordInfo2(tablename);
-  FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
+  const FLTableMetaData::FLFieldMetaDataList *fl = mtd->fieldList();
   if (!fl) {
     delete mtd;
     return recordInfo2(tablename);
@@ -2478,17 +2799,23 @@ QSqlRecordInfo QPSQLDriver::recordInfo(const QString &tablename) const
   QStringList fieldsNames = QStringList::split(",", mtd->fieldsNames());
   for (QStringList::Iterator it = fieldsNames.begin(); it != fieldsNames.end(); ++it) {
     FLFieldMetaData *field = mtd->field((*it));
-    info.append(QSqlFieldInfo(field->name(), FLFieldMetaData::flDecodeType(field->type())));
+    QVariant::Type fType = FLFieldMetaData::flDecodeType(field->type());
+    info.append(QSqlFieldInfo(field->name(), fType,
+                              !field->allowNull(),
+                              field->length(), field->partDecimal(), field->defaultValue()));
 #ifndef FL_QUICK_CLIENT
-    if (field->relationM1() || field->isPrimaryKey())
-      createIndex(field->name(), tablename, FLFieldMetaData::flDecodeType(field->type()) == QVariant::String,
-                  FLFieldMetaData::flDecodeType(field->type()) != QVariant::String);
-    else if (field->type() == QVariant::Date)
+    if (field->relationM1() || field->isPrimaryKey() || field->isCompoundKey()) {
+      bool isTypeString = (fType == QVariant::String);
+      createIndex(field->name(), tablename, isTypeString, !isTypeString);
+    } else if (field->type() == QVariant::Date || field->name() == "codigo") {
       createIndex(field->name(), tablename, false , true);
+      createIndex(field->name() + "," + mtd->primaryKey(), tablename, false, true);
+    }
 #endif
   }
 
   delete mtd;
+  cInfo->cache.replace(tablename, info);
   return info;
 }
 
@@ -2509,6 +2836,13 @@ QSqlRecordInfo QPSQLDriver::recordInfo(const QSqlQuery &query) const
         len = precision - 4;
         precision = -1;
       }
+      // ###
+      if (!info.find(name).name().isEmpty()) {
+        QString tableName(oidToTableName(d->connection, PQftable(result->d->result, i)));
+        if (!tableName.isEmpty())
+          name.prepend(tableName + QString::fromLatin1("."));
+      }
+      // ###
       info.append(QSqlFieldInfo(name,
                                 qDecodePSQLType(PQftype
                                                 (result->d->result, i)),
@@ -2596,7 +2930,7 @@ QString QPSQLDriver::formatValue(const QSqlField *field, bool) const
       case QVariant::ByteArray: {
         QByteArray ba(field->value().toByteArray());
         size_t len;
-        unsigned char *data = PQescapeBytea((unsigned char *)(const char *)ba, ba.size(), &len);
+        unsigned char *data = PQescapeByteaConn(d->connection, (unsigned char *)(const char *)ba, ba.size(), &len);
         r += QChar('\'');
         r += QString::fromLatin1((const char *) data);
         r += QChar('\'');
@@ -2733,9 +3067,12 @@ bool QPSQLDriver::savePoint(const QString &n)
     return false;
   }
   PGresult *res = PQexec(d->connection, "savepoint sv_" + n);
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo crear punto de salvaguarda"),
+                 QSqlError::Transaction, d, "savepoint sv_" + n, res)
+    );
     PQclear(res);
-    setLastError(qMakeError(QApplication::tr("No se pudo crear punto de salvaguarda"), QSqlError::Transaction, d));
     return false;
   }
   PQclear(res);
@@ -2753,9 +3090,12 @@ bool QPSQLDriver::releaseSavePoint(const QString &n)
     return false;
   }
   PGresult *res = PQexec(d->connection, "release savepoint sv_" + n);
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo liberar punto de salvaguarda"),
+                 QSqlError::Transaction, d, "release savepoint sv_" + n, res)
+    );
     PQclear(res);
-    setLastError(qMakeError(QApplication::tr("No se pudo liberar punto de salvaguarda"), QSqlError::Transaction, d));
     return false;
   }
   PQclear(res);
@@ -2773,13 +3113,140 @@ bool QPSQLDriver::rollbackSavePoint(const QString &n)
     return false;
   }
   PGresult *res = PQexec(d->connection, "rollback to savepoint sv_" + n);
-  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+    setLastError(
+      qMakeError(QApplication::tr("No se pudo deshacer punto de salvaguarda"),
+                 QSqlError::Transaction, d, "rollback to savepoint sv_" + n, res)
+    );
     PQclear(res);
-    setLastError(qMakeError(QApplication::tr("No se pudo deshacer punto de salvaguarda"), QSqlError::Transaction, d));
     return false;
   }
   PQclear(res);
   return true;
+}
+
+bool QPSQLDriver::canOverPartition()
+{
+  return (protocol() >= QPSQLDriver::Version84);
+}
+
+static inline bool notEqualsTypes(int mtdType, int bdType, bool relax)
+{
+  switch (mtdType) {
+    case QVariant::Int:
+      if (relax)
+        return (bdType != INT2OID && bdType != INT4OID);
+      else
+        return bdType != INT2OID;
+      break;
+    case FLFieldMetaData::Serial:
+    case QVariant::UInt:
+      if (relax)
+        return (bdType != INT2OID && bdType != INT4OID);
+      else
+        return bdType != INT4OID;
+      break;
+    case QVariant::Bool:
+    case FLFieldMetaData::Unlock:
+      return bdType != BOOLOID;
+      break;
+    case QVariant::Double:
+      return bdType != FLOAT8OID;
+      break;
+    case QVariant::Time:
+      return bdType != TIMEOID;
+      break;
+    case QVariant::Date:
+      return bdType != DATEOID;
+      break;
+    case QVariant::String:
+      if (relax)
+        return (bdType != VARCHAROID && bdType != TEXTOID);
+      else
+        return bdType != VARCHAROID;
+      break;
+    case QVariant::Pixmap:
+    case QVariant::StringList:
+      if (relax)
+        return (bdType != VARCHAROID && bdType != TEXTOID);
+      else
+        return bdType != TEXTOID;
+      break;
+    case QVariant::ByteArray:
+      return bdType != BYTEAOID;
+      break;
+  }
+
+  return false;
+}
+
+static inline bool notEqualsFields(QSqlField *fieldBd,
+                                   QSqlField *fieldMtd,
+                                   const QSqlFieldInfo &fieldInfoBd,
+                                   const QSqlFieldInfo &fieldInfoMtd,
+                                   FLFieldMetaData *fmtd = 0)
+{
+  if (!fieldBd)
+    return true;
+  if (!fieldMtd)
+    return false;
+
+  bool relax = (fmtd == 0);
+  int mtdType = fmtd ? fmtd->type() : fieldMtd->type();
+  int bdType = fieldInfoBd.typeID();
+
+  if (notEqualsTypes(mtdType, bdType, relax)) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= type " +
+             QString::number(mtdType) + " " +
+             QString::number(bdType));
+#endif
+    return true;
+  }
+
+  if (!fieldBd->value().canCast(FLFieldMetaData::flDecodeType(fieldMtd->type()))) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= type " +
+             QString::number(FLFieldMetaData::flDecodeType(fieldMtd->type())) + " " +
+             QString::number(fieldBd->type()));
+#endif
+    return true;
+  }
+
+  if (fieldBd->isNull() != fieldMtd->isNull()) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= null " + QString::number(fieldMtd->isNull()) + " " +
+             QString::number(fieldBd->isNull()));
+#endif
+    return true;
+  }
+
+  if (fieldBd->isReadOnly() != fieldMtd->isReadOnly()) {
+#ifdef FL_DEBUG
+    qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+    qWarning("!= readOnly " + QString::number(fieldMtd->isReadOnly()) + " " +
+             QString::number(fieldBd->isReadOnly()));
+#endif
+    return true;
+  }
+
+  if (fieldInfoBd.typeID() == VARCHAROID) {
+    int lenBd = fieldInfoBd.length();
+    int lenMtd = fieldInfoMtd.length();
+    if (lenBd > 0 && lenMtd > 0 && lenBd != lenMtd) {
+#ifdef FL_DEBUG
+      qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
+      qWarning("!= length " + QString::number(lenMtd) + " " +
+               QString::number(lenBd));
+#endif
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void QPSQLDriver::Mr_Proper()
@@ -2807,18 +3274,18 @@ void QPSQLDriver::Mr_Proper()
   QStringList listOldBks(tables("").grep(rx));
 
   qry.exec("select nombre from flfiles where nombre similar to"
-           "'%[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]%:[[:digit:]][[:digit:]]$' or nombre similar to"
+           "'%[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]%:[[:digit:]][[:digit:]]%' or nombre similar to"
            "'%alteredtable[[:digit:]][[:digit:]][[:digit:]][[:digit:]]%' or (bloqueo='f' and nombre like '%.mtd')");
   FLUtil::createProgressDialog(tr("Borrando backups"), listOldBks.size() + qry.size() + 2);
   while (qry.next()) {
     item = qry.value(0).toString();
-    FLUtil::setLabelText(tr("Borrando regisro %1").arg(item));
+    FLUtil::setLabelText(tr("Borrando registro %1").arg(item));
     qry2.exec("delete from flfiles where nombre = '" + item + "'");
 #ifdef FL_DEBUG
     qWarning("delete from flfiles where nombre = '" + item + "'");
 #endif
     if (item.contains("alteredtable")) {
-      if (tables("").contains(item.replace(".mtd", ""))) {
+      if (existsTable(item.replace(".mtd", ""))) {
         FLUtil::setLabelText(tr("Borrando tabla %1").arg(item));
         qry2.exec("drop table " + item.replace(".mtd", "") + " cascade");
 #ifdef FL_DEBUG
@@ -2831,7 +3298,7 @@ void QPSQLDriver::Mr_Proper()
 
   for (QStringList::Iterator it = listOldBks.begin(); it != listOldBks.end(); ++it) {
     item = *it;
-    if (tables("").contains(item)) {
+    if (existsTable(item)) {
       FLUtil::setLabelText(tr("Borrando tabla %1").arg(item));
       qry2.exec("drop table " + item + " cascade");
 #ifdef FL_DEBUG
@@ -2851,13 +3318,17 @@ void QPSQLDriver::Mr_Proper()
   FLUtil::destroyProgressDialog();
 
 #ifndef FL_QUICK_CLIENT
-  steps = 0;
-  qry.exec("select tablename,indexname from pg_indexes where indexname like '%_m1_idx'");
-  FLUtil::createProgressDialog(tr("Regenerando índices"), qry.size());
   if (dictIndexes) {
     delete dictIndexes;
     dictIndexes = 0;
   }
+#endif
+
+#if 0
+  //#ifndef FL_QUICK_CLIENT
+  steps = 0;
+  qry.exec("select tablename,indexname from pg_indexes where indexname like '%_m1_idx'");
+  FLUtil::createProgressDialog(tr("Regenerando índices"), qry.size());
   QString tableIdx, fieldIdx;
   FLTableMetaData *mtdIdx = 0;
   while (qry.next()) {
@@ -2885,64 +3356,26 @@ void QPSQLDriver::Mr_Proper()
 
   steps = 0;
   qry.exec("select tablename from pg_tables where schemaname='public'");
-  FLUtil::createProgressDialog(tr("Vacunando base de datos"), qry.size());
+  FLUtil::createProgressDialog(tr("Comprobando base de datos"), qry.size());
   while (qry.next()) {
     item = qry.value(0).toString();
-    FLUtil::setLabelText(tr("Vacunando tabla %1").arg(item));
-    qry2.exec("vacuum " + item);
+    FLUtil::setLabelText(tr("Comprobando tabla %1").arg(item));
 #ifdef FL_DEBUG
-    qWarning("vacuum " + item);
-#endif
-    QSqlRecord recMtd = record(item);
-    QSqlRecord recBd = record2(item);
-    QSqlField *fieldMtd = 0;
-    QSqlField *fieldBd = 0;
-    bool mustAlter = false;
-    for (int i = 0; i < recMtd.count(); ++i) {
-      fieldMtd = recMtd.field(i);
-      fieldBd = recBd.field(fieldMtd->name());
-      if (fieldBd) {
-        if (!fieldBd->value().canCast(FLFieldMetaData::flDecodeType(fieldMtd->type())) ||
-            fieldBd->isNull() != fieldMtd->isNull() || fieldBd->isReadOnly() != fieldMtd->isReadOnly()) {
-#ifdef FL_DEBUG
-          qWarning("!= name " + fieldMtd->name() + " " + fieldBd->name());
-          qWarning("!= type " + QString::number(FLFieldMetaData::flDecodeType(fieldMtd->type())) + " " +
-                   QString::number(fieldBd->type()));
-          qWarning("!= null " + QString::number(fieldMtd->isNull()) + " " + QString::number(fieldBd->isNull()));
-          qWarning("!= readOnly " + QString::number(fieldMtd->isReadOnly()) + " " + QString::number(fieldBd->isReadOnly()));
-#endif
-          mustAlter = true;
-          break;
-        }
-      } else {
-#ifdef FL_DEBUG
-        qWarning("No fieldBd " +  fieldMtd->name());
-#endif
-        mustAlter = true;
-        break;
-      }
-    }
-
-#if 0
-    for (int i = 0; i < recBd.count(); ++i) {
-      fieldBd = recBd.field(i);
-      fieldMtd = recMtd.field(fieldBd->name());
-      if (!fieldMtd) {
-#ifdef FL_DEBUG
-        qWarning("No fieldMtd " +  fieldBd->name());
-#endif
-        mustAlter = true;
-        break;
-      }
-    }
+    qWarning("comprobando " + item);
 #endif
 
+    bool mustAlter = mismatchedTable(item, item);
     if (mustAlter) {
-#ifdef FL_DEBUG
-      qWarning("mustAlter " + item);
-#endif
-      QString conte = db_->managerModules()->content(item + ".mtd");
-      alterTable2(conte, conte, QString::null, true);
+      QString conte(db_->managerModules()->content(item + ".mtd"));
+      if (!conte.isEmpty()) {
+        QString msg(QApplication::tr(
+                      "La estructura de los metadatos de la tabla '%1' y su "
+                      "estructura interna en la base de datos no coinciden. "
+                      "Intentando regenerarla."
+                    ));
+        qWarning(msg.arg(item));
+        alterTable2(conte, conte, QString::null, true);
+      }
     }
     FLUtil::setProgress(++steps);
   }
@@ -2956,14 +3389,14 @@ void QPSQLDriver::Mr_Proper()
   sqlQuery.setForwardOnly(true);
   if (sqlQuery.exec("select relname from pg_class where ( relkind = 'r' ) "
                     "and ( relname !~ '^Inv' ) " "and ( relname !~ '^pg_' ) and ( relname !~ '^sql_' )")) {
+    cInfo->clear();
     FLUtil::setTotalSteps(sqlQuery.size());
     while (sqlQuery.next()) {
       item = sqlQuery.value(0).toString();
       FLUtil::setProgress(++steps);
       FLUtil::setLabelText(tr("Creando índices para %1").arg(item));
-
       FLTableMetaData *mtd = db_->manager()->metadata(item);
-      FLTableMetaData::FLFieldMetaDataList *fl;
+      const FLTableMetaData::FLFieldMetaDataList *fl;
       if (!mtd || !(fl = mtd->fieldList()))
         continue;
       QDictIterator<FLFieldMetaData> it(*fl);
@@ -2973,7 +3406,7 @@ void QPSQLDriver::Mr_Proper()
         QString v;
         QSqlCursor cur(item, true, db_->dbAux());
         QSqlRecord *buf;
-        cur.select();
+        cur.select((*it)->name() + QString::fromLatin1(" not like 'RK@%'"));
         while (cur.next()) {
           v = cur.value((*it)->name()).toString();
           if (v.isEmpty())
@@ -2993,6 +3426,19 @@ void QPSQLDriver::Mr_Proper()
   d->checkLock = true;
   d->activeCreateIndex = false;
   db_->dbAux()->commit();
+
+  steps = 0;
+  qry.exec("select tablename from pg_tables where schemaname='public'");
+  FLUtil::createProgressDialog(tr("Analizando base de datos"), qry.size());
+  while (qry.next()) {
+    item = qry.value(0).toString();
+    FLUtil::setLabelText(tr("Analizando tabla %1").arg(item));
+    qry2.exec("vacuum analyze " + item);
+#ifdef FL_DEBUG
+    qWarning("vacuum analyze " + item);
+#endif
+    FLUtil::setProgress(++steps);
+  }
 
   FLUtil::destroyProgressDialog();
 }
@@ -3184,27 +3630,7 @@ QStringList QPSQLDriver::detectRisksLocks(const QString &table, const QString &p
 
 bool QPSQLDriver::regenTable(const QString &n, FLTableMetaData *tmd)
 {
-  QSqlRecord recMtd = record(tmd);
-  QSqlRecord recBd = record2(n);
-  QSqlField *fieldMtd = 0;
-  QSqlField *fieldBd = 0;
-  bool mustAlter = false;
-
-  for (int i = 0; i < recMtd.count(); ++i) {
-    fieldMtd = recMtd.field(i);
-    fieldBd = recBd.field(fieldMtd->name());
-    if (fieldBd) {
-      if (!fieldBd->value().canCast(FLFieldMetaData::flDecodeType(fieldMtd->type())) ||
-          fieldBd->isNull() != fieldMtd->isNull() || fieldBd->isReadOnly() != fieldMtd->isReadOnly()) {
-        mustAlter = true;
-        break;
-      }
-    } else {
-      mustAlter = true;
-      break;
-    }
-  }
-
+  bool mustAlter = mismatchedTable(n, tmd);
   if (mustAlter) {
     mustAlter = alterTable(tmd);
 
@@ -3225,13 +3651,13 @@ bool QPSQLDriver::regenTable(const QString &n, FLTableMetaData *tmd)
       while (qry.next()) {
         item = qry.value(0).toString();
         qry2.exec("delete from flfiles where nombre = '" + item + "'");
-        if (item.contains("alteredtable") && tables("").contains(item.replace(".mtd", "")))
+        if (item.contains("alteredtable") && existsTable(item.replace(".mtd", "")))
           qry2.exec("drop table " + item.replace(".mtd", "") + " cascade");
       }
 
       for (QStringList::Iterator it = listOldBks.begin(); it != listOldBks.end(); ++it) {
         item = *it;
-        if (tables("").contains(item))
+        if (existsTable(item))
           qry2.exec("drop table " + item + " cascade");
       }
       db_->dbAux()->commit();
@@ -3239,6 +3665,86 @@ bool QPSQLDriver::regenTable(const QString &n, FLTableMetaData *tmd)
   }
 
   return mustAlter;
+}
+
+QString QPSQLDriver::md5TuplesState() const
+{
+  PGresult *result = 0;
+  QString ret;
+  QString sqlStr(
+    "select md5(tup_inserted ::text || tup_updated ::text || tup_deleted ::text) "
+    "from pg_catalog.pg_stat_database where datname='" + db_->database() + "'");
+  if (d->isUtf8) {
+    result = PQexec(d->connection, sqlStr.utf8());
+  } else {
+    result = PQexec(d->connection, sqlStr.local8Bit());
+  }
+  int status = PQresultStatus(result);
+  if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK)
+    ret = PQgetvalue(result, 0, 0);
+  PQclear(result);
+  return ret;
+}
+
+QString QPSQLDriver::md5TuplesStateTable(const QString &table) const
+{
+  PGresult *result = 0;
+  QString ret;
+  QString sqlStr(
+    "select md5(n_tup_ins ::text || n_tup_upd ::text || n_tup_del ::text) "
+    "from pg_catalog.pg_stat_all_tables where schemaname not in "
+    "('pg_catalog', 'information_schema') and relname='" + table + "'");
+  if (d->isUtf8) {
+    result = PQexec(d->connection, sqlStr.utf8());
+  } else {
+    result = PQexec(d->connection, sqlStr.local8Bit());
+  }
+  int status = PQresultStatus(result);
+  if (status == PGRES_COMMAND_OK || status == PGRES_TUPLES_OK)
+    ret = PQgetvalue(result, 0, 0);
+  PQclear(result);
+  return ret;
+}
+
+bool QPSQLDriver::mismatchedTable(const QString &table,
+                                  const FLTableMetaData *tmd) const
+{
+  return mismatchedTable(table, tmd->name());
+}
+
+bool QPSQLDriver::mismatchedTable(const QString &table1,
+                                  const QString &table2) const
+{
+  FLTableMetaData *mtd = db_->manager()->metadata(table2, true);
+  if (!mtd)
+    return false;
+
+  QSqlRecordInfo recInfoMtd = recordInfo(table2);
+  QSqlRecordInfo recInfoBd = recordInfo2(table1);
+  QSqlRecord recMtd = recInfoMtd.toRecord();
+  QSqlRecord recBd = recInfoBd.toRecord();
+  QSqlField *fieldMtd = 0;
+  QSqlField *fieldBd = 0;
+  bool mismatch = false;
+
+  for (int i = 0; i < recMtd.count(); ++i) {
+    fieldMtd = recMtd.field(i);
+    fieldBd = recBd.field(fieldMtd->name());
+    if (fieldBd) {
+      if (notEqualsFields(fieldBd, fieldMtd,
+                          recInfoBd.find(fieldMtd->name()),
+                          recInfoMtd.find(fieldMtd->name()),
+                          mtd->field(fieldMtd->name()))) {
+        mismatch = true;
+        break;
+      }
+    } else {
+      mismatch = true;
+      break;
+    }
+  }
+
+  return mismatch;
 }
 
 int QPSQLDriver::backendId() const

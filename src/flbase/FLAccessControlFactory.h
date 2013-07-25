@@ -19,6 +19,8 @@
 #ifndef FLACCESSCONTROLFACTORY_H
 #define FLACCESSCONTROLFACTORY_H
 
+#include "AQGlobal.h"
+
 class FLAccessControl;
 
 /**
@@ -54,7 +56,7 @@ IMPORTANTE : Los objetos de alto nivel deben heredar de QObject.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLAccessControlFactory
+class AQ_EXPORT FLAccessControlFactory
 {
 
 public:

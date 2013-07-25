@@ -87,15 +87,19 @@ inline void FLReportEnginePrivate::addRowToReportData(int l)
   row.setAttribute("level", l);
 
   QValueStack<int> imgFieldsBack;
-  QVariant val;
   int i = 0;
 
   for (QStringList::const_iterator it = qFieldList_.begin();
        it != qFieldList_.end(); ++it, ++i) {
+    QVariant rawVal(qry_->value(i, true));
     if (!qImgFields_.isEmpty() && qImgFields_.top() == i) {
+      QString strVal(rawVal.toString());
       imgFieldsBack.push_front(qImgFields_.pop());
-      QString imgFile(AQ_DISKCACHE_DIRPATH + '/' +
-                      qry_->value(i, true).toString() + ".png");
+      if (strVal.isEmpty()) {
+        row.setAttribute(*it, strVal);
+        continue;
+      }
+      QString imgFile(AQ_DISKCACHE_DIRPATH + '/' + strVal + ".png");
       if (!QFile::exists(imgFile)) {
         QPixmap pix;
         pix.loadFromData(qry_->value(i).toCString());
@@ -103,11 +107,10 @@ inline void FLReportEnginePrivate::addRowToReportData(int l)
       }
       row.setAttribute(*it, imgFile);
     } else {
-      val = qry_->value(i, true);
       // ###
-      //if (!val.isValid() || val.isNull())
+      //if (!rawVal.isValid() || rawVal.isNull())
       //  continue;
-      row.setAttribute(*it, val.toString());
+      row.setAttribute(*it, rawVal.toString());
     }
   }
   rows_.appendChild(row);
@@ -132,9 +135,6 @@ inline void FLReportEnginePrivate::groupBy(int levelMax, QStringList &vA)
     (*vA.at(i)) = qry_->value((*g)[QString::number(i)]->field()).toString();
   }
   addRowToReportData(levelMax);
-
-  if (qry_->next())
-    groupBy(levelMax, vA);
 }
 
 inline void FLReportEnginePrivate::setQuery(FLSqlQuery *qry)
@@ -222,7 +222,9 @@ bool FLReportEngine::setReportData(FLSqlQuery *q)
     QStringList vA;
     for (int i = 0; i < 10; ++i)
       vA.append(QString::null);
-    d->groupBy(g->count(), vA);
+    do {
+      d->groupBy(g->count(), vA);
+    } while (q->next());
   }
 
   QDomElement data(tmpDoc.createElement("KugarData"));
@@ -310,6 +312,13 @@ FLDomNodeInterface *FLReportEngine::reportData() const
 FLDomNodeInterface *FLReportEngine::reportTemplate() const
 {
   return FLDomNodeInterface::nodeInterface(rt ? *rt : QDomDocument());
+}
+
+void FLReportEngine::exportToOds(FLReportPages *pages)
+{
+  if (!pages || !pages->pageCollection())
+    return;
+  MReportEngine::exportToOds(pages->pageCollection());
 }
 
 FLReportPages *FLReportEngine::renderReport(int initRow, int initCol,

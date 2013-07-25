@@ -55,7 +55,7 @@
 #include <messageclass.h>
 #include <mailfolder.h>
 
-class LocalMailFolder : public MailFolder
+class AQMAIL_EXPORT LocalMailFolder : public MailFolder
 {
 public:
 

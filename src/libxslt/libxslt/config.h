@@ -47,7 +47,9 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define if pthread library is there (-lpthread) */
+#ifndef WIN32
 #define HAVE_LIBPTHREAD /**/
+#endif
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
@@ -74,7 +76,9 @@
 #define HAVE_PRINTF 1
 
 /* Define if <pthread.h> is there */
+#ifndef WIN32
 #define HAVE_PTHREAD_H /**/
+#endif
 
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1

@@ -1,8 +1,8 @@
-TEMPLATE = subdirs
+TEMPLATE	= subdirs
 no-png {
     message("Tools not available without PNG support")
 } else {
-    SUBDIRS = assistant/lib \
+    SUBDIRS		= assistant/lib \
 	      designer \
               linguist
 }

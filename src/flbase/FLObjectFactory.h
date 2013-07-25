@@ -354,6 +354,16 @@ public slots:
   }
 
   /**
+   Obtiene la contraseña del usuario conectado a la base de datos
+
+   @param connName Nombre de la conexion
+   @return Contraseña del usuario
+   */
+  QString passUser(const QString &connName = "default") const {
+    return FLSqlConnections::database(connName)->password();
+  }
+
+  /**
    Obtiene el nombre de la base de datos
 
    @param connName Nombre de la conexion
@@ -454,11 +464,17 @@ public slots:
    @param host  Nombre o dirección del servidor de la base de datos
    @param port  Puerto TCP de conexion
    @param connectionName Nombre de la nueva conexion
+   @param connectOptions Contiene opciones auxiliares de conexión a la base de datos.
+                        El formato de la cadena de opciones es una lista separada por punto y coma
+                        de nombres de opción o la opción = valor. Las opciones dependen del uso del
+                        driver de base de datos.
    @return TRUE si se pudo realizar la conexión, FALSE en caso contrario
    */
   bool addDatabase(const QString &driverAlias, const QString &nameDB, const QString &user,
-                   const QString &password, const QString &host, int port, const QString &connectionName) {
-    return FLSqlConnections::addDatabase(driverAlias, nameDB, user, password, host, port, connectionName);
+                   const QString &password, const QString &host, int port,
+                   const QString &connectionName, const QString &connectOptions = QString::null) {
+    return FLSqlConnections::addDatabase(driverAlias, nameDB, user, password, host, port,
+                                         connectionName, connectOptions);
   }
 
   /**
@@ -623,7 +639,7 @@ public slots:
    @return El nivel actual de anidamiento de transacciones, 0 no hay transaccion
    */
   int transactionLevel() {
-    return FLSqlCursor::transactionLevel();
+    return (obj_->db() ? obj_->db()->transactionLevel() : 0);
   }
 
   /**
@@ -857,6 +873,7 @@ public slots:
     return false;
   }
 
+
   FLApplication *obj() {
     return obj_;
   }
@@ -992,6 +1009,10 @@ public slots:
   void setModeAccess(const int m) {
     if (obj_)
       obj_->setModeAccess(m);
+  }
+
+  QString connectionName() const {
+    return obj_->connectionName();
   }
 
   /**
@@ -1345,14 +1366,16 @@ public slots:
    Redefinición del método select() de QSqlCursor
    */
   bool select(const QString &filter, const QSqlIndex &sort = QSqlIndex()) {
-    return (obj_ ? obj_->select(QString(filter).replace("NaN", ""), sort) : false);
+    if (!obj_ || obj_->aqWasDeleted())
+      return false;
+    return obj_->select(QString(filter).replace("NaN", ""), sort);
   }
 
   /**
    Redefinicion del método select() de QSqlCursor
    */
   bool select() {
-    if (!obj_)
+    if (!obj_ || obj_->aqWasDeleted())
       return false;
     obj_->QSqlCursor::setFilter(obj_->curFilter());
     return obj_->QSqlCursor::select();
@@ -1485,7 +1508,7 @@ public slots:
    */
   void setAction(const QString &action) {
     if (obj_) {
-      const FLAction *a = obj_->db()->manager()->action(action);
+      FLAction *a = obj_->db()->manager()->action(action);
       if (a)
         obj_->setAction(a);
     }
@@ -1617,7 +1640,7 @@ public slots:
    @return El nivel actual de anidamiento de transacciones, 0 no hay transaccion
    */
   int transactionLevel() {
-    return FLSqlCursor::transactionLevel();
+    return (obj_ ? obj_->transactionLevel() : 0);
   }
 
   /**
@@ -1749,6 +1772,17 @@ public slots:
     return obj_->concurrencyFields();
   }
 
+  /**
+  Cambia el cursor a otra conexión de base de datos
+  */
+  void changeConnection(const QString &connName) {
+    obj_->changeConnection(connName);
+  }
+
+  QSqlCursor *qSqlCursor() const {
+    return static_cast<QSqlCursor *>(obj_);
+  }
+
   FLSqlCursor *obj() {
     return obj_;
   }
@@ -1776,6 +1810,9 @@ public slots:
   }
   void emitBufferCommited() {
     emit bufferCommited();
+  }
+  void emitCommited() {
+    emit commited();
   }
 
 signals:
@@ -1812,9 +1849,20 @@ signals:
   void autoCommit();
 
   /**
-   Indica que se ha realizado un commit
+   Indica que se ha realizado un commitBuffer
    */
   void bufferCommited();
+
+  /**
+  Indica que se ha cambiado la conexión de base de datos del cursor. Ver changeConnection
+  */
+  void connectionChanged();
+
+  /**
+   Indica que se ha realizado un commit
+   */
+  void commited();
+
 
 private:
 
@@ -2124,8 +2172,18 @@ class  FLFieldDBInterface : public QObject
   Q_PROPERTY(bool showAlias READ showAlias WRITE setShowAlias)
   Q_PROPERTY(bool showEditor READ showEditor WRITE setShowEditor)
   Q_PROPERTY(int textFormat READ textFormat WRITE setTextFormat)
+  Q_PROPERTY(int echoMode READ echoMode WRITE setEchoMode)
+  Q_PROPERTY(AutoCompMode autoCompletionMode READ autoCompletionMode WRITE setAutoCompletionMode)
+
+  Q_ENUMS(AutoCompMode)
 
 public:
+
+  enum AutoCompMode {
+    NeverAuto = 0,
+    OnDemandF4,
+    AlwaysAuto
+  };
 
   /**
    Constructor
@@ -2341,6 +2399,39 @@ public slots:
   }
 
   /**
+  Carga una imagen en el campo de tipo pixmap con el ancho y alto preferido
+
+  @param pixmap: pixmap a cargar en el campo
+  @param w: ancho preferido de la imagen
+  @param h: alto preferido de la imagen
+  @author Silix
+  */
+  void setPixmapFromPixmap(const QPixmap &pixmap, const int w = 0, const int h = 0) {
+    obj_->setPixmapFromPixmap(pixmap, w, h);
+  }
+
+  /**
+  Guarda imagen de campos tipo Pixmap en una ruta determinada.
+
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &filename, const char *format) {
+    obj_->savePixmap(filename, format);
+  }
+
+  /**
+  Devueve el objeto imagen asociado al campo
+
+  @return imagen asociada al campo
+  @author Silix
+  */
+  QPixmap pixmap() {
+    return obj_->pixmap();
+  }
+
+  /**
    Hace que el control tome el foco
    */
   void setFocus() {
@@ -2393,7 +2484,7 @@ public slots:
 
    @param f Formato del campo
    */
-  void setTextFormat(const int &f) {
+  void setTextFormat(int f) {
     Qt::TextFormat tt;
     switch (f) {
       case 0: {
@@ -2424,6 +2515,22 @@ public slots:
    */
   int textFormat() const {
     return obj_->textFormat();
+  }
+
+  /**
+  Establece el modo de "echo"
+
+  @param m Modo (Normal, NoEcho, Password)
+  */
+  void setEchoMode(int m) {
+    obj_->setEchoMode(m);
+  }
+
+  /**
+  @return El mode de "echo" (Normal, NoEcho, Password)
+  */
+  int echoMode() const {
+    return obj_->echoMode();
   }
 
   /**
@@ -2468,6 +2575,16 @@ public slots:
     obj_->setPartDecimal(d);
   }
 
+  /**
+  Para asistente de completado automático.
+  */
+  void setAutoCompletionMode(AutoCompMode m) {
+    obj_->setAutoCompletionMode((FLFieldDB::AutoCompMode) m);
+  }
+  AutoCompMode autoCompletionMode() const {
+    return (FLFieldDBInterface::AutoCompMode) obj_->autoCompletionMode();
+  }
+
   FLFieldDB *obj() {
     return obj_;
   }
@@ -2494,6 +2611,11 @@ signals:
    Señal emitida si se pulsa la tecla Return
    */
   void keyReturnPressed();
+
+  /**
+  Señal de foco perdido
+  */
+  void lostFocus();
 
 private:
 
@@ -2522,6 +2644,7 @@ class  FLTableDBInterface : public QObject
   Q_PROPERTY(bool filterHidden READ filterHidden WRITE setFilterHidden)
   Q_PROPERTY(bool showAllPixmaps READ showAllPixmaps WRITE setShowAllPixmaps)
   Q_PROPERTY(QString functionGetColor READ functionGetColor WRITE setFunctionGetColor)
+  Q_PROPERTY(bool onlyTable READ onlyTable WRITE setOnlyTable)
 
 public:
 
@@ -2612,6 +2735,13 @@ public slots:
   }
 
   /**
+   Establece el nombre de función a llamar cuando cambia el filtro de búsqueda
+   */
+  void setFilterRecordsFunction( QString fn) {
+    obj_->setFilterRecordsFunction(fn);
+    
+  } 
+  /**
    Establece si el componente esta en modo solo edición o no.
    */
   void setEditOnly(const bool mode) {
@@ -2700,7 +2830,15 @@ public slots:
   QString filter() {
     return obj_->filter();
   }
-
+  
+  bool isSortOrderAscending() {
+    return obj_->isSortOrderAscending();  
+  }
+  
+  void setSortOrder(int ascending) {
+    obj_->setSortOrder(ascending);  
+  }
+  
   /**
    Obtiene el filtro impuesto en el Find.
 
@@ -2737,6 +2875,10 @@ public slots:
 
   void emitInsertOnlyChanged(bool b) {
     emit insertOnlyChanged(b);
+  }
+
+  void emitRefreshed() {
+    emit refreshed();
   }
 
   /**
@@ -2801,6 +2943,15 @@ public slots:
   }
 
   /**
+  Establece el segundo campo de búsqueda
+
+  @author Silix - dpinelo
+  */
+  void putSecondCol(const QString &c) {
+    obj_->putSecondCol(c);
+  }
+
+  /**
    Mueve una columna de un campo origen a la columna de otro campo destino
 
    @param  from  Nombre del campo de la columna de origen
@@ -2824,6 +2975,14 @@ public slots:
    */
   QStringList orderCols() {
     return obj_->orderCols();
+  }
+
+  /**
+  Conmuta el sentido de la ordenación de los registros de la tabla, de ascendente a descendente y
+  viceversa. Los registros siempre se ordenan por la primera columna.
+  */
+  void switchSortOrder(int col = -1) {
+    obj_->switchSortOrder(col);
   }
 
   /**
@@ -2988,7 +3147,22 @@ public slots:
     obj_->setFunctionGetColor(f);
   }
 
+  /**
+    Ver FLTableDB::onlyTable_
+    */
+  void setOnlyTable(bool on = true) {
+    obj_->setOnlyTable(on);
+  }
+  bool onlyTable() const {
+    return obj_->onlyTable();
+  }
+
 signals:
+
+  /**
+   Señal emitida cuando se refresca la tabla
+   */
+  void refreshed();
 
   /**
    Señal emitida cuando se establece si el componente es o no de solo lectura.
@@ -3975,7 +4149,7 @@ public:
    Constructor
    */
   FLFormDBInterface(const QString &a, QWidget *p, WFlags f = 0)
-    : QObject(p), obj_(0), cursor_(0), script_(0) {
+    : QObject(p), obj_(0), script_(0) {
     setObj(new FLFormDB(a, p ? p : aqApp->mainWidget(), f));
   }
 
@@ -3983,27 +4157,21 @@ public:
    Constructor
    */
   FLFormDBInterface(FLSqlCursorInterface *c, const QString &a, QWidget *p, WFlags f = 0)
-    : QObject(p), obj_(0), cursor_(0), script_(0) {
+    : QObject(p), obj_(0), script_(0) {
     setObj(new FLFormDB(c->obj(), a, p ? p : aqApp->mainWidget(), f));
   }
 
   /**
    Constructor
    */
-  FLFormDBInterface(FLFormDB *obj) : QObject(obj), obj_(0), cursor_(0), script_(0) {
+  FLFormDBInterface(FLFormDB *obj) : QObject(obj), obj_(0), script_(0) {
     setObj(obj);
   }
 
   /**
    Constructor
    */
-  FLFormDBInterface() : QObject(0), obj_(0), cursor_(0), script_(0) {}
-
-  /**
-   Destructor
-   */
-  ~FLFormDBInterface() {
-  }
+  FLFormDBInterface() : QObject(0), obj_(0), script_(0) {}
 
   /**
    Establece el objeto del formulario
@@ -4014,20 +4182,8 @@ public:
     obj_ = obj;
     if (obj_) {
       setName(obj_->name());
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
       connects();
-    } else
-      cursor_ = 0;
-  }
-
-  /**
-   Establece el cursor del objeto relacionado con el formulario
-
-   @param c. cursor del formulario
-   */
-  void setObjCursor(FLSqlCursor *c) {
-    if (c && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
+    }
   }
 
   /**
@@ -4051,10 +4207,8 @@ public slots:
    @param c. cursor del formulario
    */
   void setCursor(FLSqlCursorInterface *c) {
-    if (c && obj_) {
+    if (c && obj_)
       obj_->setCursor(c->obj());
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-    }
   }
 
   /**
@@ -4063,9 +4217,9 @@ public slots:
    @return Cursor del formulario
    */
   FLSqlCursorInterface *cursor() {
-    if (!cursor_ && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-    return (cursor_ ? cursor_ : new FLSqlCursorInterface());
+    if (!obj_)
+      return new FLSqlCursorInterface();
+    return FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
   }
 
   /**
@@ -4126,6 +4280,15 @@ public slots:
   }
 
   /**
+   Devuelve si se ha aceptado el formulario
+
+   @return devuelve TRUE si el formulario ha sido aceptado y FALSE si no se ha aceptado
+   */
+  bool accepted() {
+    return (obj_ ? obj_->accepted() : false);
+  }
+
+  /**
    Devuelve un objeto hijo de formulario
 
    @param objName. Nombre del objeto hijo
@@ -4172,6 +4335,22 @@ public slots:
       return false;
   }
 
+  /**
+   Realiza las operaciones equivalentes a pulsar el boton aceptar
+   */
+  void accept() {
+    if (obj_)
+      obj_->accept();
+  }
+
+  /**
+   Realiza las operaciones equivalentes a pulsar el botón cancelar
+   */
+  void reject() {
+    if (obj_)
+      obj_->reject();
+  }
+
   FLFormDB *obj() {
     return obj_;
   }
@@ -4201,6 +4380,13 @@ public slots:
   void saveSnapShot(const QString &pathFile) {
     if (obj_)
       obj_->saveSnapShot(pathFile);
+  }
+
+  /**
+  Sólo para compatibilizar con FLFormSearchDB. Por defecto sólo llama QWidget::show
+  */
+  QVariant exec(const QString & = QString::null) {
+    return (obj_ ? obj_->exec() : QVariant());
   }
 
   /**
@@ -4238,6 +4424,14 @@ public slots:
     obj_->setCaptionWidget(text);
   }
 
+  /**
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
+  */
+  QString formClassName() const {
+    if (obj_)
+      return obj_->formClassName();
+  }
+
 signals:
 
   /**
@@ -4255,7 +4449,6 @@ private:
   void connects() const;
 
   FLFormDB *obj_;
-  FLSqlCursorInterface *cursor_;
   QSScript *script_;
 };
 
@@ -4275,29 +4468,23 @@ public:
   /**
    Constructor
    */
-  FLFormRecordDBInterface(FLSqlCursorInterface *c, const QString &a, QWidget *p, bool sA) : QObject(p), obj_(0),
-    cursor_(0), script_(0) {
+  FLFormRecordDBInterface(FLSqlCursorInterface *c, const QString &a, QWidget *p, bool sA)
+    : QObject(p), obj_(0), script_(0) {
     setObj(new FLFormRecordDB(c->obj(), a, aqApp->mainWidget(), sA));
   }
 
   /**
    Constructor
    */
-  FLFormRecordDBInterface(FLFormRecordDB *obj) : QObject(obj), obj_(0), cursor_(0), script_(0) {
+  FLFormRecordDBInterface(FLFormRecordDB *obj)
+    : QObject(obj), obj_(0), script_(0) {
     setObj(obj);
   }
 
   /**
    Constructor
    */
-  FLFormRecordDBInterface() : QObject(0), obj_(0), cursor_(0), script_(0) {}
-
-  /**
-   Destructor
-   */
-  ~FLFormRecordDBInterface() {}
-
-  void finish() {}
+  FLFormRecordDBInterface() : QObject(0), obj_(0), script_(0) {}
 
   /**
    Establece el objeto de formRecord
@@ -4308,20 +4495,8 @@ public:
     obj_ = obj;
     if (obj_) {
       setName(obj_->name());
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
       connects();
-    } else
-      cursor_ = 0;
-  }
-
-  /**
-   Establece el cursor del objeto relacionado con el formulario
-
-   @param c. cursor del formulario
-   */
-  void setObjCursor(FLSqlCursor *c) {
-    if (c && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
+    }
   }
 
   /**
@@ -4350,13 +4525,8 @@ public slots:
    @param c. Objeto cursor
    */
   void setCursor(FLSqlCursorInterface *c) {
-    if (c) {
-      if (obj_) {
-        obj_->setCursor(c->obj());
-        cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-      } else
-        cursor_ = c;
-    }
+    if (c && obj_)
+      obj_->setCursor(c->obj());
   }
 
   /**
@@ -4365,9 +4535,9 @@ public slots:
    @return Objeto cursor
    */
   FLSqlCursorInterface *cursor() {
-    if (!cursor_ && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-    return (cursor_ ? cursor_ : new FLSqlCursorInterface());
+    if (!obj_)
+      return new FLSqlCursorInterface();
+    return FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
   }
 
   /**
@@ -4416,6 +4586,15 @@ public slots:
   void setMainWidget(const QString &uiFileName) {
     if (obj_)
       ::qt_cast<FLFormDB *>(obj_)->setMainWidget(uiFileName);
+  }
+
+  /**
+   Devuelve si se ha aceptado el formulario
+
+   @return devuelve TRUE si el formulario ha sido aceptado y FALSE si no se ha aceptado
+   */
+  bool accepted() {
+    return (obj_ ? obj_->accepted() : false);
   }
 
   /**
@@ -4521,6 +4700,13 @@ public slots:
   }
 
   /**
+  Sólo para compatibilizar con FLFormSearchDB. Por defecto sólo llama QWidget::show
+  */
+  QVariant exec(const QString & = QString::null) {
+    return (obj_ ? obj_->exec() : QVariant());
+  }
+
+  /**
    Redefinida por conveniencia
    */
   void show() {
@@ -4555,6 +4741,14 @@ public slots:
     obj_->setCaptionWidget(text);
   }
 
+  /**
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
+  */
+  QString formClassName() const {
+    if (obj_)
+      return obj_->formClassName();
+  }
+
 signals:
 
   /**
@@ -4572,7 +4766,6 @@ private:
   void connects() const;
 
   FLFormRecordDB *obj_;
-  FLSqlCursorInterface *cursor_;
   QSScript *script_;
 };
 
@@ -4592,40 +4785,39 @@ public:
   /**
    Constructor
    */
-  FLFormSearchDBInterface(const QString &a) : QObject(0), obj_(0), cursor_(0),
-    script_(0) {
+  FLFormSearchDBInterface(const QString &a)
+    : QObject(0), obj_(0), script_(0) {
     setObj(new FLFormSearchDB(a));
   }
 
   /**
    Constructor
    */
-  FLFormSearchDBInterface(FLSqlCursorInterface *c, const QString &a) : QObject(0), obj_(0), cursor_(0),
-    script_(0) {
+  FLFormSearchDBInterface(FLSqlCursorInterface *c, const QString &a)
+    : QObject(0), obj_(0), script_(0) {
     setObj(new FLFormSearchDB(c->obj(), a));
   }
 
   /**
    Constructor
    */
-  FLFormSearchDBInterface(FLFormSearchDB *obj) : QObject(obj), obj_(0), cursor_(0), script_(0) {
+  FLFormSearchDBInterface(FLFormSearchDB *obj)
+    : QObject(obj), obj_(0), script_(0) {
     setObj(obj);
   }
 
   /**
    Constructor
    */
-  FLFormSearchDBInterface() : QObject(0), obj_(0), cursor_(0), script_(0) {
-  }
+  FLFormSearchDBInterface() : QObject(0), obj_(0), script_(0) {}
 
   /**
    Destructor
    */
   ~FLFormSearchDBInterface() {
-    close();
+    if (obj_ && !obj_->aqWasDeleted())
+      close();
   }
-
-  void finish() {}
 
   /**
    Establece el objeto FLFormSearchDB asociado
@@ -4636,20 +4828,8 @@ public:
     obj_ = obj;
     if (obj_) {
       setName(obj_->name());
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
       connects();
-    } else
-      cursor_ = 0;
-  }
-
-  /**
-   Establece el cursor del objeto relacionado con el formulario
-
-   @param c. cursor del formulario
-   */
-  void setObjCursor(FLSqlCursor *c) {
-    if (c && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
+    }
   }
 
   /**
@@ -4676,10 +4856,8 @@ public slots:
    Establece un cursor para el objeto
    */
   void setCursor(FLSqlCursorInterface *c) {
-    if (c && obj_) {
+    if (c && obj_)
       obj_->setCursor(c->obj());
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-    }
   }
 
   /**
@@ -4688,9 +4866,9 @@ public slots:
    @return Objeto cursor
    */
   FLSqlCursorInterface *cursor() {
-    if (!cursor_ && obj_)
-      cursor_ = FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
-    return (cursor_ ? cursor_ : new FLSqlCursorInterface());
+    if (!obj_)
+      return new FLSqlCursorInterface();
+    return FLSqlCursorInterface::sqlCursorInterface(obj_->cursor());
   }
 
   /**
@@ -4755,9 +4933,13 @@ public slots:
   QVariant exec(const QString &n = QString::null) {
     return (obj_ ? obj_->exec(n) : QVariant());
   }
+
+  /**
+   Redefinida por conveniencia
+   */
   void show() {
     if (obj_)
-      obj_->exec();
+      obj_->show();
   }
 
   /**
@@ -4880,6 +5062,14 @@ public slots:
     obj_->setCaptionWidget(text);
   }
 
+  /**
+  Devuelve el nombre de la clase del formulario en tiempo de ejecución
+  */
+  QString formClassName() const {
+    if (obj_)
+      return obj_->formClassName();
+  }
+
 signals:
 
   /**
@@ -4897,7 +5087,6 @@ private:
   void connects() const;
 
   FLFormSearchDB *obj_;
-  FLSqlCursorInterface *cursor_;
   QSScript *script_;
 };
 
@@ -5799,6 +5988,18 @@ public slots:
 
   bool execSql(const QString &sql, const QString &connName = "default") {
     return FLUtil::execSql(sql, connName);
+  }
+
+  /**
+  Guarda imagen Pixmap en una ruta determinada.
+
+  @param data Contenido de la imagen en una cadena de caracteres
+  @param filename: Ruta al fichero donde se guardará la imagen
+  @param fmt Indica el formato con el que guardar la imagen
+  @author Silix
+  */
+  void savePixmap(const QString &data, const QString &filename, const char *format) {
+    FLUtil::savePixmap(data, filename, format);
   }
 
   /**
@@ -6852,7 +7053,7 @@ class  FLReportViewerInterface : public QObject
 {
 
   Q_OBJECT
-  Q_ENUMS(RenderReportFlags)
+  Q_ENUMS(RenderReportFlags PrinterColorMode)
 
 public:
 
@@ -6860,6 +7061,10 @@ public:
     Append    = 0x00000001,
     Display   = 0x00000002,
     PageBreak = 0x00000004
+  };
+
+  enum PrinterColorMode {
+    PrintGrayScale, PrintColor
   };
 
   /**
@@ -7240,6 +7445,20 @@ public slots:
   }
 
   /**
+  Establece el modo de color de la impresión (PrintColor, PrintGrayScale)
+  */
+  void setColorMode(uint c) {
+    obj_->setColorMode(c);
+  }
+
+  /**
+  Obtiene el modo de color de la impresión establecido
+  */
+  uint colorMode() const {
+    return obj_->colorMode();
+  }
+
+  /**
   Metodos proporcionados por ergonomia. Son un enlace a los
   mismos métodos que proporciona FLReportPages, para manejar
   la coleccion de paginas del visor
@@ -7493,7 +7712,7 @@ public slots:
     obj_->setPaperWidth((FLPosPrinter::PaperWidth)pw);
   }
 
-  const QString &printerName() {
+  QString printerName() {
     return obj_->printerName();
   }
 
@@ -7530,8 +7749,38 @@ private:
 class  FLSmtpClientInterface : public QObject
 {
   Q_OBJECT
+  Q_ENUMS(State)
 
 public:
+
+  enum State {
+    Init,
+    Mail,
+    Rcpt,
+    Data,
+    Body,
+    Quit,
+    Close,
+    SmtpError,
+    Connecting,
+    Connected,
+    MxDnsError,
+    SendOk,
+    SocketError,
+    Composing,
+    Attach,
+    AttachError,
+    ServerError,    // 4xx smtp error
+    ClientError,    // 5xx smtp error
+    StartTTLS,
+    WaitingForSTARTTLS,
+    SendAuthPlain,
+    SendAuthLogin,
+    WaitingForAuthPlain,
+    WaitingForAuthLogin,
+    WaitingForUser,
+    WaitingForPass
+  };
 
   /**
    Constructor
@@ -7641,6 +7890,20 @@ public slots:
     obj_->startSend();
   }
 
+  /**
+  Devuelve el último mensaje de estado
+  */
+  QString lastStatusMsg() const {
+    return obj_->lastStatusMsg();
+  }
+
+  /**
+  Devuelve el último código de estado
+  */
+  int lastStateCode() const {
+    return obj_->lastStateCode();
+  }
+
   void emitStatus(const QString &st) {
     emit status(st);
   }
@@ -7691,6 +7954,11 @@ signals:
    Indica el número de paso que se va ejecutar. Usado para diálogos de progreso.
    */
   void sendStepNumber(int);
+
+  /**
+  Informa del estado del envío, incluyendo código de estado
+  */
+  void statusChanged(const QString &, int);
 
 private:
 
@@ -8086,6 +8354,21 @@ public:
                           objName.isEmpty() ? 0 : objName.latin1(),
                           regexpMatch, recursiveSearch);
       l_->first();
+    } else { // Si obj == 0 devuelve QApplication::topLevelWidgets()
+      l_ = new QObjectList;
+      QWidgetList  *list = QApplication::topLevelWidgets();
+      QWidgetListIt it(*list);
+      QWidget *w;
+      while ((w = it.current()) != 0) {
+        ++it;
+        if (!inheritsClass.isEmpty() && !w->inherits(inheritsClass))
+          continue;
+        if (!objName.isEmpty() && w->QObject::name() != objName)
+          continue;
+        l_->append(w);
+      }
+      delete list;
+      l_->first();
     }
   }
 
@@ -8093,6 +8376,17 @@ public:
     QObject(0), l_(0) {
     if (obj) {
       l_ = obj->queryList();
+      l_->first();
+    } else { // Si obj == 0 devuelve QApplication::topLevelWidgets()
+      l_ = new QObjectList;
+      QWidgetList  *list = QApplication::topLevelWidgets();
+      QWidgetListIt it(*list);
+      QWidget *w;
+      while ((w = it.current()) != 0) {
+        ++it;
+        l_->append(w);
+      }
+      delete list;
       l_->first();
     }
   }

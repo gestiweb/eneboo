@@ -11,7 +11,8 @@ CONFIG += warn_off createprl staticlib qt
 CONFIG -= dll
 unix:CONFIG += x11
 
-INCLUDEPATH += $$ROOT $$ROOT/src/kugar $$ROOT/src/flbase $$ROOT/src/flmail $$ROOT/src/serialport
+INCLUDEPATH += $$ROOT $$ROOT/src/kugar $$ROOT/src/flbase $$ROOT/src/flmail \
+               $$ROOT/src/serialport $$ROOT/tools/aqods
 DEPENDPATH += $$ROOT/src/flbase
 
 LIBS += -L$$PREFIX/lib
@@ -42,7 +43,11 @@ mac {
 	INCLUDEPATH += $$ROOT/src/qsa/src/qsa
         INCLUDEPATH += $$ROOT/src/qsa/src/ide
 }
-
+shared {
+       win32:DEFINES += AQ_DLL
+} else {
+       win32:DEFINES += AQ_NO_DLL
+}
 SOURCES += mcalcobject.cpp \
            mfieldobject.cpp \
            mlabelobject.cpp \

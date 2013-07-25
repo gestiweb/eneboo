@@ -53,8 +53,6 @@
 #ifndef QSQL_MYSQL_H
 #define QSQL_MYSQL_H
 
-#include <qsqldriver.h>
-#include <qsqlresult.h>
 #include <qsqlfield.h>
 #include <qsqlindex.h>
 #include <qmessagebox.h>
@@ -81,6 +79,7 @@
 #define Q_EXPORT_SQLDRIVER_MYSQL Q_EXPORT
 #endif
 
+class QMYSQLCacheInfoPrivate;
 class QMYSQLDriverPrivate;
 class QMYSQLResultPrivate;
 class QMYSQLDriver;
@@ -89,116 +88,121 @@ class QSqlRecordInfo;
 class Q_EXPORT_SQLDRIVER_MYSQL QMYSQLDriver : public FLSqlDriver
 {
 
-    Q_OBJECT
+  Q_OBJECT
 
-    friend class QMYSQLResult;
+  friend class QMYSQLResult;
 
 public:
 
-    enum MySQLVersion {
-        Version4 = 4,
-        Version5 = 5
-    };
+  enum MySQLVersion {
+    Version4 = 4,
+    Version5 = 5
+  };
 
-    QMYSQLDriver( QObject * parent = 0, const char * name = 0 );
-    QMYSQLDriver( MYSQL * con, QObject * parent = 0, const char * name = 0 );
-    ~QMYSQLDriver();
-    bool hasFeature( DriverFeature f ) const;
-    bool open( const QString & db, const QString & user = QString::null,
-               const QString & password = QString::null, const QString & host = QString::null, int port = -1 );
-    void close();
-    QSqlQuery createQuery() const;
-    QStringList tables( const QString & user ) const;
-    QSqlIndex primaryIndex( const QString & tablename ) const;
-    QSqlRecord record( const QString & tablename ) const;
-    QSqlRecord record( const QSqlQuery & query ) const;
-    QSqlRecordInfo recordInfo( const QString & tablename ) const;
-    QSqlRecordInfo recordInfo( const QSqlQuery & query ) const;
-    QString formatValue( const QSqlField * field, bool trimStrings ) const;
-    MYSQL * mysql();
-    // ### remove me for 4.0
-    bool open( const QString& db, const QString& user, const QString& password,
-               const QString& host, int port, const QString& connOpts );
+  QMYSQLDriver(QObject *parent = 0, const char *name = 0);
+  QMYSQLDriver(MYSQL *con, QObject *parent = 0, const char *name = 0);
+  ~QMYSQLDriver();
+  bool hasFeature(DriverFeature f) const;
+  bool open(const QString &db, const QString &user = QString::null,
+            const QString &password = QString::null, const QString &host = QString::null, int port = -1);
+  void close();
+  QSqlQuery createQuery() const;
+  QStringList tables(const QString &user) const;
+  QSqlIndex primaryIndex(const QString &tablename) const;
+  QSqlRecord record(const QString &tablename) const;
+  QSqlRecord record(const QSqlQuery &query) const;
+  QSqlRecordInfo recordInfo(const QString &tablename) const;
+  QSqlRecordInfo recordInfo(const QSqlQuery &query) const;
+  QString formatValue(const QSqlField *field, bool trimStrings) const;
+  MYSQL *mysql();
+  // ### remove me for 4.0
+  bool open(const QString &db, const QString &user, const QString &password,
+            const QString &host, int port, const QString &connOpts);
 
-    bool tryConnect( const QString & db, const QString & user = QString::null,
-                     const QString & password = QString::null, const QString & host = QString::null, int port = -1 );
-    QString sqlCreateTable( FLTableMetaData * tmd );
-    QString formatValueLike( int t, const QVariant & v, const bool upper = false );
-    QString formatValue( int t, const QVariant & v, const bool upper = false );
-    QVariant nextSerialVal( const QString & table, const QString & field );
-    int atFrom( FLSqlCursor * cur );
-    bool alterTable( const QString & mtd1, const QString & mtd2, const QString & key = QString::null );
-    bool canSavePoint();
-    bool savePoint( const QString & n );
-    bool releaseSavePoint( const QString & n );
-    bool rollbackSavePoint( const QString & n );
-    MySQLVersion version() const;
+  bool tryConnect(const QString &db, const QString &user = QString::null,
+                  const QString &password = QString::null, const QString &host = QString::null, int port = -1);
+  QString sqlCreateTable(const FLTableMetaData *tmd);
+  QString formatValueLike(int t, const QVariant &v, const bool upper = false);
+  QString formatValue(int t, const QVariant &v, const bool upper = false);
+  QVariant nextSerialVal(const QString &table, const QString &field);
+  int atFrom(FLSqlCursor *cur);
+  bool alterTable(const QString &mtd1, const QString &mtd2, const QString &key = QString::null);
+  bool canSavePoint();
+  bool savePoint(const QString &n);
+  bool releaseSavePoint(const QString &n);
+  bool rollbackSavePoint(const QString &n);
+  MySQLVersion version() const;
+  bool mismatchedTable(const QString &table,
+                       const FLTableMetaData *tmd) const;
 
 private slots:
 
-    void Mr_Proper();
+  void Mr_Proper();
 
 protected:
 
-    bool beginTransaction();
-    bool commitTransaction();
-    bool rollbackTransaction();
+  bool beginTransaction();
+  bool commitTransaction();
+  bool rollbackTransaction();
 
 private:
 
-    QSqlIndex primaryIndex2( const QString& tablename ) const;
-    QSqlRecord record2( const QString& tablename ) const;
-    QSqlRecordInfo recordInfo2( const QString& tablename ) const;
-    bool alterTable2( const QString & mtd1, const QString & mtd2,
-                      const QString & key = QString::null, bool force = false );
+  QSqlIndex primaryIndex2(const QString &tablename) const;
+  QSqlRecord record2(const QString &tablename) const;
+  QSqlRecord record(const FLTableMetaData *mtd) const;
+  QSqlRecordInfo recordInfo2(const QString &tablename) const;
+  bool alterTable2(const QString &mtd1, const QString &mtd2,
+                   const QString &key = QString::null, bool force = false);
 #ifndef FL_QUICK_CLIENT
-    void createIndex( const QString & fieldName, const QString & tableName ) const;
-    static QDict < bool > * dictIndexes;
+  void createIndex(const QString &fieldName, const QString &tableName) const;
+  static QDict < bool > * dictIndexes;
 #endif
+  void init();
+  bool mismatchedTable(const QString &table1, const QString &table2) const;
 
-    void init();
-    MySQLVersion version_;
-    QMYSQLDriverPrivate* d;
+  MySQLVersion version_;
+  QMYSQLDriverPrivate *d;
+  QMYSQLCacheInfoPrivate *cInfo;
 
-    bool existsDatabase( const QString & db, const QString & user,
-                         const QString & password, const QString & host, int port );
+  bool existsDatabase(const QString &db, const QString &user,
+                      const QString &password, const QString &host, int port);
 
-    int insertMulti( const QString & tablename, QPtrList<QSqlRecord> * records );
+  int insertMulti(const QString &tablename, QPtrList<QSqlRecord> * records);
 };
 
 class QMYSQLResult : public QSqlResult
 {
-    friend class QMYSQLDriver;
+  friend class QMYSQLDriver;
 
 public:
 
-    QMYSQLResult( const QMYSQLDriver * db );
-    ~QMYSQLResult();
-    MYSQL_RES * result();
+  QMYSQLResult(const QMYSQLDriver *db);
+  ~QMYSQLResult();
+  MYSQL_RES *result();
 
 protected:
 
-    void cleanup();
-    bool fetch( int i );
-    bool fetchNext();
-    bool fetchLast();
-    bool fetchFirst();
-    QVariant data( int field );
-    bool isNull( int field );
-    bool reset( const QString & query );
-    int size();
-    int numRowsAffected();
+  void cleanup();
+  bool fetch(int i);
+  bool fetchNext();
+  bool fetchLast();
+  bool fetchFirst();
+  QVariant data(int field);
+  bool isNull(int field);
+  bool reset(const QString &query);
+  int size();
+  int numRowsAffected();
 
 private:
 
-    my_ulonglong calcSize();
-    bool fetchF( int i );
-    bool fetchNextF();
-    bool resetF( const QString & query );
-    bool nextResult( int i );
-    void cleanupCache();
-    QMYSQLDriver::MySQLVersion version_;
-    QMYSQLResultPrivate* d;
+  my_ulonglong calcSize();
+  bool fetchF(int i);
+  bool fetchNextF();
+  bool resetF(const QString &query);
+  bool nextResult(int i);
+  void cleanupCache();
+  QMYSQLDriver::MySQLVersion version_;
+  QMYSQLResultPrivate *d;
 };
 
 #endif

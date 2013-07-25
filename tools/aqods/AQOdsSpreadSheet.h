@@ -27,7 +27,7 @@ class AQOdsSpreadSheet : public Spreadsheet
 {
 public:
   AQOdsSpreadSheet(AQOdsGenerator& gen)
-    : Spreadsheet(gen.strStream()) {}
+    : Spreadsheet(gen.fileStream()) {}
 };
 
 #endif /* AQSODSSPREADSHEET_H */

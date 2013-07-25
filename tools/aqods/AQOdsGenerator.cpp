@@ -19,6 +19,8 @@
 #include "AQOdsGenerator.h"
 #include "AQS_p.h"
 #include "AQZipWriter.h"
+#include "FLDiskCache.h"
+
 
 QString data_main("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 "<xsl:stylesheet \n"
@@ -621,6 +623,81 @@ QString data_chart("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
 
 
+bool isXmlCharODS(const QChar &c)
+{
+  // Characters in this range must be accepted by XML parsers.
+  // Consequently characters outside of this range need to be escaped.
+
+  ushort uc = c.unicode();
+
+  return uc == 0x9
+         || uc == 0xA
+         || uc == 0xD
+         || 0x20 <= uc && uc <= 0xD7FF
+         || 0xE000 <= uc && uc <= 0xFFFD;
+}
+
+// ### AbanQ
+// to do compliant with the standar XML 1.0
+// 2.11 End-of-Line Handling and 3.3.3 Attribute-Value Normalization
+// see below encodeAttrODS
+bool isEndOfLineCharODS(const QChar &c)
+{
+  ushort uc = c.unicode();
+
+  return uc == 0x9
+         || uc == 0xA
+         || uc == 0xD;
+}
+// ### AbanQ
+
+QString encodeAttrODS(const QString &str)
+{
+  QString tmp(str);
+  uint len = tmp.length();
+  uint i = 0;
+  while (i < len) {
+    if (tmp[(int)i] == '<') {
+      tmp.replace(i, 1, "&lt;");
+      len += 3;
+      i += 4;
+    } else if (tmp[(int)i] == '"') {
+      tmp.replace(i, 1, "&quot;");
+      len += 5;
+      i += 6;
+    } else if (tmp[(int)i] == '&') {
+      tmp.replace(i, 1, "&amp;");
+      len += 4;
+      i += 5;
+    } else if (tmp[(int)i] == '>' && i >= 2 && tmp[(int)i - 1] == ']' && tmp[(int)i - 2] == ']') {
+      tmp.replace(i, 1, "&gt;");
+      len += 3;
+      i += 4;
+    }
+    // ### AbanQ
+    // to do compliant with the standar XML 1.0
+    // 2.11 End-of-Line Handling and 3.3.3 Attribute-Value Normalization
+    else if (isEndOfLineCharODS(tmp[(int)i])) {
+      QString repl = "&#x" + QString::number(tmp[(int)i].unicode(), 16) + ';';
+      tmp.replace(i, 1, repl);
+      len += repl.length() - 1;
+      i += repl.length();
+    }
+    // ### AbanQ
+    else if (!isXmlCharODS(tmp[(int)i])) {
+      QString repl = "&#x" + QString::number(tmp[(int)i].unicode(), 16) + ';';
+      qWarning("AQOdsRow: not saving invalid character %s, the document will not be well-formed", repl.latin1());
+      repl = "?";
+      tmp.replace(i, 1, repl);
+      len += repl.length() - 1;
+      i += repl.length();
+    } else {
+      ++i;
+    }
+  }
+
+  return tmp;
+}
 
 
 
@@ -659,7 +736,53 @@ static inline QString imageLink(const QString &image)
   return image.mid(pos, end - pos);
 }
 
-bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
+AQOdsGenerator::AQOdsGenerator()
+{
+  clear();
+}
+
+AQOdsGenerator::~AQOdsGenerator()
+{
+  if (!fileName_.isEmpty()) {
+    if (fileStream_.is_open()) {
+      fileStream_.flush();
+      fileStream_.close();
+    }
+    QFile::remove(fileName_);
+  }
+}
+
+void AQOdsGenerator::clear()
+{
+  if (!fileName_.isEmpty()) {
+    if (fileStream_.is_open()) {
+      fileStream_.flush();
+      fileStream_.close();
+    }
+    QFile::remove(fileName_);
+  }
+  strStream_.str("");
+  fileName_ = AQ_DISKCACHE_DIRPATH + QString::fromLatin1("/report_") +
+              QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+              QString::fromLatin1(".str");
+  fileStream_.open(fileName_, std::ios_base::in | std::ios_base::out | std::ios_base::trunc);
+  if (!fileStream_.is_open())
+    qWarning("AQOdsGenerator::clear : Error opening " + fileName_);
+}
+
+QString AQOdsGenerator::str()
+{
+  if (fileStream_.is_open()) {
+    fileStream_.flush();
+    fileStream_.close();
+    fileStream_.open(fileName_, std::ios_base::in | std::ios_base::out | std::ios_base::app);
+    strStream_ << fileStream_.rdbuf();
+    fileStream_.seekp(0, std::ios_base::end);
+  }
+  return strStream_.str();
+}
+
+bool AQOdsGenerator::generateOds(const QString &fileNameOut)
 {
   AQS *aqs = globalAQS;
   QByteArray baMain(data_main.utf8());
@@ -671,11 +794,43 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
   QString strInput(str());
   QByteArray input(strInput.utf8());
   QByteArray content(aqs->xsltproc(&baMain, &input));
+  // ------------ vvvv   AbanQ 2.5    vvvv  ------
+  QString fileNameContent(fileName_ + QString::fromLatin1(".cnt"));
+  aqs->xsltproc(&baMain, fileName_, fileNameContent);
 
+  QString errMsg;
+  int errLine, errColumn;
+  QFile filAux(fileNameContent);
+  filAux.open(IO_ReadOnly);
+  QDomDocument docTmp;
+  if (!docTmp.setContent(&filAux, &errMsg, &errLine, &errColumn)) {
+    qWarning("'%s': XML error %s  line: %d  column: %d",
+             fileNameContent.latin1(), errMsg.latin1(),
+             errLine, errColumn);
+  } else {
+    QString cntAux(docTmp.toString());
+    cntAux.replace("__HREF1__", "<text:a xlink:href");
+    cntAux.replace("__HREF2__", ">");
+    cntAux.replace("__HREF3__", "</text:a>");
+    filAux.close();
+
+    if (!docTmp.setContent(cntAux, &errMsg, &errLine, &errColumn)) {
+      qWarning("'%s cntAux': XML error %s  line: %d  column: %d",
+               fileNameContent.latin1(), errMsg.latin1(),
+               errLine, errColumn);
+    } else {
+      QFile::remove(fileNameContent);
+      filAux.open(IO_WriteOnly);
+      QTextStream tsAux(&filAux);
+      docTmp.save(tsAux, 0);
+      filAux.close();
+    }
+  }
+  // ----------- ^^^^^                ^^^^^^
   QStringList charts;
   if (strInput.contains("<chart name=\"")) {
     charts = QStringList::split("__SEP__",
-                                aqs->xsltproc(&baExtCharts, &input));
+                                aqs->xsltproc(&baExtCharts, fileName_));
   }
 
   QValueList<QPair<QString, QByteArray> > objects;
@@ -692,7 +847,7 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
   QStringList images;
   if (strInput.contains("<image name=\"")) {
     images = QStringList::split("__SEP__",
-                                aqs->xsltproc(&baExtImgs, &input));
+                                aqs->xsltproc(&baExtImgs, fileName_));
   }
 
   QValueList<QPair<QString, QString> > imgs;
@@ -711,7 +866,8 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
   QByteArray mimeType(QCString("application/vnd.oasis.opendocument.spreadsheet"));
   mimeType.truncate(mimeType.size() - 1);
   zip.addFile("mimetype", mimeType);
-  zip.addFile("content.xml", content);
+  QFile filCont(fileNameContent);
+  zip.addFile("content.xml", &filCont);
 
   for (int i = 0; i < objects.size(); ++i) {
     QPair<QString, QByteArray> object = objects[i];
@@ -772,6 +928,8 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut) const
   mf.truncate(mf.size() - 1);
   zip.addFile("META-INF/manifest.xml", mf);
   zip.close();
+
+  QFile::remove(fileNameContent);
 
   return true;
 }

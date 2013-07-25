@@ -134,7 +134,7 @@ static const PaperSize sizes[] = {
 
 void qprinterSize2CarbonSize(QPrinter::PageSize &size, PMPageFormat &format, PMPrintSession session)
 {
-  if (size >= QPrinter::Custom)
+  if (size == QPrinter::Custom)
     return;
   // Basically, get the supported pages supported by the printer and see what will work,
   // Since we document undefined behavior when we don't specify anything, don't worry if we can't.
@@ -596,9 +596,11 @@ int QPrinter::metric(int m) const
                         || o == kPMLandscape && tmpOrient == Landscape);
       }
       PageSize s = pageSize();
-      if (s >= QPrinter::Custom) {
+      if (s == QPrinter::Custom) {
         val = tmpOrient == Portrait ? customPaperSize_.width() : customPaperSize_.height();
       } else {
+        if (s > QPrinter::Custom)
+          s = QPrinter::Custom;
         if (state == PST_ACTIVE || (tmpOrient == Portrait || orientInSync)) {
           val = qt_get_PDMWidth(pformat, fullPage());
         } else {
@@ -616,9 +618,11 @@ int QPrinter::metric(int m) const
                         || o == kPMLandscape && tmpOrient == Landscape);
       }
       PageSize s = pageSize();
-      if (s >= QPrinter::Custom) {
+      if (s == QPrinter::Custom) {
         val = tmpOrient == Portrait ? customPaperSize_.height() : customPaperSize_.width();
-      } else {
+      } else {        
+        if (s > QPrinter::Custom)
+          s = QPrinter::Custom;
         if (state == PST_ACTIVE || (tmpOrient == Portrait || orientInSync)) {
           val = qt_get_PDMHeight(pformat, fullPage());
         } else {

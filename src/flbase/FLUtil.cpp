@@ -36,8 +36,8 @@ email                : mail@infosial.com
 #include "FLSqlConnections.h"
 #include "FLSettings.h"
 
-FL_EXPORT QDict<QProgressDialog> FLUtil::dictProgressD_;
-FL_EXPORT const char *FLUtil::vecUnidades[ 30 ] = {
+AQ_EXPORT QDict<QProgressDialog> FLUtil::dictProgressD_;
+const char *FLUtil::vecUnidades[ 30 ] = {
   "", QT_TR_NOOP("uno"), QT_TR_NOOP("dos"), QT_TR_NOOP("tres"), QT_TR_NOOP("cuatro"),
   QT_TR_NOOP("cinco"), QT_TR_NOOP("seis"), QT_TR_NOOP("siete"), QT_TR_NOOP("ocho"), QT_TR_NOOP("nueve"),
   QT_TR_NOOP("diez"), QT_TR_NOOP("once"), QT_TR_NOOP("doce"), QT_TR_NOOP("trece"), QT_TR_NOOP("catorce"),
@@ -45,14 +45,20 @@ FL_EXPORT const char *FLUtil::vecUnidades[ 30 ] = {
   QT_TR_NOOP("veinte"), QT_TR_NOOP("veintiun"), QT_TR_NOOP("veintidos"), QT_TR_NOOP("veintitres"), QT_TR_NOOP("veinticuatro"),
   QT_TR_NOOP("veinticinco"), QT_TR_NOOP("veintiseis"), QT_TR_NOOP("veintisiete"), QT_TR_NOOP("veintiocho"), QT_TR_NOOP("veintinueve")
 };
-FL_EXPORT const char *FLUtil::vecDecenas[ 10 ] = {
+const char *FLUtil::vecDecenas[ 10 ] = {
   "", "", "", QT_TR_NOOP("treinta"), QT_TR_NOOP("cuarenta"), QT_TR_NOOP("cincuenta"),
   QT_TR_NOOP("sesenta"), QT_TR_NOOP("setenta"), QT_TR_NOOP("ochenta"), QT_TR_NOOP("noventa")
 };
-FL_EXPORT const char *FLUtil::vecCentenas[ 10 ] = {
+const char *FLUtil::vecCentenas[ 10 ] = {
   "", QT_TR_NOOP("ciento"), QT_TR_NOOP("doscientos"), QT_TR_NOOP("trescientos"), QT_TR_NOOP("cuatrocientos"),
   QT_TR_NOOP("quinientos"), QT_TR_NOOP("seiscientos"), QT_TR_NOOP("setecientos"), QT_TR_NOOP("ochocientos"), QT_TR_NOOP("novecientos")
 };
+
+AQ_EXPORT QString aqSha1(const QString &str)
+{
+  return FLUtil::sha1(str);
+}
+
 Q_ULLONG FLUtil::partInteger(double n)
 {
   return (Q_ULLONG) n;
@@ -267,6 +273,14 @@ QChar FLUtil::calcularDC(const QString &n)
 
 QString FLUtil::dateDMAtoAMD(const QString &f)
 {
+  int pos = f.find('-');
+  if (pos == -1 || pos != 2) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil::dateDMAtoAMD: Wrong date format: " + f);
+#endif
+    return f;
+  }
+
   QString res = f;
 
   res = res.replace(QRegExp("[\\s/-]"), "");
@@ -289,6 +303,14 @@ QString FLUtil::dateDMAtoAMD(const QString &f)
 
 QString FLUtil::dateAMDtoDMA(const QString &f)
 {
+  int pos = f.find('-');
+  if (pos == -1 || pos != 4) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil::dateAMDtoDMA: Wrong date format: " + f);
+#endif
+    return f;
+  }
+
   QString res = f;
 
   res = res.replace(QRegExp("[\\s/-]"), "");
@@ -917,9 +939,15 @@ QString FLUtil::roundFieldValue(const QVariant &n, const QString &table, const Q
   if (!tmd)
     return 0;
   FLFieldMetaData *fmd = tmd->field(field);
-  if (!fmd)
+  if (!fmd) {
+    if (tmd && !tmd->inCache())
+      delete tmd;
     return 0;
-  return buildNumber(n, 'f', fmd->partDecimal());
+  }
+  QString ret(buildNumber(n, 'f', fmd->partDecimal()));
+  if (tmd && !tmd->inCache())
+    delete tmd;
+  return ret;
 }
 
 QString FLUtil::buildNumber(const QVariant &v, char tipo, int partDecimal)
@@ -1022,9 +1050,30 @@ QString FLUtil::getOS()
 
 bool FLUtil::execSql(const QString &sql, const QString &connName)
 {
+  if (sql.isNull() || connName.isNull()) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil::execSql() : " + QApplication::tr("Tarea o nombre de conexión vacío"));
+#endif
+    return false;
+  }
+
+  QString tareas = sql;
+  if (!tareas.endsWith(";"))
+    tareas += ";";
+
   QSqlQuery q(FLSqlConnections::database(connName)->db());
-  return q.exec(sql);
+  QStringList commandList = QStringList::split(";", tareas);
+  for (QStringList::Iterator it = commandList.begin(); it != commandList.end(); ++it) {
+#ifdef FL_DEBUG
+    qWarning("FLUtil : " + QApplication::tr("Ejecutando la sentencia \"%1;\"").arg(*it));
+#endif
+    if (!q.exec(*it))
+      return false;
+  }
+
+  return true;
 }
+
 
 QStringList FLUtil::findFiles(const QStringList &paths, const QString &filter,
                               bool breakOnFirstMatch)
@@ -1051,4 +1100,20 @@ QStringList FLUtil::findFiles(const QStringList &paths, const QString &filter,
     }
   }
   return result;
+}
+
+// Silix
+void FLUtil::savePixmap(const QString &data, const QString &filename, const char *format)
+{
+    if (!filename.isEmpty()) {
+      QPixmap pix;
+      pix.loadFromData(data.utf8());
+      if (!pix.isNull())
+        if (!pix.save(filename, format)) {
+#ifdef FL_DEBUG
+          qWarning("FLUtil : " + QApplication::tr("Error al intentar guardar la imagen en %1").arg(filename));
+#endif
+          return;
+        }
+    }
 }

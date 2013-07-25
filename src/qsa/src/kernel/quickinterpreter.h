@@ -122,6 +122,8 @@ public:
   QuickDebugger *debuggerEngine() const {
     return debugger;
   }
+#else
+  QObject *objError_;
 #endif
 
   struct Property {

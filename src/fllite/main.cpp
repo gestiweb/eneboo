@@ -17,9 +17,15 @@
  ***************************************************************************/
 
 // C Libraries ----
+#include "qplatformdefs.h"
+
+extern "C" {
 #include <stdlib.h>
-#include <stdio.h>
-// ----
+#if !defined(FL_DEBUG) && !defined(Q_OS_MACX)
+#include <execinfo.h>
+#include <signal.h>
+#endif
+}
 
 #include <qsplashscreen.h>
 
@@ -32,12 +38,70 @@
 #include "../flbase/AQApplication.h"
 #include "../../AQConfig.h"
 
+#if !defined(FL_DEBUG) && !defined(Q_OS_MACX)
+bool hasSilentConn = false;
+#if defined(Q_OS_WIN32)
+HINSTANCE aqkernel32 = NULL;
+#endif
+
+#if defined(Q_C_CALLBACKS)
+extern "C" {
+#endif
+
+  static void exitHandler(QT_SIGNAL_ARGS)
+  {
+    int j, nptrs;
+#define SIZE 16
+    void *buffer[SIZE];
+    char **strings;
+
+    nptrs = backtrace(buffer, SIZE);
+    printf("backtrace() returned %d addresses\n", nptrs);
+
+    // The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
+    //    would produce similar output to the following:
+
+    strings = backtrace_symbols(buffer, nptrs);
+    if (strings == NULL) {
+      perror("backtrace_symbols");
+      exit(EXIT_FAILURE);
+    }
+
+    QString log;
+    log = QString("backtrace() returned %1 addresses").arg(nptrs) + '\n';
+    for (j = 0; j < nptrs; j++) {
+      printf("%s\n", strings[j]);
+      log += QString(strings[j]) + '\n';
+    }
+
+    free(strings);
+
+    if (!hasSilentConn) {
+      QMessageBox::critical(0, "AbanQ",
+                            "AbanQ ha detectado un error y debe cerrarse.\n\n" + log,
+                            QMessageBox::Ok, QMessageBox::NoButton);
+    }
+    printf("Terminate AbanQ %p\n", aqApp);
+    if (aqApp)
+      delete aqApp;
+    exit(EXIT_FAILURE);
+  }
+
+#if defined(Q_C_CALLBACKS)
+}
+#endif
+#endif
+
 static inline bool silentConnect(const QString &conn)
 {
   if (conn.isEmpty())
     return false;
 
-  QString user, namedb, db, host, port, password;
+#if !defined(FL_DEBUG) && !defined(Q_OS_MACX)
+  hasSilentConn = true;
+#endif
+
+  QString user, namedb, db, host, port, password, connOpts;
   QStringList dat = QStringList::split(":", conn, true);
   int i = 0;
   for (QStringList::Iterator it = dat.begin(); it != dat.end(); ++it, ++i) {
@@ -60,17 +124,29 @@ static inline bool silentConnect(const QString &conn)
       case 5:
         password = *it;
         break;
+      case 6:
+        connOpts = *it;
+        break;
     }
   }
 
   FLSqlDatabase *sqlDb = new FLSqlDatabase();
+  QString driverName(FLSqlDatabase::driverAliasToDriverName(db));
 
-  if (!sqlDb->loadDriver(FLSqlDatabase::driverAliasToDriverName(db))) {
+  if (!sqlDb->loadDriver(driverName)) {
     delete sqlDb;
     return false;
   }
 
-  if (!sqlDb->connectDB(namedb, user, password, host, port.toInt())) {
+  if (driverName == "FLQPSQL7") {
+    if (connOpts.isEmpty())
+      connOpts = "connect_timeout=30";
+    else
+      connOpts += ";connect_timeout=30";
+  }
+
+  if (!sqlDb->connectDB(namedb, user, password, host, port.toInt(),
+                        "default", connOpts)) {
     delete sqlDb;
     return false;
   }
@@ -148,6 +224,19 @@ void aq_main(int argc, char **argv)
       noMax = true;
     }
   }
+
+#if !defined(FL_DEBUG) && !defined(Q_OS_MACX)
+  signal(SIGABRT, exitHandler);
+  signal(SIGFPE, exitHandler);
+  signal(SIGILL, exitHandler);
+  signal(SIGINT, exitHandler);
+  signal(SIGSEGV, exitHandler);
+  signal(SIGTERM, exitHandler);
+#if defined(Q_OS_WIN32)
+  QString fileName("Kernel32.dll");
+  aqkernel32 = LoadLibrary((wchar_t *)fileName.ucs2());
+#endif
+#endif
 
   FLApplication *AbanQ = aqApp;
   QFont appFont;

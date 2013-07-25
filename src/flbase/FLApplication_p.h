@@ -63,6 +63,8 @@
 #include <qlocale.h>
 #include "../qt/include/aqapplication.h"
 
+#include "AQGlobal.h"
+
 #define AQ_SET_MNGLOADER                 \
   bool noMngLoader = (mngLoader_ == 0);  \
   if (noMngLoader)                       \
@@ -80,15 +82,19 @@ class FLPopupWarn;
 class FLManagerModules;
 class QUrlOperator;
 class QNetworkOperation;
+class FLTextEditOuput;
+class AQApplication;
 
 /**
 Clase aplicación para AbanQ.
 
 @author InfoSiAL S.L.
 */
-class FLApplication: public AQ_DECL_APP
+class AQ_EXPORT FLApplication: public AQ_DECL_APP
 {
   Q_OBJECT
+
+  friend class AQApplication;
 
 public:
 
@@ -201,12 +207,7 @@ public:
   /**
   Establece la posibilidad de poder salir o no de la aplicación.
   */
-  void setNotExit(const bool &b);
-
-  /**
-  Establece que la ejecución es en batch, sin interfaz gráfica de usuario
-  */
-  void setNoGUI(const bool &b);
+  void setNotExit(bool b);
 
   /**
   Obtiene la lista de control de acceso actualmente instalada.
@@ -230,12 +231,7 @@ public:
   /**
   Obtiene la ruta y el nombre del programa a utilizar para imprimir
   */
-  const QString &printProgram() const;
-
-  /**
-  Obtiene si la ejecución es en batch, sin interfaz gráfica de usuario
-  */
-  bool noGUI() const;
+  QString printProgram() const;
 
   /**
   Añade código script al objeto sys, para poder ejecutarlo dinámicamente.
@@ -330,12 +326,49 @@ public:
   */
   QWidget *modMainWidget(const QString &idModulo) const;
 
+  /**
+  @return Devuelve el nombre del ejecutable de Ghostscript disponible en el sistema
+  */
+  QString gsExecutable();
+
+  /** Uso interno */
+  void setNotifyBeginTransaction(bool b = true) {
+    notifyBeginTransaction_ = b;
+  }
+  void setNotifyEndTransaction(bool b = true) {
+    notifyEndTransaction_ = b;
+  }
+  void setNotifyRollbackTransaction(bool b = true) {
+    notifyRollbackTransaction_ = b;
+  }
+  bool notifyBeginTransaction() const {
+    return notifyBeginTransaction_;
+  }
+  bool notifyEndTransaction() const {
+    return notifyEndTransaction_;
+  }
+  bool notifyRollbackTransaction() const {
+    return notifyRollbackTransaction_;
+  }
+  void emitTransactionBegin(QObject *o);
+  void emitTransactionEnd(QObject *o);
+  void emitTransactionRollback(QObject *o);
+  bool consoleShown() const;
+
+  void startTimerIdle();
+  void stopTimerIdle();
+
 signals:
 
   /**
   Señal emitida cuando se ha detectado un bloqueo en la conexion a la base de datos
   */
   void databaseLockDetected();
+
+  /** Uso interno */
+  void transactionBegin(QObject *);
+  void transactionEnd(QObject *);
+  void transactionRollback(QObject *);
 
 public slots:
 
@@ -460,6 +493,9 @@ public slots:
   Abre el entorno integrado de desarrollo de scripts QSA Workbench
   */
   void openQSWorkbench();
+  QSWorkbench *workbench() const {
+    return wb_;
+  }
 
   /**
   Evalua el código de todos los scripts del proyecto QSA
@@ -475,13 +511,14 @@ public slots:
   void chooseFont();
 
   /**
+  Muestra el menú emergente de estilos
+  */
+  void showStyles();
+
+  /**
   Muestra el dialogo "Acerca de"
   */
   void aboutAbanQ();
-  /**
-  Muestra cuadro de dialogo para configurar la carga estatica desde el disco local
-  */
-  void staticLoaderSetup();
 
   /** Uso interno */
   QTranslator *createSysTranslator(const QString &lang, bool loadDefault = false);
@@ -505,6 +542,23 @@ public slots:
   QChar commaSeparator() const {
     return commaSeparator_;
   }
+
+  /**
+  Uso interno.
+  Muestra cuadro de dialogo para configurar la carga estatica desde el disco local
+  */
+  void staticLoaderSetup();
+
+  /**
+  Uso interno.
+  Muestra la consola de mensajes
+  */
+  void showConsole();
+
+  /**
+  Sale de la aplicacion, pidiendo confirmación
+  */
+  void generalExit(bool askExit = true);
 
 protected:
 
@@ -540,11 +594,6 @@ protected slots:
   Lee el estado general
   */
   void readState();
-
-  /**
-  Sale de la aplicacion, pidiendo confirmación
-  */
-  void generalExit();
 
   /**
   Abre el formulario por defecto para una acción.
@@ -596,11 +645,6 @@ protected slots:
   void makeStyle(const QString &);
 
   /**
-  Muestra el menú emergente de estilos
-  */
-  void showStyles();
-
-  /**
   Muestra el menú emergente para conmutar barras
   */
   void showToggleBars();
@@ -635,7 +679,10 @@ protected slots:
   void updateAbanQ();
   void dumpDatabase();
   void checkForUpdate();
-  void checkForUpdateFinish(QNetworkOperation * op);
+  void checkForUpdateFinish(QNetworkOperation *op);
+  void mrProper();
+  void evaluatedProject();
+  void aqAppIdle();
 
 private:
 
@@ -804,11 +851,6 @@ protected:
   QString printProgram_;
 
   /**
-  Indica que la ejecución es en batch, sin interfaz gráfica de usuario
-  */
-  bool noGUI_;
-
-  /**
   Almacena el nombre de la funcion de entrada tras evaluar el código
   */
   QString scriptEntryFunction_;
@@ -837,6 +879,16 @@ protected:
   bool initializing_;
 
   /**
+  Flag de destrucción en curso
+  */
+  bool destroying_;
+
+  /**
+  Contiene el nombre del ejecutable de Ghostscript
+  */
+  QString gsExecutable_;
+
+  /**
   Uso interno
   */
   QSObjectFactory *flFactory_;
@@ -844,6 +896,15 @@ protected:
   QChar commaSeparator_;
   QUrlOperator *opCheckUpdate_;
   QString hashUpdate_;
+  bool notifyBeginTransaction_;
+  bool notifyEndTransaction_;
+  bool notifyRollbackTransaction_;
+  FLTextEditOuput *tedOutput_;
+
+  QTimer *timerIdle_;
+
+  void msgBoxWarning(const QString &text, bool gui = true);
+  void checkAndFixTransactionLevel(const QString &ctx = QString::null);
 };
 
 #endif

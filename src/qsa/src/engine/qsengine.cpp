@@ -154,7 +154,7 @@ bool QSEngine::checkSyntax(const QString &code, int checkMode,
                            );
 
   int parseError = qsyyparse();
-  QSNode *lastNode = QSProgramNode::last();
+  QSNode *lastNode = QSProgramNode::nodeProgLast();
   bool success = true;
 
   if (parseError) {
@@ -175,13 +175,17 @@ bool QSEngine::checkSyntax(const QString &code, int checkMode,
 
 static QSObject debugFunction(QSEnv *env)
 {
+#ifndef AQ_NO_DEBUG_FUN
   qDebug("---> %s", env->arg(0).toString().local8Bit().data());
+#endif
   return env->createUndefined();
 }
 
 static QSObject printFunction(QSEnv *env)
 {
+#ifndef AQ_NO_PRINT_FUN
   qDebug("%s", env->arg(0).toString().local8Bit().data());
+#endif
   return env->createUndefined();
 }
 

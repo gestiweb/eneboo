@@ -74,16 +74,18 @@
 #include <qstringlist.h>
 #include <addressclass.h>
 
+#include "aqmailglobal.h"
+
 #ifdef Q_WS_WIN
 #if defined(Q_TEMPLATEDLL)
 // MOC_SKIP_BEGIN
-template class FL_EXPORT QValueList<AddressClass>
+template class AQMAIL_EXPORT QValueList<AddressClass>
 ;
 // MOC_SKIP_END
 #endif
 #endif
 
-class FL_EXPORT AddressListClass
+class AQMAIL_EXPORT AddressListClass
 {
     friend QTextStream& operator<<(QTextStream &t, AddressListClass &);
 public:

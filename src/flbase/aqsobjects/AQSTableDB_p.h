@@ -77,6 +77,7 @@ public slots:
   QString functionGetColor() const;
   void setFunctionGetColor(const QString &);
   void exportToOds();
+  void switchSortOrder(int = 0);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -304,6 +305,10 @@ inline void FLSTableDB::setFunctionGetColor(const QString &arg0)
 inline void FLSTableDB::exportToOds()
 {
   AQ_CALL_VOID(exportToOds());
+}
+inline void FLSTableDB::switchSortOrder(int arg0)
+{
+  AQ_CALL_VOID(switchSortOrder(arg0));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

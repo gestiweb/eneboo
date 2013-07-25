@@ -1,0 +1,23 @@
+The fonts here are in various formats:
+
+    *.ttf - TrueType fonts, requires QT_FEATURE_TRUETYPE
+    *.bdf - BDF fonts, requires QT_FEATURE_BDF
+    *.qpf - Qt prerendered fonts (QPF format) rendered from above fonts.
+
+Normally, small embedded devices will only use QPF files, and these will only
+contain the subset of Unicode appropriate for the device. QPF is a portable,
+endian-independent format.
+
+The fonts here are generated from various sources:
+
+    helvetica*    - Helvetica BDF distributed with X11
+                    - Latin-1 characters (about 250 characters)
+    smoothtimes*  - MS Times TTF font
+                    - Full character range (about 1000 characters) for normal
+                    - ASCII-only for Bold, Italic, etc. (about 120 characters)
+    unifont*      - GNU Unifont
+                    - Full unicode range (about 50000 characters)
+    verdana*      - MS Verdana TTF font
+                    - Latin-1 characters (about 250 characters)
+
+Each font is provided in all 4 rotated forms (plain, _t5, _t10, _t15).

@@ -28,6 +28,11 @@ class AQSSInterpreter : public AQSObject
 
   AQ_DECLARE_AQS_OBJECT(SInterpreter, Object);
 
+public slots:
+  QObject *self() const {
+    return o_;
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   bool checkSyntax(const QString &);
@@ -46,6 +51,8 @@ public slots:
   QObjectList presentObjects() const;
   bool isRunning() const;
   bool hadError() const;
+  bool interactiveGUI() const;
+  void setInteractiveGUI(bool = true);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -118,6 +125,14 @@ inline bool AQSSInterpreter::isRunning() const
 inline bool AQSSInterpreter::hadError() const
 {
   AQ_CALL_RET_V(hadError(), bool);
+}
+inline bool AQSSInterpreter::interactiveGUI() const
+{
+  AQ_CALL_RET_V(interactiveGUI(), bool);
+}
+inline void AQSSInterpreter::setInteractiveGUI(bool arg0)
+{
+  AQ_CALL_VOID(setInteractiveGUI(arg0));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

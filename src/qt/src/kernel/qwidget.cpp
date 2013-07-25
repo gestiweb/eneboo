@@ -865,6 +865,10 @@ QWidget::QWidget( QWidget *parent, const char *name, WFlags f )
     }
 #endif
 
+    // ### AbanQ
+     aqFirstTabStop = 0;
+    // ###
+
     fstrut_dirty = 1;
 
     isWidget = TRUE;				// is a widget
@@ -4298,7 +4302,7 @@ bool QWidget::close( bool alsoDelete )
     if ( deleted )
 	return TRUE;
     is_closing = 0;
-    if ( alsoDelete )
+    if ( alsoDelete && this )
 	delete this;
     else if ( testWFlags(WDestructiveClose) ) {
 	clearWFlags(WDestructiveClose);

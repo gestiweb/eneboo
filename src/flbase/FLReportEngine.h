@@ -146,6 +146,13 @@ public slots:
   FLDomNodeInterface *reportTemplate() const;
 
   /**
+  A partir de una colección de páginas exporta a una hoja de cálculo ODS y la visualiza
+
+  @param  pages  Colección de paginas a exportar
+  */
+  void exportToOds(FLReportPages *pages);
+
+  /**
   Imprime el informe a imagenes que devuelve como una colección de paginas
 
   @param  initRow     Fila de inicio cuando se imprimen etiquetas

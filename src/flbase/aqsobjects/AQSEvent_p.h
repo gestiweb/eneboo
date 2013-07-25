@@ -186,6 +186,26 @@ public slots:
   QCustomEvent *castCustomEvent() const {
     return static_cast<QCustomEvent *>(o_);
   }
+  QEvent *castEvent() const {
+    return static_cast<QEvent *>(o_);
+  }
+
+protected:
+  static void *construct(const QSArgumentList &args) {
+    QMap<int, QStringList> candidates;
+    candidates[1].append(QString::fromLatin1("QEvent::Type"));
+    QString sgt(castArgsSignature(args, candidates));
+    if (sgt == QString::fromLatin1("QEvent::Type"))
+      return new QEvent(static_cast<QEvent::Type>(args[0].variant().toUInt()));
+    return 0;
+  }
+
+public:
+  static QMap<int, QStringList> candidateConstructors() {
+    QMap<int, QStringList> candidates;
+    candidates[1].append(QString::fromLatin1("QEvent::Type"));
+    return candidates;
+  }
 
   //@AQ_BEGIN_DEF_PUB_SLOTS@
   //@AQ_END_DEF_PUB_SLOTS@

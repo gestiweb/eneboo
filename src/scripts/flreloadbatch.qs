@@ -177,6 +177,7 @@ function oficial_ejecutarComando(comando: String) : Array {
 \end */
 function oficial_cargarModulo(nombreFichero: String) : Boolean {
   var util: FLUtil = new FLUtil;
+  if (util.getOS() == "WIN32") nombreFichero = nombreFichero.left( nombreFichero.length - 1 );
   var fichero = new File(nombreFichero);
 
   var modulo;

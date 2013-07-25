@@ -931,7 +931,7 @@ QRect QHeader::sRect( int index )
 QRect QHeader::sectionRect( int section ) const
 {
     int index = mapToIndex( section );
-    if ( section < 0 )
+    if ( section < 0 || index < 0 )
 	return rect(); // ### eeeeevil
 
     if ( reverse() )

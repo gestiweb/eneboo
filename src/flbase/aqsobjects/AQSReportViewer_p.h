@@ -52,6 +52,8 @@ public slots:
   void rptViewerReparent(QWidget *);
   QString csvData();
   void setReportPages(FLReportPages *);
+  void setColorMode(uint);
+  uint colorMode() const;
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -178,6 +180,14 @@ inline QString AQSReportViewer::csvData()
 inline void AQSReportViewer::setReportPages(FLReportPages *arg0)
 {
   AQ_CALL_VOID(setReportPages(arg0));
+}
+inline void AQSReportViewer::setColorMode(uint arg0)
+{
+  AQ_CALL_VOID(setColorMode(arg0));
+}
+inline uint AQSReportViewer::colorMode() const
+{
+  AQ_CALL_RET_V(colorMode(), uint);
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

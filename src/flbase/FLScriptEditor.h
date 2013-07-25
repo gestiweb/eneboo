@@ -28,6 +28,8 @@
 
 #include "FLWidgetScriptEditor.h"
 
+#include "AQGlobal.h"
+
 #ifdef QSDEBUGGER
 class QSReplaceText;
 class QSPreferencesContainer;
@@ -39,7 +41,7 @@ Editor para scripts.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLScriptEditor : public FLWidgetScriptEditor
+class AQ_EXPORT FLScriptEditor : public FLWidgetScriptEditor
 {
 
   Q_OBJECT

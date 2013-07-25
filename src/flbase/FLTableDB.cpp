@@ -26,6 +26,7 @@ email                : mail@infosial.com
 #include "FLRelationMetaData.h"
 #include "FLFormSearchDB.h"
 #include "FLManager.h"
+#include "FLManagerModules.h"
 #include "FLAction.h"
 #include "FLApplication.h"
 #include "FLSqlDatabase.h"
@@ -35,8 +36,7 @@ email                : mail@infosial.com
 #include "FLSqlQuery.h"
 #include "FLDiskCache.h"
 #include "AQOds.h"
-
-extern void qt_set_table_clipper_enabled(bool enabled);
+#include "FLSettings.h"
 
 FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent, name),
   tableRecords_(0), tableName_(QString::null), foreignField_(QString::null),
@@ -45,13 +45,11 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
   editonly_(false), reqEditOnly_(false), insertonly_(false), reqInsertOnly_(false),
   sortField_(0), initSearch_(QString::null), checkColumnEnabled_(false),
   aliasCheckColumn_(tr("Seleccionar")), fieldNameCheckColumn_(QString::null),
-  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), tdbFilterLastWhere_(QString::null),
-  findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0)
+  checkColumnVisible_(false), sortColumn_(0), orderAsc_(true), sortColumn2_(1),
+  orderAsc2_(true), sortColumn3_(2), orderAsc3_(true), tdbFilterLastWhere_(QString::null),
+  findHidden_(false), filterHidden_(false), showAllPixmaps_(false), fakeEditor_(0),
+  reqOnlyTable_(false), onlyTable_(false), autoSortColumn_(true)
 {
-
-#ifndef Q_OS_WIN32
-  qt_set_table_clipper_enabled(false);
-#endif
   topWidget = topLevelWidget();
 
   if (topWidget && !topWidget->inherits("FLFormDB")) {
@@ -65,9 +63,9 @@ FLTableDB::FLTableDB(QWidget *parent, const char *name) : FLWidgetTableDB(parent
 #ifdef FL_DEBUG
     qWarning(tr("FLTableDB : Uno de los padres o antecesores de FLTableDB deber ser de la clase FLFormDB o heredar de ella"));
 #endif
-    return ;
+    return;
   } else {
-    cursor_ = ::qt_cast<FLFormDB *>(topWidget) ->cursor();
+    cursor_ = ::qt_cast<FLFormDB *>(topWidget)->cursor();
     setFont(qApp->font());
   }
 
@@ -87,9 +85,11 @@ FLDataTable *FLTableDB::tableRecords()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
-    connect(tableRecords_->horizontalHeader(), SIGNAL(clicked(int)), this, SLOT(switchSortOrder(int)));
+    if (autoSortColumn_)
+      connect(tableRecords_->horizontalHeader(), SIGNAL(clicked(int)), this, SLOT(switchSortOrder(int)));
   }
   FLSqlCursor *tCursor = tableRecords_->cursor();
   if (cursor_ && cursor_ != tCursor && cursor_->metadata() &&
@@ -107,6 +107,7 @@ void FLTableDB::setTableRecordsCursor()
     tabDataLayout->addWidget(tableRecords_);
     setTabOrder(tableRecords_, lineEditSearch);
     setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
   }
@@ -122,7 +123,7 @@ void FLTableDB::setTableRecordsCursor()
 
 bool FLTableDB::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
+  if (!tableRecords_ || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
     return FLWidgetTableDB::eventFilter(obj, ev);
   if (ev->type() == QEvent::KeyPress && obj == tableRecords_) {
     QKeyEvent *k = static_cast<QKeyEvent *>(ev);
@@ -174,14 +175,32 @@ void FLTableDB::putFirstCol(int c)
   moveCol(c, 0);
 }
 
-void FLTableDB::moveCol(const QString &from, const QString &to)
+// Silix - dpinelo
+void FLTableDB::putSecondCol(const QString &c)
+{
+  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
+  if (c != comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1)) {
+    moveCol(c, comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1), false);
+  }
+}
+
+// Silix - dpinelo
+void FLTableDB::putSecondCol(int c)
+{
+  // Aprovechamos que siempre, el combo box de filtro presenta sus items ordenados igual que el grid
+  if (c != (comboBoxFieldToSearch->currentItem() + 1)) {
+    moveCol(c, (comboBoxFieldToSearch->currentItem() + 1), false);
+  }
+}
+
+void FLTableDB::moveCol(const QString &from, const QString &to, bool firstSearch)
 {
   if (!topWidget || !cursor_ || !showed)
-    return ;
+    return;
 
   FLTableMetaData *tMD = cursor_->metadata();
   if (!tMD)
-    return ;
+    return;
 
   QHeader *horizHeader = tableRecords()->horizontalHeader();
   int i = sortColumn_, hCount = horizHeader->count();
@@ -209,13 +228,13 @@ void FLTableDB::moveCol(const QString &from, const QString &to)
 #endif
     return;
   }
-  moveCol(iFrom - sortColumn_, iTo - sortColumn_);
+  moveCol(iFrom - sortColumn_, iTo - sortColumn_, firstSearch);
 }
 
-void FLTableDB::moveCol(int from, int to)
+void FLTableDB::moveCol(int from, int to, bool firstSearch)
 {
-  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !cursor_)
-    return ;
+  if (from == to || !lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_)
+    return;
 
   if (comboBoxFieldToSearch->text(from) == "*" || comboBoxFieldToSearch->text(to) == "*")
     return;
@@ -224,7 +243,7 @@ void FLTableDB::moveCol(int from, int to)
 
   FLTableMetaData *tMD = cursor_->metadata();
   if (!tMD)
-    return ;
+    return;
 
   tableRecords_->hide();
 
@@ -252,16 +271,18 @@ void FLTableDB::moveCol(int from, int to)
   refresh(true);
   if (!textSearch.isEmpty()) {
     refresh(false, true);
-    disconnect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
-    lineEditSearch->setText(textSearch);
-    connect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
-    lineEditSearch->selectAll();
+    if (firstSearch) {
+      disconnect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
+      lineEditSearch->setText(textSearch);
+      connect(lineEditSearch, SIGNAL(textChanged(const QString &)), this, SLOT(filterRecords(const QString &)));
+      lineEditSearch->selectAll();
+    }
     seekCursor();
     QTimer::singleShot(0, tableRecords_, SLOT(ensureRowSelectedVisible()));
   } else
     refreshDelayed();
   if (!sender())
-    tableRecords_->setQuickFocus();
+    lineEditSearch->setFocus();
 }
 
 void FLTableDB::setReadOnly(const bool mode)
@@ -312,6 +333,7 @@ QString FLTableDB::findFilter()
 
 void FLTableDB::refreshDelayed(int msec, const bool refreshData)
 {
+  QString bfilter = filter_;
   if (!timer)
     return;
 
@@ -321,28 +343,29 @@ void FLTableDB::refreshDelayed(int msec, const bool refreshData)
   if (obj) {
     if (!obj->inherits("QTimer")) {
       timer->start(msec, true);
-      return ;
+      return;
     }
   } else {
     timer->start(msec, true);
-    return ;
+    return;
   }
 
   if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
     return;
-  if (refreshData)
+  if (refreshData) {
     refresh(false, true);
+  }
   seekCursor();
 }
 
 void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
 {
-  if (!lineEditSearch || !comboBoxFieldToSearch || !cursor_ || (topWidget && !topWidget->isShown()))
-    return ;
+  if (!lineEditSearch || !comboBoxFieldToSearch || !comboBoxFieldToSearch2 || !cursor_ || (topWidget && !topWidget->isShown()))
+    return;
 
   FLTableMetaData *tMD = cursor_->metadata();
   if (!tMD)
-    return ;
+    return;
 
   if (tableName_.isEmpty())
     tableName_ = tMD->name();
@@ -352,8 +375,10 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       FLFieldMetaData *fieldCheck = tMD->field(fieldNameCheckColumn_);
       if (!fieldCheck) {
         fieldNameCheckColumn_ = tMD->name() + "_check_column";
-        fieldCheck = new FLFieldMetaData(fieldNameCheckColumn_, tr(aliasCheckColumn_), true, false, FLFieldMetaData::Check, 0, false, true,
-                                         true, 0, 0, false, false, false, QVariant(), false, QString::null, true, false, false);
+        fieldCheck = new FLFieldMetaData(fieldNameCheckColumn_, tr(aliasCheckColumn_),
+                                         true, false, FLFieldMetaData::Check, 0, false,
+                                         true, true, 0, 0, false, false, false, QVariant(),
+                                         false, QString::null, true, false, false);
         tMD->addFieldMD(fieldCheck);
       }
       if (!cursor_->contains(fieldNameCheckColumn_)) {
@@ -366,6 +391,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
         setTableRecordsCursor();
         tableRecords_->setColumn(0, fieldNameCheckColumn_, aliasCheckColumn_);
         sortColumn_ = 1;
+        sortColumn2_ = 2;
+        sortColumn3_ = 3;
         QSqlRecord *buffer_ = cursor_->editBuffer(true);
         for (uint i = 0; i < buffer_->count(); ++i)
           buffer_->setGenerated(i, true);
@@ -382,6 +409,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
           cursor_->append(QSqlFieldInfo(*(recordCursor.field(i))));
         setTableRecordsCursor();
         sortColumn_ = 0;
+        sortColumn2_ = 1;
+        sortColumn3_ = 2;
       }
       checkColumnVisible_ = false;
     }
@@ -404,8 +433,12 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
           i--;
       }
     }
-    QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
-    tableRecords_->setSort(s);
+    if (autoSortColumn_) {
+      QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
+    s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
+    s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
+      tableRecords_->setSort(s);
+    }
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
     comboBoxFieldToSearch->clear();
     for (int i = sortColumn_; i < tableRecords_->numCols(); ++i) {
@@ -419,11 +452,27 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       horizHeader->setLabel(i, field->alias());
       tableRecords_->setColumn(i, field->name(), field->alias());
     }
+    comboBoxFieldToSearch2->clear();
+    for (int i = sortColumn2_; i < tableRecords_->numCols(); ++i) {
+      field = tMD->field(tMD->fieldAliasToName(horizHeader->label(i)));
+      if (!field)
+        continue;
+      if (i == sortColumn2_)
+        sortField2_ = field;
+      if (comboBoxFieldToSearch2->count() == (i - sortColumn2_))
+        comboBoxFieldToSearch2->insertItem(field->alias());
+      horizHeader->setLabel(i, field->alias());
+      tableRecords_->setColumn(i, field->name(), field->alias());
+    }
     comboBoxFieldToSearch->insertItem("*");
-    horizHeader->setClickEnabled(false);
-    horizHeader->setClickEnabled(true, sortColumn_);
-    horizHeader->setSortIndicator(-1, Qt::Ascending);
-    horizHeader->setSortIndicator(sortColumn_, (orderAsc_ ? Qt::Ascending : Qt::Descending));
+    comboBoxFieldToSearch2->setCurrentText(comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem() + 1));
+    if (autoSortColumn_) {
+      horizHeader->setClickEnabled(false);
+      horizHeader->setClickEnabled(true, sortColumn_);
+    horizHeader->setClickEnabled(true, sortColumn2_);
+      horizHeader->setSortIndicator(-1, Qt::Ascending);
+      horizHeader->setSortIndicator(sortColumn_, (orderAsc_ ? Qt::Ascending : Qt::Descending));
+    }
     horizHeader->show();
   }
 
@@ -448,21 +497,29 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     seekCursor();
   }
 
-  if (readonly_ != reqReadOnly_)
+  if (readonly_ != reqReadOnly_ ||
+      (tableRecords_ && readonly_ != tableRecords_->flReadOnly()))
     setReadOnly(reqReadOnly_);
-  if (editonly_ != reqEditOnly_)
+  if (editonly_ != reqEditOnly_ ||
+      (tableRecords_ && editonly_ != tableRecords_->editOnly()))
     setEditOnly(reqEditOnly_);
-  if (insertonly_ != reqInsertOnly_)
+  if (insertonly_ != reqInsertOnly_ ||
+      (tableRecords_ && insertonly_ != tableRecords_->insertOnly()))
     setInsertOnly(reqInsertOnly_);
+  if (onlyTable_ != reqOnlyTable_ ||
+      (tableRecords_ && onlyTable_ != tableRecords_->onlyTable()))
+    setOnlyTable(reqOnlyTable_);
 
   if (showed && tableRecords_ && tableRecords_->isHidden())
     tableRecords_->show();
+
+  emit refreshed();
 }
 
 void FLTableDB::filterRecords(const QString &p)
 {
   if (!topWidget || !cursor_ || (p.isEmpty() && filter_.isEmpty()))
-    return ;
+    return;
 
   if (!sortField_) {
     FLTableMetaData *tMD = cursor_->metadata();
@@ -472,30 +529,66 @@ void FLTableDB::filterRecords(const QString &p)
   }
 
   if (sortField_->type() == FLFieldMetaData::Unlock)
-    return ;
+    return;
 
   bool refreshData = filter_.contains("%");
-  bool allFields = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem()) == "*";
-  filter_ = "";
+  QString fieldSearch = comboBoxFieldToSearch->text(comboBoxFieldToSearch->currentItem());
+  bool allFields = fieldSearch == "*";
+  int msec_refresh = 400;
+  QString bfilter = "";
   if (!p.isEmpty() && allFields) {
-    FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
-    if (fieldList) {
-      FLFieldMetaData *field;
-      QDictIterator<FLFieldMetaData> it(*fieldList);
-      while ((field = it.current()) != 0) {
-        ++it;
-        if (!field->visibleGrid())
-          continue;
-        if (!p.contains("'") && !p.contains("\\") && field->type() == QVariant::String) {
-          if (!filter_.isEmpty())
-            filter_ += " OR ";
-          else
-            filter_ = "(";
-          filter_ += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
-        }
+    QString FTSFunction = cursor_->metadata()->FTSFunction();
+    if (FTSFunction.isEmpty()) {
+      const FLTableMetaData::FLFieldMetaDataList *fieldList = cursor_->metadata() ->fieldList();
+      if (fieldList) {
+	FLFieldMetaData *field;
+	QDictIterator<FLFieldMetaData> it(*fieldList);
+	bfilter = "( false";
+	while ((field = it.current()) != 0) {
+	  ++it;
+	  bool searchField = true;
+	  if (!field->visibleGrid()) searchField = false;
+	  if (field->type() != QVariant::String) searchField = false;
+	  QStringList sOptions = field->searchOptions();
+	  QString allFieldSearchInclude = "allfieldsearch:include";
+	  QString allFieldSearchExclude = "allfieldsearch:exclude";
+
+	  if (sOptions.contains(allFieldSearchExclude) > 0) {
+	    if (searchField) {
+	      //qDebug("Excluding field in allfield search: " + field->name());
+	      searchField = false;
+	    }
+	  }
+	  if (sOptions.contains(allFieldSearchInclude) > 0) {
+	    if (!searchField) {
+	      //qDebug("Including field in allfield search: " + field->name());
+	      searchField = true;
+	    }
+	  }
+        
+	  if (searchField) {
+	    bfilter += " OR ";
+	    bfilter += cursor_->db()->manager()->formatAssignValueLike(field, p, true);
+	  }
+	}
+        bfilter += ")";
+        msec_refresh = 800;
       }
-      if (!filter_.isEmpty())
-        filter_ += ")";
+    } else {
+      QString ftsfilter = p;
+      QString tablename = cursor_->metadata()->name();
+      ftsfilter = ftsfilter.replace(",", " ");
+      ftsfilter = ftsfilter.replace("&", " ");
+      ftsfilter = ftsfilter.replace("|", " ");
+      ftsfilter = ftsfilter.replace("'", " ");
+      ftsfilter = ftsfilter.replace("\"", " ");
+      ftsfilter = ftsfilter.replace(":", " ");
+      ftsfilter = ftsfilter.replace("%", " ");
+      ftsfilter = ftsfilter.replace(QRegExp("\\s+"), " ");
+      ftsfilter = ftsfilter.replace(QRegExp("(^\\s+|\\s+$)"), "");
+      ftsfilter = ftsfilter.replace(" ", " & ");
+      bfilter += FTSFunction + "(" + tablename + ") @@ to_tsquery('" + ftsfilter + ":*')";
+      qDebug("Using Full Text Search: " + bfilter);
     }
   }
 
@@ -509,18 +602,46 @@ void FLTableDB::filterRecords(const QString &p)
 
         for (QStringList::Iterator it = list.begin(); it != list.end(); ++it) {
           qField = *it;
-          if (qField.endsWith("." + sortField_->name()))
+          if (qField == sortField_->name() || qField.endsWith("." + sortField_->name()))
             break;
         }
-
-        filter_ = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
+        bfilter = cursor_->db()->manager()->formatAssignValueLike(qField, sortField_, p, true);
         qry->deleteLater();
       }
     } else
-      filter_ = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
+      bfilter = cursor_->db()->manager()->formatAssignValueLike(sortField_, p, true);
+    fieldSearch = sortField_->name();
   }
 
-  refreshDelayed(300, !filter_.isEmpty() || refreshData);
+  QString functionQSA = tableDB_filterRecords_functionName_;
+
+  if (functionQSA.isEmpty()) {
+    QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
+                                                           QString::fromLatin1(".mtd")));
+    functionQSA = idMod + QString::fromLatin1(".tableDB_filterRecords_") + cursor_->metadata()->name();
+  }
+                                                   
+  if (!functionQSA.isEmpty()) {
+    QValueList<QVariant> vargs = QValueList<QVariant>();
+    vargs.append(cursor_->metadata()->name());
+    vargs.append(p);
+    vargs.append(fieldSearch);
+    vargs.append(bfilter);
+    QSArgumentList args = QSArgumentList(vargs);
+    QVariant v = aqApp->call(functionQSA,args, 0).variant();
+    QString ret = v.toString();
+    if (!ret.isNull()) {
+      bfilter = ret;   
+      qDebug("functionQSA:" + functionQSA + " : " + ret.replace("%","%%"));
+    } else {
+      qDebug("functionQSA:" + functionQSA + " -> NULL");
+    }
+  } else {
+    qDebug("functionQSA: (empty)");
+  }
+
+  refreshDelayed(msec_refresh, !bfilter.isEmpty() || refreshData);
+  filter_ = bfilter;
 }
 
 QString FLTableDB::tableName() const
@@ -574,52 +695,59 @@ void FLTableDB::setFieldRelation(const QString &fN)
 void FLTableDB::deleteRecord()
 {
   QWidget *w = ::qt_cast<QWidget *>(sender());
-  if (w && (!cursor_ || readonly_ || insertonly_ || editonly_
+  if (w && (!cursor_ || reqReadOnly_ || reqInsertOnly_ || reqEditOnly_ || reqOnlyTable_
             || (cursor_->cursorRelation() && cursor_->cursorRelation()->isLocked()))) {
     w->setDisabled(true);
-    return ;
+    return;
   }
   cursor_->deleteRecord();
 }
 
 void FLTableDB::browseRecord()
 {
-  if (!cursor_)
-    return ;
-  cursor_->browseRecord();
+  QWidget *w = ::qt_cast<QWidget *>(sender());
+  if (w && (!cursor_ || reqOnlyTable_)) {
+    w->setDisabled(true);
+    return;
+  }
+  if (cursor_)
+    cursor_->browseRecord();
 }
 
 void FLTableDB::editRecord()
 {
   QWidget *w = ::qt_cast<QWidget *>(sender());
-  if (w && (!cursor_ || readonly_ || insertonly_
+  if (w && (!cursor_ || reqReadOnly_ || reqEditOnly_ || reqOnlyTable_
             || (cursor_->cursorRelation() && cursor_->cursorRelation()->isLocked()))) {
     w->setDisabled(true);
-    return ;
+    return;
   }
-  cursor_->editRecord();
+  if (cursor_)
+    cursor_->editRecord();
 }
 
 void FLTableDB::insertRecord()
 {
   QWidget *w = ::qt_cast<QWidget *>(sender());
-  if (w && (!cursor_ || readonly_ || editonly_
+  if (w && (!cursor_ || reqReadOnly_ || reqEditOnly_ || reqOnlyTable_
             || (cursor_->cursorRelation() && cursor_->cursorRelation()->isLocked()))) {
     w->setDisabled(true);
-    return ;
+    return;
   }
-  cursor_->insertRecord();
+  if (cursor_)
+    cursor_->insertRecord();
 }
 
 void FLTableDB::copyRecord()
 {
   QWidget *w = ::qt_cast<QWidget *>(sender());
-  if (w && (!cursor_ || readonly_ || editonly_
+  if (w && (!cursor_ || reqReadOnly_ || reqEditOnly_ || reqOnlyTable_
             || (cursor_->cursorRelation() && cursor_->cursorRelation()->isLocked()))) {
     w->setDisabled(true);
-    return ;
+    return;
   }
-  cursor_->copyRecord();
+  if (cursor_)
+    cursor_->copyRecord();
 }
 
 void FLTableDB::initCursor()
@@ -638,38 +766,52 @@ void FLTableDB::initCursor()
       sortField_ = tMD->field(tMD->primaryKey());
   }
 
+  bool ownTMD = false;
   if (!tableName_.isEmpty()) {
-    if (!cursor_->db()->manager()->existsTable(tableName_))
+    if (!cursor_->db()->manager()->existsTable(tableName_)) {
+      ownTMD = true;
       tMD = cursor_->db()->manager()->createTable(tableName_);
-    else
+    } else {
+      ownTMD = true;
       tMD = cursor_->db()->manager()->metadata(tableName_);
+    }
 
     if (!tMD)
-      return ;
+      return;
 
     if (foreignField_.isEmpty() || fieldRelation_.isEmpty()) {
       if (!cursor_->metadata()) {
-        return ;
+        if (ownTMD && tMD && !tMD->inCache()) {
+          delete tMD;
+        }
+        return;
       }
-      if (cursor_->metadata() ->name() != tableName_) {
+      if (cursor_->metadata()->name() != tableName_) {
         QObject *ctxt = cursor_->context();
         cursor_ = new FLSqlCursor(tableName_, true, cursor_->db()->connectionName(), 0, 0, this);
         if (cursor_) {
           cursor_->setContext(ctxt);
           cursorAux = 0;
         }
-        return ;
+        if (ownTMD && tMD && !tMD->inCache()) {
+          delete tMD;
+        }
+        return;
       }
     } else {
-      FLSqlCursor *cursorTopWidget = ::qt_cast<FLFormDB *>(topWidget) ->cursor();
-      if (cursorTopWidget && cursorTopWidget->metadata() ->name() != tableName_)
+      FLSqlCursor *cursorTopWidget = ::qt_cast<FLFormDB *>(topWidget)->cursor();
+      if (cursorTopWidget && cursorTopWidget->metadata()->name() != tableName_)
         cursor_ = cursorTopWidget;
     }
   }
 
   if (tableName_.isEmpty() || foreignField_.isEmpty()
-      || fieldRelation_.isEmpty() || cursorAux)
-    return ;
+      || fieldRelation_.isEmpty() || cursorAux) {
+    if (ownTMD && tMD && !tMD->inCache()) {
+      delete tMD;
+    }
+    return;
+  }
 
   cursorAux = cursor_;
   QString curName(cursor_->metadata()->name());
@@ -682,6 +824,11 @@ void FLTableDB::initCursor()
       checkIntegrity = (testM1->cardinality() == FLRelationMetaData::RELATION_M1);
     FLFieldMetaData *fMD = cursor_->metadata()->field(foreignField_);
     if (fMD) {
+      FLTableMetaData *tmdAux = cursor_->db()->manager()->metadata(tableName_);
+      if (!tmdAux || tmdAux->isQuery())
+        checkIntegrity = false;
+      if (tmdAux && !tmdAux->inCache())
+        delete tmdAux;
       rMD = new FLRelationMetaData(tableName_, fieldRelation_, FLRelationMetaData::RELATION_1M, false, false, checkIntegrity);
       fMD->addRelationMD(rMD);
 #ifdef FL_DEBUG
@@ -731,8 +878,12 @@ void FLTableDB::initCursor()
   }
 
   if (cursorAux && topWidget->isA("FLFormSearchDB")) {
-    topWidget->setCaption(cursor_->metadata() ->alias());
-    ::qt_cast<FLFormSearchDB *>(topWidget) ->setCursor(cursor_);
+    topWidget->setCaption(cursor_->metadata()->alias());
+    ::qt_cast<FLFormSearchDB *>(topWidget)->setCursor(cursor_);
+  }
+
+  if (ownTMD && tMD && !tMD->inCache()) {
+    delete tMD;
   }
 }
 
@@ -758,15 +909,18 @@ void FLTableDB::showWidget()
 
   showed = true;
 
-  FLTableMetaData *tMD;
-
+  FLTableMetaData *tMD = 0;
+  bool ownTMD = false;
   if (!tableName_.isEmpty()) {
-    if (!cursor_->db()->manager()->existsTable(tableName_))
+    if (!cursor_->db()->manager()->existsTable(tableName_)) {
+      ownTMD = true;
       tMD = cursor_->db()->manager()->createTable(tableName_);
-    else
+    } else {
+      ownTMD = true;
       tMD = cursor_->db()->manager()->metadata(tableName_);
+    }
     if (!tMD)
-      return ;
+      return;
   }
 
   tableRecords();
@@ -783,7 +937,7 @@ void FLTableDB::showWidget()
         refreshDelayed();
     }
     if (!topWidget->isA("FLFormRecordDB"))
-      tableRecords_->setQuickFocus();
+      lineEditSearch->setFocus();
   }
 
   if (cursorAux) {
@@ -803,9 +957,14 @@ void FLTableDB::showWidget()
         refreshDelayed();
     }
   } else if (topWidget->isA("FLFormRecordDB")
-             && cursor_->modeAccess() == FLSqlCursor::BROWSE && !tMD->isQuery()) {
+             && cursor_->modeAccess() == FLSqlCursor::BROWSE &&
+             (tMD && !tMD->isQuery())) {
     cursor_->setEdition(false);
     setReadOnly(true);
+  }
+
+  if (ownTMD && tMD && !tMD->inCache()) {
+    delete tMD;
   }
 }
 
@@ -817,13 +976,21 @@ FLSqlCursor *FLTableDB::cursor()
 void FLTableDB::setOrderCols(QStringList &fields)
 {
   if (!cursor_)
-    return ;
+    return;
   FLTableMetaData *tMD = cursor_->metadata();
   if (!tMD)
-    return ;
+    return;
 
   if (!showed)
     showWidget();
+
+  for (QStringList::Iterator it = fields.begin(); it != fields.end();) {
+    FLFieldMetaData *fmd = tMD->field(*it);
+    if (!fmd || !fmd->visibleGrid())
+      it = fields.remove(it);
+    else
+      ++it;
+  }
 
   QHeader *horizHeader = tableRecords()->horizontalHeader();
   int i = fields.count(), hCount = horizHeader->count();
@@ -831,33 +998,34 @@ void FLTableDB::setOrderCols(QStringList &fields)
   if (i > (hCount - sortColumn_))
     return;
 
-  int j;
-  for (j = sortColumn_; j < i; ++j) {
-    if (fields[ j - sortColumn_ ] != tMD->fieldAliasToName(horizHeader->label(j)))
-      break;
-  }
-  if (j == i)
-    return;
-
-  int c;
-  QString fieldName, fieldAlias;
-  QStringList::Iterator it = fields.end();
+  int c = 0;
+  QString fieldName;
+  QString fieldNameAlias;
+  QString fieldAlias;
+  QString itStr;
+  QStringList::const_iterator it(fields.end());
 
   tableRecords_->hide();
 
   do {
     --it;
     --i;
-    fieldAlias = tMD->fieldNameToAlias(*it);
-    for (c = sortColumn_; horizHeader->label(c) != fieldAlias && c < hCount; ++c)
-      ;
-    if (c < hCount) {
-      fieldName = tMD->fieldAliasToName(horizHeader->label(i + sortColumn_));
-      if (fieldName != (*it)) {
-        tableRecords_->setColumn(i + sortColumn_, *it, fieldAlias);
-        horizHeader->setLabel(i + sortColumn_, tMD->fieldNameToAlias(*it));
-        horizHeader->setLabel(c, tMD->fieldNameToAlias(fieldName));
-        tableRecords_->setColumn(c, fieldName, tMD->fieldNameToAlias(fieldName));
+    itStr = *it;
+    fieldAlias = tMD->fieldNameToAlias(itStr);
+
+    for (c = sortColumn_; horizHeader->label(c) != fieldAlias && c < hCount; ++c) {}
+
+    if (c < hCount && c != i + sortColumn_) {
+      fieldNameAlias = horizHeader->label(i + sortColumn_);
+      fieldName = tMD->fieldAliasToName(fieldNameAlias);
+
+      if (fieldName != itStr) {
+        tableRecords_->setColumn(i + sortColumn_, itStr, fieldAlias);
+        horizHeader->setLabel(i + sortColumn_, fieldAlias);
+
+        tableRecords_->setColumn(c, fieldName, fieldNameAlias);
+        horizHeader->setLabel(c, fieldNameAlias);
+
         tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
       }
     }
@@ -904,15 +1072,11 @@ QStringList FLTableDB::orderCols()
 
 void FLTableDB::seekCursor()
 {
-  if (!cursor_)
-    return ;
-
-  FLTableMetaData *tMD = cursor_->metadata();
-  if (!tMD)
-    return ;
-
   QString textSearch(lineEditSearch->text());
   if (textSearch.isEmpty())
+    return;
+
+  if (!cursor_)
     return;
 
   QString fN(sortField_->name());
@@ -922,8 +1086,15 @@ void FLTableDB::seekCursor()
     QString sql(cursor_->executedQuery() + " LIMIT 1");
     QSqlQuery qry(sql, cursor_->db()->db());
 
-    if (qry.first())
-      cursor_->seek(cursor_->atFromBinarySearch(fN, qry.value(0).toString(), orderAsc_), false, true);
+    if (qry.first()) {
+      QString v(qry.value(0).toString());
+      int pos = -1;
+      if (!v.upper().startsWith(textSearch.upper()))
+        pos = cursor_->atFromBinarySearch(fN, textSearch, orderAsc_);
+      if (pos == -1)
+        pos = cursor_->atFromBinarySearch(fN, v, orderAsc_);
+      cursor_->seek(pos, false, true);
+    }
   }
 }
 
@@ -947,12 +1118,35 @@ void FLTableDB::setAliasCheckColumn(const QString &t)
   aliasCheckColumn_ = t;
 }
 
-void FLTableDB::switchSortOrder(int)
+void FLTableDB::switchSortOrder(int col)
 {
-  orderAsc_ = !orderAsc_;
+  if (!autoSortColumn_)
+    return;
+  if (checkColumnVisible_)
+    --col;
+  if (col == 0) {
+    orderAsc_ = !orderAsc_;
+  } else if (col == 1) {
+    orderAsc2_ = !orderAsc2_;
+  }
+  tableRecords()->hide();
+  refresh( true, true );
+}
+
+void FLTableDB::setSortOrder(int ascending)
+{
+  if (orderAsc_ == ascending) return;
+  
+  orderAsc_ = ascending;
   tableRecords()->hide();
   refresh(true, true);
 }
+
+bool FLTableDB::isSortOrderAscending()
+{
+    return orderAsc_;
+}
+
 
 void FLTableDB::activeTabData(bool on)
 {
@@ -990,7 +1184,7 @@ void FLTableDB::refreshTabFilter()
   if (tdbFilter->numRows() < hCount && cursor_) {
     FLTableMetaData *tMD = cursor_->metadata();
     if (!tMD)
-      return ;
+      return;
 
     FLFieldMetaData *field = 0;
     QWidget *editor_ = 0;
@@ -1117,7 +1311,7 @@ void FLTableDB::refreshTabFilter()
           case QVariant::Time: {
             editor_ = new QTimeEdit;
             QTime timeNow = QTime::currentTime();
-            ::qt_cast<QTimeEdit *>(editor_) ->setTime(timeNow);
+            ::qt_cast<QTimeEdit *>(editor_)->setTime(timeNow);
           }
           break;
 
@@ -1435,13 +1629,36 @@ void FLTableDB::setFunctionGetColor(const QString &f)
   }
 }
 
+void FLTableDB::setOnlyTable(bool on)
+{
+  if (tableRecords_) {
+    onlyTable_ = on;
+    tableRecords_->setOnlyTable(on);
+  }
+  reqOnlyTable_ = on;
+}
+
 void FLTableDB::exportToOds()
 {
   if (!cursor_)
-    return ;
+    return;
+//-->Aulla : Desactiva exportar a ODS
+if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc", true))
+	{
+	QMessageBox::information(this, tr("Opción deshabilitada"),
+                                                 tr("Esta opción ha sido deshabilitada por el administrador"),
+                                                  QMessageBox::Yes);
+	return;
+	}
+//>--Aulla : Desactiva exportar a ODS
   FLTableMetaData *mtd = cursor_->metadata();
   if (!mtd)
     return;
+
+  FLDataTable *tdb = tableRecords();
+  if (!tdb || !tdb->sqlCursor())
+    return;
+  QHeader *horHeader = tdb->horizontalHeader();
 
   const AQOdsStyle titleStyle(Style::ALIGN_CENTER | Style::TEXT_BOLD);
   const AQOdsStyle borderBot(Style::BORDER_BOTTOM);
@@ -1449,17 +1666,16 @@ void FLTableDB::exportToOds()
   const AQOdsStyle borderLeft(Style::BORDER_LEFT);
   const AQOdsStyle italic(Style::TEXT_ITALIC);
 
-  FLDataTable *tdb = tableRecords();
-  QHeader *horHeader = tdb->horizontalHeader();
-
   AQOdsGenerator odsGen;
   AQOdsSpreadSheet spreadsheet(odsGen);
   AQOdsSheet sheet(spreadsheet, mtd->alias());
+  int tdbNumRows = tdb->numRows();
+  int tdbNumCols = tdb->numCols();
 
   QProgressDialog progress(tr("Procesando..."),
-                           tr("Cancelar"), tdb->numRows(),
+                           tr("Cancelar"), tdbNumRows,
                            this, tr("odsprogress"), true);
-  progress.setProgress(0);
+  progress.setProgress(1);
 
   {
     AQOdsRow row(sheet);
@@ -1474,19 +1690,24 @@ void FLTableDB::exportToOds()
     row.close();
   }
 
-  QSqlCursor *cur = tdb->sqlCursor();
+  QSqlCursor cur = *(tdb->sqlCursor());
   int curRow = tdb->currentRow();
 
-  cur->QSqlCursor::first();
+  cur.first();
 
-  for (int r = 0; r < tdb->numRows(); ++r) {
+  for (int r = 0; r < tdbNumRows; ++r) {
     if (progress.wasCanceled())
       break;
     AQOdsRow row(sheet);
-    for (int c = 0; c < tdb->numCols(); ++c) {
-      QVariant val(cur->QSqlCursor::value(tdb->indexOf(c)));
+    for (int c = 0; c < tdbNumCols; ++c) {
+      int idx = tdb->indexOf(c);
+      if (idx == -1)
+        continue;
+      QVariant val(cur.QSqlCursor::value(idx));
       switch (val.type()) {
         case QVariant::Double: {
+          QString fName(cur.fieldName(idx));
+          row.setFixedPrecision(mtd->fieldPartDecimal(fName));
           row.opIn(val.toDouble());
         }
         break;
@@ -1509,64 +1730,50 @@ void FLTableDB::exportToOds()
 
         default: {
           QString str(val.toString());
-	  if (str.contains('RK@')) 
-				{
- 				QSqlQuery q(QString::null, cursor_->db()->db());
-  				q.exec("SELECT contenido FROM fllarge WHERE refkey = '" + str + "'");
-  				while (q.next()) {
-						str = q.value(0).toString();
-						}
-		   QString fileNameXpm(AQ_DISKCACHE_DIRPATH + '/' + mtd->name() +
-                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
-                   QString::fromLatin1(".xpm"));
-                   QString fileNamePng(AQ_DISKCACHE_DIRPATH + '/' + mtd->name() +
-                   QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
-                   QString::fromLatin1(".png"));
-						 QFile f( fileNameXpm );
-						 f.open( IO_WriteOnly );
-						QTextStream out(&f);
-						 out << str;
-						 f.close();
-						QImage imagen;
-						QPixmap xpm(fileNameXpm);
-						if(!xpm.isNull())
-								{
-						imagen = xpm.convertToImage();
-						imagen.save(fileNamePng,"PNG");
-						uint alto = ((imagen.width() * 2.54)/98) * 1000;
-						uint ancho = ((imagen.height() * 2.54)/98) * 1000;
-						QString nombreImagen = "Imagen"+ QString::number(r);						
-						AQOdsImage img(nombreImagen,alto,ancho,0,0,fileNamePng);
-						row.opIn(img);
-								} else 
-								{
-								qWarning("La imagen está vacia");
-								row.opIn(str);
-								}      
-
-						
-				}
-				else
-				{
-          			if (str.isEmpty())
+          if (!str.isEmpty()) {
+            if (str.startsWith("RK@")) {
+              QCString cs = cursor_->db()->manager()->fetchLargeValue(str).toCString();
+              if (!cs.isEmpty()) {
+                QPixmap pix;
+                if (!QPixmapCache::find(cs.left(100), pix)) {
+                  pix.loadFromData(cs);
+                  QPixmapCache::insert(cs.left(100), pix);
+                }
+                if (!pix.isNull()) {
+                  QString pixName(QString("pix%1_").arg(pix.serialNumber()));
+                  QString pixFileName(AQ_DISKCACHE_DIRPATH + '/' + pixName +
+                                      QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
+                                      QString::fromLatin1(".png"));
+                  pix.save(pixFileName, "PNG");
+                  row.opIn(AQOdsImage(pixName,
+                                      AQOdsCentimeters(double(pix.width()) / 100.0 * 2.54),
+                                      AQOdsCentimeters(double(pix.height()) / 100.0 * 2.54),
+                                      AQOdsCentimeters(0),
+                                      AQOdsCentimeters(0),
+                                      pixFileName));
+                } else
            			 row.coveredCell();
-          			else
+              } else
+                row.coveredCell();
+            } else
             			row.opIn(str);
-				}
+          } else
+            row.coveredCell();
         }
       }
-    
     }
     row.close();
-    progress.setProgress(r);
-    qApp->processEvents();
-    cur->QSqlCursor::next();
+    if (!(r % 4))
+      progress.setProgress(r);
+    cur.next();
   }
 
-  cur->QSqlCursor::seek(curRow);
+  cur.seek(curRow);
 
   sheet.close();
   spreadsheet.close();
+
+  progress.setProgress(tdbNumRows);
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
 

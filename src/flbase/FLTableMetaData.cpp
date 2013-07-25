@@ -21,51 +21,89 @@ email                : mail@infosial.com
 #include "FLRelationMetaData.h"
 #include "FLCompoundKey.h"
 
-FLTableMetaDataPrivate::FLTableMetaDataPrivate(const QString &n, const QString &a, const QString &q) :
-  name_(n.lower()), alias_(a), compoundKey_(0), query_(q),
-  concurWarn_(true), detectLocks_(false)
+#ifdef FL_DEBUG
+AQ_EXPORT long FLTableMetaData::count_ = 0;
+#endif
+
+FLTableMetaDataPrivate::FLTableMetaDataPrivate(const QString &n, const QString &a, const QString &q)
+  : name_(n.lower()), alias_(a), compoundKey_(0), query_(q),
+    concurWarn_(false), detectLocks_(false), inCache_(false)
 {
   fieldList_ = new FLTableMetaData::FLFieldMetaDataList(71);
-  fieldList_->setAutoDelete(true);
+}
+
+FLTableMetaDataPrivate::FLTableMetaDataPrivate()
+  : compoundKey_(0), inCache_(false)
+{
+  fieldList_ = new FLTableMetaData::FLFieldMetaDataList(71);
 }
 
 FLTableMetaDataPrivate::~FLTableMetaDataPrivate()
 {
+  clearFieldList();
   delete fieldList_;
-  if (compoundKey_)
-    delete compoundKey_;
+  delete compoundKey_;
+}
+
+void FLTableMetaDataPrivate::clearFieldList()
+{
+  FLFieldMetaData *field;
+  QDictIterator<FLFieldMetaData> it(*fieldList_);
+  while ((field = it.current()) != 0) {
+    ++it;
+    if (field->deref())
+      delete field;
+  }
+  fieldsNames_ = QString::null;
 }
 
 FLTableMetaData::FLTableMetaData(const QString &n, const QString &a, const QString &q) : QObject(0, n.lower())
 {
+#ifdef FL_DEBUG
+  ++count_;
+#endif
   d = new FLTableMetaDataPrivate(n, a, q);
+}
+
+FLTableMetaData::FLTableMetaData(const FLTableMetaData *other)
+{
+#ifdef FL_DEBUG
+  ++count_;
+#endif
+  d = new FLTableMetaDataPrivate;
+  copy(other);
 }
 
 FLTableMetaData::~FLTableMetaData()
 {
-  if (d)
-    delete d;
+#ifdef FL_DEBUG
+  --count_;
+#endif
+  delete d;
 }
 
 void FLTableMetaData::addFieldMD(FLFieldMetaData *f)
 {
-  if (f) {
+  if (!f)
+    return;
+  if (!f->metadata())
     f->setMetadata(this);
-    d->fieldList_->insert(f->d->name_.lower(), f);
-    d->addFieldName(f->d->name_);
-    d->formatAlias(f);
-    if (f->d->type_ == FLFieldMetaData::Unlock)
-      d->fieldsNamesUnlock_.append(f->d->name_);
-    if (f->d->isPrimaryKey_)
-      d->primaryKey_ = f->d->name_.lower();
-  }
+  d->fieldList_->insert(f->d->fieldName_.lower(), f);
+  d->addFieldName(f->d->fieldName_);
+  d->formatAlias(f);
+  if (f->d->type_ == FLFieldMetaData::Unlock)
+    d->fieldsNamesUnlock_.append(f->d->fieldName_);
+  if (f->d->isPrimaryKey_)
+    d->primaryKey_ = f->d->fieldName_.lower();
 }
 
 void FLTableMetaData::removeFieldMD(const QString &fN)
 {
   if (fN.isEmpty())
     return;
-  d->fieldList_->remove(fN.lower());
+  FLFieldMetaData *field = d->fieldList_->take(fN.lower());
+  if (field->deref())
+    delete field;
   d->removeFieldName(fN);
 }
 
@@ -150,6 +188,8 @@ bool FLTableMetaData::fieldIsPrimaryKey(const QString &fN) const
 
 QString FLTableMetaData::primaryKey(bool prefixTable) const
 {
+  if (d->primaryKey_.contains("."))
+    return d->primaryKey_;
   return (prefixTable ? d->name_ + QString::fromLatin1(".") + d->primaryKey_ : d->primaryKey_);
 }
 
@@ -284,7 +324,7 @@ FLRelationMetaData *FLTableMetaData::relation(const QString &fN, const QString &
   return 0;
 }
 
-FLTableMetaData::FLFieldMetaDataList *
+const FLTableMetaData::FLFieldMetaDataList *
 FLTableMetaData::fieldListOfCompoundKey(const QString &fN) const
 {
   if (d->compoundKey_ && d->compoundKey_->hasField(fN))
@@ -351,5 +391,44 @@ void FLTableMetaDataPrivate::removeFieldName(const QString &n)
     QStringList list(QStringList::split(',', fieldsNames_));
     list.remove(n.lower());
     fieldsNames_ = list.join(",");
+  }
+}
+
+void FLTableMetaData::copy(const FLTableMetaData *other)
+{
+  if (other == this)
+    return;
+  FLTableMetaDataPrivate *od = other->d;
+
+  if (od->compoundKey_)
+    d->compoundKey_ = new FLCompoundKey(od->compoundKey_);
+
+  d->clearFieldList();
+
+  FLFieldMetaData *field;
+  QDictIterator<FLFieldMetaData> it(*od->fieldList_);
+  while ((field = it.current()) != 0) {
+    ++it;
+    FLFieldMetaData *f = new FLFieldMetaData(field);
+    f->setMetadata(this);
+    d->fieldList_->insert(f->d->fieldName_.lower(), f);
+  }
+
+  d->name_ = od->name_;
+  d->alias_ = od->alias_;
+  d->query_ = od->query_;
+  d->fieldsNames_ = od->fieldsNames_;
+  d->aliasFieldMap_ = od->aliasFieldMap_;
+  d->fieldAliasMap_ = od->fieldAliasMap_;
+  d->fieldsNamesUnlock_ = od->fieldsNamesUnlock_;
+  d->primaryKey_ = od->primaryKey_;
+  d->concurWarn_ = od->concurWarn_;
+  d->detectLocks_ = od->detectLocks_;
+
+  QDictIterator<FLFieldMetaData> it2(*d->fieldList_);
+  while ((field = it2.current()) != 0) {
+    ++it2;
+    if (!field->d->associatedFieldName_.isEmpty())
+      field->d->associatedField_ = this->field(field->d->associatedFieldName_);
   }
 }

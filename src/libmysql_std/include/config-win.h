@@ -232,7 +232,7 @@ typedef uint rf_SetTimer;
   return (((c-nr) >= (nr-f)) ? f :c);
 }*/
 
-#ifdef _WIN64
+#if defined(_WIN64) && !defined(AQ_WIN64)
 #define ulonglong2double(A) ((double) (ulonglong) (A))
 #define my_off_t2double(A)  ((double) (my_off_t) (A))
 
@@ -458,3 +458,6 @@ typedef uint rf_SetTimer;
 #define HAVE_CHARSET_utf8 1
 #define HAVE_UCA_COLLATIONS 1
 
+#if defined(AQ_WIN64)
+#define _TIMESPEC_DEFINED
+#endif

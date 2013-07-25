@@ -20,29 +20,37 @@
 #define AQODSGENERATOR_H_
 
 #include <sstream>
+#include <fstream>
 #include <qstring.h>
 
 class AQOdsGenerator
 {
 public:
-  AQOdsGenerator() {}
+  AQOdsGenerator();
+  ~AQOdsGenerator();
 
   std::stringstream &strStream() {
     return strStream_;
   }
 
-  void clear() {
-    strStream_.str("");
+  std::fstream &fileStream() {
+    return fileStream_;
   }
 
-  QString str() const {
-    return strStream_.str();
+  QString fileNameStream() const {
+    return fileName_;
   }
 
-  bool generateOds(const QString &fileNameOut) const;
+  void clear();
+
+  QString str();
+
+  bool generateOds(const QString &fileNameOut);
 
 private:
   std::stringstream strStream_;
+  std::fstream fileStream_;
+  QString fileName_;
 };
 
 #endif /* AQODSGENERATOR_H_ */

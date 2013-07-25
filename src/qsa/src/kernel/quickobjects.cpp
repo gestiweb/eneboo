@@ -540,6 +540,8 @@ static inline QSObject qsa_execute_slot_no_cast(QSEnv *env, QObject *qobj,
 static inline QSObject executeSlot(QSEnv *env, QObject *qobj,
                                    const QValueList<QuickMetaData> &mds)
 {
+  if (!qobj || qobj->aqWasDeleted())
+    return QSObject();
   bool exactMatch = false;
   QSObject obj = qsa_execute_slot_no_cast(env, qobj, mds, &exactMatch);
   if (exactMatch) {
@@ -877,6 +879,8 @@ void QSWrapperClass::invalidate()
 void QSWrapperClass::deref(QSObject *o) const
 {
 #ifndef QS_LEAK
+  if (o->shVal()->deleted())
+    return;
   o->shVal()->deref();
   if (o->shVal()->count == 0) {
     ((QSWrapperClass *)this)->invalidate();
@@ -2481,6 +2485,7 @@ QuickScriptReceiver::QuickScriptReceiver(QObject *o)
 QuickScriptReceiver::~QuickScriptReceiver()
 {
   delete handler;
+  handler = 0;
 }
 
 void QuickScriptReceiver::setEventHandler(QuickInterpreter *ip, int id,
@@ -2516,30 +2521,38 @@ void QuickScriptReceiver::removeEventHandler(int id, QObject *ctx, const QString
 
 bool QuickScriptReceiver::qt_invoke(int id, QUObject *o)
 {
+  if (!handler)
+    return false;
   const QMetaData *qmd = qobj->metaObject()->signal(id, TRUE);
   QuickMetaData md = QuickMetaData(qmd, id);
   QSList args;
   QuickScriptEventMap::Iterator it = handler->find(id);
   if (it == handler->end())
-    return FALSE;
+    return false;
   const QUParameter *param = md.method->parameters;
   QuickInterpreter *ip = (*it).eng;
   // 0th element contains return value
   for (int i = 1; i < md.method->count + 1; i++, param++)
     args.append(uObjectToQS(ip, &o[ i ], param->typeExtra, qobj));
-  for (QValueList<EventTarget::Target>::ConstIterator sit = (*it).targets.begin(); sit != (*it).targets.end(); ++sit) {
-    if ((*sit).ctx)
-      ip->call((*sit).ctx, (*sit).func, args);
-    else
+  QValueList<EventTarget::Target> tgts((*it).targets);
+  for (QValueList<EventTarget::Target>::ConstIterator sit = tgts.constBegin();
+       sit != tgts.constEnd(); ++sit) {
+    if ((*sit).ctx) {
+      if (!(*sit).ctx->aqWasDeleted())
+        ip->call((*sit).ctx, (*sit).func, args);
+    } else
       ip->call((*sit).qsctx, (*sit).func, args);
+    if (!handler || aqWasDeleted() || qobj.isNull())
+      break;
   }
-
-  return TRUE;
+  return true;
 }
 
 
 void QuickScriptReceiver::invalidate()
 {
+  if (!handler)
+    return;
   for (QuickScriptEventMap::Iterator it = handler->begin();
        it != handler->end(); ++it) {
     for (QValueList<EventTarget::Target>::Iterator targets = (*it).targets.begin();

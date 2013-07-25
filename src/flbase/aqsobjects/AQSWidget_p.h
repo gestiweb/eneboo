@@ -46,6 +46,8 @@ public slots:
   void setFixedHeight(int);
   QLayout *layout() const;
   void setSizePolicy(uint, uint, bool = FALSE);
+  virtual void reparent(QWidget *, WFlags, const QPoint &, bool = FALSE);
+  void reparent(QWidget *, const QPoint &, bool = FALSE);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -125,6 +127,14 @@ inline QLayout *AQSWidget::layout() const
 inline void AQSWidget::setSizePolicy(uint arg0,  uint arg1,  bool arg2)
 {
   AQ_CALL_VOID(setSizePolicy(static_cast<QSizePolicy::SizeType>(arg0), static_cast<QSizePolicy::SizeType>(arg1), arg2));
+}
+inline void AQSWidget::reparent(QWidget *arg0,  WFlags arg1,  const QPoint &arg2,  bool arg3)
+{
+  AQ_CALL_VOID(reparent(arg0, arg1, arg2, arg3));
+}
+inline void AQSWidget::reparent(QWidget *arg0,  const QPoint &arg1,  bool arg2)
+{
+  AQ_CALL_VOID(reparent(arg0, arg1, arg2));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

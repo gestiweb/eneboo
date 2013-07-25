@@ -296,14 +296,24 @@ void FLStaticLoaderWarning::updateScripts()
   QString n;
   QString *scrName = 0;
   QSScript *scr = 0;
+  QString sufMn("::Main");
+  QString sufFm("::Form");
+  QString sufFr("::FormRecord");
   for (QStringList::const_iterator it = paths_.begin(); it != paths_.end(); ++it) {
     n = (*it).section(':', 0, 0);
     if (!n.endsWith(".qs"))
       continue;
-    scr = scriptBaseFileName(n);
-    if (!scr)
-      continue;
-    scr->setFileName((*it).section(':', 1, 1) + n);
+    scr = scriptBaseFileName(n + sufMn);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
+
+    scr = scriptBaseFileName(n + sufFm);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
+
+    scr = scriptBaseFileName(n + sufFr);
+    if (scr)
+      scr->setFileName((*it).section(':', 1, 1) + n);
   }
   paths_.clear();
 }
@@ -314,12 +324,18 @@ FLStaticLoaderWarning *FLModulesStaticLoader::warn_ = 0;
 
 QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
 {
+   QString separator;
+#if defined(Q_OS_WIN32)
+   separator = "/";
+#else
+   separator ="";
+#endif
   for (AQStaticDirInfo *info = b->dirs_.first(); info; info = b->dirs_.next()) {
-    if (info->active_ && QFile::exists(info->path_ + n)) {
+    if (info->active_ && QFile::exists(info->path_ + separator + n)) {
       if (!warn_)
         warn_ = new FLStaticLoaderWarning;
 #ifdef AQ_STATIC_LOADER_POPUP_WARN
-      if (warn_->warns_.isEmpty())
+      if (warn_->warns_.isEmpty() && FLSettings::readBoolEntry("ebcomportamiento/SLInterface", true))
         QTimer::singleShot(500, warn_, SLOT(popupWarnings()));
 #endif
       if (warn_->paths_.isEmpty())
@@ -330,9 +346,10 @@ QString FLModulesStaticLoader::content(const QString &n, AQStaticBdInfo *b)
       if (!warn_->warns_.contains(msg)) {
         warn_->warns_ << msg;
         warn_->paths_ << QString(n + ':' + info->path_);
+        if (FLSettings::readBoolEntry("ebcomportamiento/SLConsola", true))
         qWarning("CARGA ESTATICA ACTIVADA:" + n + " -> " + info->path_);
       }
-      return FLManagerModules::contentFS(info->path_ + n);
+      return FLManagerModules::contentFS(info->path_ + separator + n);
     }
   }
   return QString::null;

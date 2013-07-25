@@ -297,11 +297,11 @@ static void closeAllOpenFds()
 
 
 
-static const char *const psToStr[QPrinter::NPageSize + 2] = {
+static const char *const psToStr[QPrinter::NPageSize + 3] = {
   "A4", "B5", "Letter", "Legal", "Executive",
   "A0", "A1", "A2", "A3", "A5", "A6", "A7", "A8", "A9", "B0", "B1",
   "B10", "B2", "B3", "B4", "B6", "B7", "B8", "B9", "C5E", "Comm10E",
-  "DLE", "Folio", "Ledger", "Tabloid", "Custom", 0
+  "DLE", "Folio", "Ledger", "Tabloid", "Custom", 0, 0
 };
 
 
@@ -422,7 +422,7 @@ bool QPrinter::cmd(int c, QPainter *paint, QPDevCmdParam *p)
               lpargs[++i] = "-o";
               media = "media=";
               media += psToStr[page_size];
-              if (page_size >= QPrinter::Custom) {
+              if (page_size == QPrinter::Custom) {
                 media += QString(".%1x%2mm")
                          .arg(metric(QPaintDeviceMetrics::PdmWidthMM))
                          .arg(metric(QPaintDeviceMetrics::PdmHeightMM));
@@ -537,14 +537,17 @@ int QPrinter::metric(int m) const
   int val;
   PageSize s = pageSize();
 #if defined(QT_CHECK_RANGE)
-  Q_ASSERT((uint)s <= (uint)NPageSize);
+  Q_ASSERT((uint)s <= (uint)CustomOld);
 #endif
   switch (m) {
     case QPaintDeviceMetrics::PdmWidth:
-      if (s >= QPrinter::Custom)
+      if (s == QPrinter::Custom) {
         val = orient == Portrait ? customPaperSize_.width() : customPaperSize_.height();
-      else
+      } else {
+        if (s > QPrinter::Custom)
+          s = QPrinter::Custom;
         val = orient == Portrait ? paperSizes[s].width : paperSizes[s].height;
+      }
       if (res != 72)
         val = (val * res + 36) / 72;
       if (!fullPage()) {
@@ -555,10 +558,13 @@ int QPrinter::metric(int m) const
       }
       break;
     case QPaintDeviceMetrics::PdmHeight:
-      if (s >= QPrinter::Custom)
+      if (s == QPrinter::Custom) {
         val = orient == Portrait ? customPaperSize_.height() : customPaperSize_.width();
-      else
+      } else {
+        if (s > QPrinter::Custom)
+          s = QPrinter::Custom;
         val = orient == Portrait ? paperSizes[s].height : paperSizes[s].width;
+      }
       if (res != 72)
         val = (val * res + 36) / 72;
       if (!fullPage()) {

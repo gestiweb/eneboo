@@ -48,3 +48,8 @@ void MCalcObject::copy(const MCalcObject *mCalcObject)
   // Copy the fields's calculation type
   calcType = mCalcObject->calcType;
 }
+
+int MCalcObject::RTTI() const
+{
+  return MReportObject::Calc;
+}

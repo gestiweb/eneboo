@@ -16,6 +16,8 @@
  versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 #include <stdio.h>
+#include <qsworkbench.h>
+
 #include "FLFormDB.h"
 #include "FLSqlCursor.h"
 #include "FLTableMetaData.h"
@@ -30,15 +32,24 @@
 FLFormDB::FLFormDB(QWidget *parent, const char *name, WFlags f) :
   QWidget(parent ? parent : aqApp->mainWidget(), name, f),
   cursor_(0), layout(0), mainWidget_(0), layoutButtons(0), pushButtonCancel(0), showed(false),
-  iface(0), oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0)
+  iface(0), oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0), oldFormObj(0),
+  accepted_(false)
 {
+#ifdef QSDEBUGGER
+  pushButtonDebug = 0;
+#endif
 }
 
 FLFormDB::FLFormDB(const QString &actionName, QWidget *parent, WFlags f) :
   QWidget(parent ? parent : aqApp->mainWidget(), actionName, f),
   layout(0), mainWidget_(0), layoutButtons(0), pushButtonCancel(0), showed(false), iface(0),
-  oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0)
+  oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0), oldFormObj(0),
+  accepted_(false)
 {
+#ifdef QSDEBUGGER
+  pushButtonDebug = 0;
+#endif
+
   setFocusPolicy(QWidget::NoFocus);
 
   if (actionName.isEmpty()) {
@@ -64,7 +75,8 @@ FLFormDB::FLFormDB(const QString &actionName, QWidget *parent, WFlags f) :
 FLFormDB::FLFormDB(FLSqlCursor *cursor, const QString &actionName, QWidget *parent, WFlags f) :
   QWidget(parent ? parent : aqApp->mainWidget(), actionName, f),
   cursor_(cursor), layout(0), mainWidget_(0), layoutButtons(0), pushButtonCancel(0),
-  showed(false), iface(0), oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0)
+  showed(false), iface(0), oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0),
+  oldFormObj(0), accepted_(false)
 {
   setFocusPolicy(QWidget::NoFocus);
 
@@ -74,15 +86,14 @@ FLFormDB::FLFormDB(FLSqlCursor *cursor, const QString &actionName, QWidget *pare
     action_ = cursor->db()->manager()->action(actionName);
   else
     action_ = FLSqlConnections::database()->manager()->action(actionName);
-  name_ = QString::null;
+  name_ = (action_ ? action_->name() : QString::null);
 
   initForm();
 }
 
 FLFormDB::~FLFormDB()
 {
-  if (iface && iface->obj() == this)
-    iface->setObj(0);
+  unbindIface();
 }
 
 bool FLFormDB::close()
@@ -96,33 +107,21 @@ bool FLFormDB::close()
 void FLFormDB::initForm()
 {
   if (cursor_ && cursor_->metadata()) {
-    bool captionIsSet = false;
-    QString caption = "";
+    QString caption;
     if (action_) {
       cursor_->setAction(action_);
-      if (action_->caption() != QString::null) {
-        captionIsSet = true;
-        QString action_caption = action_->caption(); 
-        if (action_caption.contains("TRANSLATE", false) != 0) {
-            action_caption = FLUtil::translate("MetaData", action_caption.mid(30, action_caption.length() - 32));
-        }
-
-        setCaption(action_caption + caption); 
-      }
+      caption = action_->caption();
+      if (!action_->description().isEmpty())
+        QWhatsThis::add(this, action_->description());
       idMDI_ = action_->name();
     }
-    if (!captionIsSet) {
-        setCaption(cursor_->metadata()->alias() + caption);
-    }
-    setName("form" + idMDI_);
-    QSProject *p = aqApp->project();
-    iface = static_cast<FLFormDBInterface *>(p->object(name()));
-    if (iface) {
-      iface->setObj(this);
-      if (!oldCursorCtxt)
-        oldCursorCtxt = cursor_->context();
-      cursor_->setContext(iface);
-    }
+
+    if (caption.isEmpty())
+      caption = cursor_->metadata()->alias();
+    setCaption(caption);
+
+    bindIface();
+    setCursor(cursor_);
   } else
     setCaption(tr("No hay metadatos"));
 }
@@ -153,6 +152,22 @@ void FLFormDB::setMainWidget(QWidget *w)
   layoutButtons->addWidget(wt);
   wt->show();
 
+#ifdef QSDEBUGGER
+  pushButtonDebug = new QPushButton(this, "pushButtonDebug");
+  pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
+                                             pushButtonDebug->sizePolicy().hasHeightForWidth()));
+  pushButtonDebug->setMinimumSize(pbSize);
+  pushButtonDebug->setMaximumSize(pbSize);
+  QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
+  pushButtonDebug->setIconSet(qsa);
+  pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
+  QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
+  layoutButtons->addWidget(pushButtonDebug);
+  connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+#endif
+
   layoutButtons->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
   pushButtonCancel = new QPushButton(this, "pushButtonCancel");
@@ -174,10 +189,21 @@ void FLFormDB::setMainWidget(QWidget *w)
   mainWidget_ = w;
 }
 
-void FLFormDB::initScript()
+bool FLFormDB::initScript()
 {
-  if (iface)
+  if (iface) {
     aqApp->call("init", QSArgumentList(), iface);
+    return true;
+  }
+  return false;
+}
+
+void FLFormDB::accept()
+{
+}
+
+void FLFormDB::reject()
+{
 }
 
 void FLFormDB::setMainWidget()
@@ -209,8 +235,7 @@ void FLFormDB::closeEvent(QCloseEvent *e)
     }
   }
 
-  if (cursor_ && oldCursorCtxt)
-    cursor_->setContext(oldCursorCtxt);
+  setCursor(0);
 
   emit closed();
   QWidget::closeEvent(e);
@@ -219,20 +244,20 @@ void FLFormDB::closeEvent(QCloseEvent *e)
 
 void FLFormDB::hideEvent(QHideEvent *h)
 {
-  QWidget *pW = this->parentWidget();
+  QWidget *pW = parentWidget();
   if (pW && pW->isA("QWorkspaceChild")) {
     QRect geo(pW->x(), pW->y(), pW->width(), pW->height());
-    if (this->isMinimized()) {
-      //geo.setWidth(1);
-      //aqApp->saveGeometryForm(QObject::name(), geo);
-    } else if (this->isMaximized()) {
-      //geo.setWidth(9999);
-      //aqApp->saveGeometryForm(QObject::name(), geo);
+    if (isMinimized()) {
+      geo.setWidth(1);
+      aqApp->saveGeometryForm(geoName(), geo);
+    } else if (isMaximized()) {
+      geo.setWidth(9999);
+      aqApp->saveGeometryForm(geoName(), geo);
     } else
-      aqApp->saveGeometryForm(QObject::name(), geo);
+      aqApp->saveGeometryForm(geoName(), geo);
   } else {
     QRect geo(x(), y(), width(), height());
-    aqApp->saveGeometryForm(QObject::name(), geo);
+    aqApp->saveGeometryForm(geoName(), geo);
   }
 }
 
@@ -240,14 +265,22 @@ void FLFormDB::showEvent(QShowEvent *e)
 {
   if (!showed && mainWidget_) {
     showed = true;
+    if (cursor_ && iface) {
+      QVariant v(aqApp->call("preloadMainFilter", QSArgumentList(), iface).variant());
+      if (v.isValid() && v.type() == QVariant::String)
+        cursor_->setMainFilter(v.toString(), false);
+    }
     initMainWidget();
     callInitScript();
   }
+  if (!isIfaceBind())
+    bindIface();
 }
 
 void FLFormDB::callInitScript()
 {
-  this->initScript();
+  if (!initScript())
+    return;
   if (!isClosing_ && !aqApp->project()->interpreter()->hadError())
     QTimer::singleShot(0, this, SLOT(emitFormReady()));
 }
@@ -272,18 +305,19 @@ void FLFormDB::initMainWidget(QWidget *w)
       ++itf;
       fdb->initCursor();
       fdb->initEditor();
+      if (fdb->aqFirstTabStop == 1)
+        initFocusWidget_ = fdb;
     }
 
-    initFocusWidget_ = static_cast<QWidget *>(mWidget->child(mWidget->caption()));
-    if (initFocusWidget_)
-      initFocusWidget_->setFocus();
-
+    while (mWidget->parentWidget() && mWidget->parentWidget() != this)
+      mWidget = mWidget->parentWidget();
     mWidget->show();
+
     FLAccessControlLists *acl = aqApp->acl();
     if (acl)
       acl->process(this);
 
-    QWidget *pW = this->parentWidget();
+    QWidget *pW = parentWidget();
     QRect desk;
     bool parentIsDesktop = true;
     
@@ -430,11 +464,20 @@ void FLFormDB::initMainWidget(QWidget *w)
 
 void FLFormDB::setCursor(FLSqlCursor *c)
 {
+  if (c != cursor_ && cursor_ && oldCursorCtxt)
+    cursor_->setContext(oldCursorCtxt);
+
   if (!c)
     return;
+
+  if (cursor_)
+    disconnect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
   cursor_ = c;
-  if (iface)
-    iface->setObjCursor(c);
+  connect(cursor_, SIGNAL(destroyed(QObject *)), this, SLOT(cursorDestroyed(QObject *)));
+  if (iface && cursor_) {
+    oldCursorCtxt = cursor_->context();
+    cursor_->setContext(iface);
+  }
 }
 
 QImage FLFormDB::snapShot()
@@ -459,13 +502,130 @@ void FLFormDB::showForDocument()
 {
   showed = true;
   mainWidget_->show();
-  this->resize(size().expandedTo(mainWidget_->size()));
+  resize(size().expandedTo(mainWidget_->size()));
   QWidget::show();
 }
 
 void FLFormDB::setMaximized()
 {
   setWindowState(windowState() | WindowMaximized);
+}
+
+void FLFormDB::emitFormReady()
+{
+  emit formReady();
+}
+
+void FLFormDB::debugScript()
+{
+  QSScript *scr = script();
+  if (!scr)
+    return;
+  aqApp->openQSWorkbench();
+  QSWorkbench *wb = aqApp->workbench();
+  if (wb)
+    wb->showScript(scr);
+}
+
+QSScript *FLFormDB::script() const
+{
+  FLFormDBInterface *ifc = ::qt_cast<FLFormDBInterface *>(iface);
+  if (ifc)
+    return ifc->script();
+  return 0;
+}
+
+QString FLFormDB::formName() const
+{
+  return QString::fromLatin1("form") + idMDI_;
+}
+
+QString FLFormDB::geoName() const
+{
+  return formName();
+}
+
+void FLFormDB::bindIface()
+{
+  QSProject *p = aqApp->project();
+  if (!p)
+    return;
+
+  setName(formName());
+  QObject *o = p->object(name());
+
+  if (o != iface && iface && oldFormObj)
+    static_cast<FLFormDBInterface *>(iface)->setObj(oldFormObj);
+  iface = o;
+
+  FLFormDBInterface *ifc = ::qt_cast<FLFormDBInterface *>(iface);
+  if (!ifc)
+    return;
+
+  if (ifc->obj() != this) {
+    if (oldFormObj) {
+      disconnect(oldFormObj, SIGNAL(destroyed()),
+                 this, SLOT(oldFormObjDestroyed()));
+    }
+    oldFormObj = ifc->obj();
+    if (oldFormObj) {
+      connect(oldFormObj, SIGNAL(destroyed()),
+              this, SLOT(oldFormObjDestroyed()));
+    }
+    ifc->setObj(this);
+  }
+}
+
+void FLFormDB::unbindIface()
+{
+  FLFormDBInterface *ifc = ::qt_cast<FLFormDBInterface *>(iface);
+  if (!ifc)
+    return;
+  if (ifc->obj() == this)
+    ifc->setObj(oldFormObj);
+}
+
+bool FLFormDB::isIfaceBind() const
+{
+  FLFormDBInterface *ifc = ::qt_cast<FLFormDBInterface *>(iface);
+  if (!ifc)
+    return true;
+  return (ifc->obj() == this);
+}
+
+void FLFormDB::oldFormObjDestroyed()
+{
+  oldFormObj = 0;
+}
+
+void FLFormDB::cursorDestroyed(QObject *obj)
+{
+  if (!obj || obj != cursor_)
+    return;
+  cursor_ = 0;
+}
+
+void FLFormDB::focusInEvent(QFocusEvent *f)
+{
+  QWidget::focusInEvent(f);
+  if (!isIfaceBind())
+    bindIface();
+}
+
+QString FLFormDB::formClassName() const
+{
+  return "FormDB";
+}
+
+void FLFormDB::show()
+{
+  QWidget::show();
+}
+
+QVariant FLFormDB::exec(const QString &)
+{
+  QWidget::show();
+  return QVariant();
 }
 
 // Silix
@@ -476,7 +636,3 @@ void FLFormDB::setCaptionWidget(const QString &text) {
   setCaption(text);
 }
 
-void FLFormDB::emitFormReady()
-{
-  emit formReady();
-}

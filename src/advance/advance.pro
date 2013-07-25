@@ -7,13 +7,18 @@ else {
 }
 TEMPLATE = lib
 
-CONFIG += warn_off createprl linkprl qt 
+CONFIG += warn_off createprl linkprl qt
 !mac:CONFIG += plugin
 unix:CONFIG += x11
 
 win32 {
-        CONFIG += dll
+        CONFIG += dll shared
         DLLDESTDIR = $$PREFIX/bin
+}
+shared {
+	win32:DEFINES	+= AQADV_DLL
+} else {
+	win32:DEFINES += AQADV_NO_DLL
 }
 DESTDIR = $$PREFIX/lib
 
@@ -27,7 +32,7 @@ VERSION = 0.8.0
 
 SOURCES += vdatepopup.cpp vdatetable.cpp
 
-HEADERS += vdatepopup.h vdatetable.h
+HEADERS += aqadvglobal.h vdatepopup.h vdatetable.h
 
 IMAGES += images/1leftarrow.png images/1rightarrow.png \ 
 	images/2leftarrow.png images/2rightarrow.png

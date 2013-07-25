@@ -28,6 +28,8 @@
 
 #include "FLWidgetConnectDB.h"
 
+#include "AQGlobal.h"
+
 class FLTableMetaData;
 
 /**
@@ -40,7 +42,7 @@ a la que conectar, puerto, usuario y contraseña.
 
 @author InfoSiAL S.L.
 */
-class FL_EXPORT FLConnectDBDialog: public FLWidgetConnectDB
+class AQ_EXPORT FLConnectDBDialog: public FLWidgetConnectDB
 {
 
   Q_OBJECT
