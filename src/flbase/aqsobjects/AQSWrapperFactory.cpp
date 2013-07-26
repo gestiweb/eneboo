@@ -237,42 +237,13 @@ QByteArray AQS::uncompress(QByteArray *ba) const
 
 QByteArray AQS::encryptInternal(QByteArray *ba) const
 {
-  if (!ba)
     return QByteArray();
 
-  AQ_ENC_KEY;
-  AQ_ENC_KEYVI;
-
-  QByteArray key(32);
-  QByteArray vi(32);
-
-  for (int i = 0; i < 32; ++i)
-    key[i] = enckey[i];
-  for (int i = 0; i < 32; ++i)
-    vi[i] = enckeyvi[i];
-
-  QByteArray bac(qCompress(*ba));
-  return aes_256_encrypt(&bac, key, vi);
 }
 
 QByteArray AQS::decryptInternal(QByteArray *ba) const
 {
-  if (!ba)
     return QByteArray();
-
-  AQ_ENC_KEY;
-  AQ_ENC_KEYVI;
-
-  QByteArray key(32);
-  QByteArray vi(32);
-
-  for (int i = 0; i < 32; ++i)
-    key[i] = enckey[i];
-  for (int i = 0; i < 32; ++i)
-    vi[i] = enckeyvi[i];
-
-  QByteArray bac(aes_256_decrypt(ba, key, vi));
-  return qUncompress(bac);
 }
 
 QString AQS::sha1(QByteArray *ba) const

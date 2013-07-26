@@ -32,7 +32,9 @@
 
 #include "../engine/qsfuncref.h"
 #ifdef QSDEBUGGER
+#ifdef QSDEBUGGER_VISUAL
 #include "../ide/idewindow.h"
+#endif
 #include "../kernel/quickdebugger.h"
 #endif
 #include "../kernel/quickinterpreter.h"
@@ -56,7 +58,7 @@ extern Q_EXPORT Qt::HANDLE qt_get_application_thread_id();
 
 #define getQuickInterpreter() d->interpreter->interpreter()
 
-#ifdef QSDEBUGGER
+#ifdef QSDEBUGGER_VISUAL
 IdeWindow *get_workbench(QWidget *w)
 {
   if (!w)

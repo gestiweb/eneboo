@@ -188,22 +188,22 @@ namespace dbiplus
   int SqliteDatabase::connect()
   {
     disconnect();
-  int result;
-result = sqlite3_open(db.c_str(),&conn);
-    //char* err=NULL;
-    if (result != SQLITE_OK) {
+    if (conn = sqlite_open(db.c_str(), 0, NULL)) {
+      //cout << "Connected!\n";
+      char *err = NULL;
+      if (setErr(sqlite_exec(getHandle(), "PRAGMA empty_result_callbacks=ON", NULL, NULL, &err), "PRAGMA empty_result_callbacks=ON") != SQLITE_OK) {
         return DB_CONNECTION_NONE;
       }
       active = true;
       return DB_CONNECTION_OK;
-  
-  //return DB_CONNECTION_NONE;
+    }
+    return DB_CONNECTION_NONE;
   };
 
   void SqliteDatabase::disconnect(void)
   {
     if (active == false) return;
-  sqlite3_close(conn);
+    sqlite_close(conn);
     active = false;
   };
 
@@ -230,18 +230,18 @@ result = sqlite3_open(db.c_str(),&conn);
     result_set res;
     char sqlcmd[512];
     sprintf(sqlcmd, "select nextid from %s where seq_name = '%s'", sequence_table.c_str(), sname);
-  if (last_err = sqlite3_exec(getHandle(),sqlcmd,&callback,&res,NULL) != SQLITE_OK) {
+    if (last_err = sqlite_exec(getHandle(), sqlcmd, &callback, &res, NULL) != SQLITE_OK) {
       return DB_UNEXPECTED_RESULT;
     }
     if (res.records.size() == 0) {
       id = 1;
       sprintf(sqlcmd, "insert into %s (nextid,seq_name) values (%d,'%s')", sequence_table.c_str(), id, sname);
-    if (last_err = sqlite3_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
+      if (last_err = sqlite_exec(conn, sqlcmd, NULL, NULL, NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
       return id;
     } else {
       id = res.records[0][0].get_asInteger() + 1;
       sprintf(sqlcmd, "update %s set nextid=%d where seq_name = '%s'", sequence_table.c_str(), id, sname);
-    if (last_err = sqlite3_exec(conn,sqlcmd,NULL,NULL,NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
+      if (last_err = sqlite_exec(conn, sqlcmd, NULL, NULL, NULL) != SQLITE_OK) return DB_UNEXPECTED_RESULT;
       return id;
     }
     return DB_UNEXPECTED_RESULT;
@@ -253,7 +253,7 @@ result = sqlite3_open(db.c_str(),&conn);
   void SqliteDatabase::start_transaction()
   {
     if (active) {
-    sqlite3_exec(conn,"begin",NULL,NULL,NULL);
+      sqlite_exec(conn, "begin", NULL, NULL, NULL);
       _in_transaction = true;
     }
   }
@@ -261,7 +261,7 @@ result = sqlite3_open(db.c_str(),&conn);
   void SqliteDatabase::commit_transaction()
   {
     if (active) {
-    sqlite3_exec(conn,"commit",NULL,NULL,NULL);
+      sqlite_exec(conn, "commit", NULL, NULL, NULL);
       _in_transaction = false;
     }
   }
@@ -269,7 +269,7 @@ result = sqlite3_open(db.c_str(),&conn);
   void SqliteDatabase::rollback_transaction()
   {
     if (active) {
-    sqlite3_exec(conn,"rollback",NULL,NULL,NULL);
+      sqlite_exec(conn, "rollback", NULL, NULL, NULL);
       _in_transaction = false;
     }
   }
@@ -310,7 +310,7 @@ result = sqlite3_open(db.c_str(),&conn);
 
   //--------- protected functions implementation -----------------//
 
-sqlite3* SqliteDataset::handle()
+  sqlite *SqliteDataset::handle()
   {
     if (db != NULL) {
       return ((SqliteDatabase *)db)->getHandle();
@@ -334,7 +334,7 @@ sqlite3* SqliteDataset::handle()
       query = *i;
       char *err = NULL;
       Dataset::parse_sql(query);
-	if (db->setErr(sqlite3_exec(this->handle(),query.c_str(),NULL,NULL,&err),query.c_str())!=SQLITE_OK) {
+      if (db->setErr(sqlite_exec(this->handle(), query.c_str(), NULL, NULL, &err), query.c_str()) != SQLITE_OK) {
         if (db->in_transaction()) db->rollback_transaction();
         return;
       }
@@ -402,7 +402,7 @@ sqlite3* SqliteDataset::handle()
     int res;
     exec_res.record_header.clear();
     exec_res.records.clear();
-    if(res = db->setErr(sqlite3_exec(handle(),sql.c_str(),&callback,&exec_res,&errmsg),sql.c_str()) == SQLITE_OK)
+    if (res = db->setErr(sqlite_exec(handle(), sql.c_str(), &callback, &exec_res, &errmsg), sql.c_str()) == SQLITE_OK)
       return res;
     else
       return DB_ERROR;
@@ -433,7 +433,7 @@ sqlite3* SqliteDataset::handle()
 
     close();
 
-    if (  db->setErr(sqlite3_exec(handle(),query,&callback,&result,&errmsg),query) == SQLITE_OK) {
+    if (db->setErr(sqlite_exec(handle(), query, &callback, &result, &errmsg), query) == SQLITE_OK) {
       active = true;
       ds_state = dsSelect;
       this->first();

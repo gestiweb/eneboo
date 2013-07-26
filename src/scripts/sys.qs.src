@@ -33,15 +33,12 @@ function init()
       txt += sys.translate("La versión instalada de los módulos en esta  base\n");
       txt += sys.translate("de datos está desactualizada, le recomendamos que\n");
       txt += sys.translate("la actualice lo antes posible.\n");
-      txt += sys.translate("Mientras tanto,  AbanQ  necesita realizar algunos\n");
+      txt += sys.translate("Mientras tanto,  Eneboo necesita realizar algunos\n");
       txt += sys.translate("ajustes para  poder ser  ejecutado con las nuevas\n");
       txt += sys.translate("versiones.\n");
       txt += sys.translate("No  debería  continuar  si no tiene una  copia de\n");
       txt += sys.translate("seguridad que le  permita deshacer  los cambios y\n");
       txt += sys.translate("volver al estado anterior en cualquier momento.\n\n");
-      txt += sys.translate("Obtenga soporte en");
-      txt += " http://www.infosial.com\n(c) InfoSiAL S.L.";
-      txt += "\n\n";
       txt += sys.translate("¿Desea continuar?");
 
       var res = MessageBox.warning(txt, MessageBox.No, MessageBox.Yes);
