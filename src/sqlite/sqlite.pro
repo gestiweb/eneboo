@@ -1,10 +1,12 @@
-PRJ_MODULE      = SQLite
+PRJ_MODULE = SQLite v3
+
 exists(../../settings.pro) {
 	include(../../settings.pro)
 }
 else {
 	error("settings.pro missing, unable to build")
 }
+
 TEMPLATE = lib
 
 CONFIG += warn_off create_prl link_prl
@@ -37,8 +39,8 @@ INCLUDEPATH += $$ROOT/src/qt/include ./
 VERSION = 3.7.16.2
 
 SOURCES += sqlite3.c \
-	   shell.c \
-	   opcodes.c \         
+           shell.c \
+	         opcodes.c \         
            dataset.cpp qry_dat.cpp sqlitedataset.cpp
 
 HEADERS += aqsqliteglobal.h \
@@ -46,4 +48,5 @@ HEADERS += aqsqliteglobal.h \
            sqlite3.h \
            opcodes.h \
            config_sqlite.h \
-	   dataset.h qry_dat.h sqlitedataset.h
+ 	         dataset.h qry_dat.h sqlitedataset.h
+

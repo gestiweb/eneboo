@@ -1,5 +1,5 @@
 TEMPLATE	= subdirs
-#SUBDIRS		= linguist 
+SUBDIRS		= linguist 
 !win32 {
   SUBDIRS       += lupdate
   #SUBDIRS	+= lrelease \

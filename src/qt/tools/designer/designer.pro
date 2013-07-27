@@ -4,8 +4,8 @@ CONFIG  += ordered
 
 !macx-g++-cross:SUBDIRS	=  uic 
 SUBDIRS	+= uilib \
-	   designer
-linux-g++*:SUBDIRS += app
+	   designer \
+	   app
 
 dll:SUBDIRS *=  editor plugins
 shared:SUBDIRS *=  editor plugins

@@ -391,7 +391,7 @@ class MainWindow
     this.initTabWidget();
     this.initHelpMenu();
     this.initConfigMenu();
-    this.initTextLabel();
+    this.initTextLabels();
     this.initDocks();
     this.initEventFilter();
   }
@@ -670,33 +670,34 @@ class MainWindow
                 wb.menuText = sys.translate("QSA Work Bench");
                 wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
                 connect(wb, "activated()", this.actSigMap_, "map()");
-		this.actSigMap_.setMapping(wb, "activated():runWorkBench():" + wb.name);
-		
-		var sLoad = new QAction(ag);
-    		sLoad.name = "StaticLoadAction";
-    		sLoad.menuText = sys.translate("Cargar &Estática desde Disco Duro");
-    		sLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("image-svg.png")));
-    		connect(sLoad, "activated()", this.actSigMap_, "map()");
-    		this.actSigMap_.setMapping(sLoad, "activated():staticLoad():" + sLoad.name);
+		this.actSigMap_.setMapping(wb, "activated():openQSWorkbench():" + wb.name);
+    		
+      var staticLoad = new QAction(ag);
+      staticLoad.name = "staticLoaderSetupAction";
+      staticLoad.menuText = sys.translate("Configurar carga estática");
+      staticLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("folder_update.png")));
+      connect(staticLoad, "activated()", this.actSigMap_, "map()");
+      this.actSigMap_.setMapping(staticLoad, "activated():staticLoaderSetup():" + staticLoad.name);
 
-    		var resetSC = new QAction(ag);
-    		resetSC.name = "resetScriptAction";
-    		resetSC.menuText = sys.translate("Resetear &Scripts");
-    		resetSC.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
-    		connect(resetSC, "activated()", this.actSigMap_, "map()");
-    		this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
+      var reInit = new QAction(ag);
+      reInit.name = "reinitAction";
+      reInit.menuText = sys.translate("Recargar scripts");
+      reInit.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
+      connect(reInit, "activated()", this.actSigMap_, "map()");
+      this.actSigMap_.setMapping(reInit, "activated():reinit():" + reInit.name);
+      
+      var shConsole = new QAction(agm);
+      shConsole.name = "shConsoleAction";
+      shConsole.menuText = sys.translate("Mostrar Consola de mensajes");
+      shConsole.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("consola.png")));
+      connect(shConsole, "activated()", this.actSigMap_, "map()");
+      this.actSigMap_.setMapping(shConsole, "activated():shConsole():" + shConsole.name);
+
 
               }
-
-
-    var load = new QAction(ac);
-    load.name = "loadAbanQPackageAction";
-    load.menuText = sys.translate("Cargar Paquete de &Módulos");
-    load.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("load.png")));
-    connect(load, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
-
-              
+            }
+      }
+   }           
    // var exportMod = new QAction(ac);
    // exportMod.name = "exportModulesAction";
    // exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
@@ -718,35 +719,12 @@ class MainWindow
    // connect(update, "activated()", this.actSigMap_, "map()");
    // this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
 
-    var mrProper = new QAction(agm);
-    mrProper.name = "mrProperAction";
-    mrProper.menuText = sys.translate("Regenerar base de datos");
-    mrProper.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("eraser.png")));
-    connect(mrProper, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(mrProper, "activated():mrProper():" + mrProper.name);
-
-    var shConsole = new QAction(agm);
-    shConsole.name = "shConsoleAction";
-    shConsole.menuText = sys.translate("Mostrar Consola de mensajes");
-    shConsole.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("consola.png")));
-    connect(shConsole, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(shConsole, "activated():shConsole():" + shConsole.name);
-
-    if (sys.osName() == "LINUX" && sys.isUserBuild()) {
-      var staticLoad = new QAction(agm);
-      staticLoad.name = "staticLoaderSetupAction";
-      staticLoad.menuText = sys.translate("Configurar carga estática");
-      staticLoad.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("folder_update.png")));
-      connect(staticLoad, "activated()", this.actSigMap_, "map()");
-      this.actSigMap_.setMapping(staticLoad, "activated():staticLoaderSetup():" + staticLoad.name);
-
-      var reInit = new QAction(agm);
-      reInit.name = "reinitAction";
-      reInit.menuText = sys.translate("Recargar scripts");
-      reInit.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("reload.png")));
-      connect(reInit, "activated()", this.actSigMap_, "map()");
-      this.actSigMap_.setMapping(reInit, "activated():reinit():" + reInit.name);
-    }
+    // var mrProper = new QAction(agm);
+    // mrProper.name = "mrProperAction";
+    // mrProper.menuText = sys.translate("Regenerar base de datos");
+    // mrProper.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("eraser.png")));
+    // connect(mrProper, "activated()", this.actSigMap_, "map()");
+    // this.actSigMap_.setMapping(mrProper, "activated():mrProper():" + mrProper.name);
 
     agm.addSeparator();
 
@@ -818,13 +796,18 @@ class MainWindow
     connect(style, "activated()", aqApp, "showStyles()");
   }
 
-    function initTextLabel()
+    function initTextLabels()
     {
     var w = this.w_;
     var tL = w.child("tLabel");
+    var tL2 = w.child("tLabel2");
     var texto = AQUtil.sqlSelect("flsettings", "valor", "flkey='verticalName'");
     if (texto)
     tL.text = texto;
+    tL2.text = sys.nameUser()+"@"+sys.nameBD();
+    if (sys.osName() == "MACX") 
+           tL2.text +="     ";
+    
     }
 
   function initDocks()

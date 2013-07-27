@@ -37,8 +37,6 @@ enable_digidoc:mac:LIBS *= -llibdigidoc -lcrypto -lssl -lxml2
 load(qsa)
 
 SOURCES += main.cpp
-win32:SOURCES += backtrace.c
-win32:HEADERS += execinfo.h
 
 IMAGES += images/splashdebugger.png \
           images/splashclient.png

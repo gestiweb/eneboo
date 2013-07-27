@@ -40,9 +40,6 @@ extern "C" {
 
 #if !defined(FL_DEBUG) && !defined(Q_OS_MACX)
 bool hasSilentConn = false;
-#if defined(Q_OS_WIN32)
-HINSTANCE aqkernel32 = NULL;
-#endif
 
 #if defined(Q_C_CALLBACKS)
 extern "C" {
@@ -232,10 +229,7 @@ void aq_main(int argc, char **argv)
   signal(SIGINT, exitHandler);
   signal(SIGSEGV, exitHandler);
   signal(SIGTERM, exitHandler);
-#if defined(Q_OS_WIN32)
-  QString fileName("Kernel32.dll");
-  aqkernel32 = LoadLibrary((wchar_t *)fileName.ucs2());
-#endif
+
 #endif
 
   FLApplication *AbanQ = aqApp;

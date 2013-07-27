@@ -33,6 +33,8 @@ odf-gen: Simple API to generate OpenDocument documents.
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <time.h>
+
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>

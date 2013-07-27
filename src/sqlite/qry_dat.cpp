@@ -27,7 +27,7 @@
  **********************************************************************/
 
 #if defined(AQ_WIN64)
-#include "os.h"
+#include "win64.h"
 #endif
 
 #include <cstdlib> 

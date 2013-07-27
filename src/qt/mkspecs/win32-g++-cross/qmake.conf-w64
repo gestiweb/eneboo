@@ -45,7 +45,7 @@ QMAKE_RUN_CXX		= $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $obj $src
 QMAKE_RUN_CXX_IMP	= $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
 QMAKE_LINK		= $(CROSS)g++
-QMAKE_LFLAGS		= -static-libgcc -Wl,--enable-stdcall-fixup -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc
+QMAKE_LFLAGS		= -static-libgcc -static-libstdc++ -Wl,--enable-stdcall-fixup -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc 
 QMAKE_LFLAGS_RELEASE	= -Wl,-s
 QMAKE_LFLAGS_DEBUG      =
 QMAKE_LFLAGS_CONSOLE	= -Wl,--subsystem,console

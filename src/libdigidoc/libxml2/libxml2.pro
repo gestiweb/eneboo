@@ -15,7 +15,7 @@ win32 {
 	DLLDESTDIR = $$PREFIX/bin
 	LIBS = -L$$PREFIX/lib -lm -lws2_32
 }
-}
+
 
 mac {
        LIBS += -L$$PREFIX/lib -liconv -L/opt/mac/SDKs/MacOSX10.4u.sdk/usr/lib

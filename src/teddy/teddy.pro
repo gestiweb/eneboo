@@ -19,7 +19,7 @@ TARGET = teddy
 LIBS += -L$$PREFIX/lib -lqui
 
 DEPENDPATH += $$ROOT/src/teddy/src
-INCLUDEPATH += $$ROOT $$ROOT/src/teddy $$ROOT/src/teddy/src $$ROOT/src/teddy/ui
+INCLUDEPATH += $$ROOT $$ROOT/src/teddy $$ROOT/src/teddy/src $$ROOT/src/teddy/ui $$ROOT/src/flbase
 
 HEADERS += src/prefdialog.h src/teddy.h src/xmltable.h src/xmltablestyle.h
 SOURCES += src/main.cpp src/prefdialog.cpp src/teddy.cpp src/xmltable.cpp
