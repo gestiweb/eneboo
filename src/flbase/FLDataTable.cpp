@@ -856,18 +856,10 @@ void FLDataTable::contentsMouseDoubleClickEvent(QMouseEvent *e)
 
 void FLDataTable::refresh()
 {
-  if (!cursor_ || !cursor_->aqWasDeleted()) return;
-  if (refreshing_) {
-      if (!refresh_timer_) {
-        QTimer::singleShot(500, this, SLOT(refresh()));
-        refresh_timer_ = true;
-      }
-      return;
-  }
+  if (popup_)
+    QDataTable::refresh();
+  if (!refreshing_ && cursor_  && !cursor_->aqWasDeleted() && cursor_->metadata()) {
   refreshing_ = true;
-  refresh_timer_ = false;
-  if (popup_) QDataTable::refresh();
-  if (cursor_  && cursor_->metadata()) {
     cursor_->setFilter(persistentFilter_);
     FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
     if (sndCursor) {
