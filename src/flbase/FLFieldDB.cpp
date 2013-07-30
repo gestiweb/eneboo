@@ -2871,21 +2871,18 @@ bool FLFieldDB::showEditor() const
 
 void FLFieldDB::setShowEditor(const bool show)
 {
-  if (showEditor_ != show) {
-    QWidget *ed = 0;
-    if (editor_)
-      ed = editor_;
-    else if (editorImg_)
-      ed = editorImg_;
-
-    if (ed) {
-      showEditor_ = show;
-      if (show)
-        ed->show();
-      else
-        ed->hide();
-    }
-  }
+   	showEditor_ = show;
+    	QWidget *ed = 0;
+	if (editor_)
+    		ed = editor_;
+    	else if (editorImg_)
+		ed = editorImg_;
+		
+    	if (ed) 
+    		if (show)
+			ed->show();
+     		else
+			ed->hide();	
 }
 
 void FLFieldDB::initFakeEditor()
