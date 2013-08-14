@@ -643,37 +643,6 @@ if (tw.count == 0) ok =true;
     		this.actSigMap_.setMapping(resetSC, "activated():resetSC():" + resetSC.name);
 
               }
-
-
-    var load = new QAction(ac);
-    load.name = "loadAbanQPackageAction";
-    load.menuText = sys.translate("Cargar Paquete de &Módulos");
-    load.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("load.png")));
-    connect(load, "activated()", this.actSigMap_, "map()");
-    this.actSigMap_.setMapping(load, "activated():loadModules():" + load.name);
-
-              
-   // var exportMod = new QAction(ac);
-   // exportMod.name = "exportModulesAction";
-   // exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
-   // exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
-   // connect(exportMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
-
-   // var importMod = new QAction(ac);
-   // importMod.name = "importModulesAction";
-   // importMod.menuText = sys.translate("&Importar Módulos desde Disco");
-   // importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
-   // connect(importMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
-
-   // var update = new QAction(ac);
-   // update.name = "updateAbanQAction";
-   // update.menuText = sys.translate("Act&ualización y Soporte");
-   // update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
-   // connect(update, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
-
            }
       }
     }
