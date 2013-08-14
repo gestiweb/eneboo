@@ -250,8 +250,9 @@ FLFieldDB::FLFieldDB(QWidget *parent, const char *name) :
   setFocusProxy(pushButtonDB);
 
   // Silix //Aulla : Se carga valor desde clave local
-  maxPixImages_ = FLSettings::readEntry("ebcomportamiento/maxPixImages","600").toInt();
-
+  maxPixImages_ = FLSettings::readEntry("ebcomportamiento/maxPixImages","").toInt();
+  if(!maxPixImages_)
+  	maxPixImages_ = 600;
   topWidget_ = topLevelWidget();
 
   if (topWidget_ && !topWidget_->inherits("FLFormDB")) {
