@@ -888,7 +888,7 @@ void FLFieldDB::initEditor()
         ::qt_cast<QComboBox *>(editor_)->setFont(qApp->font());
         if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
           if (!field->allowNull())
-            ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(QColor(255, 233, 173));
+            ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(notNullColor());
 
         QStringList olTranslated;
         QStringList olNoTranslated(field->optionsList());
@@ -911,7 +911,7 @@ void FLFieldDB::initEditor()
         ::qt_cast<FLLineEdit *>(editor_)->partDecimal = partDecimal;
         if (cursor_->modeAccess() != FLSqlCursor::BROWSE)
           if (!field->allowNull())
-            ::qt_cast<FLLineEdit *>(editor_)->setPaletteBackgroundColor(QColor(255, 233, 173));
+            ::qt_cast<FLLineEdit *>(editor_)->setPaletteBackgroundColor(notNullColor());
         editor_->installEventFilter(this);
 
         if (type == QVariant::Double) {
@@ -2591,7 +2591,7 @@ void FLFieldDB::setDisabled(const bool b)
     if (field->allowNull())
       cFondo = qApp->palette().color(QPalette::Active, QColorGroup::Base);
     else
-      cFondo = QColor(255, 233, 173);
+      cFondo = notNullColor();
   }
 
   switch (field->type()) {

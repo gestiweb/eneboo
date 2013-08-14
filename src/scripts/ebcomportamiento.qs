@@ -44,7 +44,10 @@ function cargarConfiguracion() {
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
 	w.child("leCO").hide();
-	w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
+	if (leerValorLocal("colorObligatorio") == "")
+		w.child("leCO").paletteBackgroundColor = "#FFE9AD";
+	else
+		w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
 	w.child("leCO").show();
 	
 
