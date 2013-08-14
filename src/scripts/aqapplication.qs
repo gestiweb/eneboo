@@ -666,7 +666,7 @@ class MainWindow
             if (sys.isDebuggerMode())
               {
                 var wb = new QAction(ag);
-                wb.name = "runWorkBench";
+                wb.name = "openQSWorkbench";
                 wb.menuText = sys.translate("QSA Work Bench");
                 wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
                 connect(wb, "activated()", this.actSigMap_, "map()");
@@ -698,33 +698,7 @@ class MainWindow
             }
       }
    }           
-   // var exportMod = new QAction(ac);
-   // exportMod.name = "exportModulesAction";
-   // exportMod.menuText = sys.translate("E&xportar Módulos a Disco");
-   // exportMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("export.png")));
-   // connect(exportMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(exportMod, "activated():exportModules():" + exportMod.name);
 
-   // var importMod = new QAction(ac);
-   // importMod.name = "importModulesAction";
-   // importMod.menuText = sys.translate("&Importar Módulos desde Disco");
-   // importMod.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("import.png")));
-   // connect(importMod, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(importMod, "activated():importModules():" + importMod.name);
-
-   // var update = new QAction(ac);
-   // update.name = "updateAbanQAction";
-   // update.menuText = sys.translate("Act&ualización y Soporte");
-   // update.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("settings.png")));
-   // connect(update, "activated()", this.actSigMap_, "map()");
-   // this.actSigMap_.setMapping(update, "activated():updateAbanQ():" + update.name);
-
-    // var mrProper = new QAction(agm);
-    // mrProper.name = "mrProperAction";
-    // mrProper.menuText = sys.translate("Regenerar base de datos");
-    // mrProper.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("eraser.png")));
-    // connect(mrProper, "activated()", this.actSigMap_, "map()");
-    // this.actSigMap_.setMapping(mrProper, "activated():mrProper():" + mrProper.name);
 
     agm.addSeparator();
 
