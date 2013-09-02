@@ -691,6 +691,9 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
         emit recordChoosed();
         return true;
       }
+//-->Aulla : Desactiva atajos de teclado de FLTable
+if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", false))
+	{	
 
       if (ke->key() == Qt::Key_Space) {
         FLCheckBox *chk = ::qt_cast<FLCheckBox *>(cellWidget(r, c));
@@ -698,11 +701,7 @@ bool FLDataTable::eventFilter(QObject *o, QEvent *e)
           chk->animateClick();
       }
 
-      //-->Aulla : Desactiva atajos de teclado de FLTable
-      if (!FLSettings::readBoolEntry("ebcomportamiento/FLTableShortCut", true))
-      {	
-
-        if (ke->key() == Qt::Key_A && !popup_) {
+       if (ke->key() == Qt::Key_A && !popup_) {
           if (cursor_ && !cursor_->aqWasDeleted() && !readonly_ && !editonly_ && !onlyTable_) {
             cursor_->insertRecord();
             return true;

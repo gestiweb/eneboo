@@ -16,8 +16,9 @@
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
-function main() {
+var oldMainWidget = aqApp.mainWidget(); 
 
+function main() {
  	var mng = aqApp.db().managerModules();
 	this.w_ = mng.createUI("ebcomportamiento.ui");
 	var w = this.w_;
@@ -25,10 +26,10 @@ function main() {
 	var botonCancelar = w.child("pbnCancelar");
 	var botonCambiarColor = w.child("pbnCO");
 	connect(botonAceptar , "clicked()", this, "guardar_clicked");
-	connect(botonCancelar , "clicked()", this, "cancelar_clicked");
+	connect(botonCancelar , "clicked()", this, "cerrar_clicked");
 	connect(botonCambiarColor , "clicked()",this, "seleccionarColor_clicked");
-	
  	cargarConfiguracion();
+ 	aqApp.setMainWidget(w_);
  	w_.show();
 }
 
@@ -44,7 +45,10 @@ function cargarConfiguracion() {
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
 	w.child("leCO").hide();
-	w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
+	if (leerValorLocal("colorObligatorio") == "")
+		w.child("leCO").paletteBackgroundColor = "#FFE9AD";
+	else
+		w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
 	w.child("leCO").show();
 	
 
@@ -149,13 +153,12 @@ grabarValorLocal("SLInterface",w.child("cbSLInterface").checked);
 grabarValorLocal("ebCallFunction",w.child("leCallFunction").text);
 grabarValorLocal("maxPixImages",w.child("leMaxPixImages").text);
 grabarValorLocal("colorObligatorio",w.child("leCO").paletteBackgroundColor + "");
-
-w_.close();
-
+cerrar_clicked();
 }
 
-function cancelar_clicked()
+function cerrar_clicked()
 {
+aqApp.setMainWidget(this.oldMainWidget);
 w_.close();
 }
 
@@ -165,5 +168,7 @@ function seleccionarColor_clicked()
 	const colorActual:QColor = w.child("leCO").paletteBackgroundColor;
 	w.child("leCO").hide();
 	w.child("leCO").paletteBackgroundColor = AQS.ColorDialog_getColor(colorActual);
+	if (w.child("leCO").paletteBackgroundColor == "#000000")
+		w.child("leCO").paletteBackgroundColor = colorActual;
 	w.child("leCO").show();
 	}

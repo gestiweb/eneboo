@@ -1643,7 +1643,7 @@ void FLTableDB::exportToOds()
   if (!cursor_)
     return;
 //-->Aulla : Desactiva exportar a ODS
-if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc", true))
+if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc",false))
 	{
 	QMessageBox::information(this, tr("Opción deshabilitada"),
                                                  tr("Esta opción ha sido deshabilitada por el administrador"),
