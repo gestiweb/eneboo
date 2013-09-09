@@ -47,6 +47,7 @@
 #include <qclipboard.h>
 
 #include "FLWidgetFieldDB.h"
+#include "FLSettings.h"
 
 #include "AQGlobal.h"
 
@@ -751,6 +752,18 @@ private:
   */
   int maxPixImages_;
 
+
+   /**
+  Color de los campos obligatorios
+  @author Aulla
+  */
+  QColor notNullColor()
+  	{
+  	  QColor notNullColor_ = FLSettings::readEntry("ebcomportamiento/colorObligatorio","");
+  if (notNullColor_ == "")
+  	notNullColor_ = QColor(255, 233, 173);
+  	return notNullColor_;
+  	}
 
   /**
   El formato del texto
