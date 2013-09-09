@@ -16,7 +16,7 @@
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
-var oldMainWidget = aqApp.mainWidget(); 
+
 
 function main() {
  	var mng = aqApp.db().managerModules();
@@ -29,7 +29,6 @@ function main() {
 	connect(botonCancelar , "clicked()", this, "cerrar_clicked");
 	connect(botonCambiarColor , "clicked()",this, "seleccionarColor_clicked");
  	cargarConfiguracion();
- 	aqApp.setMainWidget(w_);
  	w_.show();
 }
 
@@ -158,7 +157,6 @@ cerrar_clicked();
 
 function cerrar_clicked()
 {
-aqApp.setMainWidget(this.oldMainWidget);
 w_.close();
 }
 
