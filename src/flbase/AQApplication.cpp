@@ -107,12 +107,15 @@ void AQApplication::init(const QString &n, const QString &callFunction,
                       d->aqAppScriptObject_,
                       mngLoader_->contentCode("aqapplication.qs")
                     );
-
-  QStringList list(QStringList::split(':', arguments, false));
-  QSArgumentList argList(callFunction);
-  for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
-    argList.append(QSArgument(*it));
-  FLApplication::call("aqAppScriptMain", argList, d->aqAppScriptObject_);
+  
+  if (!callFunction.isEmpty()) {
+  	QStringList list(QStringList::split(':', arguments, false));
+  	QSArgumentList argList;
+  	for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
+    		argList.append(QSArgument(*it));
+  	FLApplication::call(callFunction, argList, 0);
+  				}
+  FLApplication::call("aqAppScriptMain", QSArgumentList(), d->aqAppScriptObject_);
   QTimer::singleShot(0, this, SLOT(callInitScript()));
 
 #if 0
