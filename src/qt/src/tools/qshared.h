@@ -46,8 +46,17 @@
 struct Q_EXPORT QShared
 {
     QShared() : count( 1 ) { }
-    void ref()		{ count++; }
-    bool deref()	{ return !--count; }
+    
+    void ref()
+    { 
+    count++; 
+    }
+    
+    bool deref()
+    { 
+    return !--count; 
+    }
+    
     uint count;
 };
 
