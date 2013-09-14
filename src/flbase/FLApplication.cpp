@@ -156,7 +156,7 @@ public:
     setProperty("overwriteMode", QVariant(false, 0));
     setProperty("paletteBackgroundColor", Qt::white);
     setProperty("paletteForegroundColor", Qt::black);
-    setCaption(tr("Consola de mensajes de AbanQ"));
+    setCaption(tr("Consola de mensajes de Eneboo"));
   }
 
 protected:
@@ -797,78 +797,55 @@ void FLApplication::initToolBox()
     for (QStringList::Iterator itM = listModules.begin(); itM != listModules.end(); ++itM, ++c) {
       if (QChar(c) == 'Q')
         ++c;
-      if (*itM == "sys") {
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Cargar Paquete de Módulos");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "loadAbanQPackageAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("load.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(loadModules()));
+        
+#ifdef FL_QUICK_CLIENT
+      if (*itM == "sys")
+        continue;
+#endif
+        
+    if (*itM == "sys") {
 
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Exportar Módulos a Disco");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "exportModulesAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("export.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(exportModules()));
+#ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 
-        ++c;
+  if (ap2->isDebuggerMode())
+                                  {      
+	++c;  
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Importar Módulos desde Disco");
+                        tr("QSA WorkBench");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
                                              QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "importModulesAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("import.png"));
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("bug.png"));
         newModuleAction->setIdModule(*itM);
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(importModules()));
-
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
+        
         ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Actualización y Soporte");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "updateAbanQAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("settings.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
-
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Copia de Seguridad");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "dumpDatabaseAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("fileexport.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(dumpDatabase()));
-
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Regenerar base de datos");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "mrProperAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("eraser.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(mrProper()));
        
+        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Carga Estática desde Disco Duro");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("image-svg.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
+
+        ++c; 
+       descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
+                        tr("Reiniciar Scripts");
+        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
+                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
+                                             newAreaBar, *itM);
+        newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
+        newModuleAction->setIdModule(*itM);
+        newModuleAction->addTo(newAreaBar);
+        ag->add(newModuleAction);
+        connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
+        
         ++c;
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Mostrar Consola de mensajes");
@@ -880,44 +857,17 @@ void FLApplication::initToolBox()
         newModuleAction->addTo(newAreaBar);
         ag->add(newModuleAction);
         connect(newModuleAction, SIGNAL(activated()), this, SLOT(showConsole()));
+
+
+                                  }
+#endif
+
 #ifndef QSDEBUGGER
-#if defined (Q_OS_LINUX)
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Configurar carga estática");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "staticLoaderSetupAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("folder_update.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(staticLoaderSetup()));
 
-        ++c;
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Recargar scripts");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, "reinitAction");
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("reload.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(reinit()));
-
-        continue;
-#endif // defined (Q_OS_LINUX)
-        if (*itM == "sys")
-          continue;
 #else
         ++c;
 #endif
       }
-#ifdef FL_QUICK_CLIENT
-      if (*itM == "sys")
-        continue;
-#endif
 
       descripModule = QString(QChar(c)) + ": " + mngLoader_->idModuleToDescription(*itM);
       newModuleAction = new FLWidgetAction(tr(descripModule),
@@ -2513,7 +2463,7 @@ void FLApplication::showConsole()
     QDockWindow *dw = new QDockWindow(QDockWindow::InDock, mw, "tedOutputDock");
     tedOutput_ = new FLTextEditOuput(dw);
     dw->setWidget(tedOutput_);
-    dw->setCaption(tr("Mensajes de AbanQ"));
+    dw->setCaption(tr("Mensajes de Eneboo"));
     dw->setResizeEnabled(true);
     dw->setCloseMode(QDockWindow::Always);
     dw->setFixedExtentWidth(300);
