@@ -35,7 +35,6 @@
         <action name="flmrproper"/>
         <action name="flreinit"/>
         <separator/>
-        <separator/>
         <action name="fldumpdb"/>
         <separator/>
         <action name="ebcomportamiento"/>
@@ -66,7 +65,6 @@
         <separator/>
         <action name="flusers"/>
         <action name="flgroups"/>
-        <separator/>
         <separator/>
         <action name="fldumpdb"/>
         <separator/>
