@@ -1973,8 +1973,12 @@ void FLSqlCursor::setSort(const QSqlIndex &sort)
   if (d->metadata_ && !sort.field(d->metadata_->primaryKey())) {
     QSqlIndex srt(sort);
     FLFieldMetaData *field = d->metadata_->field(d->metadata_->primaryKey());
+  if (field)
+  	{
     srt.append(QSqlField(field->name(), FLFieldMetaData::flDecodeType(field->type())));
     QSqlCursor::setSort(srt);
+    	} else
+	qWarning(tr("FLSqlCursor : No hay una clave primaria establecida"));    	
   } else
     QSqlCursor::setSort(sort);
 }
