@@ -671,34 +671,7 @@ void FLApplication::initToolBox()
 #endif
         
     if (*itM == "sys") {
-       
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Cargar Paquete de Módulos");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("load.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(loadModules()));
 
-
-       // ++c; 
-       /* descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("Actualización y Soporte");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("settings.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(updateAbanQ()));
-        ++c;
-        */
-
-        
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 
   if (ap2->isDebuggerMode())
