@@ -16,8 +16,6 @@
    versión 2, publicada  por  la  Free  Software Foundation.
  ***************************************************************************/
 
-var oldMainWidget = aqApp.mainWidget(); 
-
 function main() {
  	var mng = aqApp.db().managerModules();
 	this.w_ = mng.createUI("ebcomportamiento.ui");
@@ -29,7 +27,7 @@ function main() {
 	connect(botonCancelar , "clicked()", this, "cerrar_clicked");
 	connect(botonCambiarColor , "clicked()",this, "seleccionarColor_clicked");
  	cargarConfiguracion();
- 	aqApp.setMainWidget(w_);
+ 	this.initEventFilter();
  	w_.show();
 }
 
@@ -133,10 +131,33 @@ function grabarValorLocal(valorName,value) {
 
 
 
+  function initEventFilter()
+  {
+    var w = this.w_;
+    
+    w.eventFilterFunction = this.name + ".eventFilter";
+    w.allowedEvents = [ AQS.Close ];
+    w.installEventFilter(w);
+
+   }
 
 
 
+ function eventFilter(o, e)
+  {
+    switch (e.type) {
+       case AQS.Close: {
+       		debug("Cerrando");
+       		this.cerrar_clicked();
+      }
+    }
+  }
 
+
+function cerrar_clicked()
+{
+this.w_.close();
+}
 
 
 
@@ -156,11 +177,6 @@ grabarValorLocal("colorObligatorio",w.child("leCO").paletteBackgroundColor + "")
 cerrar_clicked();
 }
 
-function cerrar_clicked()
-{
-aqApp.setMainWidget(this.oldMainWidget);
-w_.close();
-}
 
 function seleccionarColor_clicked()
 	{
@@ -168,6 +184,8 @@ function seleccionarColor_clicked()
 	const colorActual:QColor = w.child("leCO").paletteBackgroundColor;
 	w.child("leCO").hide();
 	w.child("leCO").paletteBackgroundColor = AQS.ColorDialog_getColor(colorActual);
+	w_.hide();
+	w_.show();
 	if (w.child("leCO").paletteBackgroundColor == "#000000")
 		w.child("leCO").paletteBackgroundColor = colorActual;
 	w.child("leCO").show();
