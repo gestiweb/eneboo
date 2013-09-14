@@ -95,6 +95,7 @@
     </item>
     <item text="&amp;Configuración" name="configMenu">
         <action name="fontAction"/>
+        <action name="styleAction"/>
     </item>
     <item text="&amp;Ventana" name="windowMenu">
     </item>
@@ -148,14 +149,6 @@
     </action>
     <action>
         <property name="name">
-            <cstring>Action</cstring>
-        </property>
-        <property name="text">
-            <string>Action</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
             <cstring>helpIndexAction</cstring>
         </property>
         <property name="text">
@@ -166,14 +159,6 @@
         </property>
         <property name="accel">
             <string>Ctrl+I</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>Action_2</cstring>
-        </property>
-        <property name="text">
-            <string></string>
         </property>
     </action>
     <action>
@@ -198,7 +183,6 @@
             <string>&amp;Estilo</string>
         </property>
     </action>
-    
 </actions>
 <images>
     <image name="image26803">
