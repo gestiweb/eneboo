@@ -56,22 +56,24 @@ function cargarConfiguracion() {
 
 function leerValorGlobal(valorName):String {
 	var util : FLUtil = new FLUtil();
-	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
+	var valor : String ="";
+	if(!util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'"))
+		valor = "";
+	else
+		valor = util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
 	return valor;
 }
 
 function grabarValorGlobal(valorName,value) {
 	var util : FLUtil = new FLUtil();
-	var valor : String =  util.sqlSelect("flsettings", "valor", "flkey='" + valorName + "'");
-	if (valor)
-		{
-		util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
-		}
-		else
+	if (!util.sqlSelect("flsettings", "flkey", "flkey='" + valorName + "'"))
 		{
 		util.sqlInsert("flsettings", "flkey,valor" , valorName + "," + value);
 		}
-
+		else
+		{
+		util.sqlUpdate("flsettings", "valor", value, "flkey = '" + valorName + "'");
+		}
 }
 
 
@@ -147,7 +149,6 @@ function grabarValorLocal(valorName,value) {
   {
     switch (e.type) {
        case AQS.Close: {
-       		debug("Cerrando");
        		this.cerrar_clicked();
       }
     }
