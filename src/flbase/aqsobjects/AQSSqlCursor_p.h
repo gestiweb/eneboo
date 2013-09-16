@@ -94,6 +94,8 @@ public slots:
   QString filter() const;
   QString connectionName() const;
   QString curName() const;
+  void changePos(const QString &, int = 0);
+  void setOrder(const QStringList &);
 
 protected:
   static void *construct(const QSArgumentList &args) {
@@ -359,6 +361,14 @@ inline QString AQSSqlCursor::connectionName() const
 inline QString AQSSqlCursor::curName() const
 {
   AQ_CALL_RET_V(curName(), QString);
+}
+inline void AQSSqlCursor::changePos(const QString &arg0,  int arg1)
+{
+  AQ_CALL_VOID(changePos(arg0, arg1));
+}
+inline void AQSSqlCursor::setOrder(const QStringList &arg0)
+{
+  AQ_CALL_VOID(setOrder(arg0));
 }
 //@AQ_END_IMP_PUB_SLOTS@
 

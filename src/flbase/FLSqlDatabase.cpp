@@ -328,6 +328,15 @@ int FLSqlDatabase::atFrom(FLSqlCursor *cur)
   return dr->atFrom(cur);
 }
 
+void FLSqlDatabase::createSortIndex(FLSqlCursor *cur)
+{
+  if (!db_ || !cur)
+    return;
+
+  FLSqlDriver *dr = ::qt_cast<FLSqlDriver *>(const_cast<QSqlDriver *>(cur->driver()));
+  dr->createSortIndex(cur);
+}
+
 bool FLSqlDatabase::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)
 {
   if (!db_)

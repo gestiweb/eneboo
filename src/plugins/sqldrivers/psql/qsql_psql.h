@@ -137,6 +137,7 @@ public:
   QString formatValue(int t, const QVariant &v, const bool upper = false);
   QVariant nextSerialVal(const QString &table, const QString &field);
   int atFrom(FLSqlCursor *cur);
+  void createSortIndex(FLSqlCursor *cur);
   bool alterTable(const QString &mtd1, const QString &mtd2, const QString &key = QString::null);
   bool canSavePoint();
   bool savePoint(const QString &n);

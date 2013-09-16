@@ -51,60 +51,65 @@ class QSqlRecordPrivate;
 class QSqlRecordShared : public QShared
 {
 public:
-    QSqlRecordShared( QSqlRecordPrivate* sqlRecordPrivate )
-    : d( sqlRecordPrivate )
-    {}
-    virtual ~QSqlRecordShared();
-    QSqlRecordPrivate* d;
+  QSqlRecordShared(QSqlRecordPrivate *sqlRecordPrivate)
+    : d(sqlRecordPrivate)
+  {}
+  virtual ~QSqlRecordShared();
+  QSqlRecordPrivate *d;
 };
 
 class Q_EXPORT QSqlRecord
 {
 public:
-    QSqlRecord();
-    QSqlRecord( const QSqlRecord& other );
-    QSqlRecord& operator=( const QSqlRecord& other );
-    virtual ~QSqlRecord();
-    virtual QVariant     value( int i ) const;
-    virtual QVariant     value( const QString& name ) const;
-    virtual void         setValue( int i, const QVariant& val );
-    virtual void         setValue( const QString& name, const QVariant& val );
-    bool                 isGenerated( int i ) const;
-    bool                 isGenerated( const QString& name ) const;
-    virtual void         setGenerated( const QString& name, bool generated );
-    virtual void         setGenerated( int i, bool generated );
-    virtual void         setNull( int i );
-    virtual void         setNull( const QString& name );
-    bool                 isNull( int i ); // remove in 4.0
-    bool                 isNull( const QString& name ); // remove in 4.0
-    bool                 isNull( int i ) const;
-    bool                 isNull( const QString& name ) const;
+  QSqlRecord();
+  QSqlRecord(const QSqlRecord &other);
+  QSqlRecord &operator=(const QSqlRecord &other);
+  virtual ~QSqlRecord();
+  virtual QVariant     value(int i) const;
+  virtual QVariant     value(const QString &name) const;
+  virtual void         setValue(int i, const QVariant &val);
+  virtual void         setValue(const QString &name, const QVariant &val);
+  bool                 isGenerated(int i) const;
+  bool                 isGenerated(const QString &name) const;
+  virtual void         setGenerated(const QString &name, bool generated);
+  virtual void         setGenerated(int i, bool generated);
+  virtual void         setNull(int i);
+  virtual void         setNull(const QString &name);
+  bool                 isNull(int i);   // remove in 4.0
+  bool                 isNull(const QString &name);   // remove in 4.0
+  bool                 isNull(int i) const;
+  bool                 isNull(const QString &name) const;
 
-    int                  position( const QString& name ) const;
-    QString              fieldName( int i ) const;
-    QSqlField*           field( int i );
-    QSqlField*           field( const QString& name );
-    const QSqlField*     field( int i ) const;
-    const QSqlField*     field( const QString& name ) const;
+  int                  position(const QString &name) const;
+  QString              fieldName(int i) const;
+  QSqlField           *field(int i);
+  QSqlField           *field(const QString &name);
+  const QSqlField     *field(int i) const;
+  const QSqlField     *field(const QString &name) const;
 
-    virtual void         append( const QSqlField& field );
-    virtual void         insert( int pos, const QSqlField& field );
-    virtual void         remove( int pos );
+  virtual void         append(const QSqlField &field);
+  virtual void         insert(int pos, const QSqlField &field);
+  virtual void         remove(int pos);
 
-    bool                 isEmpty() const;
-    bool                 contains( const QString& name ) const;
-    virtual void         clear();
-    virtual void         clearValues( bool nullify = FALSE );
-    uint                 count() const;
-    virtual QString      toString( const QString& prefix = QString::null,
-				   const QString& sep = "," ) const;
-    virtual QStringList  toStringList( const QString& prefix = QString::null ) const;
+  // ### AbanQ
+  virtual void changePos(const QString &name, int newPos = 0);
+  virtual void setOrder(const QStringList &order);
+  // ### AbanQ
+
+  bool                 isEmpty() const;
+  bool                 contains(const QString &name) const;
+  virtual void         clear();
+  virtual void         clearValues(bool nullify = FALSE);
+  uint                 count() const;
+  virtual QString      toString(const QString &prefix = QString::null,
+                                const QString &sep = ",") const;
+  virtual QStringList  toStringList(const QString &prefix = QString::null) const;
 
 private:
-    QString              createField( int i, const QString& prefix ) const;
-    void                 deref();
-    bool                 checkDetach();
-    QSqlRecordShared*    sh;
+  QString              createField(int i, const QString &prefix) const;
+  void                 deref();
+  bool                 checkDetach();
+  QSqlRecordShared    *sh;
 };
 
 /******************************************/
@@ -122,16 +127,20 @@ typedef QValueList<QSqlFieldInfo> QSqlFieldInfoList;
 class Q_EXPORT QSqlRecordInfo: public QSqlFieldInfoList
 {
 public:
-    QSqlRecordInfo(): QSqlFieldInfoList() {}
-    QSqlRecordInfo( const QSqlFieldInfoList& other ): QSqlFieldInfoList( other ) {}
-    QSqlRecordInfo( const QSqlRecord& other );
+  QSqlRecordInfo(): QSqlFieldInfoList() {}
+  QSqlRecordInfo(const QSqlFieldInfoList &other): QSqlFieldInfoList(other) {}
+  QSqlRecordInfo(const QSqlRecord &other);
 
-    size_type contains( const QString& fieldName ) const;
-    QSqlFieldInfo find( const QString& fieldName ) const;
-    QSqlRecord toRecord() const;
+  size_type contains(const QString &fieldName) const;
+  QSqlFieldInfo find(const QString &fieldName) const;
+  QSqlRecord toRecord() const;
 
+  // ### AbanQ
+  void changePos(const QString &name, int newPos = 0);
+  void setOrder(const QStringList &order);
+  // ### AbanQ
 };
 
 
-#endif	// QT_NO_SQL
+#endif  // QT_NO_SQL
 #endif

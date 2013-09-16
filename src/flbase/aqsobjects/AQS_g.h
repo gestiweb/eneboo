@@ -1,7 +1,7 @@
 /***************************************************************************
  AQS_g.h
  -------------------
- begin                : 19/06/2013
+ begin                : 29/07/2013
  copyright            : (C) 2003-2013 by InfoSiAL S.L.
  email                : mail@infosial.com
  ***************************************************************************/
@@ -102,6 +102,7 @@
 #include "AQSFormRecordDB_p.h"
 #include "AQSFormSearchDB_p.h"
 #include "AQSFrame_p.h"
+#include "AQSFtp_p.h"
 #include "AQSGroupBox_p.h"
 #include "AQSHBoxLayout_p.h"
 #include "AQSHButtonGroup_p.h"
@@ -312,6 +313,7 @@
          AQ_REG_WRAP_AQOBJECT(FormRecordDB); \
          AQ_REG_WRAP_AQOBJECT(FormSearchDB); \
          AQ_REG_WRAP(Frame); \
+         AQ_REG_WRAP(Ftp); \
          AQ_REG_WRAP(GroupBox); \
          AQ_REG_WRAP(HBoxLayout); \
          AQ_REG_WRAP(HButtonGroup); \
@@ -521,6 +523,7 @@
          AQ_CRE_WRAP_AQOBJECT(FormRecordDB); \
          AQ_CRE_WRAP_AQOBJECT(FormSearchDB); \
          AQ_CRE_WRAP_OBJECT(Frame); \
+         AQ_CRE_WRAP_OBJECT(Ftp); \
          AQ_CRE_WRAP_OBJECT(GroupBox); \
          AQ_CRE_WRAP_OBJECT(HBoxLayout); \
          AQ_CRE_WRAP_OBJECT(HButtonGroup); \
@@ -729,6 +732,7 @@
          AQ_REG_CLASS_AQOBJECT(FormRecordDB); \
          AQ_REG_CLASS_AQOBJECT(FormSearchDB); \
          AQ_REG_CLASS(Frame); \
+         AQ_REG_CLASS(Ftp); \
          AQ_REG_CLASS(GroupBox); \
          AQ_REG_CLASS(HBoxLayout); \
          AQ_REG_CLASS(HButtonGroup); \
@@ -933,6 +937,7 @@
          AQ_CRE_AQWIDGET(FormRecordDB); \
          AQ_CRE_AQWIDGET(FormSearchDB); \
          AQ_CRE_WIDGET(Frame); \
+         AQ_CRE_OBJECT(Ftp); \
          AQ_CRE_WIDGET(GroupBox); \
          AQ_CRE_OBJECT(HBoxLayout); \
          AQ_CRE_WIDGET(HButtonGroup); \

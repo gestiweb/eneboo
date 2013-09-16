@@ -269,6 +269,9 @@ void FLFormDB::showEvent(QShowEvent *e)
       QVariant v(aqApp->call("preloadMainFilter", QSArgumentList(), iface).variant());
       if (v.isValid() && v.type() == QVariant::String)
         cursor_->setMainFilter(v.toString(), false);
+      v = aqApp->call("preloadOrder", QSArgumentList(), iface).variant();
+      if (v.isValid() && v.type() == QVariant::String)
+        cursor_->setOrder(QStringList::split(',', v.toString()));
     }
     initMainWidget();
     callInitScript();
