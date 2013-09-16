@@ -1,0 +1,13 @@
+style=k&r
+indent=spaces=2
+brackets=linux
+convert-tabs
+indent-namespaces
+indent-switches
+pad=paren
+pad=oper
+min-conditional-indent=0
+max-instatement-indent=60
+
+
+
