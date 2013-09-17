@@ -1,0 +1,225 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WSERVER_H_
+#define WSERVER_H_
+
+#include <Wt/WApplication>
+
+#ifndef WT_TARGET_JAVA
+
+namespace Wt {
+
+struct WServerImpl;
+
+/*! \class WServer Wt/WServer Wt/WServer
+ *  \brief A class encapsulating an application server.
+ *
+ * This server class represents an instance of an application server.
+ *
+ * It offers support for multiple application entry points and control
+ * over starting and stopping the server (the latter functionality is
+ * only for supported for the built-in httpd). This may be used as an
+ * alternative to using WRun() when you wish to support multiple
+ * application entry points, or for integrating a Wt (stand-alone
+ * httpd) server application into an existing application, when you want
+ * to and start and stop the server as appropriate.
+ *
+ * As an example usage, consider the implementation of WRun(), which
+ * starts the server until a Ctrl-C is pressed or a termination signal
+ * has been received:
+ *
+ * \code
+int WRun(int argc, char *argv[], ApplicationCreator createApplication)
+{
+  try {
+    // use argv[0] as the application name to match a suitable entry
+    // in the Wt configuration file, and use the default configuration
+    // file (which defaults to /etc/wt/wt_config.xml unless the environment
+    // variable WT_CONFIG_XML is set)
+    WServer server(argv[0]);
+
+    // WTHTTP_CONFIGURATION is e.g. "/etc/wt/wthttpd"
+    server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
+
+    // add a single entry point, at the default location (as determined
+    // by the server configuration's deploy-path)
+    server.addEntryPoint(WServer::Application, createApplication);
+    if (server.start()) {
+      int sig = WServer::waitForShutdown();
+
+      std::cerr << "Shutdown (signal = " << sig << ")" << std::endl;
+      server.stop();
+    }
+  } catch (WServer::Exception& e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  } catch (std::exception& e) {
+    std::cerr << "exception: " << e.what() << "\n";
+    return 1;
+  }
+}
+ * \endcode
+ *
+ * \note Currently, only a single server instance may be created. We plan to
+ *       remove this limiation in the future.
+ */
+class WTCONNECTOR_API WServer
+{
+public:
+  /*! \class Exception
+   *  \brief Server %Exception class.
+   */
+  class WT_API Exception : public std::exception
+  {
+  public:
+    Exception(const std::string what);
+    ~Exception() throw();
+
+    /*! \brief Returns the error message.
+     */
+    const char *what() const throw() { return what_.c_str(); }
+
+  private:
+    std::string what_;
+  };
+
+  /*! \brief Create a new server instance.
+   *
+   * The \p wtApplicationPath is used to match specific
+   * application-settings in the %Wt configuration file. If no
+   * specific match could be found, the general settings are used
+   * (corresponding to the '*' selector).
+   *
+   * The %Wt application configuration is read from the
+   * \p wtConfigurationFile. If empty, this defaults to the value
+   * configured at build time.
+   *
+   * For more information on configuring %Wt applications, see \ref
+   * configuration_sec "Configuration".
+   *
+   * \throws Exception : indicates a configuration problem.
+   *
+   * \sa setServerConfiguration()
+   */
+  WServer(const std::string& wtApplicationPath = std::string(),
+	  const std::string& wtConfigurationFile = std::string());
+
+  /*! \brief Destructor.
+   *
+   * If the server was still running, it is stopped first by calling
+   * stop(). It is probably safer to call stop() first yourself, since
+   * this allows exceptions to be caught.
+   *
+   * \sa isRunning(), stop()
+   */
+  ~WServer();
+
+  /*! \brief Configure the HTTP(S) server or FastCGI process.
+   *
+   * Configures the HTTP(S) server using command-line arguments, a
+   * configuration file, or both. The valid options are described in
+   * \ref config_wthttpd "Built-in httpd configuration".
+   *
+   * The applications themselves are configured using the configuration
+   * file passed to the constructor.
+   *
+   * The server configuration must be set before any other
+   * functionality can be used.
+   *
+   * In case of FastCGI deployment, the \p serverConfigurationFile
+   * argument is ignored, and depending on the command-line arguments,
+   * this process may become a FastCGI protocol relay process which
+   * never returning from this call but directs the FastCGI stream to
+   * the correct session, rather than a Wt application server.
+   *
+   * \throws Exception : indicates a configuration problem.
+   */  
+  void setServerConfiguration(int argc, char *argv[],
+			      const std::string& serverConfigurationFile
+			      = std::string());
+
+  /*! \brief Bind an entry-point to a callback function to create
+   *         a new application.
+   *
+   * The \p path is the local URL at which the application is
+   * deployed: when a user visits this URL, the callback will be
+   * called to create a new application. If empty, the URL is inferred
+   * from the server configuration's deploy-path (see also \ref
+   * config_wthttpd "Built-in httpd configuration").
+   *
+   * The path must start with a '/'.
+   *
+   * The optional \p favicon is a URL path (which should not
+   * contain the host part!) to a favicon, which is the icon displayed
+   * in the browser for your application. Alternatively, you may
+   * specify a favicon using the "favicon" property in the
+   * configuration file (see als \ref config_general "Application
+   * settings (wt_config.xml)").
+   */
+  void addEntryPoint(EntryPointType type, ApplicationCreator callback,
+		     const std::string& path = std::string(),
+                     const std::string& favicon = std::string());
+
+  /*! \brief Bind a resource to a fixed path.
+   *
+   * Resources may either be private to a single session or
+   * public. Use this method to add a public resource with a fixed
+   * path.
+   */
+  void addResource(WResource *resource, const std::string& path);
+
+  /*! \brief Starts the server in the background.
+   *
+   * Returns whether the server could be successfully started.
+   *
+   * \throws Exception : indicates a problem starting the server.
+   *
+   * \sa isRunning(), stop()
+   */
+  bool start();
+
+  /*! \brief Stops the server.
+   *
+   * All active application sessions are terminated cleanly, and the
+   * HTTP(S) server is shut down.
+   *
+   * \throw Exception : indicates a problem while stopping the server.
+   *
+   * \sa isRunning(), start()
+   */
+  void stop();
+
+  /*! \brief Wait for a shutdown signal.
+   *
+   * This static method blocks the current thread, waiting for a
+   * shutdown signal. The implementation and details are platform
+   * dependent, but this is usually Ctrl-C or SIGKILL.
+   *
+   * This method is convenient if you want to customize how the server
+   * is started (by instantiating a WServer object yourself, instead
+   * of using Wt::Wrun()), but still want to use %Wt as a standalone
+   * server that cleanly terminates on interruption.
+   */
+  static int waitForShutdown();
+
+  /*! \brief Returns whether the server is running.
+   *
+   * \sa start(), stop()
+   */
+  bool isRunning() const;
+
+  WServerImpl *impl() { return impl_; }
+
+private:
+  WServerImpl *impl_;
+};
+
+}
+
+#endif // WT_TARGET_JAVA
+
+#endif // WSERVER_H_ 

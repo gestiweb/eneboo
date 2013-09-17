@@ -1,0 +1,119 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>aqsqlfiles</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Ficheros SQL")</alias>
+
+	<field>
+		<name>idfile</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Identificador")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>serial</type>
+	</field>
+
+	<field>
+		<name>iddirpadre</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Directorio padre")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>uint</type>
+	</field>
+
+	<field>
+		<name>nombre</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+	</field>
+
+	<field>
+		<name>iduser</name> 
+		<alias>QT_TRANSLATE_NOOP("MetaData","Usuario")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>30</length>
+	</field>
+
+	<field>
+		<name>idgroup</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Grupo")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>30</length>
+	</field>
+
+	<field>
+		<name>flag</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Atributos")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>uint</type>
+		<default>0</default>
+	</field>
+
+	<field>
+		<name>specialflag</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Atributos Especiales")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>30</length>
+	</field>
+
+	<field>
+		<name>perms</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Permisos")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>9</length>
+	</field>
+
+	<field>
+		<name>datetimecre</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Creado")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>50</length>
+	</field>
+
+	<field>
+		<name>datetimemod</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Modificado")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>50</length>
+	</field>
+
+	<field>
+		<name>datetimeacc</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Accedido")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>50</length>
+	</field>
+
+	<field>
+		<name>nobloqueo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Bloqueado")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>unlock</type>
+		<default>true</default>
+	</field>
+
+	<field>
+		<name>sha</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","SHA1")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>string</type>
+		<length>255</length>
+	</field>
+</TMD>

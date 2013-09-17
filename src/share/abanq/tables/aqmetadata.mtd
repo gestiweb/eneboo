@@ -1,0 +1,38 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>aqmetadata</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Metadatos")</alias>
+	
+	<field>
+		<name>tabla</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Nombre de la tabla")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>255</length>
+	</field>
+	
+	<field>
+		<name>xml</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Descripci�n XML")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+	</field>
+	
+  	<field>
+		<name>bloqueo</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Tabla bloqueada")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>bool</type>
+	</field>
+
+	<field>
+		<name>seq</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Secuencia")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>uint</type>
+	</field>
+</TMD>

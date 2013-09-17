@@ -1,0 +1,158 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WJAVASCRIPTSLOT_H_
+#define WJAVASCRIPTSLOT_H_
+
+#include "Wt/WObject"
+
+namespace Wt {
+
+class WWidget;
+
+/*! \class JSlot Wt/WJavaScript Wt/WJavaScript
+ *  \brief A slot that is only implemented in client side JavaScript code.
+ *
+ * This class provides a hook for adding your own JavaScript to respond to
+ * events.
+ *
+ * Carefully consider the use of this. Not only is writing cross-browser
+ * JavaScript hard and tedious, but one must also be aware of possible
+ * security problems (see further), and ofcourse, the event handling will
+ * not be available when JavaScript is disabled or not present at all.
+ * 
+ * \if cpp
+ * If you wish to add client side event handling, with automatic
+ * fall-back to server-side event handling and without writing
+ * JavaScript code with the associated risks and problems, consider
+ * using stateless slot implementations instead (see
+ * WObject::implementStateless())
+ * \endif 
+ *
+ * For some purposes, stateless slot implementations are not
+ * sufficient, since they do not allow state inspection. At the same
+ * time, the non-availability in case of disabled JavaScript may also
+ * be fine for some non-essential functionality (see for example the
+ * WSuggestionPopup widget), or when you simply do not care. For these
+ * situations a %JSlot can be used to add client-side event handling.
+ *
+ * The JavaScript code may be set (or changed) using the
+ * setJavaScript() method which takes a string that implements a
+ * JavaScript function with the following signature:
+ *
+ * \code
+ * function(sender, event) {
+ *   // handle the event, and sender is a reference to the DOM element
+ *   // which captured the event (and holds the signal). Therefore it
+ *   // equivalent to the sender for a normal %Wt slot.
+ *
+ *   // You can prevent the default action using:
+ *   ${WT_CLASS}.cancelEvent(event);
+ *   // (where ${WT_CLASS} should be the value of the WT_CLASS define
+ * }
+ * \endcode
+ * 
+ * In the JavaScript code, you may use WWidget::jsRef() to obtain the
+ * DOM element corresponding to any WWidget, or WWidget::id() to
+ * obtain the DOM id. In addition you may trigger server-side events
+ * using the JavaScript WtSignalEmit function (see JSignal
+ * documentation). That's how far we can help you. For the rest you
+ * are left to yourself, buggy browsers and quirky JavaScript
+ * (http://www.quirksmode.org/ was a reliable companion to me) -- good
+ * luck.
+ *
+ * \ingroup signalslot
+ */
+class WT_API JSlot
+{
+public:
+  /*! \brief Constructs a JavaScript-only slot within the parent scope.
+   *
+   * The JavaScript code block will reside within the scope of the
+   * given widget.  By picking a long-lived parent, one may reuse a
+   * single block of JavasCript code for multiple widgets.
+   *
+   * When \p parent = \c 0, then the JavaScript will be inlined in
+   * each caller (possibly replicating the same JavaScript).
+   */
+  JSlot(WWidget *parent = 0);
+
+  /*! \brief Constructs a JavaScript-only and sets the JavaScript code.
+   *
+   * \sa JSlot(WWidget *), setJavaScript()
+   */
+  JSlot(const std::string& javaScript, WWidget *parent = 0);
+
+  /*! \brief Destructor.
+   */
+  ~JSlot();
+
+  /*! \brief Sets or modify the JavaScript code associated with the slot.
+   *
+   * When the slot is triggered, the corresponding function defined by
+   * \p javaScript is executed.
+   *
+   * The JavaScript function takes two parameters and thus should look like:
+   * \code
+     function(obj, event) {
+       // ...
+     }
+     \endcode
+   * 
+   * The first parameter \p obj is a reference to the DOM element
+   * that generates the event. The \p event refers to the
+   * JavaScript event object.
+   *
+   * \sa WWidget::jsRef()
+   */
+  void setJavaScript(const std::string& javaScript);
+
+  /*! \brief Executes the JavaScript code.
+   *
+   * This executes the JavaScript code in the same way as when
+   * triggered by a EventSignal. This function returns immediately,
+   * and execution of the JavaScript code is deferred until after the
+   * event handling.
+   *
+   * The arguments are the <tt>"object, event"</tt> arguments of the
+   * JavaScript event callback function.
+   *
+   * \sa setJavaScript()
+   */
+  void exec(const std::string& object = "null",
+	    const std::string& event = "null");
+
+  /*! \brief Returns a JavaScript statement that executes the slot.
+   *
+   * This returns the JavaScript code to execute the slot.
+   *
+   * The arguments are the <tt>"object, event"</tt> arguments of the
+   * JavaScript event callback function.
+   *
+   * \sa exec()
+   */
+   std::string execJs(const std::string& object = "null",
+		      const std::string& event = "null");
+
+private:
+  WWidget *widget_;
+  WStatelessSlot* imp_;
+
+  std::string jsFunctionName() const;
+  WStatelessSlot* slotimp();
+  void create();
+
+  int fid_;
+  static int nextFid_;
+
+  friend class EventSignalBase;
+};
+
+typedef JSlot WJavaScriptSlot;
+
+}
+
+#endif

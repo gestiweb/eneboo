@@ -1,0 +1,22 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>aqsqlcharfiles</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Fichero de Caracteres SQL")</alias>
+
+	<field>
+		<name>sha</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","SHA1")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>255</length>
+	</field>
+
+	<field>
+		<name>contenido</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Contenido")</alias>
+		<null>true</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+	</field>
+</TMD>

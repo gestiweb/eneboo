@@ -1,0 +1,6 @@
+parser: AQGrammar.y
+	bison -d -p aqyy AQGrammar.y && mv AQGrammar.tab.c AQGrammar.cpp; \
+	if test -f AQGrammar.tab.h; then \
+	if cmp -s AQGrammar.tab.h AQGrammar.h; then rm -f AQGrammar.tab.h; \
+	else mv AQGrammar.tab.h AQGrammar.h; fi \
+	else :; fi

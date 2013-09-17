@@ -1,0 +1,178 @@
+<ui version="4.0" >
+ <class>formFiles</class>
+ <widget class="QWidget" name="formFiles" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>515</width>
+    <height>494</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Ficheros</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="FLFieldDB" name="nombre" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>480</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="fieldName" >
+      <string>nombre</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>119</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="FLFieldDB" name="fLFieldDB1_2" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize" >
+        <size>
+         <width>180</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="fieldName" >
+        <string>sha</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="textLabel1" >
+       <property name="text" >
+        <string>Contenido</string>
+       </property>
+       <property name="wordWrap" >
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>260</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbXMLEditor" >
+       <property name="toolTip" >
+        <string>Editor XML</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Editar XML</string>
+       </property>
+       <property name="text" >
+        <string/>
+       </property>
+       <property name="icon" >
+        <iconset resource="../../../gui/gui.qrc" >:/images/up.png</iconset>
+       </property>
+       <property name="shortcut" >
+        <string>E</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="botonEditar" >
+       <property name="toolTip" >
+        <string>Editar fichero</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Editar fichero</string>
+       </property>
+       <property name="text" >
+        <string/>
+       </property>
+       <property name="icon" >
+        <iconset resource="../../../gui/gui.qrc" >:/images/down.png</iconset>
+       </property>
+       <property name="shortcut" >
+        <string>E</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Q3TextEdit" name="contenido" >
+     <property name="textFormat" >
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="readOnly" >
+      <bool>true</bool>
+     </property>
+     <property name="tabStopWidth" >
+      <number>24</number>
+     </property>
+     <property name="autoFormatting" >
+      <set>Q3TextEdit::AutoNone</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>Q3TextEdit</class>
+   <extends>Q3Frame</extends>
+   <header>q3textedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FLFieldDB</class>
+   <extends>AQFieldDB</extends>
+   <header>AQUi/AQFieldDB</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../gui/gui.qrc" />
+ </resources>
+ <connections/>
+</ui>

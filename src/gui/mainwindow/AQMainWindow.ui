@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AQMainWindow</class>
+ <widget class="QMainWindow" name="AQMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>684</width>
+    <height>488</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AbanQ</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../gui.qrc">
+    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>684</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAbanQ">
+    <property name="title">
+     <string>&amp;AbanQ</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuConfig">
+    <property name="title">
+     <string>&amp;Configuración</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Ayuda</string>
+    </property>
+    <addaction name="aboutQt"/>
+    <addaction name="separator"/>
+    <addaction name="aboutAbanQ"/>
+   </widget>
+   <addaction name="menuAbanQ"/>
+   <addaction name="menuConfig"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actExit">
+   <property name="icon">
+    <iconset resource="../gui.qrc">
+     <normaloff>:/images/exit.png</normaloff>:/images/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Salir</string>
+   </property>
+  </action>
+  <action name="aboutQt">
+   <property name="icon">
+    <iconset resource="../gui.qrc">
+     <normaloff>:/images/qt.png</normaloff>:/images/qt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Acerca de Qt</string>
+   </property>
+  </action>
+  <action name="aboutAbanQ">
+   <property name="icon">
+    <iconset resource="../gui.qrc">
+     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Acerca de AbanQ</string>
+   </property>
+  </action>
+  <action name="actConsole">
+   <property name="icon">
+    <iconset resource="../gui.qrc">
+     <normaloff>:/images/computer.png</normaloff>:/images/computer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Consola</string>
+   </property>
+  </action>
+  <action name="actWorkbench">
+   <property name="icon">
+    <iconset resource="../gui.qrc">
+     <normaloff>:/images/sys/qsa.png</normaloff>:/images/sys/qsa.png</iconset>
+   </property>
+   <property name="text">
+    <string>QSA Workbench</string>
+   </property>
+   <property name="toolTip">
+    <string>QSA Workbench</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../gui.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,92 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WPUSHBUTTON_H_
+#define WPUSHBUTTON_H_
+
+#include <Wt/WFormWidget>
+
+namespace Wt {
+
+/*! \class WPushButton Wt/WPushButton Wt/WPushButton
+ *  \brief A widget that represents a push button.
+ *
+ * To act on a button click, connect a slot to the clicked() signal.
+ * 
+ * \if cpp
+ * Usage example:
+ * \code
+ * Wt::WPushButton *ok = new Wt::WPushButton("Okay");
+ * ok->clicked().connect(SLOT(ok, Wt::WPushButton::disable));
+ * ok->clicked().connect(SLOT(this, MyClass::processData));
+ * \endcode
+ * \endif
+ *
+ * %WPushButton is an \link WWidget::setInline(bool) inline \endlink widget.
+ *
+ * <h3>CSS</h3>
+ *
+ * The widget corresponds to the HTML <tt>&lt;button&gt;</tt> tag and
+ * has the <tt>Wt-btn</tt> style. It may be styled through the current
+ * theme, or you can override the style using internal or external CSS
+ * as appropriate.
+ */
+class WT_API WPushButton : public WFormWidget
+{
+public:
+  /*! \brief Creates a push button.
+   */
+  WPushButton(WContainerWidget *parent = 0);
+
+  /*! \brief Creates a push button with given label text.
+   */
+  WPushButton(const WString& text, WContainerWidget *parent = 0);
+
+  /*! \brief Sets the button text.
+   */
+  void setText(const WString& text);
+
+  /*! \brief Returns the button text.
+   *
+   * \sa setText()
+   */
+  const WString& text() const { return text_; }
+
+  /*! \brief Sets an icon.
+   *
+   * The icon is placed to the left of the text.
+   */
+  void setIcon(const std::string& url);
+
+  /*! \brief Returns the icon.
+   *
+   * \sa setIcon()
+   */
+  const std::string& icon() const { return icon_; }
+
+  virtual void refresh();
+
+private:
+  static const int BIT_TEXT_CHANGED = 0;
+  static const int BIT_ICON_CHANGED = 1;
+  static const int BIT_ICON_RENDERED = 2;
+
+  WString     text_;
+  std::string icon_;
+
+  std::bitset<3> flags_;
+
+protected:
+  virtual void           updateDom(DomElement& element, bool all);
+  virtual DomElementType domElementType() const;
+  virtual void           propagateRenderOk(bool deep);
+  virtual void           getDomChanges(std::vector<DomElement *>& result,
+				       WApplication *app);
+};
+
+}
+
+#endif // WPUSHBUTTON_H_

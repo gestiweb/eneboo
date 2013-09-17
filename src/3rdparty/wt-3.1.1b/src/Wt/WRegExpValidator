@@ -1,0 +1,122 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WREGEXPVALIDATOR_H_
+#define WREGEXPVALIDATOR_H_
+
+#include <limits>
+#include <Wt/WValidator>
+
+namespace Wt {
+
+class WRegExp;
+
+/*! \class WRegExpValidator Wt/WRegExpValidator Wt/WRegExpValidator
+ *  \brief A validator that checks user input against a regular expression.
+ *
+ * This validator checks whether user input is matched by the given
+ * (perl-like) regular expression.
+ *
+ * The following perl features are not supported (since client-side validation
+ * cannot handle them):
+ * <ul>
+ *   <li>No Lookbehind support, i.e. the constructs (?<=text) and (?<!text).
+ *     </li>
+ *   <li>No atomic grouping, i.e. the construct (?>group).</li>
+ *   <li>No conditional expressions, i.e. the consturct (?ifthen|else).</li>
+ * </ul>
+ *
+ * Usage example:
+ * \if cpp
+ * \code
+ * Wt::WLineEdit *lineEdit = new Wt::WLineEdit(this);
+ * // an email address validator
+ * Wt::WRegExpValidator *validator = new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+ * lineEdit->setValidator(validator);
+ * lineEdit->setText("koen@emweb.be");
+ * \endcode
+ * \elseif java
+ * \code
+ * WLineEdit lineEdit = new WLineEdit(this);
+ * // an email address validator
+ * WRegExpValidator validator = new WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+ * lineEdit.setValidator(validator);
+ * lineEdit.setText("pieter@emweb.be");
+ * \endcode
+ * \endif
+ *
+ * \note This validator does not fully support unicode: it matches on the
+ * UTF8-encoded representation of the string.
+ */
+class WT_API WRegExpValidator : public WValidator
+{
+public:
+  /*! \brief Sets a new regular expression validator.
+   */
+  WRegExpValidator(WObject *parent = 0);
+
+  /*! \brief Sets a new regular expression validator that accepts input
+   *         that matches the given regular expression.
+   *
+   * This constructs a validator that matches the perl regular
+   * expression \p expr.
+   */
+  WRegExpValidator(const WT_USTRING& pattern, WObject *parent = 0);
+
+  /*! \brief Destructor.
+   */
+  ~WRegExpValidator();
+
+  /*! \brief Sets the regular expression for valid input.
+   *
+   * Sets the perl regular expression \p expr.
+   */
+  void setRegExp(const WT_USTRING& pattern);
+
+  /*! \brief Returns the regular expression for valid input.
+   *
+   * Returns the perl regular expression.
+   */
+  WT_USTRING regExp() const;
+
+  /*! \brief Validates the given input.
+   *
+   * The input is considered valid only when it is blank for a non-mandatory
+   * field, or matches the regular expression.
+   */
+  virtual State validate(WT_USTRING& input) const;
+
+  virtual void createExtConfig(std::ostream& config) const;
+
+  /*! \brief Sets the text to be shown if no match can be found.
+   *
+   * Sets the text to be shown if no match can be found.
+   */
+  void setNoMatchText(const WString& text);
+
+  /*! \brief Sets the message to display when the input does not match.
+   *
+   * The default value is "Invalid input".
+   */
+  void setInvalidNoMatchText(const WString& text);
+
+  /*! \brief Returns the message displayed when the input does not match.
+   *
+   * \sa setInvalidNoMatchText(const WString&)
+   */
+  WString invalidNoMatchText() const;
+
+protected:
+  std::string javaScriptValidate(const std::string& jsRef) const;
+
+private:
+  WRegExp *regexp_;
+  WString  noMatchText_;
+};
+
+}
+
+#endif // WREGEXPVALIDATOR_H_

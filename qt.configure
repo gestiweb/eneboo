@@ -1,0 +1,1 @@
+./configure -prefix $HOME/workspace/install-qt-4.6.1 -no-webkit -opensource -confirm-license -nomake examples -nomake demos

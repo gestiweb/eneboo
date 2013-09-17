@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<project name="java4cpp" default="package">
+    <property name="src_java" value="src/java"/>
+    
+    <property name="classes" value="classes"/>
+    <property name="jardir"   value="jar"/>
+    <property name="jarfile"  value="java4cpp.jar"/>
+    
+    <target name="compile" description="compile all classes">
+        <mkdir dir="${classes}"/>
+        <javac srcdir="${src_java}" destdir="${classes}" debug="on" encoding="ISO-8859-1"/>
+    </target>
+    
+    <target name="package" depends="compile">
+        <mkdir dir="${jardir}"/>
+        <jar destfile="${jardir}/${jarfile}" basedir="${classes}" compress="true"/>
+    </target>
+    
+    <target name="clean" description="remove all compiled binaries">
+        <delete dir="${classes}"/>
+        <delete dir="${jardir}"/>
+    </target>
+</project>

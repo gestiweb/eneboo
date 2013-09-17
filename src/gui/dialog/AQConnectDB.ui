@@ -1,0 +1,922 @@
+<ui version="4.0" >
+ <author>InfoSiAL, S.L.</author>
+ <comment>Implementa la clase Session para generar
+una conexion a un DSN.</comment>
+ <class>AQConnectDB</class>
+ <widget class="QDialog" name="AQConnectDB" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>711</width>
+    <height>321</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>230</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>32767</width>
+    <height>32767</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Conectar</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../gui.qrc" >
+    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+  </property>
+  <property name="modal" >
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>2</number>
+   </property>
+   <property name="margin" >
+    <number>6</number>
+   </property>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="Q3Frame" name="frameConnect" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy" >
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="autoFillBackground" >
+        <bool>true</bool>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::Box</enum>
+       </property>
+       <layout class="QHBoxLayout" >
+        <item>
+         <layout class="QVBoxLayout" >
+          <item>
+           <layout class="QHBoxLayout" >
+            <item>
+             <widget class="QLabel" name="textLabelDataBase" >
+              <property name="text" >
+               <string>Base de datos:</string>
+              </property>
+              <property name="alignment" >
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="wordWrap" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBoxNameDB" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip" >
+               <string>Nombre de la base de datos a conectar</string>
+              </property>
+              <property name="editable" >
+               <bool>true</bool>
+              </property>
+              <property name="autoCompletion" >
+               <bool>true</bool>
+              </property>
+              <property name="duplicatesEnabled" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" >
+            <item>
+             <widget class="QLabel" name="TextLabelUser" >
+              <property name="text" >
+               <string>Usuario:</string>
+              </property>
+              <property name="alignment" >
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="wordWrap" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditUser" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip" >
+               <string>Usuario de la base de datos</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Usuario de la base de datos</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" >
+            <item>
+             <widget class="QLabel" name="TextLabelPassword" >
+              <property name="text" >
+               <string>Contraseña:</string>
+              </property>
+              <property name="alignment" >
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="wordWrap" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditPassword" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip" >
+               <string>Contraseña para el usuario de la base de datos</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Contraseña para el usuario de la base de datos</string>
+              </property>
+              <property name="echoMode" >
+               <enum>QLineEdit::Password</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" >
+            <item>
+             <widget class="QToolButton" name="pbMarks" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="toolTip" >
+               <string>Marcadores de conexión</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Marcadores de conexión</string>
+              </property>
+              <property name="text" >
+               <string/>
+              </property>
+              <property name="icon" >
+               <iconset resource="../gui.qrc" >
+                <normaloff>:/images/down.png</normaloff>:/images/down.png</iconset>
+              </property>
+              <property name="shortcut" >
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonConnect" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>0</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="toolTip" >
+               <string>Conectar a la base de datos (Alt+C)</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Conectar a la base de datos (Alt+C)</string>
+              </property>
+              <property name="text" >
+               <string>&amp;Conectar</string>
+              </property>
+              <property name="icon" >
+               <iconset resource="../gui.qrc" >
+                <normaloff>:/images/yes.png</normaloff>:/images/yes.png</iconset>
+              </property>
+              <property name="shortcut" >
+               <string>Alt+C</string>
+              </property>
+              <property name="autoDefault" >
+               <bool>true</bool>
+              </property>
+              <property name="default" >
+               <bool>true</bool>
+              </property>
+              <property name="flat" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonCancel" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>0</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="toolTip" >
+               <string>Cancelar y terminar (Esc)</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Cancelar y terminar (Esc)</string>
+              </property>
+              <property name="text" >
+               <string>Cancelar</string>
+              </property>
+              <property name="icon" >
+               <iconset resource="../gui.qrc" >
+                <normaloff>:/images/no.png</normaloff>:/images/no.png</iconset>
+              </property>
+              <property name="shortcut" >
+               <string>Esc</string>
+              </property>
+              <property name="autoDefault" >
+               <bool>false</bool>
+              </property>
+              <property name="default" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbnMore" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>25</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>30</width>
+            <height>32767</height>
+           </size>
+          </property>
+          <property name="toolTip" >
+           <string>Más opciones</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../gui.qrc" >
+            <normaloff>:/images/right.png</normaloff>:/images/right.png</iconset>
+          </property>
+          <property name="checkable" >
+           <bool>true</bool>
+          </property>
+          <property name="flat" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="Q3Frame" name="frMore" >
+       <property name="enabled" >
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="autoFillBackground" >
+        <bool>true</bool>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::Box</enum>
+       </property>
+       <layout class="QVBoxLayout" >
+        <property name="spacing" >
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="spacing" >
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="pixmapLabel1_2" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip" >
+             <string>InfoSiAL, S.L. Creadores de AbanQ</string>
+            </property>
+            <property name="frameShape" >
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="pixmap" >
+             <pixmap resource="../gui.qrc" >:/images/minilogoinfosial.png</pixmap>
+            </property>
+            <property name="scaledContents" >
+             <bool>false</bool>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="textLabel1" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip" >
+             <string>InfoSiAL, S.L. Creadores de AbanQ</string>
+            </property>
+            <property name="frameShape" >
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="text" >
+             <string>&lt;p align="center">&lt;b>AbanQ 3.0&lt;/b>&lt;br>
+http://www.abanq.com&lt;br>
+http://www.infosial.com&lt;/p></string>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="spacing" >
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QComboBox" name="comboBoxMarks" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>143</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip" >
+             <string>Lista de marcadores con datos de conexión</string>
+            </property>
+            <property name="editable" >
+             <bool>true</bool>
+            </property>
+            <property name="autoCompletion" >
+             <bool>true</bool>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="pbAddMark" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="focusPolicy" >
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip" >
+             <string>Agregar marcador con los datos actuales de conexión</string>
+            </property>
+            <property name="whatsThis" >
+             <string>Agregar marcador con los datos actuales de conexión</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="../gui.qrc" >
+              <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+            </property>
+            <property name="iconSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="pbRemoveMark" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="focusPolicy" >
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip" >
+             <string>Eliminar marcador de la lista</string>
+            </property>
+            <property name="whatsThis" >
+             <string>Eliminar marcador de la lista</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="../gui.qrc" >
+              <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+            </property>
+            <property name="iconSize" >
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" >
+          <item>
+           <widget class="QLabel" name="textLabelDB" >
+            <property name="text" >
+             <string>Controlador:</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxDB" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>200</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip" >
+             <string>Controlador para la base de datos</string>
+            </property>
+            <property name="editable" >
+             <bool>true</bool>
+            </property>
+            <property name="autoCompletion" >
+             <bool>true</bool>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" >
+          <item>
+           <widget class="QLabel" name="TextLabelHost" >
+            <property name="text" >
+             <string>Servidor:</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditHost" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>200</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip" >
+             <string>Nombre o dir. IP del servidor de la base de datos</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" >
+          <item>
+           <widget class="QLabel" name="TextLabelPort" >
+            <property name="text" >
+             <string>Puerto:</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditPort" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>200</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip" >
+             <string>Puerto de conexión</string>
+            </property>
+            <property name="echoMode" >
+             <enum>QLineEdit::Normal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>65</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>Q3Frame</class>
+   <extends>QFrame</extends>
+   <header>Qt3Support/Q3Frame</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>comboBoxNameDB</tabstop>
+  <tabstop>lineEditUser</tabstop>
+  <tabstop>lineEditPassword</tabstop>
+  <tabstop>pushButtonConnect</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../gui.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButtonConnect</sender>
+   <signal>clicked()</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>tryConnect()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>76</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>cancel()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>211</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbnMore</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frMore</receiver>
+   <slot>setShown(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>347</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>392</x>
+     <y>27</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxDB</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>driverChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>510</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbAddMark</sender>
+   <signal>clicked()</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>addMark()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>648</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbRemoveMark</sender>
+   <signal>clicked()</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>removeMark()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>679</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxMarks</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>selectMark(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>402</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbMarks</sender>
+   <signal>clicked()</signal>
+   <receiver>AQConnectDB</receiver>
+   <slot>popupMarks()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>38</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

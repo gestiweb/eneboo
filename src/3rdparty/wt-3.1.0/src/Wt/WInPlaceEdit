@@ -1,0 +1,129 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WINPLACE_EDIT_H_
+#define WINPLACE_EDIT_H_
+
+#include <Wt/WCompositeWidget>
+
+namespace Wt {
+
+class WText;
+class WLineEdit;
+class WPushButton;
+
+/*! \class WInPlaceEdit Wt/WInPlaceEdit Wt/WInPlaceEdit
+ *  \brief A widget that provides in-place-editable text.
+ *
+ * The %WInPlaceEdit provides a text that may be edited in place by
+ * the user by clicking on it. When clicked, the text turns into a
+ * line edit with a save and cancel button.
+ *
+ * When the user saves the edit, the valueChanged() signal is emitted.
+ *
+ * Usage example:
+ * \if cpp
+ * \code
+ * Wt::WContainerWidget *w = new Wt::WContainerWidget();
+ * new Wt::WText("Name: ", w);
+ * Wt::WInPlaceEdit *edit = new Wt::WInPlaceEdit("Bob Smith", w);
+ * edit->setStyleClass("inplace");
+ * \endcode
+ * \elseif java
+ * \code 
+ * WContainerWidget w = new WContainerWidget();
+ * new WText("Name: ", w);
+ * WInPlaceEdit edit = new WInPlaceEdit("Bob Smith", w);
+ * edit.setStyleClass("inplace");
+ * \endcode
+ * \endif
+ *
+ * CSS stylesheet:
+ * \code
+ * .inplace span:hover {
+ *    background-color: gray;
+ * }
+ * \endcode
+ *
+ * This code will produce an edit that looks like:
+ * \image html WInPlaceEdit-1.png "WInPlaceEdit text mode"
+ * When the text is clicked, the edit will expand to become:
+ * \image html WInPlaceEdit-2.png "WInPlaceEdit edit mode"
+ */
+class WT_API WInPlaceEdit : public WCompositeWidget
+{
+public:
+  /*! \brief Create an in-place edit with the given text.
+   */
+  WInPlaceEdit(const WString& text, WContainerWidget *parent = 0);
+
+  /*! \brief Returns the current text value.
+   *
+   * \sa setText()
+   */
+  const WString& text() const;
+
+  /*! \brief Set the current text.
+   *
+   * \sa text()
+   */
+  void setText(const WString& text);
+
+  /*! \brief Returns the line edit.
+   *
+   * You may for example set a validator on the line edit.
+   */
+  WLineEdit *lineEdit() const { return edit_; }
+
+  /*! \brief Returns the save button.
+   *
+   * This method returns a null pointer if the buttons were disabled.
+   *
+   * \sa cancelButton(), setButtonsEnabled()
+   */
+  WPushButton *saveButton() const { return save_; }
+
+  /*! \brief Returns the cancel button.
+   *
+   * This method returns a null pointer if the buttons were disabled.
+   *
+   * \sa saveButton(), setButtonsEnabled()
+   */
+  WPushButton *cancelButton() const { return cancel_; }
+
+  /*! \brief %Signal emitted when the value has been changed.
+   *
+   * The signal argument provides the new value.
+   */
+  Signal<WString>& valueChanged() { return valueChanged_; }
+
+  /*! \brief Display the Save and 'Cancel' button during editing
+   *
+   * By default, the Save and Cancel buttons are shown. Call this function
+   * with a false parameter to only show a line edit. In this mode, the
+   * enter key has the effect of the save button and the escape key has
+   * the effect of the cancel button.
+   */
+  void setButtonsEnabled(bool enabled = true);
+
+private:
+  void save();
+  void cancel();
+
+private:
+  Signal<WString> valueChanged_;
+  WContainerWidget *impl_;
+  WText            *text_;
+  WLineEdit        *edit_;
+  WPushButton      *save_;
+  WPushButton      *cancel_;
+  boost::signals::connection c1_;
+  boost::signals::connection c2_;
+};
+
+}
+
+#endif // WINPLACE_EDIT_H_

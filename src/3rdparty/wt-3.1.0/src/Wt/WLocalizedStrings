@@ -1,0 +1,69 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WLOCALIZED_STRINGS_
+#define WLOCALIZED_STRINGS_
+
+#include <string>
+#include <Wt/WDllDefs.h>
+
+namespace Wt {
+
+class WString;
+
+/*! \class WLocalizedStrings Wt/WLocalizedStrings Wt/WLocalizedStrings
+ *  \brief An abstract class that provides support for localized strings.
+ *
+ * This abstract class provides the content to localized WStrings, by
+ * resolving the key to a string using the current application locale.
+ *
+ * \sa WString::tr(), WApplication::setLocalizedStrings()
+ */
+class WT_API WLocalizedStrings
+{
+public:
+  /*! \brief Destructor.
+   */
+  virtual ~WLocalizedStrings();
+
+  /*! \brief Reread the message resources.
+   *
+   * Purge any cached key/values, if applicable.
+   *
+   * The default implementation does nothing.
+   */
+  virtual void refresh();
+
+  /*! \brief Purge memory resources, if possible.
+   * 
+   * This is called afer event handling, and is an opportunity to
+   * conserve memory inbetween events, by freeing memory used for
+   * cached key/value bindings, if applicable.
+   *
+   * The default implementation does nothing.
+   */
+  virtual void hibernate();
+
+  /*! \brief Resolve a key in the current locale.
+   * 
+   * This method is used by WString to obtain the UTF8 value corresponding
+   * to a key in the current locale.
+   *
+   * Returns \c true if the key could be resolved. The value is written
+   * in \p result, encoded using UTF8.
+   *
+   * \sa WApplication::locale()
+   */
+#ifndef WT_TARGET_JAVA
+  virtual bool resolveKey(const std::string& key, std::string& result) = 0;
+#else // WT_TARGET_JAVA
+  virtual std::string *resolveKey(const std::string& key) = 0;
+#endif // WT_TARGET_JAVA
+};
+
+}
+
+#endif // WSTRING_TRANSLATOR_

@@ -1,0 +1,174 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WFORM_WIDGET_H_
+#define WFORM_WIDGET_H_
+
+#include <Wt/WInteractWidget>
+#include <Wt/WValidator>
+
+namespace Wt {
+
+class WLabel;
+
+/*! \class WFormWidget Wt/WFormWidget Wt/WFormWidget
+ *  \brief An abstract widget that corresponds to an HTML form element.
+ *
+ * A %WFormWidget may receive focus, can be disabled, and can have a
+ * label that acts as proxy for getting focus. It provides signals
+ * which reflect changes to its value, or changes to its focus.
+ *
+ * Form widgets also have built-in support for validation, using
+ * setValidator(WValidator *). If the validator provide client-side
+ * validation, then an invalid validation state is reflected using the
+ * style class <tt>"Wt-invalid"</tt>. All validators provided by %Wt
+ * implement client-side validation.
+ *
+ * On the server-side, use validate() method to validate the content
+ * using a validator previously set.
+ */
+class WT_API WFormWidget : public WInteractWidget
+{
+public:
+  /*! \brief Creates a %WFormWidget with an optional parent.
+   */
+  WFormWidget(WContainerWidget *parent = 0);
+
+  /*! \brief Destructor.
+   *
+   * If a label was associated with the widget, its buddy is reset to \c 0.
+   */
+  ~WFormWidget();
+
+  /*! \brief Returns the label associated with this widget.
+   *
+   * Returns the label (if there is one) that acts as a proxy for this
+   * widget.
+   *
+   * \sa WLabel::setBuddy(WFormWidget *)
+   */
+  WLabel *label() const { return label_; }
+
+  /*! \brief Sets the hidden state of this widget.
+   *
+   * If the widget has a label, it is hidden and shown together with
+   * this widget.
+   */
+  virtual void setHidden(bool hidden);
+
+  /*! \brief Sets a validator for this field.
+   *
+   * The validator is used to validate the current input.
+   *
+   * If the validator has no parent yet, then ownership is transferred
+   * to the form field, and thus the validator will be deleted
+   * together with the form field.
+   *
+   * The default value is \c 0.
+   *
+   * \sa validate()
+   */
+  void setValidator(WValidator *validator);
+
+  /*! \brief Returns the validator.
+   */
+  WValidator *validator() const { return validator_; }
+
+  /*! \brief Validates the field.
+   */
+  virtual WValidator::State validate();
+
+  /*! \brief Sets whether the widget is enabled.
+   *
+   * A widget that is disabled cannot receive focus or user interaction.
+   *
+   * This is the opposite of setDisabled().
+   */
+  void setEnabled(bool enabled);
+
+  /*! \brief Gives focus to this widget.
+   *
+   * Giving focus to an input element only works when JavaScript is enabled.
+   */
+  void setFocus();
+
+  /*! \brief Sets the element read-only.
+   *
+   * A read-only form element cannot be edited, but the contents can
+   * still be selected.
+   *
+   * By default, a form element area is not read-only.
+   *
+   * \sa setEnabled()
+   */
+  void setReadOnly(bool readOnly);
+
+  /*! \brief Returns whether the form element is read-only.
+   *
+   * \sa setReadOnly()
+   */
+  bool isReadOnly() const;
+
+  /*! \brief %Signal emitted when the value was changed.
+   */
+  EventSignal<>& changed();
+
+  /*! \brief %Signal emitted when ??
+   */
+  EventSignal<>& selected();
+
+  /*! \brief %Signal emitted when the widget lost focus.
+   */
+  EventSignal<>& blurred();
+
+  /*! \brief %Signal emitted when the widget recieved focus.
+   */
+  EventSignal<>& focussed();
+
+protected:
+  WLabel     *label_;
+  WValidator *validator_;
+  JSlot      *validateJs_, *filterInput_;
+
+  // also used in WAbstractToggleButton
+  static const char *CHANGE_SIGNAL;
+
+private:
+  static const char *SELECT_SIGNAL;
+  static const char *FOCUS_SIGNAL;
+  static const char *BLUR_SIGNAL;
+
+  static const int BIT_ENABLED_CHANGED  = 0;
+  static const int BIT_GOT_FOCUS        = 1;
+  static const int BIT_INITIAL_FOCUS    = 2;
+  static const int BIT_READONLY         = 3;
+  static const int BIT_READONLY_CHANGED = 4;
+
+  std::bitset<5> flags_;
+
+  void undoSetFocus();
+
+  void setLabel(WLabel *label);
+
+  void validatorChanged();
+
+protected:
+  virtual void updateDom(DomElement& element, bool all);
+  virtual void propagateRenderOk(bool deep);
+  virtual WStatelessSlot *getStateless(Method method);
+
+  virtual void propagateSetEnabled(bool enabled);
+
+  virtual std::string formName() const;
+
+  friend class WLabel;
+  friend class WValidator;
+  friend class WebSession;
+};
+
+}
+
+#endif // WFORM_WIDGET_H_

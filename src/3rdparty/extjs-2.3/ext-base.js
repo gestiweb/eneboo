@@ -1,0 +1,1 @@
+adapter/ext/ext-base.js

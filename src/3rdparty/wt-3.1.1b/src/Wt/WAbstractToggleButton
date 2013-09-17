@@ -1,0 +1,141 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WABSTRACTTOGGLEBUTTON_H_
+#define WABSTRACTTOGGLEBUTTON_H_
+
+#include <Wt/WFormWidget>
+
+namespace Wt {
+
+class WLabel;
+
+/*! \brief An abstract base class for radio buttons and check boxes.
+ *
+ * A toggle button provides a button with a boolean state (checked or
+ * unchecked), and a text label.
+ *
+ * To act on a change of the state, either connect a slot to the changed()
+ * signal, or connect a slot to the checked() or unChecked() signals.
+ *
+ * The current state (checked or unchecked) may be inspected using the
+ * isChecked() method.
+ */
+class WT_API WAbstractToggleButton : public WFormWidget
+{
+protected:
+  /*! \brief Creates an unchecked toggle button without label.
+   */
+  WAbstractToggleButton(WContainerWidget *parent = 0);
+
+  /*! \brief Creates an unchecked toggle button with given text label.
+   *
+   * The text label is rendered to the right side of the button.
+   */
+  WAbstractToggleButton(const WString& text, WContainerWidget *parent = 0);
+
+public:
+  /*! \brief Destructor.
+   */
+  virtual ~WAbstractToggleButton();
+
+  /*! \brief Sets the label text.
+   *
+   * The label is rendered to the right fo the button.
+   */
+  void setText(const WString& text);
+
+  /*! \brief Returns the label text.
+   *
+   * \sa setText()
+   */
+  const WString text() const;
+
+  /*! \brief Returns the button state.
+   *
+   * \sa setChecked()
+   */
+  bool isChecked() const { return state_ == Checked; }
+
+  /*! \brief Sets the button state.
+   *
+   * This method does not emit one of the checked() or unChecked()
+   * signals.
+   *
+   * \sa setChecked(), setUnChecked()
+   */
+  void setChecked(bool checked);
+
+  /*! \brief Checks the button.
+   *
+   * Does not emit the checked() signal.
+   *
+   * \sa setChecked(bool)
+   */
+  virtual void setChecked();
+
+  /*! \brief Unchecks the button.
+   *
+   * Does not emit the unChecked() signal.
+   *
+   * \sa setChecked(bool)
+   */
+  virtual void setUnChecked();
+
+  /*! \brief %Signal emitted when the button gets checked.
+   *
+   * This signal is emitted when the user checks the button.
+   *
+   * You can use the changed() signal to react to any change of the
+   * button state.
+   */
+  EventSignal<>& checked();
+
+  /*! \brief %Signal emitted when the button gets unChecked.
+   *
+   * This signal is emitted when the user unchecks the button.
+   *
+   * You can use the changed() signal to react to any change of the
+   * button state.
+   */
+  EventSignal<>& unChecked();
+
+protected:
+  CheckState state_;
+
+  virtual DomElement *createDomElement(WApplication *app);
+  virtual void getDomChanges(std::vector<DomElement *>& result,
+			     WApplication *app);
+  virtual void updateDom(DomElement& element, bool all);
+  virtual void getFormObjects(FormObjectsMap& formObjects);
+  virtual void setFormData(const FormData& formData);
+  virtual void propagateRenderOk(bool deep);
+  virtual DomElementType domElementType() const;
+  virtual bool useImageWorkaround() const;
+  virtual std::string formName() const;
+
+  virtual WStatelessSlot *getStateless(Method method);
+
+private:
+  static const char *CHECKED_SIGNAL;
+  static const char *UNCHECKED_SIGNAL;
+  static const char *UNDETERMINATE_CLICK_SIGNAL;
+
+  bool stateChanged_;
+  CheckState prevState_;
+
+  void undoSetChecked();
+  void undoSetUnChecked();
+  void setCheckState(CheckState state);
+
+  friend class WCheckBox;
+  friend class WRadioButton;
+  friend class WButtonGroup;
+};
+
+}
+
+#endif // WABSTRACTTOGGLEBUTTON_H_

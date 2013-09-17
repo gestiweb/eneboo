@@ -1,0 +1,55 @@
+<ui version="4.0" >
+ <class>AQTabView</class>
+ <widget class="QWidget" name="AQTabView" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>478</width>
+    <height>495</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>AQTabView</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../gui.qrc" >:/images/icon.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>0</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tab" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <widget class="QWidget" name="tabvoid" >
+      <attribute name="title" >
+       <string>...</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../gui.qrc" />
+ </resources>
+ <connections/>
+</ui>

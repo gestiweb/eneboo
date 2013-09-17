@@ -1,0 +1,21 @@
+/* additional style rules for ie */
+
+/*
+ * WCalendar
+ */
+
+.Wt-cal td div {
+    zoom: 1;
+}
+
+/*
+ * WTreeView
+ */
+/* nodes */
+.Wt-treeview .Wt-expand {
+    background: url(nav-plus.gif) no-repeat 0 center;
+}
+
+.Wt-treeview .Wt-collapse {
+    background: url(nav-minus.gif) no-repeat 0 center;
+}

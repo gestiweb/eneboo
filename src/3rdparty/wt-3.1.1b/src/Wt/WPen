@@ -1,0 +1,163 @@
+// This may look like C code, but it's really -*- C++ -*-
+/*
+ * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
+ *
+ * See the LICENSE file for terms of use.
+ */
+#ifndef WPEN_H_
+#define WPEN_H_
+
+#include <Wt/WLength>
+#include <Wt/WColor>
+
+namespace Wt {
+
+/*! \class WPen Wt/WPen Wt/WPen
+ *  \brief Class that defines the style for pen strokes
+ *
+ * A pen defines the properties of how lines (that may surround
+ * shapes) are rendered.
+ *
+ * A pen with width 0 is a <i>cosmetic</i> pen, and is always rendered
+ * as 1 pixel width, regardless of transformations. Otherwized, the
+ * pen width is modified by the \link WPainter::worldTransform()
+ * transformation\endlink set on the painter.
+ *
+ * \sa WPainter::setPen(), WBrush
+ *
+ * \ingroup painting
+ */
+class WT_API WPen
+{
+public:
+  /*! \brief Creates a black cosmetic pen.
+   *
+   * Constructs a black solid pen of 0 width (i.e. cosmetic single
+   * pixel width), with \link Wt::SquareCap SquareCap\endlink line
+   * ends and \link Wt::BevelJoin BevelJoin\endlink line join style.
+   */
+  WPen();
+
+  /*! \brief Creates a black pen with a particular style.
+   *
+   * Constructs a black pen of 0 width (i.e. cosmetic single pixel
+   * width), with \link Wt::SquareCap SquareCap\endlink line ends and
+   * \link Wt::BevelJoin BevelJoin\endlink line join style.
+   *
+   * The line style is set to \p style.
+   */
+  WPen(PenStyle style);
+
+  /*! \brief Creates a solid pen of a particular color.
+   *
+   * Constructs a solid pen of 0 width (i.e. cosmetic single pixel
+   * width), with \link Wt::SquareCap SquareCap\endlink line ends and
+   * \link Wt::BevelJoin BevelJoin\endlink line join style.
+   *
+   * The pen color is set to \p color.
+   */
+  WPen(const WColor& color);
+
+  /*! \brief Creates a solid pen of a particular standard color.
+   *
+   * Constructs a solid pen of 0 width (i.e. cosmetic single pixel
+   * width), with \link Wt::SquareCap SquareCap\endlink line ends and
+   * \link Wt::BevelJoin BevelJoin\endlink line join style.
+   *
+   * The pen color is set to \p color.
+   */
+  WPen(GlobalColor color);
+
+#ifdef WT_TARGET_JAVA
+    /*! \brief Clone method.
+   *
+   * Clones this WPen object.
+   */
+  WPen clone() const;
+#endif
+
+  /*! \brief Comparison operator.
+   *
+   * Returns \c true if the pens are exactly the same.
+   */
+  bool operator==(const WPen& other) const;
+
+  /*! \brief Comparison operator.
+   *
+   * Returns \c true if the pens are different.
+   */
+  bool operator!=(const WPen& other) const;
+
+  /*! \brief Sets the pen style.
+   *
+   * \sa style()
+   */
+  void setStyle(PenStyle style);
+
+  /*! \brief Returns the pen style.
+   *
+   * \sa setStyle(PenStyle)
+   */
+  PenStyle style() const { return penStyle_; }
+
+  /*! \brief Sets the style for rendering line ends.
+   *
+   * \sa capStyle()
+   */
+  void setCapStyle(PenCapStyle style);
+
+  /*! \brief Returns the style for rendering line ends.
+   *
+   * \sa setCapStyle(PenCapStyle)
+   */
+  PenCapStyle capStyle() const { return penCapStyle_; }
+
+  /*! \brief Sets the style for rendering line joins.
+   *
+   * \sa joinStyle()
+   */
+  void setJoinStyle(PenJoinStyle style);
+
+  /*! \brief Returns the style for rendering line joins.
+   *
+   * \sa setJoinStyle(PenJoinStyle)
+   */
+  PenJoinStyle joinStyle() const { return penJoinStyle_; }
+
+  /*! \brief Sets the pen width.
+   *
+   * A pen width \p must be specified using WLength::Pixel units.
+   *
+   * \sa width()
+   */
+  void setWidth(const WLength& width);
+
+  /*! \brief Returns the pen width.
+   *
+   * \sa setWidth(const WLength&)
+   */
+  const WLength& width() const { return width_; }
+
+  /*! \brief Sets the pen color.
+   *
+   * \sa color()
+   */
+  void setColor(const WColor& color);
+
+  /*! \brief Returns the pen color.
+   *
+   * \sa color()
+   */
+  const WColor& color() const { return color_; }
+
+private:
+  PenStyle penStyle_;
+  PenCapStyle penCapStyle_;
+  PenJoinStyle penJoinStyle_;
+  WLength  width_;
+  WColor   color_;
+};
+
+}
+
+#endif // WPEN_H_

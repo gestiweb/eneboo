@@ -1,0 +1,72 @@
+<ui version="4.0" >
+ <author>InfoSiAL, S.L.</author>
+ <comment>Acceso general a una tabla.</comment>
+ <class>mastersimple</class>
+ <widget class="QWidget" name="mastersimple" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>401</width>
+    <height>422</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="focusPolicy" >
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="windowTitle" >
+   <string>mastersimple</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../../../gui/gui.qrc" >:/images/icon.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>2</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>1</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="FLTableDB" name="tableDBRecords" />
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>FLTableDB</class>
+   <extends>AQTableDB</extends>
+   <header>AQUi/AQTableDB</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="global" >qwidgetfactory.h</include>
+ </includes>
+ <resources>
+  <include location="../../../gui/gui.qrc" />
+ </resources>
+ <connections/>
+</ui>

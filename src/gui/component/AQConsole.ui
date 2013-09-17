@@ -1,0 +1,240 @@
+<ui version="4.0" >
+ <class>AQConsole</class>
+ <widget class="QWidget" name="AQConsole" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>660</width>
+    <height>583</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>AQConsole</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../gui.qrc" >
+    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QTextEdit" name="tedOutput" >
+     <property name="focusPolicy" >
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="contextMenuPolicy" >
+      <enum>Qt::NoContextMenu</enum>
+     </property>
+     <property name="acceptDrops" >
+      <bool>false</bool>
+     </property>
+     <property name="toolTip" >
+      <string>Salida de la ejecución de comandos</string>
+     </property>
+     <property name="statusTip" >
+      <string>Salida de la ejecución de comandos</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Salida de la ejecución de comandos</string>
+     </property>
+     <property name="verticalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="undoRedoEnabled" >
+      <bool>false</bool>
+     </property>
+     <property name="readOnly" >
+      <bool>true</bool>
+     </property>
+     <property name="textInteractionFlags" >
+      <set>Qt::TextBrowserInteraction</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Entrada de comandos :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>341</width>
+         <height>24</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbExec" >
+       <property name="minimumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip" >
+        <string>Ejecutar comando (Ctrl+Retorno)</string>
+       </property>
+       <property name="statusTip" >
+        <string>Ejecutar comando (Ctrl+Retorno)</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Ejecutar comando (Ctrl+Retorno)</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="../gui.qrc" >
+         <normaloff>:/images/yes.png</normaloff>:/images/yes.png</iconset>
+       </property>
+       <property name="shortcut" >
+        <string>Ctrl+Return</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbHistoUp" >
+       <property name="minimumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip" >
+        <string>Histórico de comandos arriba (Ctrl+Arriba)</string>
+       </property>
+       <property name="statusTip" >
+        <string>Histórico de comandos arriba (Ctrl+Arriba)</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Histórico de comandos arriba (Ctrl+Arriba)</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="../gui.qrc" >
+         <normaloff>:/images/up.png</normaloff>:/images/up.png</iconset>
+       </property>
+       <property name="shortcut" >
+        <string>Ctrl+Up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbHistoDown" >
+       <property name="minimumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip" >
+        <string>Histórico de comandos abajo (Ctrl+Abajo)</string>
+       </property>
+       <property name="statusTip" >
+        <string>Histórico de comandos abajo (Ctrl+Abajo)</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Histórico de comandos abajo (Ctrl+Abajo)</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="../gui.qrc" >
+         <normaloff>:/images/down.png</normaloff>:/images/down.png</iconset>
+       </property>
+       <property name="shortcut" >
+        <string>Ctrl+Down</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbAutoCompletion" >
+       <property name="minimumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip" >
+        <string>Autocomplementar ( Tab )</string>
+       </property>
+       <property name="statusTip" >
+        <string>Autocomplementar ( Tab )</string>
+       </property>
+       <property name="whatsThis" >
+        <string>Autocomplementar ( Tab )</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="../gui.qrc" >
+         <normaloff>:/images/info.png</normaloff>:/images/info.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="tedInput" >
+     <property name="maximumSize" >
+      <size>
+       <width>16777215</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="toolTip" >
+      <string>Entrada de comandos</string>
+     </property>
+     <property name="statusTip" >
+      <string>Entrada de comandos</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Entrada de comandos</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../gui.qrc" />
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,391 @@
+<ui version="4.0" >
+ <class>sys</class>
+ <widget class="AQ3MainWindow" name="sys" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>492</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Administración</string>
+  </property>
+  <property name="whatsThis" >
+   <string>Administración del sistema</string>
+  </property>
+  <widget class="QWidget" name="widget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>41</y>
+     <width>600</width>
+     <height>451</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Q3ToolBar" name="toolBar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>193</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="label" >
+    <string>Toolbar</string>
+   </property>
+   <addaction name="flloadmod" />
+   <addaction name="separator" />
+   <addaction name="flareas" />
+   <addaction name="flmodules" />
+   <addaction name="separator" />
+   <addaction name="flusers" />
+   <addaction name="flgroups" />
+  </widget>
+  <widget class="QMenuBar" name="MenuBarEditor" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="Principal" >
+    <property name="title" >
+     <string>&amp;Principal</string>
+    </property>
+    <addaction name="flloadmod" />
+    <addaction name="separator" />
+    <addaction name="flareas" />
+    <addaction name="flmodules" />
+    <addaction name="separator" />
+    <addaction name="flreinit" />
+    <addaction name="flreloadlast" />
+    <addaction name="flreloadbatch" />
+   </widget>
+   <widget class="QMenu" name="Usuarios" >
+    <property name="title" >
+     <string>&amp;Usuarios</string>
+    </property>
+    <addaction name="flusers" />
+    <addaction name="flgroups" />
+   </widget>
+   <addaction name="Principal" />
+   <addaction name="Usuarios" />
+  </widget>
+  <action name="flmodules" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/modulos.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Módulos</string>
+   </property>
+   <property name="iconText" >
+    <string>&amp;Módulos</string>
+   </property>
+   <property name="toolTip" >
+    <string>Módulos (Ctrl+M)</string>
+   </property>
+   <property name="statusTip" >
+    <string>Módulos (Ctrl+M)</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Administración de los módulos de aplicación (Ctrl+M)</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+M</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flmodules</string>
+   </property>
+  </action>
+  <action name="flareas" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/areas.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Á&amp;reas</string>
+   </property>
+   <property name="iconText" >
+    <string>Á&amp;reas</string>
+   </property>
+   <property name="toolTip" >
+    <string>Áreas (Ctrl+R)</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Áreas de negocio</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+R</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flareas</string>
+   </property>
+  </action>
+  <action name="flloadmod" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/cargar.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Cargar Módulo</string>
+   </property>
+   <property name="iconText" >
+    <string>&amp;Cargar Módulo</string>
+   </property>
+   <property name="toolTip" >
+    <string>Cargar Módulo (Ctrl+C)</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Carga un módulo desde disco</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+C</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flloadmod</string>
+   </property>
+  </action>
+  <action name="flreloadlast" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/recargar.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Recargar último módulo</string>
+   </property>
+   <property name="iconText" >
+    <string>Recargar último módulo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+L</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flreloadlast</string>
+   </property>
+  </action>
+  <action name="flreinit" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/reiniciar.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Reiniciar</string>
+   </property>
+   <property name="iconText" >
+    <string>Reiniciar</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flreinit</string>
+   </property>
+  </action>
+  <action name="flusers" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/users.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Usuarios</string>
+   </property>
+   <property name="iconText" >
+    <string>Usuarios</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Usuarios del sistema</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+U</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flusers</string>
+   </property>
+  </action>
+  <action name="flgroups" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/groups.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Grupos</string>
+   </property>
+   <property name="iconText" >
+    <string>Grupos</string>
+   </property>
+   <property name="toolTip" >
+    <string>Grupos de usuarios</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Grupos de usuarios</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+G</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flgroups</string>
+   </property>
+  </action>
+  <action name="flreloadbatch" >
+   <property name="icon" >
+    <iconset resource="../../../gui/gui.qrc" >:/images/sys/recargarbatch.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Recarga en batch</string>
+   </property>
+   <property name="iconText" >
+    <string>Recarga en batch</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+B</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>flreloadbatch</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>Q3ToolBar</class>
+   <extends>Q3Frame</extends>
+   <header>q3listview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>AQ3MainWindow</class>
+   <extends>Q3MainWindow</extends>
+   <header>AQUi/AQ3MainWindow</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../gui/gui.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>flmodules</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>openDefaultForm()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flareas</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>openDefaultForm()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flloadmod</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>execDefaultScript()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flreloadlast</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>execDefaultScript()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flreinit</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>execDefaultScript()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flusers</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>openDefaultForm()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flgroups</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>openDefaultForm()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flreloadbatch</sender>
+   <signal>triggered()</signal>
+   <receiver>sys</receiver>
+   <slot>execDefaultScript()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

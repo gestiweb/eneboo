@@ -1,0 +1,22 @@
+<!DOCTYPE TMD>
+<TMD>
+	<name>aqsettings</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Configuración global")</alias>
+
+	<field>
+		<name>aqkey</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Clave")</alias>
+		<null>false</null>
+		<pk>true</pk>
+		<type>string</type>
+		<length>30</length>
+	</field>
+
+	<field>
+		<name>valor</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Valor")</alias>
+		<null>false</null>
+		<pk>false</pk>
+		<type>stringlist</type>
+	</field>
+</TMD>

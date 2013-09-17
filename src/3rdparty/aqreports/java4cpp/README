@@ -1,0 +1,986 @@
+
+Java For C++ (Stefan Palme <java4cpp@kapott.org>)
+=================================================
+
+
+Introduction
+------------
+
+java4cpp is a command line tool that creates code for C++ classes that
+wrap existing Java classes. For understanding this README and for being able
+to really use this tool you should have at least basic knowledge about Java,
+the Java API and C++. 
+
+
+This README mostly uses classes and interfaces from the Java standard API. But
+this does not mean, that the wrapper generator only works for these standard
+classes - it works for ANY valid java class. The reason is, that the wrapper
+generator uses reflection to detect the structure of the classes, that you
+want to generate C++ classes for.
+
+
+For example, the Java class java.lang.Integer can be used in Java code
+in this way:
+
+  ...
+  java.lang.Integer i = new java.lang.Integer("10");
+  System.out.println("i=" + i.intValue());
+  System.out.println("class of object i is "+i.getClass().getName());
+  ...
+  
+This code is of course not very optimal and even senseless - it's just
+an example to show the purpose of java4cpp...
+
+After creating a C++-wrapper-class for java.lang.Integer you get a 
+C++-class java::lang::Integer (i.e. a class "Integer" in namespace 
+"java::lang"), which can be used as following:
+
+  #include <java_magic.h>
+  #include <stdio.h>
+  
+  int main(int argc, char** argv)
+  {
+      initJavaWrapper(argc, argv);
+      
+      java::lang::Integer* i = new java::lang::Integer("10");
+      printf("i=%i\n", i->intValue());
+      
+      java::lang::Class* klass = i->getClass();
+      const char* name = klass->getName();
+      printf("class of object i is %s\n", name);
+      
+      delete[] name;
+      delete klass;
+      delete i;
+  }
+
+As you can see, the C++-API for working with Java objects is very close to the
+original Java API for these objects.
+
+
+
+Creating C++ wrapper classes for existing Java classes
+------------------------------------------------------
+
+To create C++ wrapper classes for existing Java classes you have 
+to follow these steps (but see below for a shortcut):
+
+
+- Create a text file containing the name of all Java classes you
+  want to create wrappers for. For example:
+  
+    content of file javaClasses.txt:
+    
+    java.lang.Integer
+    java.lang.String
+    java.net.Socket
+    org.mydomain.myprojects.MainClass
+    
+  When some of the classes you want to use have method return types,
+  method arguments or fields of other classes, you don't have to specify
+  them all. java4cpp automatically detects this and creates wrapper 
+  classes for these "internally used" classes too.
+  
+  For example, when you give java.lang.Integer in the text file,
+  java4cpp will also automatically generate wrapper classes for:
+  
+    * java.lang.Number (because Integer extends Number), 
+    * java.lang.Comparable (because Integer implements Comparable), 
+    * java.lang.Object (because Integer.equals() takes an Object argument),
+    * ...
+    
+  When automatically creating the wrapper class for e.g. java.lang.Number,
+  the same mechanism applies. So java.lang.Number causes java4cpp to
+  create java.lang.Object (because Number extends Object), ...
+  
+  This is the reason, why you get a lot of C++ wrapper classes even if
+  you want to wrap only one simple Java class like java.lang.Object.
+  
+
+- Create a configuration file for the wrapper generator. The file will be
+  called CONFIGFILE here and should contain the following lines:
+  
+    basedir    = /home/kleiner/projects/myJavaProject
+    classfile  = ${basedir}/javaClasses.txt
+    targetpath = ${basedir}/c++-wrapper
+    verbose    = true
+  
+    
+  "basedir" is just a variable that can be used via ${basedir} later in the
+  configfile. You can define and use any variable you want (excluding the 
+  keywords described below).
+  
+  "classfile" contains the path to the text file containing the list
+  of Java classes you want to generate C++ classes for.
+  
+  "targetpath" must be the name of an existing directory. java4cpp will
+  write all generated code in this directory. When no targetpath is given,
+  it defaults to the current directory.
+  
+  "verbose" can be "true" or "false". When "true", the wrapper generator
+  will print a line for each Java class it creates a wrapper class for 
+  (so it is not very useful at the moment). When not given, verbose mode
+  defaults to false.
+  
+
+- Call
+    java -cp java4cpp.jar:$YOUR_CLASSPATH org.kapott.wrappergen.c.Main CONFIGFILE
+
+  $YOUR_CLASSPATH is maybe needed to make Java find all the classes you 
+  specified in javaClasses.txt. For example, if your Java project lives
+  in /projects/myProject and the classfiles in /projects/myProject/classes,
+  you probably have to include /projects/myProject/classes in the 
+  CLASSPATH when calling the wrapper generator. This is caused by the fact,
+  that java4cpp uses "Class.forName(...)" to find the classes.
+  
+  CONFIGFILE is the name of the configuration file you created in the 
+  step before :-)
+  
+  This call will create one .cpp file and one .h file for each Java class.
+  
+  
+- Copy all the files from the directory "src/c" from the java4cpp-archive to
+  the targetpath. These files contain additional code and helper classes 
+  required internally be the generated code for the C++ classes.
+  
+  This step will be done automatically in a later version of java4cpp.
+
+
+Now you have a lot of .cpp and .h files in the targetpath.
+
+
+There is a Makefile.java4cpp included in the Java4CPP archives. You can use
+this Makefile to automatically perform these steps. See the comments in 
+Makefile.java4cpp on how to configure and use it.
+
+
+
+How to include the generated C++ code in your project
+-----------------------------------------------------
+
+There are a lot of ways to include the generated files in your own projects.
+I will describe a very easy and fool-proof solution here. C++ developers 
+will of course know other solutions and maybe prefer them... :-)
+
+
+To be able to use the wrapper classes, follow these steps (but see below
+for a shortcut):
+
+
+- Go into the directory where the generated files live (this directory has
+  been specified via "targetpath" in the configuration file for the wrapper
+  generator):
+  
+    cd /home/kleiner/projects/myJavaProject/c++-wrapper
+  
+    
+- Compile all .cpp files and link them together:
+
+    g++ -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -I. -fPIC -shared -o libjavawrapper.so *.cpp
+
+  You will get a shared library "libjavawrapper.so" that has to be linked
+  to your application. You don't need the .cpp files any longer, so you can
+  remove them if you want:
+  
+    rm *.cpp
+
+
+- Write your C++ application and optionally use the newly available 
+  C++ wrapper classes to create and use Java objects. Hints for using
+  the wrapper classes in your code can be found in a later section of
+  this README.
+  
+  
+- When compiling your C++ application, you have to add the following to 
+  the compilation process:
+  
+    * For compiling your code, you have to add the "targetpath" (where all 
+      the include files for the C++ wrapper classes live) to the list of
+      directories where to search for include files. And you have to use
+      -fPIC to compile your code (don't know exactly why...)
+      
+        g++ -I/home/kleiner/projects/myJavaProject/c++-wrapper -fPIC ...other_options...
+      
+        
+    * When linking the executable, you have to add two libraries to the
+      link process:
+      
+        g++ ...other_options... \
+            -L/home/kleiner/projects/myJavaProject/c++-wrapper -ljavawrapper \
+            -L$JAVA_HOME/jre/lib/i386/client -ljvm
+            
+      The first library (libjavawrapper.so) is the library you created from
+      the generated C++ wrapper classes.
+      
+      The second one is a library provided by the Java Runtime Engine. It
+      is needed for function calls which create an instance of the JVM at
+      runtime. The need to link this library to your application will be
+      removed in a later version of java4cpp.
+      
+      The stdc++ library is probably already included in your list of
+      libraries...
+
+  After all these steps you will have an executable that can use Java 
+  classes via C++ method calls.
+
+
+The Java4CPP archives contains a Makefile.example that can be used as a 
+template for your own application's Makefile on how to automate the steps of 
+creating the wrapper code needed by your application.
+
+
+
+How to call the executable
+--------------------------
+
+There are some things to be taken care of when you call your application:
+
+
+- When you want to run your C++ application, you need the following on the
+  system the application:
+  
+    * the original Java classes that are used by the C++ wrapper classes
+      (because these classes are really only *wrappers*, they internally call
+      the original Java classes to let them do all the work),
+      
+    * a working Java Runtime Engine, that is compatible with the Java classes
+      you want to use,
+      
+    * the library containing all the C++ wrapper objects for the Java classes
+      (only needed when this library has created as shared library - when 
+      included as static library directly in the executable, no extra library
+      is needed, of course).
+
+- The three libraries libjavawrapper.so, libjvm.so and libverify.so 
+  (used internally by the JRE) must be found by the dynamic loader of 
+  your OS. Normally these libraries are stored in a location not in the 
+  default search path where the dynamic loader looks for shared libraries.
+  
+  To solve this, there are again a lot of solutions, here is only one:
+  
+    env LD_LIBRARY_PATH=$JAVA_HOME/jre/lib/i386/client:$JAVA_HOME/lib/i386:/home/kleiner/projects/myJavaProject/c++-wrapper:$LD_LIBRARY_PATH ./myApplication ARGUMENTS
+
+  This adds the required directories to the environment for the call of
+  your application.
+  
+  
+- When your application code uses the C++ wrapper classes to create Java
+  objects, the internally running Java Virtual Machine must be able to
+  find the Java classes you want to use.
+  
+  When these Java classes are not part of your default CLASSPATH, you have
+  to add a command line argument when calling your application:
+  
+    env LD_LIBRARY_PATH=... ./myApplication [myArguments] -Djava.class.path=/home/kleiner/projects/myJavaProject/classes [myArguments]
+    
+  To define the classpath where the JVM should look for Java classes, you
+  have to specify an additional argument "-Djava.class.path=...". Your 
+  application code should ignore this additional argument. And your 
+  application code should provide all command line arguments to 
+  "initJavaWrapper()" (see later section in the README for hints how to
+  use the C++ wrapper classes in your own code), so that the wrapper
+  code knows about the additional classpath.
+
+  
+To simplify this, the Java4CPP archives contain a shell script called 
+"runme.sh". You can use it as a template for a shell script to start your
+own application. Just copy and modify the script for your own needs.
+  
+  
+All steps up to here can be done without really using application code that 
+makes use of the wrapper classes. You should perform these steps and test, if
+your application still works (it should!). After all the modifications to
+the process of compiling and calling your application have been done
+and still produce a working application executable, you can start 
+inserting code that uses the wrapper classes.
+
+  
+
+How to use the generated wrapper classes in your own code
+---------------------------------------------------------
+
+This is a list of important aspects to be aware of when you use
+the generated C++ wrapper classes in your own application code. Some things 
+are not explained in detail here and may seem strange to you. Maybe
+you find an explanation of some of the gotchas in a later section of
+this README, where the internal stuff of the wrapper code is explained
+a little bit more detailed.
+
+
+- Include-Files: to make integration of Java objects for you as easy as 
+  possible, there is only one include file that is interesting for you.
+  Every file of code of your application, that makes use of any of
+  the C++ wrapper classes or the Java wrapper in general, should
+  contain the following line:
+  
+    #include <java_magic.h>
+    
+  This header file is part of the header files that come with the java4cpp
+  archive. It is responsible for including other internally needed
+  header files and for including all the header files that define the
+  C++ wrapper classes.
+  
+  For this include directive to work you should ensure, that the directory
+  containing the generated wrapper classes is part of your INCLUDE-path
+  when compiling the application. Furthermore you must ensure, that you
+  did not forget to copy the files from src/c from the java4cpp archive
+  into this directory.
+  
+  
+- Initializing the Java wrapper: before you can create your first Java
+  proxy class in your application you have to initialize the wrapper
+  engine. To do this, you have to call the method
+  
+    int result = initJavaWrapper(int argc, char** argv);
+    
+  (dont forget to include <java_magic.h>). The arguments argc and argv
+  define an array of strings (argv) and its size (argc). Each of the
+  strings in this array will be given to the initialization routine for
+  the Java Virtual Machine. This means, that each of the strings can contain
+  an option understood by the JVM. When the JVM finds an option it does not
+  understand, this option is ignored silently - so you could give all the
+  command line arguments of your main application to this method: the
+  command line arguments may contain mixed arguments understood by your 
+  application and arguments for the JVM. 
+  
+  The most important JVM arguments may be "-Djava.class.path=..." to define
+  the classpath where the JVM should look for Java classes used by your 
+  application code.
+  
+  A call to this method makes the Java wrapper engine create an instance
+  of the Java Virtual Machine. You should ensure, that you create ONLY ONE
+  Java Virtual Machine instance for your application. A reference to this
+  JVM instance is kept internally by the Java wrapper engine. Currently 
+  there is no way to "remove" this JVM instance (because of limitations in
+  the JNI invocation API).
+  
+  The return value of this function will be 0 on success and a value less that
+  zero on failure.
+  
+  
+- API: the generated C++ classes provide the same API as their corresponding
+  Java classes (with some exceptions). At the moment, only "public" 
+  constructors, methods and fields are accessibly by the C++ wrapper classes!
+  The name of a C++ class equals the name of the corresponding Java class 
+  with two modifications:
+  
+    * The Java package containing of the Java class will be converted to
+      a C++ namespace. So class java.lang.Object will become C++ class Object
+      in namespace java::lang (full qualified name java::lang::Object).
+      
+    * Every "$" in the Java class name is replaced by "__": this is needed
+      for emulation of nested classes (classes defined in classes).
+    
+  So the Java class "java.lang.Integer" is called "java::lang::Integer" in
+  C++, and the Java class "org.kapott.myProject.AList$Entry" would be called
+  org::kapott::myProject::AList__Entry in C++ (Java classes with "$" in their
+  name are classes, that are nested in other classes. This feature is
+  natively not available in C++ (at least I think so)).
+  
+  The object hierarchy of Java classes is also provided by the C++ classes.
+  In Java, java.lang.Integer inherits from java.lang.Number, which inherits
+  from java.lang.Object. In C++, java::lang::Integer inherits from 
+  java::lang::Number, which inherits from java::lang::Object. Because in Java 
+  there is no multi-inheritance, also the C++ class structure will be single-
+  inherited (without all the ugly problems caused by multi inheritance). The
+  concept of interfaces available in Java is also provided for the C++ 
+  classes, see a later section for a description of this.
+  
+  
+  To create an instance of a Java class in your C++ code, you could
+  do the following:
+  
+    java::lang::Integer*           i     = new java::lang::Integer("12");
+    org::kapott::myProject::AList* alist = new org::kapott::myProject::AList();
+    
+  The available constructors match those from the original Java class,
+  so java::lang::Integer will have the constructors
+  
+    new java::lang::Integer(int i);
+    new java::lang::Integer(const char* st);
+  
+  (See the documentation of the corresponding Java classes to find the list
+  of valid constructors, methods and fields).
+  
+  There are some exceptions to this: whenever a Java method or field has a 
+  name that corresponds to a C++ keyword, the NAME is replaced by NAME_.
+  At the moment, only the C++ keyword "delete" is detected and mangled by the 
+  code generator (happens in class java.lang.StringBuffer; method delete()).
+  
+  
+  To use any of the methods or fields of the original Java class,
+  you just call them by calling the same method on the C++ class instance:
+  
+    int                                  value = i->intValue();
+    org::kapott::myProject::AList__Entry entry = alist->getEntry(0);
+    const char*                          entry_value = entry->value;
+    
+    java::lang::StringBuffer* aStringBuffer = new java::lang::StringBuffer("hello");
+    aStringBuffer->delete_(1,2);
+    
+    
+  There are some details to be aware of for certain situations:
+  
+    * field values
+    * data types of method arguments, method return types and fields
+    * using arrays
+    * using strings
+    * using static methods or fields
+    * using interfaces
+    * Java exceptions
+        
+  For all this, see below...
+  
+  
+- Field values: values of member variables (=fields) are automatically updated
+  by the java wrapper code whenever a method of the corresponding class is
+  called:
+  
+    a Java class:
+      public class MyClass() {
+          public int x=5;
+          
+          public incrementX() {
+              this.x++;
+          }
+      }
+      
+    some C++ code:
+      MyClass* myClass = new MyClass();
+      printf("x = %i\n", myClass->x);   // prints "5"
+      myClass->incrementX();
+      printf("x = %i\n", myClass->x);   // prints "6"
+      
+  Although x is just a member variable (also in the C++ wrapper classes) and
+  not touched by the given C++ code its value is updated after the call to
+  incrementX(). This works for *all* member variables, but only with methods
+  in the same class.
+  
+  Following an example, that will not work this way:
+  
+    Java:
+      public class MyClass() {
+          public int x=5;
+      }
+      
+      public class OtherClass() {          
+          public incrementX(MyClass cl) {
+              cl.x++;
+          }
+      }
+      
+    C++:
+      MyClass *myClass = new MyClass();
+      printf("x = %i\n", myClass->x);     // prints "5"
+      OtherClass *other = new OtherClass();
+      other->incrementX(myClass);
+      printf("x = %i\n", myClass->x);     // prints "5" (!)
+      
+  The reason is, that the wrapper code for MyClass does not know, that the
+  instance of MyClass has been used and modified by another class. Whenever
+  you know about this possible problem, you could write the following code:
+
+    C++:
+      MyClass *myClass = new MyClass();
+      printf("x = %i\n", myClass->x);     // prints "5"
+      OtherClass *other = new OtherClass();
+      other->incrementX(myClass);
+      myClass->updateAllNonFinalVariables(wrapperIntern);
+      printf("x = %i\n", myClass->x);     // prints "6" (!)
+
+  The magic about all this will be explained later in this README, where some
+  of the internal stuff of the generated wrapper code will be explained.
+
+
+- Data types: All Java data types are mapped to corresponding C++ data 
+  types transparently by the C++ wrapper code.
+  
+  When a Java constructor or method requires or returns a value of a
+  primitive type, or if a public field of a Java class has a primitive type,
+  it is mapped to a corresponding C++ primitive type:
+  
+    Java       C++
+    ----------------------
+    boolean    bool
+    byte       char  (!)
+    char       char  (!)
+    short      short
+    int        int
+    long       long
+    float      float
+    double     double
+    void       void
+    
+  So, when you know a Java method requiring a "boolean" and an "int"
+  value, you can call the corresponding C++ wrapper method by giving
+  it a "bool" and an "int" value:
+  
+    Java declaration: void aMethod(boolean yes_or_no, int x);
+    C++ call:         obj->aMethod(true, 5);
+    
+  BE AWARE OF THE FACT, that both Java "byte" and "char" map to
+  C++ "char" - so when you have a Java class with the following
+  methods:
+  
+    void aMethod(char ch);
+    void aMethod(byte by);
+    
+  there will be ONLY ONE C++ method
+  
+    void aMethod(char arg1);
+    
+  You do not even know, which one of the original Java methods is called
+  by this C++ method. Maybe this will be fixed in a later version of
+  java4cpp, when Java type "char" will be mapped to C++ wide_char...
+  
+  
+  There are three non-primitive data types (references to objects,
+  strings, arrays), which are described below.
+  
+  
+- Java objects: every Java datatype, that is not primitive (see above),
+  is a reference to a Java object. So, when you have a Java method
+  declaration:
+  
+    String getValueOf(int value, Translations t, String language, byte[] additionalInfo);
+    
+  there is only one primitive argument (value), whose use is described
+  above. All the other arguments are in fact references to Java objects. 
+  References to java.lang.String and to arrays are handled in a special way
+  (see below). All other references (i.e. references to all Java objects
+  excluding Strings and arrays) are handled as following:
+  
+  Whenever a Java method requires an object reference (Translations),
+  you have to call the corresponding C++ method with an instance of
+  the appropriate C++ wrapper class:
+  
+    org::kapott::myProject::Translations* trans = new org::kapott::myProject::Translations();
+    ... language = ...;         // not discussed here
+    ... additionalInfo = ...;   // not discussed here
+    obj->getValueOf(5, trans, language, additionalInfo);
+    
+  This is the reason, why the wrapper code generator not only generates code
+  for the classes you specified in the javaClasses.txt, but also for all 
+  classes used as arguments or return types of methods or fields.
+  
+    
+  Of course, the OOP mechanism of inheritance works here. The Java class
+  java.lang.Integer inherits from java.lang.Number: So a Java
+  method
+  
+    void printNumber(java.lang.Number n);
+    
+  can be called from C++ as:
+
+    java::lang::Integer *i = new java::lang::Integer(5);
+    obj->printNumber(i);
+    
+  because "i" is an instance of a class that inherits from
+  java::lang::Number, which is in fact required by 
+  printNumber(java::lang::Number *n); 
+  
+  BUT BEWARE: This mechanism does not apply so easily for methods,
+  that have arguments describing interfaces (see below)!
+  
+    
+  The same mechanism works for method return types or for field values:
+  
+    in a Java class:
+      public java.lang.Integer i;
+      public java.lang.Object getRandomObject();
+    
+    in C++:
+      java::lang::Integer *i = obj->i;
+      java::lang::Object  *o = obj->getRandomObject();
+  
+
+- Strings: all Java method arguments, method return values or fields of type
+  java.lang.String are mapped to C++ "const char*". So when you have a Java 
+  method
+  
+    String convertString(String x);
+    
+  it's C++ signature will be
+  
+    const char* convertString(const char* arg1);
+    
+  You can call it (obviously) by using
+  
+    const char* result = obj->convertString("a string");
+    
+    
+  Currently there is a problem with the String class: The Java wrapper code 
+  only wraps pure ASCII strings without embedded 0-characters correctly.
+  So whenever you use a Java method or field, that requires or returns a
+  String object (in C++: a const char*), you have to ensure, that the
+  string contains only ASCII characters (between 0x01 and 0x7F). 
+  
+  Furthermore, you have to be aware about the memory management stuff
+  (see below).
+  
+  
+  In Java the String class is of course a subclass of java.lang.Object
+  (like any other Java class), so this also holds true for the C++ 
+  wrapper code: The Java method Hashtable.put(Object key, Object value)
+  takes two instances of Object (i.e. any object reference). When you
+  want to use *Strings* for "key" or "value", you CAN NOT write
+  
+    hashtable->put("myKey", "myValue");
+    
+  (because the signature of the corresponding C++ method expects
+  instances of java::lang::Object and not "const char*"), but instead 
+  you can do:
+  
+    java::lang::String* st1=new java::lang::String("myKey");
+    java::lang::String* st2=new java::lang::String("myValue");
+    hashtable->put(st1, st2);
+    
+  This way, "st1" and "st2" are instances of java::lang::String, which inherits
+  from java::lang::Object, which is required by Hashtable.put().
+  
+  (Short note: when calling 'hashtable.put("key", "value")' in pure Java code,
+   internally exact the same happens: the call will effectively read
+   'hashtable.put(new String("key"), new String("value"))'
+  )
+  
+  
+  There is another hint about Strings: In Java you can write the following:
+  
+    java.lang.Integer i = new java.lang.Integer(10);
+    System.out.println("i=" + i);
+    
+  This will cause the Java compiler to automatically call the method
+  "String toString()" of the Integer object to get a printable representation.
+  This method is defined in java.lang.Object and available in any Java class
+  and overwritten by most of the Java classes to create useful output.
+  
+  In C++, you can NOT try the following:
+  
+    java::lang::Integer* i = new java::lang::Integer(10);
+    printf("i=%i\n", i);
+    printf("i=%s\n", i);
+    
+  Both will not print the expected result, because "i" is (from C++'s point 
+  of view) just a pointer. Correct code:
+  
+    java::lang::Integer* i = new java::lang::Integer(10);
+    printf("i=%s\n", i->toString());
+    
+  (Be aware, that i->toString() returns a newly allocated memory block, that
+  must be deleted by the application!)
+    
+
+- Arrays: When a method requires or returns an array value, or when a field
+  of a class has array type, you can not just use normal C++ arrays for
+  mapping. Instead, you have to use the special Java Wrapper Classes
+  JavaXYZArray(), where "XYZ" stands for the type of the array components.
+  
+  The reason is, that normal C++ arrays are in fact only pointers to the start
+  of the array and contain no information about their size.
+  
+  An example: You have the following Java method:
+  
+    String[] getStrings(int[] values);
+    
+  The "values" argument requires an array of integers, while the method
+  returns an array of String-Objects. In C++ code, you have to use it the 
+  following way:
+  
+    int*          c_values = new int[10];
+    ... // fill int array
+    JavaIntArray* j_values = new JavaIntArray(c_values, 10);
+    
+    JavaObjectArray* j_result = obj->getStrings(j_values);
+    
+    java::lang::Object** c_result = (java::lang::Object**)(j_result->getArrayData());
+    for (int i=0; i < j_result->getArrayLength(); i++) {
+        printf("string %i: %s\n", i, c_result[i]->toString());
+    }
+    
+  
+  Note, that strings as array components are not handled specially (i.e.,
+  a string array is always a JavaObjectArray with java::lang::String as
+  array components). Arrays of arrays may work too, but are not yet
+  testet at the moment.
+    
+  TODO: maybe add more documentation here
+    
+
+- Static methods or fields: in Java there exist so called static methods and
+  fields. These are methods or fields not tied to a special instance of the
+  corresponding class, but are global for all instances of this class. Here
+  is a short Java example code:
+  
+    public class MyClass()
+    {
+      public static void printBanner();
+      public static int  x=5;
+    }
+    
+    ...
+    MyClass.printBanner();
+    System.out.println("MyClass.x=" + MyClass.x);
+    ...
+    
+  As you can see, there is no instance of the class MyClass - the methods and
+  fields are accessed directly via the "class declaration".
+    
+  These static methods and fields can not be mapped to corresponding 
+  features in C++, so you have to use them in this way: To access a static
+  method or field, you first have to create a dummy C++ object of this
+  class. After that, you can call the static methods and access the static
+  fields of this class by using the dummy object:
+  
+    org::kapott::MyClass* MyClass = new org::kapott::MyClass(wrapperIntern);
+    MyClass->printBanner();
+    printf("MyClass.x=%i\n", MyClass->x);
+    
+  The argument "wrapperIntern" (declared by include <java_magic.h>) ensures,
+  that no real constructor of the corresponding Java class will be called.
+  This is necessary, because some Java classes can never been instantiated
+  (because they have only private constructors). So MyClass can be used only 
+  for calls to static methods or static fields.
+  
+  
+  When you already have a "normal" instance of a class and want to call
+  static methods of this class, you can use this "normal" instance without
+  creating the "static only" variant:
+  
+    Java:
+      int x = Integer.parseInt("10");
+  
+    C++:
+      // static-only:
+      java::lang::Integer* i = new java::lang::Integer(wrapperIntern);
+      int                  x = i->parseInt("10");
+      
+    or:
+      // "normal" class instance:
+      java::lang::Integer* i = new java::lang::Integer(1);
+      int                  x = i->parseInt("10");
+      
+  But be aware of the difference: With the "static only" variant (created
+  by calling the constructor with "(wrapperIntern)") you can ONLY access
+  static methods and fields. "Normal" class instances (created by using any
+  constructor provided by the Java API) can use static methods/fields AND
+  "normal" object-methods/-fields.
+    
+
+- Interfaces: Mapping the Java concepts of single-inheritance and interfaces
+  to the C++ concept of multiple inheritance has been shown to be extremely
+  problematic. The current solution requires the folling coding rules for 
+  C++ applications:
+  
+  
+  Example #1: You have a class java.lang.Integer, that implements the
+  interface java.lang.Comparable. One method of this interface is
+  
+    int compareTo(Object o);
+    
+  When you want to call a method declared by an interface on a class 
+  implementing this interface, you just can call that method like any 
+  other methods of the corresponding C++ class:
+  
+    java::lang::Integer* i1 = new java::lang::Integer(5);
+    java::lang::Integer* i2 = new java::lang::Integer(10);
+    printf("i1.compareTo(i2): %i\n", i1->compareTo(i2));
+  
+  
+  Example #2: A method or constructor requires an argument of an 
+  interface type:
+  
+    java.util.Hashtable(java.util.Map t);
+    
+  From the Java API you know, that the class java.util.Hashtable implements
+  the interface java.util.Map, so you might want to try the following to
+  create a new Hashtable from an existing Hashtable (which is also a Map):
+  
+    java::util::Hashtable* ht1 = new java::util::Hashtable();
+    ...
+    java::util::Hashtable* ht2 = new java::util::Hashtable(ht1);
+    
+  THIS WILL NOT WORK. The reason is, that the concept of Java interfaces
+  corresponds to C++ multiple inheritance. The wrapper generator does not 
+  use multiple inheritance (because of some really really really ugly 
+  problems). So instances of java::util::Hashtable CAN NOT be used for
+  arguments of type java::util::Map in C++.
+  
+  But there is a really simple solution: you just have to create a proxy
+  object of type java::util::Map that wraps the java::util::Hashtable object:
+  
+    java::util::Hashtable* ht1 = new java::util::Hashtable();
+    ...
+    java::util::Map*       map = new java::util::Map(ht1->getJavaObject());
+    java::util::Hashtable* ht2 = new java::util::Hashtable(map);
+    
+  Here you create an instance of java::util::Map - which is not possible in
+  Java, because java.util.Map is an interface. Because of this, the class
+  java::util::Map has a special constructor - instances of interface classes 
+  can be created by using the constructor "InterfaceName(obj->getJavaObject())", 
+  where "obj" is an instance of any class that implements the interface 
+  InterfaceName. 
+  
+  The so created C++ object (map) "contains" the original C++-object (ht1),
+  but provides only the API of the used interface class (java::util::Map).
+  
+  The other way around is also possible:
+  
+  
+  Example #3: A method returns an interface type, or a field has an interface
+  type. 
+  
+    java.util.List  java.util.Arrays.asList(Object[] objs);
+    
+  To use the method Arrays->asList in C++, you can do the following:
+  
+    JavaObjectArray*  objArray = new JavaObjectArray(...);
+    // create the static-only proxy for calling static methods
+    java::util::Arrays* Arrays = new java::util::Arrays(wrapperIntern);
+    java::util::List*   list = Arrays->asList(objArray);
+    
+  On the object "list" you can now call all the methods defined in the
+  interface java.util.List. But if you know, that the returned List-object 
+  is in fact an instance of java.util.ArrayList (which implements 
+  java.util.List), and you want to use the API provided by the ArrayList 
+  class, you have to create an appropriate object instance first:
+  
+    in Java:
+      java.util.ArrayList arrayList = (java.util.ArrayList)Arrays.asList(objs);
+      
+    in C++:
+      JavaObjectArray*     objArray = new JavaObjectArray(objs, len);
+      java::util::Arrays*    Arrays = new java::util::Arrays(wrapperIntern);
+      java::util::List*      list = Arrays->asList(objArray);
+      java::util::ArrayList* arrayList = new java::util::ArrayList(list->getJavaObject());
+      
+  CAUTION: When you try this example, it will fail! The reason is, that
+  Arrays.asList() does NOT return an instance of ArrayList - this is just an
+  example for the case, where you know the real class of returned objects, but
+  the method is declared to return an interface type, that the "real" class
+  implements.
+  
+  This is approach is analog to simple type casting, described below.
+    
+  Please be aware, that there is NO TYPE CHECKING when calling these special
+  constructors. When you use incompatible objects when creating interface 
+  proxies from class instances or when creating class instances from 
+  interface proxies you may get a Java exception ("no such method", 
+  "no such field") when creating or using the object.
+  
+
+- Type casts: Following example:
+
+    in Java:
+      Hashtable ht = new Hashtable();
+      ht.put("x", new Integer(10)); // you put only Integer objects in the Hashtable
+      ...
+      Integer i = (Integer)ht.get("x"); // you know, the result is an Integer object
+      
+    in C++ you should do the following:
+    
+      java::util::Hashtable* ht = new java::util::Hashtable();
+      ht->put("x", new java::lang::Integer(10));
+      ...
+      java::lang::Object*  o = ht->get("x");
+      java::lang::Integer* i = new java::lang::Integer(o->getJavaObject());
+      
+    This is the same approach as for using interfaces: To convert datatypes 
+    from the API-specified type to a known "real" type, you may call the
+    constructor of the "real" type with "obj->getJavaObject()" as argument.
+    
+    
+    
+    Theoretically the following code should also work:
+    
+      java::util::Hashtable* ht = new java::util::Hashtable();
+      ht->put(new java::lang::Integer(2), new java::lang::Integer(10));
+      ...
+      java::lang::Integer* i = (java::lang::Integer*)(ht->get(new java::lang::Integer(2)));
+      
+    But just type casting the result has not been tested very well and may 
+    give strange effects. Maybe this will be reliable possible in later 
+    versions of java4cpp.
+    
+    THIS TYPE-CASTING CODE WILL NOT WORK FOR TYPECASTING CLASS INSTANCE 
+    OBJECTS TO INTERFACE CLASSES OR VICE-VERSA! YOU HAVE BEEN WARNED.
+    You have to use explicit creation of new objects as shown in 
+    examples #2 and #3 above instead.
+
+
+- Exceptions: Each call to a Java method may throw an exception. The wrapper
+  code always checks, whether a call to the JVM caused an exception. If this is
+  the case, a description of the Java exception will be printed out to STDERR,
+  and a C++ exception will be thrown. The argument to the C++ exception is the
+  Java exception object. In later versions of java4cpp there will be some helper
+  functions for analyzing these Java exception objects. 
+  
+  At the moment you could try the following, but THIS IS NOT TESTED (I do not
+  even know, if this C++ code is valid):
+  
+    try {
+      o1->callSomeMethod();
+    } catch (jthrowable exc) {
+        java::lang::Throwable* thr = new java::lang::Throwable(exc);
+        // call methods of java.lang.Throwable to look "inside" the exception
+    }
+  
+
+- Memory management: 
+
+  Every object you create must be manually deleted:
+  
+    java::lang::Integer* i = new java::lang::Integer(10);
+    ...
+    delete i;
+    
+  
+  Every object returned by a call to a Java method must
+  be manually freed:
+  
+    // java::util::Hashtable* ht;
+    java::lang::Object* o = ht.get(key);
+    ...
+    delete o;
+    
+    
+  The same holds true for strings and arrays:
+  
+    java::lang::Integer* i = new Integer(10);
+    const char* st = i->toString();
+    ...
+    delete[] st;
+    delete i;
+    
+    
+    // java::lang::Class *cl = i->getClass();
+    JavaObjectArray*   constructors = cl->getConstructors();
+    java::lang::Object** constructors_data = constructors->getArrayData();
+    ...
+    delete[] constructors_data;
+    delete   constructors;
+    
+    
+  Also proxy objects have to be deleted manually:
+  
+    // create an static-only object for accessing java.util.Arrays
+    java::util::Arrays* Arrays = new java::util::Arrays(wrapperIntern);
+    ...
+    delete Arrays;
+    
+    java::util::Hashtable* ht = new java::util::Hashtable();
+    java::util::Map* map = new java::util::Map(ht->getJavaObject());
+    ...
+    delete map;
+    delete ht;
+    
+    
+  Correct management of memory and java reference counters have not been
+  tested yet very carefully, so there may be problems with applications that
+  run a long time and make exhaustive use of Java objects. This will be
+  improved in later versions of java4cpp.
+
+
+How the code generator and the generated code work
+--------------------------------------------------
+
+TODO

@@ -1,0 +1,1067 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>AQ3About</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>AQ3About</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>578</width>
+            <height>404</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Acerca de AbanQ</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>6</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <widget class="QTabWidget">
+            <property name="name">
+                <cstring>TabWidget2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>505</width>
+                    <height>256</height>
+                </size>
+            </property>
+            <property name="focusPolicy">
+                <enum>TabFocus</enum>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab1</cstring>
+                </property>
+                <attribute name="title">
+                    <string>&amp;Acerca de</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout7</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer6</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>21</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                            <widget class="QFrame">
+                                <property name="name">
+                                    <cstring>Frame3</cstring>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>Box</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Raised</enum>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>logo</cstring>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image1</pixmap>
+                                        </property>
+                                        <property name="scaledContents">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>AlignJustify|AlignCenter|AlignBottom|AlignTop|AlignRight|AlignLeft</set>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout9</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QLayoutWidget">
+                                                <property name="name">
+                                                    <cstring>layout12</cstring>
+                                                </property>
+                                                <hbox>
+                                                    <property name="name">
+                                                        <cstring>unnamed</cstring>
+                                                    </property>
+                                                    <widget class="QLabel">
+                                                        <property name="name">
+                                                            <cstring>TextLabel7</cstring>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>Versión</string>
+                                                        </property>
+                                                    </widget>
+                                                    <widget class="QLabel">
+                                                        <property name="name">
+                                                            <cstring>labelVersion</cstring>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>0.0</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>AlignVCenter|AlignRight</set>
+                                                        </property>
+                                                    </widget>
+                                                </hbox>
+                                            </widget>
+                                        </hbox>
+                                    </widget>
+                                </vbox>
+                            </widget>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer4</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>90</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </hbox>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout8</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer5</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>50</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>TextLabel1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;p align="center"&gt;&lt;b&gt;AbanQ&lt;/b&gt;&lt;br&gt;
+&lt;b&gt;Open Source ERP Software&lt;/b&gt;&lt;br&gt;
+Publicado bajo licencia GPL&lt;br&gt;&lt;br&gt;
+
+http://www.abanq.com&lt;br&gt;
+(c) 2003-2007 InfoSiAL, S.L. http://www.infosial.com&lt;/p&gt;</string>
+                                </property>
+                            </widget>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer4_2</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>111</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </hbox>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab2</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Acuerdo de &amp;licencia</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>6</number>
+                    </property>
+                    <property name="spacing">
+                        <number>6</number>
+                    </property>
+                    <widget class="QTextEdit">
+                        <property name="name">
+                            <cstring>TextEdit1</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="focusPolicy">
+                            <enum>WheelFocus</enum>
+                        </property>
+                        <property name="textFormat">
+                            <enum>AutoText</enum>
+                        </property>
+                        <property name="text">
+                            <string>[INCLUIDA VERSION EN CASTELLANO A CONTINUACIÓN DE LA VERSIÓN EN INGLÉS]
+
+[VERSIÓN EN INGLÉS]
+You may use, distribute and copy this software under the terms of GNU General Public License version 2, which is displayed below.
+
+		    GNU GENERAL PUBLIC LICENSE
+		       Version 2, June 1991
+
+ Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+                          675 Mass Ave, Cambridge, MA 02139, USA
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+			    Preamble
+
+  The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the GNU General Public
+License is intended to guarantee your freedom to share and change free
+software--to make sure the software is free for all its users.  This
+General Public License applies to most of the Free Software
+Foundation's software and to any other program whose authors commit to
+using it.  (Some other Free Software Foundation software is covered by
+the GNU Library General Public License instead.)  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+this service if you wish), that you receive source code or can get it
+if you want it, that you can change the software or use pieces of it
+in new free programs; and that you know you can do these things.
+
+  To protect your rights, we need to make restrictions that forbid
+anyone to deny you these rights or to ask you to surrender the rights.
+These restrictions translate to certain responsibilities for you if you
+distribute copies of the software, or if you modify it.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must give the recipients all the rights that
+you have.  You must make sure that they, too, receive or can get the
+source code.  And you must show them these terms so they know their
+rights.
+
+  We protect your rights with two steps: (1) copyright the software, and
+(2) offer you this license which gives you legal permission to copy,
+distribute and/or modify the software.
+
+  Also, for each author's protection and ours, we want to make certain
+that everyone understands that there is no warranty for this free
+software.  If the software is modified by someone else and passed on, we
+want its recipients to know that what they have is not the original, so
+that any problems introduced by others will not reflect on the original
+authors' reputations.
+
+  Finally, any free program is threatened constantly by software
+patents.  We wish to avoid the danger that redistributors of a free
+program will individually obtain patent licenses, in effect making the
+program proprietary.  To prevent this, we have made it clear that any
+patent must be licensed for everyone's free use or not licensed at all.
+
+  The precise terms and conditions for copying, distribution and
+modification follow.
+
+		    GNU GENERAL PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. This License applies to any program or other work which contains
+a notice placed by the copyright holder saying it may be distributed
+under the terms of this General Public License.  The "Program", below,
+refers to any such program or work, and a "work based on the Program"
+means either the Program or any derivative work under copyright law:
+that is to say, a work containing the Program or a portion of it,
+either verbatim or with modifications and/or translated into another
+language.  (Hereinafter, translation is included without limitation in
+the term "modification".)  Each licensee is addressed as "you".
+
+Activities other than copying, distribution and modification are not
+covered by this License; they are outside its scope.  The act of
+running the Program is not restricted, and the output from the Program
+is covered only if its contents constitute a work based on the
+Program (independent of having been made by running the Program).
+Whether that is true depends on what the Program does.
+
+  1. You may copy and distribute verbatim copies of the Program's
+source code as you receive it, in any medium, provided that you
+conspicuously and appropriately publish on each copy an appropriate
+copyright notice and disclaimer of warranty; keep intact all the
+notices that refer to this License and to the absence of any warranty;
+and give any other recipients of the Program a copy of this License
+along with the Program.
+
+You may charge a fee for the physical act of transferring a copy, and
+you may at your option offer warranty protection in exchange for a fee.
+
+  2. You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you also meet all of these conditions:
+
+    a) You must cause the modified files to carry prominent notices
+    stating that you changed the files and the date of any change.
+
+    b) You must cause any work that you distribute or publish, that in
+    whole or in part contains or is derived from the Program or any
+    part thereof, to be licensed as a whole at no charge to all third
+    parties under the terms of this License.
+
+    c) If the modified program normally reads commands interactively
+    when run, you must cause it, when started running for such
+    interactive use in the most ordinary way, to print or display an
+    announcement including an appropriate copyright notice and a
+    notice that there is no warranty (or else, saying that you provide
+    a warranty) and that users may redistribute the program under
+    these conditions, and telling the user how to view a copy of this
+    License.  (Exception: if the Program itself is interactive but
+    does not normally print such an announcement, your work based on
+    the Program is not required to print an announcement.)
+
+These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from the Program,
+and can be reasonably considered independent and separate works in
+themselves, then this License, and its terms, do not apply to those
+sections when you distribute them as separate works.  But when you
+distribute the same sections as part of a whole which is a work based
+on the Program, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote it.
+
+Thus, it is not the intent of this section to claim rights or contest
+your rights to work written entirely by you; rather, the intent is to
+exercise the right to control the distribution of derivative or
+collective works based on the Program.
+
+In addition, mere aggregation of another work not based on the Program
+with the Program (or with a work based on the Program) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of this License.
+
+  3. You may copy and distribute the Program (or a work based on it,
+under Section 2) in object code or executable form under the terms of
+Sections 1 and 2 above provided that you also do one of the following:
+
+    a) Accompany it with the complete corresponding machine-readable
+    source code, which must be distributed under the terms of Sections
+    1 and 2 above on a medium customarily used for software interchange; or,
+
+    b) Accompany it with a written offer, valid for at least three
+    years, to give any third party, for a charge no more than your
+    cost of physically performing source distribution, a complete
+    machine-readable copy of the corresponding source code, to be
+    distributed under the terms of Sections 1 and 2 above on a medium
+    customarily used for software interchange; or,
+
+    c) Accompany it with the information you received as to the offer
+    to distribute corresponding source code.  (This alternative is
+    allowed only for noncommercial distribution and only if you
+    received the program in object code or executable form with such
+    an offer, in accord with Subsection b above.)
+
+The source code for a work means the preferred form of the work for
+making modifications to it.  For an executable work, complete source
+code means all the source code for all modules it contains, plus any
+associated interface definition files, plus the scripts used to
+control compilation and installation of the executable.  However, as a
+special exception, the source code distributed need not include
+anything that is normally distributed (in either source or binary
+form) with the major components (compiler, kernel, and so on) of the
+operating system on which the executable runs, unless that component
+itself accompanies the executable.
+
+If distribution of executable or object code is made by offering
+access to copy from a designated place, then offering equivalent
+access to copy the source code from the same place counts as
+distribution of the source code, even though third parties are not
+compelled to copy the source along with the object code.
+
+  4. You may not copy, modify, sublicense, or distribute the Program
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense or distribute the Program is
+void, and will automatically terminate your rights under this License.
+However, parties who have received copies, or rights, from you under
+this License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+  5. You are not required to accept this License, since you have not
+signed it.  However, nothing else grants you permission to modify or
+distribute the Program or its derivative works.  These actions are
+prohibited by law if you do not accept this License.  Therefore, by
+modifying or distributing the Program (or any work based on the
+Program), you indicate your acceptance of this License to do so, and
+all its terms and conditions for copying, distributing or modifying
+the Program or works based on it.
+
+  6. Each time you redistribute the Program (or any work based on the
+Program), the recipient automatically receives a license from the
+original licensor to copy, distribute or modify the Program subject to
+these terms and conditions.  You may not impose any further
+restrictions on the recipients' exercise of the rights granted herein.
+You are not responsible for enforcing compliance by third parties to
+this License.
+
+  7. If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot
+distribute so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you
+may not distribute the Program at all.  For example, if a patent
+license would not permit royalty-free redistribution of the Program by
+all those who receive copies directly or indirectly through you, then
+the only way you could satisfy both it and this License would be to
+refrain entirely from distribution of the Program.
+
+If any portion of this section is held invalid or unenforceable under
+any particular circumstance, the balance of the section is intended to
+apply and the section as a whole is intended to apply in other
+circumstances.
+
+It is not the purpose of this section to induce you to infringe any
+patents or other property right claims or to contest validity of any
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system, which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
+
+This section is intended to make thoroughly clear what is believed to
+be a consequence of the rest of this License.
+
+  8. If the distribution and/or use of the Program is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places the Program under this License
+may add an explicit geographical distribution limitation excluding
+those countries, so that distribution is permitted only in or among
+countries not thus excluded.  In such case, this License incorporates
+the limitation as if written in the body of this License.
+
+  9. The Free Software Foundation may publish revised and/or new versions
+of the General Public License from time to time.  Such new versions will
+be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+Each version is given a distinguishing version number.  If the Program
+specifies a version number of this License which applies to it and "any
+later version", you have the option of following the terms and conditions
+either of that version or of any later version published by the Free
+Software Foundation.  If the Program does not specify a version number of
+this License, you may choose any version ever published by the Free Software
+Foundation.
+
+  10. If you wish to incorporate parts of the Program into other free
+programs whose distribution conditions are different, write to the author
+to ask for permission.  For software which is copyrighted by the Free
+Software Foundation, write to the Free Software Foundation; we sometimes
+make exceptions for this.  Our decision will be guided by the two goals
+of preserving the free status of all derivatives of our free software and
+of promoting the sharing and reuse of software generally.
+
+			    NO WARRANTY
+
+  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
+PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+REPAIR OR CORRECTION.
+
+  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+		     END OF TERMS AND CONDITIONS
+
+[VERSIÓN EN CASTELLANO]
+
+Puede usar, distribuir y copiar este software bajo los términos
+ de la Licencia Pública GNU versión 2, mostrada a continuación.
+
+   #[1]Free  Software  Foundation [2]Proyecto GNU [3]LuCAS: biblioteca de
+   GNU/Linux en español
+
+Licencia Pública GNU
+
+   Esta  es  la conocida GNU Public License (GPL), versión 2 (de junio de
+   1.991),  que  cubre  la  mayor  parte del software de la Free Software
+   Foundation, y muchos más programas.
+
+   Los autores de esta traducción son:
+     * [4]Jesús González Barahona
+     * [5]Pedro de las Heras Quirós
+       ______________________________________________________________
+
+     NOTA IMPORTANTE:
+
+     Esta  es  una  traducción  no  oficial al español de la GNU General
+     Public   License.  No  ha  sido  publicada  por  la  Free  Software
+     Foundation,   y   no   establece   legalmente  las  condiciones  de
+     distribución para el software que usa la GNU GPL. Estas condiciones
+     se establecen solamente por el texto original, en inglés, de la GNU
+     GPL.  Sin  embargo,  esperamos  que  esta  traducción  ayude  a los
+     hispanohablantes a entender mejor la GNU GPL.
+
+     IMPORTANT NOTICE:
+
+     This is an unofficial translation of the GNU General Public License
+     into Spanish. It was not published by the Free Software Foundation,
+     and does not legally state the distribution terms for software that
+     uses  the  GNU  GPL--only  the original English text of the GNU GPL
+     does that. However, we hope that this translation will help Spanish
+     speakers understand the GNU GPL better.
+       ______________________________________________________________
+
+   Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+
+   675 Mass Ave, Cambridge, MA 02139, EEUU
+
+   Se  permite  la  copia  y  distribución  de  copias  literales de este
+   documento, pero no se permite su modificación.
+
+Preámbulo
+
+   Las  licencias  que cubren la mayor parte del software están diseñadas
+   para quitarle a usted la libertad de compartirlo y modificarlo. Por el
+   contrario, la Licencia Pública General de GNU pretende garantizarle la
+   libertad de compartir y modificar software libre, para asegurar que el
+   software  es  libre  para  todos  sus  usuarios. Esta Licencia Pública
+   General  se  aplica a la mayor parte del software del la Free Software
+   Foundation y a cualquier otro programa si sus autores se comprometen a
+   utilizarla.  (Existe  otro software de la Free Software Foundation que
+   está   cubierto   por   la   Licencia  Pública  General  de  GNU  para
+   Bibliotecas).  Si  quiere,  también  puede  aplicarla  a  sus  propios
+   programas.
+
+   Cuando  hablamos  de software libre, estamos refiriéndonos a libertad,
+   no  a  precio.  Nuestras  Licencias Públicas Generales están diseñadas
+   para  asegurarnos  de  que  tenga  la libertad de distribuir copias de
+   software libre (y cobrar por ese servicio si quiere), de que reciba el
+   código  fuente  o  que  pueda  conseguirlo  si lo quiere, de que pueda
+   modificar  el  software  o  usar  fragmentos de él en nuevos programas
+   libres, y de que sepa que puede hacer todas estas cosas.
+
+   Para  proteger  sus  derechos  necesitamos  algunas  restricciones que
+   prohiban  a  cualquiera  negarle  a usted estos derechos o pedirle que
+   renuncie   a   ellos.  Estas  restricciones  se  traducen  en  ciertas
+   obligaciones que le afectan si distribuye copias del software, o si lo
+   modifica.
+
+   Por  ejemplo,  si  distribuye  copias  de  uno de estos programas, sea
+   gratuitamente,  o  a  cambio  de  una contraprestación, debe dar a los
+   receptores  todos los derechos que tiene. Debe asegurarse de que ellos
+   también  reciben,  o  pueden  conseguir,  el  código  fuente.  Y  debe
+   mostrarles estas condiciones de forma que conozcan sus derechos.
+
+   Protegemos sus derechos con la combinación de dos medidas:
+    1. Ponemos el software bajo copyright y
+    2. le  ofrecemos  esta licencia, que le da permiso legal para copiar,
+       distribuir y/o modificar el software.
+
+   También,  para  la  protección  de  cada  autor  y  la nuestra propia,
+   queremos  asegurarnos  de  que  todo  el  mundo  comprende  que  no se
+   proporciona  ninguna garantía para este software libre. Si el software
+   se modifica por cualquiera y éste a su vez lo distribuye, queremos que
+   sus receptores sepan que lo que tienen no es el original, de forma que
+   cualquier  problema introducido por otros no afecte a la reputación de
+   los autores originales.
+
+   Por último, cualquier programa libre está constantemente amenazado por
+   patentes  sobre  el  software.  Queremos  evitar el peligro de que los
+   redistribuidores de un programa libre obtengan patentes por su cuenta,
+   convirtiendo  de  facto  el programa en propietario. Para evitar esto,
+   hemos  dejado  claro que cualquier patente debe ser pedida para el uso
+   libre de cualquiera, o no ser pedida.
+
+   Los  términos  exactos y las condiciones para la copia, distribución y
+   modificación se exponen a continuación.
+
+Términos y condiciones para la copia, distribución y modificación
+
+    1. Esta  Licencia  se  aplica  a  cualquier  programa  u otro tipo de
+       trabajo  que  contenga  una  nota  colocada  por  el  tenedor  del
+       copyright  diciendo que puede ser distribuido bajo los términos de
+       esta Licencia Pública General. En adelante, «Programa» se referirá
+       a cualquier programa o trabajo que cumpla esa condición y «trabajo
+       basado  en el Programa» se referirá bien al Programa o a cualquier
+       trabajo  derivado  de  él  según  la ley de copyright. Esto es, un
+       trabajo  que  contenga  el  programa  o una proción de él, bien en
+       forma literal o con modificaciones y/o traducido en otro lenguaje.
+       Por  lo  tanto, la traducción está incluida sin limitaciones en el
+       término  «modificación».  Cada  concesionario (licenciatario) será
+       denominado «usted».
+       Cualquier  otra  actividad  que  no  sea  la copia, distribución o
+       modificación  no está cubierta por esta Licencia, está fuera de su
+       ámbito. El acto de ejecutar el Programa no está restringido, y los
+       resultados   del   Programa  están  cubiertos  únicamente  si  sus
+       contenidos   constituyen   un   trabajo  basado  en  el  Programa,
+       independientemente  de haberlo producido mediante la ejecución del
+       programa.  El  que  esto  se  cumpla,  depende  de  lo que haga el
+       programa.
+    2. Usted puede copiar y distribuir copias literales del código fuente
+       del  Programa, según lo has recibido, en cualquier medio, supuesto
+       que  de  forma  adecuada  y bien visible publique en cada copia un
+       anuncio  de  copyright adecuado y un repudio de garantía, mantenga
+       intactos todos los anuncios que se refieran a esta Licencia y a la
+       ausencia  de garantía, y proporcione a cualquier otro receptor del
+       programa una copia de esta Licencia junto con el Programa.
+       Puede cobrar un precio por el acto físico de transferir una copia,
+       y  puede,  según  su  libre albedrío, ofrecer garantía a cambio de
+       unos honorarios.
+    3. Puede  modificar  su  copia  o  copias del Programa o de cualquier
+       porción  de  él,  formando  de esta manera un trabajo basado en el
+       Programa,  y  copiar  y distribuir esa modificación o trabajo bajo
+       los términos del apartado 1, antedicho, supuesto que además cumpla
+       las siguientes condiciones:
+         a. Debe  hacer  que  los  ficheros  modificados  lleven anuncios
+            prominentes  indicando  que  los  ha  cambiado  y la fecha de
+            cualquier cambio.
+         b. Debe  hacer que cualquier trabajo que distribuya o publique y
+            que en todo o en parte contenga o sea derivado del Programa o
+            de  cualquier  parte  de  él sea licenciada como un todo, sin
+            carga alguna, a todas las terceras partes y bajo los términos
+            de esta Licencia.
+         c. Si   el   programa   modificado   lee   normalmente   órdenes
+            interactivamente  cuando es ejecutado, debe hacer que, cuando
+            comience  su  ejecución  para ese uso interactivo de la forma
+            más  habitual,  muestre  o  escriba un mensaje que incluya un
+            anuncio de copyright y un anuncio de que no se ofrece ninguna
+            garantía (o por el contrario que sí se ofrece garantía) y que
+            los  usuarios  pueden  redistribuir  el  programa  bajo estas
+            condiciones,  e  indicando  al  usuario cómo ver una copia de
+            esta   licencia.   (Excepción:   si  el  propio  programa  es
+            interactivo  pero  normalmente  no muestra ese anuncio, no se
+            requiere  que su trabajo basado en el Programa muestre ningún
+            anuncio).
+       Estos requisitos se aplican al trabajo modificado como un todo. Si
+       partes   identificables  de  ese  trabajo  no  son  derivadas  del
+       Programa,  y  pueden,  razonablemente,  ser  consideradas trabajos
+       independientes   y  separados  por  ellos  mismos,  entonces  esta
+       Licencia  y  sus  términos no se aplican a esas partes cuando sean
+       distribuidas  como trabajos separados. Pero cuando distribuya esas
+       mismas  secciones  como partes de un todo que es un trabajo basado
+       en  el  Programa,  la  distribución  del  todo  debe ser según los
+       términos   de   esta   licencia,   cuyos   permisos   para   otros
+       licenciatarios  se  extienden  al  todo completo, y por lo tanto a
+       todas  y  cada  una  de  sus partes, con independencia de quién la
+       escribió.
+       Por  lo  tanto,  no  es  la  intención  de  este apartado reclamar
+       derechos   o   desafiar   sus  derechos  sobre  trabajos  escritos
+       totalmente  por  usted  mismo.  El intento es ejercer el derecho a
+       controlar  la  distribución  de  trabajos  derivados  o colectivos
+       basados en el Programa.
+       Además,  el  simple  hecho  de  reunir  un trabajo no basado en el
+       Programa  con el Programa (o con un trabajo basado en el Programa)
+       en  un  volumen de almacenamiento o en un medio de distribución no
+       hace  que  dicho trabajo entre dentro del ámbito cubierto por esta
+       Licencia.
+    4. Puede  copiar y distribuir el Programa (o un trabajo basado en él,
+       según  se  especifica  en  el  apartado 2, como código objeto o en
+       formato  ejecutable  según  los  términos  de los apartados 1 y 2,
+       supuesto que además cumpla una de las siguientes condiciones:
+         a. Acompañarlo con el código fuente completo correspondiente, en
+            formato  electrónico,  que  debe  ser  distribuido  según  se
+            especifica  en  los  apartados  1  y 2 de esta Licencia en un
+            medio   habitualmente   utilizado   para  el  intercambio  de
+            programas, o
+         b. Acompañarlo  con  una  oferta  por escrito, válida durante al
+            menos  tres  años,  de proporcionar a cualquier tercera parte
+            una  copia  completa en formato electrónico del código fuente
+            correspondiente,  a  un  coste  no  mayor  que el de realizar
+            físicamente  la distribución del fuente, que será distribuido
+            bajo  las  condiciones  descritas  en  los  apartados  1  y 2
+            anteriores,  en  un  medio  habitualmente  utilizado  para el
+            intercambio de programas, o
+         c. Acompañarlo  con  la  información  que  recibiste  ofreciendo
+            distribuir  el código fuente correspondiente. (Esta opción se
+            permite  sólo  para distribución no comercial y sólo si usted
+            recibió   el   programa  como  código  objeto  o  en  formato
+            ejecutable  con  tal  oferta,  de  acuerdo  con el apartado b
+            anterior).
+       Por código fuente de un trabajo se entiende la forma preferida del
+       trabajo  cuando  se  le  hacen  modificaciones.  Para  un  trabajo
+       ejecutable,  se entiende por código fuente completo todo el código
+       fuente  para todos los módulos que contiene, más cualquier fichero
+       asociado  de  definición de interfaces, más los guiones utilizados
+       para  controlar  la compilación e instalación del ejecutable. Como
+       excepción  especial  el  código  fuente  distribuido  no  necesita
+       incluir  nada  que  sea distribuido normalmente (bien como fuente,
+       bien   en   forma   binaria)   con   los  componentes  principales
+       (compilador,  kernel y similares) del sistema operativo en el cual
+       funciona el ejecutable, a no ser que el propio componente acompañe
+       al ejecutable.
+       Si  la  distribución  del  ejecutable  o del código objeto se hace
+       mediante  la  oferta  acceso  para  copiarlo  de  un cierto lugar,
+       entonces  se  considera  la oferta de acceso para copiar el código
+       fuente  del  mismo  lugar  como  distribución  del  código fuente,
+       incluso  aunque  terceras  partes  no  estén  forzadas a copiar el
+       fuente junto con el código objeto.
+    5. No  puede copiar, modificar, sublicenciar o distribuir el Programa
+       excepto  como  prevé expresamente esta Licencia. Cualquier intento
+       de copiar, modificar sublicenciar o distribuir el Programa de otra
+       forma  es  inválida, y hará que cesen automáticamente los derechos
+       que  te  proporciona  esta Licencia. En cualquier caso, las partes
+       que  hayan  recibido copias o derechos de usted bajo esta Licencia
+       no   cesarán  en  sus  derechos  mientras  esas  partes  continúen
+       cumpliéndola.
+    6. No está obligado a aceptar esta licencia, ya que no la ha firmado.
+       Sin  embargo,  no  hay  nada  más  que le proporcione permiso para
+       modificar o distribuir el Programa o sus trabajos derivados. Estas
+       acciones  están  prohibidas por la ley si no acepta esta Licencia.
+       Por  lo  tanto,  si modifica o distribuye el Programa (o cualquier
+       trabajo  basado  en  el  Programa), está indicando que acepta esta
+       Licencia  para  poder  hacerlo, y todos sus términos y condiciones
+       para copiar, distribuir o modificar el Programa o trabajos basados
+       en él.
+    7. Cada  vez que redistribuya el Programa (o cualquier trabajo basado
+       en  el  Programa), el receptor recibe automáticamente una licencia
+       del  licenciatario original para copiar, distribuir o modificar el
+       Programa, de forma sujeta a estos términos y condiciones. No puede
+       imponer  al receptor ninguna restricción más sobre el ejercicio de
+       los  derechos  aquí garantizados. No es usted responsable de hacer
+       cumplir esta licencia por terceras partes.
+    8. Si como consecuencia de una resolución judicial o de una alegación
+       de infracción de patente o por cualquier otra razón (no limitada a
+       asuntos  relacionados  con patentes) se le imponen condiciones (ya
+       sea  por mandato judicial, por acuerdo o por cualquier otra causa)
+       que contradigan las condiciones de esta Licencia, ello no le exime
+       de  cumplir las condiciones de esta Licencia. Si no puede realizar
+       distribuciones  de  forma  que  se  satisfagan simultáneamente sus
+       obligaciones  bajo  esta  licencia  y  cualquier  otra  obligación
+       pertinente  entonces,  como  consecuencia,  no puede distribuir el
+       Programa  de ninguna forma. Por ejemplo, si una patente no permite
+       la  redistribución  libre  de  derechos  de autor del Programa por
+       parte   de   todos   aquellos   que   reciban   copias  directa  o
+       indirectamente  a  través de usted, entonces la única forma en que
+       podría  satisfacer  tanto  esa  condición como esta Licencia sería
+       evitar completamente la distribución del Programa.
+       Si  cualquier  porción  de  este  apartado se considera inválida o
+       imposible de cumplir bajo cualquier circunstancia particular ha de
+       cumplirse  el  resto  y  la  sección por entero ha de cumplirse en
+       cualquier otra circunstancia.
+       No  es el propósito de este apartado inducirle a infringir ninguna
+       reivindicación de patente ni de ningún otro derecho de propiedad o
+       impugnar  la  validez  de ninguna de dichas reivindicaciones. Este
+       apartado  tiene  el  único propósito de proteger la integridad del
+       sistema de distribución de software libre, que se realiza mediante
+       prácticas de licencia pública. Mucha gente ha hecho contribuciones
+       generosas  a la gran variedad de software distribuido mediante ese
+       sistema   con   la   confianza  de  que  el  sistema  se  aplicará
+       consistentemente.  Será  el  autor/donante  quien decida si quiere
+       distribuir software mediante cualquier otro sistema y una licencia
+       no puede imponer esa elección.
+       Este  apartado  pretende  dejar completamente claro lo que se cree
+       que es una consecuencia del resto de esta Licencia.
+    9. Si  la  distribución  y/o  uso  de el Programa está restringida en
+       ciertos países, bien por patentes o por interfaces bajo copyright,
+       el  tenedor  del  copyright  que  coloca  este  Programa bajo esta
+       Licencia  puede  añadir  una  limitación explícita de distribución
+       geográfica excluyendo esos países, de forma que la distribución se
+       permita sólo en o entre los países no excluidos de esta manera. En
+       ese   caso,  esta  Licencia  incorporará  la  limitación  como  si
+       estuviese escrita en el cuerpo de esta Licencia.
+   10. La Free Software Foundation puede publicar versiones revisadas y/o
+       nuevas  de la Licencia Pública General de tiempo en tiempo. Dichas
+       nuevas  versiones  serán  similares  en  espíritu  a  la  presente
+       versión,  pero  pueden  ser diferentes en detalles para considerar
+       nuevos problemas o situaciones.
+       Cada  versión  recibe  un  número  de  versión que la distingue de
+       otras.  Si  el  Programa  especifica  un número de versión de esta
+       Licencia  que se refiere a ella y a «cualquier versión posterior»,
+       tienes la opción de seguir los términos y condiciones, bien de esa
+       versión, bien de cualquier versión posterior publicada por la Free
+       Software  Foundation.  Si  el  Programa no especifica un número de
+       versión   de  esta  Licencia,  puedes  escoger  cualquier  versión
+       publicada por la Free Software Foundation.
+   11. Si quiere incorporar partes del Programa en otros programas libres
+       cuyas condiciones de distribución son diferentes, escribe al autor
+       para  pedirle  permiso.  Si el software tiene copyright de la Free
+       Software  Foundation,  escribe  a  la  Free  Software  Foundation:
+       algunas veces hacemos excepciones en estos casos. Nuestra decisión
+       estará guiada por el doble objetivo de de preservar la libertad de
+       todos los derivados de nuestro software libre y promover el que se
+       comparta y reutilice el software en general.
+
+AUSENCIA DE GARANTÍA
+
+   12. Como el programa se licencia libre de cargas, no se ofrece ninguna
+       garantía sobre el programa, en todas la extensión permitida por la
+       legislación aplicable. Excepto cuando se indique de otra forma por
+       escrito, los tenedores del copyright y/u otras partes proporcionan
+       el  programa  «tal  cual»,  sin  garantía  de  ninguna clase, bien
+       expresa  o  implícita,  con  inclusión,  pero sin limitación a las
+       garantías  mercantiles  implícitas  o  a  la  conveniencia para un
+       propósito  particular.  Cualquier  riesgo referente a la calidad y
+       prestaciones  del programa es asumido por usted. Si se probase que
+       el  Programa  es defectuoso, asume el coste de cualquier servicio,
+       reparación o corrección.
+   13. En  ningún  caso, salvo que lo requiera la legislación aplicable o
+       haya  sido  acordado  por escrito, ningún tenedor del copyright ni
+       ninguna  otra  parte  que  modifique  y/o redistribuya el Programa
+       según  se permite en esta Licencia será responsable ante usted por
+       daños,  incluyendo  cualquier daño general, especial, incidental o
+       resultante  producido  por  el  uso  o la imposibilidad de uso del
+       Programa (con inclusión, pero sin limitación a la pérdida de datos
+       o  a  la  generación incorrecta de datos o a pérdidas sufridas por
+       usted o por terceras partes o a un fallo del Programa al funcionar
+       en  combinación  con  cualquier  otro  programa), incluso si dicho
+       tenedor u otra parte ha sido advertido de la posibilidad de dichos
+       daños.
+
+   FIN DE TÉRMINOS Y CONDICIONES
+
+References
+
+   1. http://www.fsf.org/
+   2. http://www.gnu.org/
+   3. http://lucas.hispalinux.es/
+   4. mailto:jgb@computer.org
+   5. mailto:pheras@acm.org
+</string>
+                        </property>
+                        <property name="wordWrap">
+                            <enum>WidgetWidth</enum>
+                        </property>
+                        <property name="overwriteMode">
+                            <bool>false</bool>
+                        </property>
+                        <property name="readOnly">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab3</cstring>
+                </property>
+                <attribute name="title">
+                    <string>&amp;InfoSiAL</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout5</cstring>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;b&gt;InfoSiAL, S.L.&lt;/b&gt;&lt;br&gt;http://infosial.com</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignCenter</set>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="pixmap">
+                                    <pixmap>image2</pixmap>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignCenter</set>
+                                </property>
+                            </widget>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer3</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Vertical</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </vbox>
+                    </widget>
+                </vbox>
+            </widget>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>Layout1</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>6</number>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>Spacer1</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>cerrar</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>Cerrar</string>
+                    </property>
+                    <property name="accel">
+                        <string>Esc</string>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image3</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Cerrar el formulario Acerca de.. (Esc)</string>
+                    </property>
+                    <property name="whatsThis" stdset="0">
+                        <string>Cerrar el formulario Acerca de.. (Esc)</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1451">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af400000572494441545885e59641685cd715863f9527381726f01e68a129a6e8052dacaeac690b96b3a995d410390d46aa0b89e9266e17b5524a497676298d9345b0a19b76111a379b5a853a9603755508cda40bc78206e42e1c8f20262350f11b92c1f7510fba0774e16671df8c5218c9ae43f0a2072e33efce7d67fef39fff9c730921d05f879f7a21c04438f7fa9be18bfb5fe5fa1a43cc20c3b6bf121b0ac0a18f16008f9a011e3503ff571a48866f7f4906b609b6748041bd431243e91d69523d8b4112308f31b20b808760609b60bba049849fd54c0c6fd4009061aa83061c380fb6200c05f03f69609b607b5094967a9a910a18739f770c18c03cb64b0a1e5403ce12da1d4b56cbc8c7aa1813601b187d10075f420345e142d15124051150755033e01f80012a90c943f681f6c72eb46f7720812c115481c48082e933703f1b05fc43f481f6a60ded8d76a56eb03d8504d4473e9daf9cdf0fc45e0ceca6015b106edd2c28ca12490caa60120105a1a23f3ad85b037d70fa001a58bb712b68a9d89e62a44e694bf0825547bd265855ea29a807490cedaea5bddec679a5b17f8afabe6c87912f30e3fc1e0c80f2d72bcd90e7b3e15b8da33c31bbc033cf9ee0e8b30b2c5f6aa255a4a5821035604be5e55f9de7f16f3478f2c802cfcc9de0eb8f37387a6491b5d536b347161919c9397feee20e53bb31b0f4a7156efc6b8d89899c73af9f417bb0746585d6cd3596dfb980ed298ba7e6a98b522a18117ef0c31fd3bab906c0f33f3a493e59474bcb85b79678726e81344d63683ea6d76ac5f3b01b114c84533f3d1bfaf6debb1f8537dff820cc3f7776f0fbe95fbe1daebefb49f8e09f77c2a99f9d0b3011d2743abcd7fc286c7d1ac2d67fe2ba73672b4c1f981fbc77f6b53f86adbb216cdd0de1eea7210c4d419a66bcfada4b11e9678e6253b1aacc1e9c6562b20140f3fd15f0a03dcbf2a56500167fb2483e99a309b13401a919cebe727a27b95aa21eca9e0376d1c0fcf139b22c7693b207a52a26111ccaa19919005aeb2d3a9f598acd924ea70060e67b3308a6ea0b31c77838f4ed06e3fbf2cabba0ea500f45d70d07d0989c1a7c6fffbb0380f30a089256c0ba05e2851bebedc1d97c5f8e551b99d158cc45d7a2de91efab570c68146daf44bdee3d0bdc3db01d87a362c083243b255a411a3c975d254d058bc324607b161228ca78122223454fc103bd723880d6ed1895f61ce5bd58f711443aa03b1d8b11c9d80e8056abc5785ea75e4b69750b3289235944686fb400b0a5c5764a4a6ba1b78b06962fade0eefd37f2be06d63e8c8ea6f64fa328f9783e00d3bcd6c420b4da256501ad4d4bb1e958bed21c0057858d4d87f684d2eb7000656979f1a533315f5e3149d4c0eab5261bb7af0330fd9d0629827a65f6f07c057c9956ab051aeb5dbc509425972f2dedf8763124f58af3323c05d3071afce1f71759f94b934307e750afdc5a6f0ffefcf0530b340ecc54ed57983b36c7da87ab6c6cacf1e2cf4f32f3dd39eab53a564b56af35ab94e594dd3682603d182fbb4fc3e79f9be7ed3fff3646f5ce0556ae5e64e3f6754432e68e9de0c4f117628455242986577f7d9af9e3270158fdc70acb572ff0fedf2f333e91b3f88bf3a463594c010a98a829602484300c030045db85dfbdb544d12d10a9f3cdc9294404f58248742726abee80029282965cfe5b1393083296918fe7a887f3bf39c3c6fa75e68f2d32f3f40206706a779b8654b419f2c99c742c85248b83c76b2cc5fe278eac9681402a409ab2f0fd39d63e2ec812132fa989d0bfe4e8a89201d63b48b2dda661342390d7c7a1a2abef4c51440412432a1920a4922209646298da9f3195d7b1f4cf43bf9a643bf6894c6243db1300a38ca4e3192429d617888f19ecab5faa992ab5985b5333b8c421028d83198da914554512060ca475684cd5b1ea30c0e7981e17326595d7a50000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="XPM.GZ" length="30618">789cd55cd95223bb967d3f5f5171f576a343d7061b4c74f483319879b0190ae8e80749c9e4190f4c37fadf7b6b4f99691baaea945d557d32745c0b2995d2d2d2d296d2f0af7f7eb93a3dfaf2cf7ffd351abbf163f8121edcf0cb3f9349b7fbf6dffff35ffffeeb1fc5d5952f1ba52fabab6b5f56fef11f7ffdc3de7d095f4c01fe5b2920f68a3722f67dc49542582d461c7a11170b82dd9e622cef1e09170b946fd615537d15c615c28670a55829517d5f1907c6d58857a0758c5b8a1ddebf22b8e231ff897189f2c3a3e032f6d7f50473f93ae20d2dbf2698ca9ba2602a6f56056f94224e7a8c2b543edc0ae6fa878c03e7af2ac6e7f9ae602eef0473fd98bf5a94f2ce08a67c7f4078b540f9a62098f3278ca5ff35c554be2498cabb4dc6156edf05e20db93fbc0be6f205c65cde7504af6179af782360bed41708fb6dc2a502e7a31e4b45c977c784253fbc0a76f8fcf0c4b844cf73378aa9fdc857c9090e89e0f5552cbfcbb8c2e51573fe9b606ecf58303ddf7f651c08bb15c2e502dfbf2a98db8bf3a9bc520a941fba82397f48b85ca8d0fd5630d7bfad98f86b312e537dfe5a31eac99704f3fd078aa93f97889d60bfcf78839e1fb61827549f2b0ae6fc9162cc0f7782f9795dc5f4bc9d88d756a43e7f2498eaf3c78a297f2498ee0f03c26b45badfec0be6fbaf14537bb704f3f3bd604fe3d766cc7c993dc15cdf8a609e4faf82b9be33c1545fd866ccfc990dc5d41fc55c1fceb735a7cfdb124cf5b92bc652df8162aacf0be6f9782498fb57652c7cee09a6f22128c6fe9853c174bf69105e67be0cceaff555c90f2dc2eb45beff4430b7ff507182f89a7199fdf44a30f3f12698db7fab18eff7a8af752fd83e30663eecbd60e643f3b97d65c1747fa80a0e65bc3f30667efcb360d2b3690ae6fe28a6fb7d8f7085f9f09782797eef2ac67c8be35959d5e7ed08e6f69c1286faa83f6dc5a4bf92606ecfb960beff2be332b7e74130fbd7a162aa6f4330f3f32698ea33c78c993ff72298f2c34431ddffcc98f9f26b82b97dd45e2fedb3ab8c65bcd604337f7b82f9f9f782a93e77ab989e5f63ccfe610e05b3be0a8ab1bc91f670fbcc85626abf25bcc1e3e7717e6c94b4fc25e18d22970f8c45bf35c15cfe4831b5d732e6fe9933c15c1fc6071b616383fbb32398f3eb8213d2e33b6369ff4030e5bb1161c77af12f8aa93d9b8ccb543eb9557c8bf958de95b4fe7bc15cff3e61a9dfad2ba6faef055379f39531f3e5ca82a9bcd9154ce5c38e626a4f93b1637f3a544ccf3b16ccfc6f29a6e73d0be6fadb8aa9fe92e0db35c4478c6fb9fe1bc15c7f5531e55f0ae6fa2a84fd0ad597248cd7b87e8c9f5c90fefb73c13cbe8f8ca53f9b8aa93f7dc13c1e0dc5f4fc7dc6d2fe0bc15cdf5831f13f11ccf5258aa93e2f98daefde09fb15ae6fa898ea1b09e6fe248ab13e5f16ccf5ad315e633d06c5547e5d30f3b7c298c7cb637f7c49daef8b8af17ef34ed8aff0faf22498db7fad98da3f10ccfaad29a6f6dc08a6e75bc7788deb7b524cf5f504737d6f8aa9be33c1dcbf2bc594bfca98c7dfb404737d75c5345ee782b9be6bc5989f78c63c9ea1ac18f32dfa814fb43fcf82a97e7bc298f569cf1453fbee0573fb1e15537f4e05d3f38d63ccfab42b8aa9be4430d777a718eb73d21eee8fa1fe2541c6afab98ca5704f3fc348a891f6e4f90f158574cfd47bd86b2b6ef5630f7af2998db13086b7bac626a8fe6f3f38c627ade0663d68f2d28267d7704f37c38514cf7571833fff646303fef5431f55fdac77a30185f84948fb162aaafc458eabf12cce59d62eaef80318fa7bd564cf73705b33f4c1493bea53db77734ff2e0827cca73d14ccf79f2aa6fea17e12ed6f6830e6e7f9a162caaf0ba6e71943589f772498fde05831e9e14930b7b7cc98f9b4fb8a899f57c15c9edb97309f764f31f5e75130954f1e18737b03aebfc9ad3e7f9d313f2f1c08e6f2678aefb0bfaf8ce5f9db8aa9ffbb82f9fe13c578bfdd622cfe5217cce50b8aa9fc3be15bd17f5f30f7afc598db9bdc2ba6f662fc72bba6cfdb11cccf2b2aa6f27dc2fabc89601eef6dc554becd58f4df15ccfc3e2ba6fef418333fb6aa18f3c30663e93fc613b7da3fbba998f2db8ca5be8e62ca1f3296f9d1524cf9d4ffdb3bd1c34831e6275cff9d3c0ff575b7a6f5d514537e4258eb1b28a6fc3163a9ef9531b737e930bee37c9c5f00f8fec698b1dcffc258fafbc6f84eca5bf313c9598f57f8c97a7e7ba2b1817ffded646f91893b1b7eae9edf9f16a88bfbdf3dae7f842eee688efcee71fd8374f1f0bbc7f50fd08563bfb8ff2de3f9685bb66d3bb66b7b90bab68fff6f63ea41dea31dfc425d3cfd0ebf80ab05570f58e821131dfdf7eccf5a7618eff825ba20bff845ba809ea5e3dfe26b6047768c295e03fc77fcd98819ebda0996efd8e12fd1c5b2fd62689f99810e5c23eef98b7d85f462df30c9f5a2e985d91900271d65b1bd345d2cdb2fe2ec7f87919dd82a8c71ca42b6f79f5db1dc2b5c9191213232c1fa7affaf74318096470efaa0890e6a7f56033f72914e06a82caa77d3d616aa8ba5f805b438ea790b677aeb87b5f0b946c6a8aea88f2d78c604eaff73751179d8b675686715da39fe693d4cb3218c440fe9db1d78d6c40eff48bfe8da5dbbc7e3257a58141be2a8af9c46b82e4de079db7f5a7c01e314f5b005edabb23f100b8bd6c50b7b07ad33d19deb7f945fb481853dd444176386c8c5b881ba682c5817581fd52d2b6eef0fda8f7491896dd0444799182c9889796c0c383a6b2dd02f7e629f0a6dd9b2fb7045267ac884b2b124bfc83311e38ec19f70ae053ad85726a2266accc4e017e96280a3b1887544ce2f0efee6fd5d7b083c1c41dac218a803bed14ab5b16036724ca49a8054fbddba80d5ecf83326c83d97a38b46ea9c35b816a18b13f68bd31fbe77086bc6217071085c3470dff48ce70e6d3c93684daf258bf50b6622214dc0f3860bd0c509ebe2f407ef6b83169acac44477d5b40fad4daf254bd145ea9cc0c6027471c67e71fe43f7f5808526f0d084eb02e6c716ee1d231b97336ca4ba58c47ee445759132318c6a5ca02ebefe90268eed15b2d1b4d7b87ed02e6ca2e713adac2e1a8b6262968d019e020ee3ac5c882ec82fbe5f17511337c842d31620452ef630f24ed96867ceabd259f2b33bf659268aea178bd0c50aeb62f53bcb0fc02722132564e2ca96818b0633d19f6262d1abeabcd8a2864c2c46176bec17abdf597e1d19a8c0b5612c3052360654b1f7011b8b8c3d733b329d21b5c5f985713fa20bd0c04d868902ac2165d0c91ef0b06d77808f384b84895a56170b60622ab66864d690b8535d802e56d82fbe4317d0db027051b005e34d3009b072085cc448ab9c5b4be8243fc7c64f7ac6b457a431678b98b097bfd22fe0895113c4c4ad49cc1da8e30823f0e819dbea9ecfdf5c55ff8e36669d5322add6c274f19d7e013d6b1a7cc9135930f770455dc41843d8c8ae25bd69cf68641df4fb1979c9b3d0c87a4571d1baf86ebfd8370fd121988947d342e73cc4d8b3ccee59e733ef19f7fc9b4c7c6b86e03e84fcc22c621df93ebfd8321dd3454ddc9b1ea616eaa284f1d6beb2919f25c2c6606a2d79c98cf7b7f4304f13e3ec3e8498a039f20bfca2cdf3236aa2a76c58f08bc80479c61ebb677f2af6fccc3dbfa58d293672ab696e0d81c87ff26bfcc21e6734915e49f451d0c635b07134878ddc5a92893f53465ea6c67fae1e729a9889bc9189aee91317cbf60bdb654d24392606185fc459925f4bded13babe89eb959923231e31bd33af98c8d41434e7b7586101bcbf70b78ea15aea0f7e6091818020743fc045d301bd7bc96ecf35a42baa84eed4be6c5a0df7f653531e09947efe09109fb4e5c2cd92fb632b363044c0c501331dd011757ec19c79fbae7c7b36466fc3f66c3e6f7a6357eaf0a5e6122fbcbf78b21a8a2a59a1899317010d308f9b0e81895b96b49d641f3da184f69e355cf2f3ffccc9dfe8f643746dfe5885e119fb76cbfb03b30fa8fa889383b26192606e619224f724f594bf6a7dcb39b714f6562d6371a1ffc3bf5094803688db03160365af4061175b164bf40afb86726a2262690b2dab8636534712d995d59ab3333659e36c40b7249f2245ffd46bc82bca807d7bb7931af766bc97e11bd427c62c22c4c38c5abc5ee99ce92ed4f3de3236dccf43eeb11533344d690586f95bfab13f9df5aae5f408415f71da92626aa0d6204630c74d012ee4cd2b5a43e1367641919a7da6870442dbd6d64d69a4626dfd277b85a1857b4f59b6d5dfce6533c61ac2fd32f601e5a9c21a20961827431326f901ea14c873de318e6c91eb051c7f34fda97e4e38c196d701a343e9821929f9b1d037d0f535536268bd0857967bf7898c96b821f3ca1374c4c15febf099f9b194646e219c84693df10ec67d8483da3976123ab0dd1c7208b1bd99fd1ea99ee3d28aea0d5b4cadf669bc81c59925fb4615f1af7a3a3a919425764212aa6c62beb159e8136f12ddaf6cc9eb587ad9f9d2583467ea6a47e914655c2c490bf152bf3adc39a88ce149fb6bd3cbfb0db1061b5b0cf63b8b6386d66fc62c433a585e73b0f73e38c74a64cb3311d8b8e19cbae4bdf93220b438d31a99e9e7ec3316aa2be64bfb8e1b862ccba486788f8450dfeff0625de609e74a6e28cd95952452646ba3f99d68668a095f96c311b2d2bdf94967ad235a48fbad8b6e5a5c5175d5e4d87395d4c304d501723d5456444a2ae2b7ca748eb097d7b2d5d5dab389ed3da48cf2d530da45a68330bb2ef98f07bdbbe7ef6f1dcf9d05e2fcb2f608644af18b0736e66123151435d0813a88d399eb195f18c6a664cf36bca406348d140aa0561a2a34cbcf3ac88dfddeb9b6df48a727c5fb334bfa019424c902636316daa83a67ed1cbb07135970d79079fd546ba47a177f3e4b06df682540ba487aeb2806b067e1b8a22bb5d74a76be262097ed1361decdd68ca2b522646395dbc993aa447f48d7465ddc5595237db995992d7c6083571a991537bea937e93e2923511df38f45913dbf85ee688fd299eba563ed5c531ac8a3b7cedc21ddfeb17b7f6deec997d73600e335eb199f10b992947e6d89c9853480dd33467c0461d56d81b8cba888d7c0c5ac55405a6cfcd05a44b53871ebfebc8cf5e709ff90aedb9b2f7f6abb9c6fd4ed44119aee84cd7705520eaad1017d3630dfbf91d73630aa66856cc2a24f92c993270fc995f2466cdac33c6cb54ccc68c262650ff89b3ce4cd55f74ce79b3eb02b2716cd7918d5d9750bebb8de36f76dc5deebe82bb8772d2f767fd57f48623f7e01eb3ed712dd78e4cb80eff24bed78d6c148c9fa70bd7753d78f2fc5470fd8ffcc20ddc136bc4673fddd08d54131883baf187f5af0043cdb8aab889cc14f74c79eec5bdbab7b9f78ca11c7df7bf9f7eba77579ddb9e4da8bdc6386a6203f70a4ff374e1b68873b70deac519e2ee9dcd8cc5e35cbf7870757cd2a3db81d9b1ef76dd5e6634f6790dc1d9e1de684cdd9d3b300d77082a3972c7e958c3f34e4cd75eb9d3384b5c83dbd3040e637ec19dc519e2cedd8568ca5d4e33619f5285baafeeca5d9b2bb7cbf8c61538af14df659a6bb8e67e5fcb756186bccdf842d79c8a36e6fa453a53e24e3d9e638d5d51c76285674935b2e1c66e35fe6d997465756b90d68119d1c6c055cc9d0be0a5c7306b5403ce99237cfbdca718c46d489eb944a7a5b7d4f0e986d42eb3ee2dfa033aa5f1de64db0b91319d328dcd0fc617a0111abb9d397e019777e837757c0b721d9fe0d3bc90465959167c82eb08ad25757f4b1af077c844175cb2e3ef55930577824c74313ac2f30eb7c15adae25518ddd13f705fd7fd2396a3ef0a1ec635cab7327ed6c31808d9f8d1f802541dc7c1cef10befdbfcb37226ca1ac33860be37a4098e3927c0417665ad618c012babefe0f81fc32c0136e265ceb2638fd1d1be46ebb077f1ec6fb88fd9470decb9af34f6be870cc89a71154f4b604e54441b7cc6167dec877f7f04d6311ca3397ee14d1f7ff608aa6e616c11f71d131f98a97e36e60426848591ea22aea88fee8835804ca02e06ac958e9bf827bbeb87512f1ca302237ec43e53c379031af08fe213901f4b5d310b8f1801d652b5f269e3d88fbfad0bd38718a39349651ea3ceb45ff809e3b6bd32cfc8049d5b4c5c8bc7e839ab0bd1847f017ee5ba0447dc620d1ce92cd9a167fa573f84d5e518188b516b7c3b7d174f3f3caf2dfe1d4f0b2192f755d2a22b62897b64e08dd91fc439aa7e2127099b1febc2ae4fad1dd39f0fd37ee1371983fff39307b44765b7f2304d28f246167ccd6ff9ed0feb5f3597ee042ed086afd3cffd4ed405f44b62d5783d83e71ef27d97515731795e2ffc5ecce7abc7f70d90910a97001ea226221bf37501ebc8c7ebffb42ea6f623e06d057624e6dcefb3628ba20b8818ec37ea8fba782436cc11ffac094cdc414f26da2bea6583f3cfa5dffe80b57a8858ca8ed8b1a37b0fd92f280a1c7fa40b882bd2986ecb94350e8f91c6168fc1c38c5fc87e641b5adfd3952abae7118fc131cd0cd787c851e202e3c630df4f606c31cef0b710439036441715d445f48b1d7f823da945a74dd71fd445117581fb1a7fca5c78e6e28dcbd762c2fb275222bb579ad5856a229e42cebcc597b93beb17aa8b7d5c51655716fda2486300baa0159535e1e28e82dd33c617d493d8335a33a22ed0334417b03eb9be4fa457910d64e4748e2e68ed3ae432a807874cb804239c2173b1e9fa94888ba9bd08c79cb0039cf38d06dff8a65fece3298eec51e38cd855bf883ef1ae31673fb386d4654c611d51bf3077bee94ec42f5c33f6cae598f067f013f18b0bf8c9594ca95fc4fc54130e13b251115db8fe47baf0e7ecc9e7f3bfdda17b9519bff017aa8b84df0eb15f388e6dfc25eaa2cce35e9eb3aa4636beaa2eea537e518619833df1894b59c9e922b203e98afde29a5888e5633ce330c11c5dd7f8226a82ce556674019e207e308f8b897afdac5f487c51c008fc89cf354799f882de939cb21f9c7384a5973f052e76752d21bf38615da05f20170d873d8374e331a95f5c40bfcf900dde6d980a9521e67c31de094c245e63659921314deb42fd60771e1799f565d62f38ee8c719d5f75efe09db1e7557743f96e97e38ad38c2eb29a405df8d227eb48d99fc00ad420369091328e37ebc2af2113ebc886ac991b3e91d2785fbcff196688ec93cac04d99b431a38b47f68bad39f3a3ff597ca1fb9112be21ba265da4115eb01457b812fbc538eb989c9ad3f14530d9f822381863642278664274817e812c94232381d5e8f67c21968be5998d4648d2160313fd8f7401e35ae07169c2986767473ee6988d2f68efb78a7ef104ba18f30a426bc88a3ae973b8a53a02bb273112eef33107f8c51db1a15a6d8607eccfb3cc14d286e8c2bd000f0925e8fd23c79e7ba145e543db35fcbbeb64db0bfe884c848e9bf3bd1cdd8b46aef9fc022200c4a12bfb91397ec1e717a117fa6100d753e6fce20976a6f27e1da28934c694f38be898888f753f72896bc809ef53a356cfc12f6086c0183754179052bf001ecae821f1b3903edf54c2308cfcb19c66b98ec417a40bd2c6bcb853f71c53c97fcdf8c99cf802cfb5a6ce90501343b7ceefca781fe2ba1fc49b108dc55d3bf905cd9030f6751ef72638086a223291b221ba0893ac2e7c39647c21df9ef0a2f1c52e6902c66ac62f78acdf32b1277e8657d7d77566be5ff07967fe7cd154cc817ec34076e890c21bf43bb7ff08efe0167588196ff9e747c40470c1e717a18a5acf69027aec337e5146bf88176a236cfa2bdfcfb7c7afc4d9a2ba687cae0b3dc7dae5c8fbeda333f0b9f74d42cdec872db8b6cd21ee40e42dc044dfa38ef014e705d6123c030f6fe68cdf0a001bb27e10137884f1e09f02e4871d9af7793662e2d931f3896ced8651bcfc4ad813df90fd48f48bb88eccf78b9f4e719f0af145d80ffbb99991be1d9a1361a52cc02eb3e99ba20964a20ed701b061880562827de186b5f0519232bc96b0d7347e4c177f37d936acaab08eb8f770188ec2718e8dccb905b331caacaa918d7aaa097f429a701364e3249ce29826aa8544354071c5ec67ce3f2213787f5c83327e1153d4c61274510b8da80b64a389daa865d6909405798faaba889a98991df5383f401367e10074b1133cf72e1dfb7549e19c52f667398d2823f099eae27979ba8074685af6c93e812af6818d8b399ae829233d39e794591257d278b2171c5ff57882036c802e20864ad928ab06d6f19aff491ac96be3927511d7148843a32ea26f2c4117f48e9d74b10f7c1ce2f70e0633efd6b3ef51eba40bd8a5a22698893ac4999185af51177617d870fe0cd9c869225cb126aef39f53da48c437306575c19eb1145d6c99c4bd5b744fd0c561b8a1b3a4dcbbf55417291b8f72f6cdf323d5c4997b0d05b88aee14f86aa036d6336c9ccf4faa8df54c3c4ad138fb85e822a6a5e8a26dbc813902ba88b3e41066899ebaa66f86f4ec7bfe4a5aa7f543bd029830dbf6d9b6ecae3f85f84018b80e2be11cd2dccf9c4688919b195df4c53396a28b21ac24d7b4aae25a72886b6b6d7a0dc9ecccc839eff233843571009a388119528cdf3e003e46763bb291d70033904bf0f31566624a1ba08ed5bc5f2c4b178df8b6e8debacc2cd99f5a4352c7ac6b5cf109137015a32e5819b5701a4aa88973d6c079fc6bef90ce510ff289f9a48dbc6f00176bac8b0475b13cbf80d8d3af46f70c17a40b9825637c3b34ed15c4087b85ce10e72691891861b9d7f8ad8350604d3ce3dfa21bdb3af4a6e4cbf3f5a0e97cc637ced4339e727ed158a22eda74b685ba3802468e908b0fe20a5e49f11d59f40a62223b3b541355fc4662fc7b69bb017b87634fba984dd7323b428557d934ce38505d34d83396a50b630bbcaa927bc2457b90a9484bd6903b5d3f38c2f243ff345713c046d80036deec20b1b167392dac4cf9453931fe247130a7ce391e61cf50bf6890732e51171063d02c5136a2836244915b43ea79d74cf71fee953551504d3cf3f7c2e9af96bee209d336f4bac23a5861afa0749df830b6132ef7e65ee38e963511e38cac2e9265ea0276fded186f59594ba2833663d495848c57685ce19bf45d0b68fd556423ce10650366083251d56fbbd2dfe87bc5dfae9a242654922409c1d863bbeb4e037416547002a5c77c2617f918813e6e7d19ac621d63cf553e796ca7abeab274016cd8a80b2b9e213345de6de6f7a65dd4453ce6be13af800b99c869427fbf1d7fb38a7ada4aee9307fceb9ef43b23035b05f65a9affc26c3c278f492be6c11e38f995bac0f7244fb9b58456d76333006dd06ada9b1f57ccf18a9c269236fe95d6948dd9eb3597277f93f19573fab0620d737ed190357539bab03d5d4b2e5817a28d413a3bc435e3371a8489fcfa218ea9bf1f30fe94858f7e7f997e7315ee4e3a109f98a49bd34563b9ba68c4b703f7ea9e4dd64664a389f1c6297f4340d710134f2ac02becb1c415c0445fd78f54133fcac60b6b033c06ee7fb37ba696f4d42f12f58bfffdcfbffe0fa6cd2962</data>
+    </image>
+    <image name="image2">
+        <data format="XPM.GZ" length="26460">789cb59c5773e43ad2a6efe7579c18de4d6cf0ab2a9a2263632fe4bdf7dad80b58fa2a4925bfb1ff7d9378939069a9bb4fcf7c83382a3d02086426128904583dfff5afbf2e0ff7fefad77ffd63712fee2bf5972ac5dd5fffd20f5df7f2bfffcffffabffff8e77892fc15477fe569f6d7e49fffe31fff0c8bbfd45f416ca76399f51cec324f64eaea75cfc988eac1967922f39e85648e64e2ea85e7a963e3784ced5dfdd1bd67d44bcfaebfb0628e64d473b7e47842e3c7ae3e608e206fe8e44da2e9586827fff6c072ecea95678cd7314f24f42f3dbbf1c2dab393579f314772e4fa7f721c4f47c2bafa90792c20ffc2b374ed1bcf4ebed0338f37639e08e3f861601ecf7a86bc2d73047b049037a1fe5c7bb3f0ecdaeb2be68910eef9b967e5f8d6b31bdf86cc6cfff0ce714afa3af96dc23c16cefedd1ef304f6eef69923b6cf8ae3293deffca7dbf5ec9ed7d5c090bf58631e0ba75fa13c43fe7bcf90ffc6b393dfcc982702f33df2ece6c7ec3047c2cdafbc769ca506ed25facb483ed77ff7ead9f51f54cc63b417779e5dff6dc03c11ce7ef6d6b31bcfac7b76fea1f63d3bfb766ff5ce7ea6668e04e6f3c4b3b35fb1eed9d9a7c2f839c9ebda77038fd15ff0cc3c61fb9f3347b07775e0d9cd978c1d8b5443fe6e85d9a23ed8020fe38947cf880f13cf4e3e79ebd9d937b8621ec35e81f1ecc62b8467676f75c13c11ce5fca67cf6e7cd3314fe1bf1af32f495e377e8d7823a7a31cfefc3830c6138967ccef8367ccef0af338477fd1c090a70e3dc31e4f9eb19e52e649eef4af9567e75fe5edc0980fa33d3b7b97437f11fa2b979863e8676f9813cc6f79c5aca5d3d7c05f15d9c3e957215ea841ff70ca3c867c61e219fedf0e0c7d5bdf1ee3aba17e92c35e279e9dbf57e1c0c2c50b7befd9e9a32e9963f4dfa49ee19f2bcc5ab9fa6a95d948275f0bd634bf4e9ece33c7abd033e249cc3c813f34b967b75e9a1173047b340be618fdd9a13e81fdf4305e06fb5aac2f13c7b1630d7b99d4a0fff67260d8432c982dec61469e5dff2de2a321fddcf8e2d0b3d35f6c0f0cff0b33e631e6433d7a76f3d11e334f72d7bf6a3c3b79eb7de614fed7bc326788f7e53533fb97453cb0c92475ed05e6d792fc589f63cf4ebf62193cc8afef06c67cab57e631e42b4e9853d8bf6a99739ecf1d6685fdb12c98b584ff2d7b76f2b66ebc741427b19b5ffb0c4ee2d4f5678ec0e92473e3b5117394213e8e98e30cf1ed8959627eda8967d8ff014cfa423e1e9ffc07fe1e324f116fca556681fda2119e9dfcfa9a5942ffc2ed7fe998ec8ff9447f63920ffe77cb9ce5d84f52660dffaf1e990de6abd963b6f07ff3ea19fbedd09f85fc0afa8f493f375e7bea19f1608799e733e4f1a612f3655d7c4f27b14ce0ef2f6092cfe92f226683f1bbb581d97e9ad972fbd8b3935fd703c3ffda3330c987f1ce99c739f4e1f168fd3b7f6f979963c4177dcc3c85bd8a5de61cf365536681f9696e9825d64fb5e4d9c9530de329e49f16fe17917f623f9a328b04f1b7012749eaf46be7ccb4c33bfb08cfcebe12fd47e4bfd84fd799a7999b7fb5ccac307f6689d9c09ef2d9b31baf9c315bb46f763dbbf8d6717fc37e1bf2f8d304fd35e7cc29e64f2b6681f55f96cc6c0f057f8cc99fddfa6b6be63483fe05b364f9ef9939de9a15e6c19f0fc0347f6e3e9a983947bc330db3443c2f5dbc49693662e7cff6109c90459dbe9a99322ef7fc29334528a75f061eecdd586695bbf1ec1333fbbb14cc06fe290e3cbbfe3aee7f58ffa51d18eba919332bce072e0746be6de1bf691c45ce3e3264ce62c43fe63e6373f2e79ee1ef0933ed78ae7d00a6f9c07e6b98658e7cb864d6981f1578467e2e982dc74fe84be7093c5fac32e758bff59459f2f9e2d833c63ff18cf80cf9a7f124c27e7ec01cc7d067c19cc4ce7e7ac2ac12379f05e6774aebcd8ddfec33e7d82f74c32c52179f24ec3fa50887fc8bfba3fd04eb37658e33f4b7c99cc2bf1bc52c33ec8f7a60c4a766dd33f2a98099fda9e5fa698ef527315e46f115e7ad86d92458bf583f593249701e3c608e52671f0bf9329a5ea7afd86166f9cc32b386bfea176603793bacf78cd637e6e7cc33f2b50b66c9f119eb21a7f5e6f4512bcc39fcd36e78c6fe7dc62c63e423f0f79cd61fce77b07fdeef984ede9c7902fb17b7cc7986f3d986679ccf2cb3cadc7a296e0686bef5985943df6aee19fe75e619f97bc26c60bf02fe94d37a75fa163c7e36c279be803d05f92fd647e519e7bf07e608feadd63cc37f6e986d827800ff104994201e6d3127a9f3ffba60ce90cfb563cf18ff8a59223e144bcc94313a7b433f41fe8df3d12973027bebd233e25bca3c85ff8b7de63c43fce4f1c9dece1e8ac723ff76f2a89a59613f2902660d7f6b10afe5b0fe8b57e628c27e7dc22ce14f05fc552631d6439b30a7c8af24f23749fe8ff302fc87ce5b7cfeef980de6b3467f2a8e31bebe674e303fe5509fc458df15334568377ec99cc538ffc3bf14ad57e4b337cc718a7c25634eb17eab2be68ce3d729b3463c6f591e9a0fe4df5c4ffe8ef95cf38cf13bcf90dfb767ffdf64d698bf7ad7b3b37789f5a7a616f9ae62fd33be1fa958df2c41fe5e207fd0f138423cd8f58cf318e2a34e288377fac4cc09f437c7cc598a78f0c84c33e8fc8dfbeb4f20eef967cf588fcc143fd0ff82790a7f362fcc1c9f2bd84b537cc3fe8e7c5d677cbf53737b0ac8f08f3be68ccf27c8374c6422ecd72fcc36427e08ff37e40fc88f0e98550c7fc67c18b207e2b7621e2790c730478807d58d67ecff90d70cebb1eb9873e48f15e2a921fd5cffe5c833fc87db4f35f26581f9b6243fce8f78dec623e85746cce308f7279967f4b7c93ce57ce585d9723e8c7cd4d2fe8bfba73d6683fdb81403637e25e283a50c13f9e219b3e0f3de2db3e4fc929fcf46ec9f1533dfa7b62efe4e47919d60ff9f0e0cfdea6530e983f3d813f304f3691e99e308eb413027881775c59c22de77129c24884fe68439437c2a3b306540d07f8759623d96d233f63bc3ac108f0b9687f22dc4875d30e9efe64f4d98f97eca6c3367f0677dca6c14f66bb77f4fc7243ff6cf3b6601ffed14384911cfcc05b3c07ea417603a21c1ff05738cf5599f3127d8df6dc19cf1fede324bf86f01fb8f2981c37d1ed793be6ebec21c9c8df8be86e5cbf83eafda619e42df8ac7cf04df4fb978319d903fe0bc74041efc5b9d304fe10f729539c37c5bcccf24a10cc6d9e38a59207e59cb6ce0ef12f699f4370c2ebef37834ffd86f12e61cf1bde5fe693eb1bf6866beefb39087b20796bf61b613f8cf1e98e4c77d79cd2cb15f994b30c51bacef8039427c960f9e915f5c33c709ee0b72e604f9695d32679cafec78c6fb8667668578dfb59e717f8af989c81eb82fe1f1a729ce1f55cc9c41ff86e5c912de9fae98a77cdf6e9873bc8f52b05f1c8f26f0f757cfce1fbb8a59b2bfc39e71328ee15f23e618f71ff29e799a20de0cf594c13a7bac321b9c3fba82d972bcc37a8c693d38f9ea15cf909ffba778877c00f313937e4e1e85fe293bc17cdb75cf386f1e83e331fca3d9609e223e35b04f42f909f2ff9239c27e54c6cc19f69bea89d9e23ea3807c948d62bf35e7cc29ced325f74ff385f53e030ff3a5979905ee0faa43662921bfcb2fa729e983f3ca8367ec6f98ff94e4c57dcd1d330564274fc63c853fd69699f5290f9873c4e712f3df1fc870be437c4b33bebfecb69825fc49a2ff69a4215f7ded19fbc723b3993879c48cd98e614fec3f34a1c897eab967f8c30eb3c27aad369829a372f5f0370a8ff0bf52331bc4e302f337ed6f7c5c7bf8f394e603f77ff0bf69c6ef4bda7de604fb49c0f2678adf27df7a463ee6ee1fa6593c1a63fc2de678e2c6abc6e0fe46c731f6273a9de27d5da5990df2a912f13b8fd404fbff2bb39ee07c5f7b463cec3c637fbe61b66c7facb79cd637e667c63ce6f5b1c69cf07e6f9853ecf715e2634efe83fd83e5a109c2f914f6caf391c27e8a7826481ec4f76dcf4efe20673663e4db43bd9960bdc13e82d68fe3ba63ce787d3d30e7d82f4af8a7a01d01eb0dfb8b20fbbafacae55f5349fde3beeb89d9c21e02fa489a3f7cbf20661e8fb1beaf06467cac603f3a6fe1fcdec13e32e3fbef628759e3fe3428990de71b8167f8770ace473cff37cc63ac7f057f529182bdecfec0b0af5d63d663bc5f6998cd18fb11e2a1a2f9c77ac0788ae239deaf427e3a1de1fc5e2f79c6fd26d69b8e24c65787cc0af6a96e3d63fc82d98c615fc4731d4f397ec1be74dee1f81431a7885f769959727ce2f168bee1bf35b3443edc607e7566113f0be40b3a9f48e4df18df0cf6ab3acfd85fad67dcb7c6cc7aece643c07e268ec7d8bfe7cc39f2df1af6a1f30be2515933c7b06f89fcc950fc01b33ce41f789fc0e30df66f22668bf72715f24743fe00ffcb9913e5c6d3f0474bf23a7d02d88bce23acdf887902fb0747cc11e6abde6236c87735ec673383fdb572eb2b1bd1fc235ea7cc0afea5763cc33fa6cc7a8cf839f68cfcf61a4cf6c37c397fc9c6d43fde1f2c332b3c5fe49e717e4c99f518f72753cfd0d7305bcc5fbd09a60d1ae7d52370c6f71f66179cf3f7814a17cfb309d903fe9280c91f71be7b01678adf776e321b3e4f42df49cedfd7512ebe655124c66ebee412b3647b8c3d63bd186635c27a1ada2be86b52660d7bb7989f2893fc7e5f83f34ca17fb7beb398c6c7febbc12cd1bf5c1e18f656c7cc6a8cfcfbd133ce4fcfe07482fb996a9d39473ed742de38e7ef37a96be698df17c11e09c903792f3d23fe6f32b37c25ec93a419f22d3502e729bf3f80bc29c98ff80e7fa068027fee307e9a2b85fddaed4fd934ca47b81f2a3dbb7add318b11ce377b9e71ff590d0cf9c5d05e8eb0fedcfaa5c39c1821bfb39e71fffe56effa97f0c73c8970df203699639cbff49e67e87b05ce33e4232a67ceb15f344fcc46e1fb5eccb40163fee0cf82f485bc136631c27a569eb1df607dcb8896acabbf63ced1bec83cbbf60173a2703f28a0bfa27aacdf23cf88df27cc6c1f710a4e2cde7758cc97227d111fef9915be4f11c29f949868bc6f71fb61a6a93fdc874d3ce3fead068b48e1be02ebc744d311f69f5de68ce595ccf908eb07fe64d209de77b6881786ec8dfdf3002cc6b07f3170acf07ef19539d3a8c7f896c6c3f3579eb17ee1df36b788f7f50d584c20bf70e7c57c94c678dfd71a709e211f099fc1628af1c217cf78bfe9fc3f1f93fef83ec61298ea612f379ff984c6c3f7833699a71aed973de3fb8f2bcc9946bc73f253b0377c9fbc0f4ec77c7f7c09a6fef17dc855e654e37e63cd33d6875bff949e0ae40b0df48fc5f0fdcb0de629da87eb9e115fa04f42f381f7fb5bcc29ea03375ff9344df13ea780beb950583fcaad7f3a0ce5c8776bc12c105fec98d9c01f8dcb17687172bd31cc9af571f13a3774e2c7fb7c974f91f35ad6cff93f693782ff94cb9eb13f1f31471aebd7ad6f1151ba8578c12c2cfcb13a05537be4f76e7e44428cfda562ce35f203b73e452a13cc6f80f653ca68705f8f7a4aa8219f70f9adc8a716f71935e4cba532785fe3f21d4a9685467c5d304b03fba25e527ff83eaf5bbf643c01fdea636689e74bb73f092dadc17eebf221612800e13cb30656b171f6af219fa5f6584fe8dfaa89413c74fe25c799c0f9bd5e80556a311f2e7ec8894a0cd6f335f3d4e23ec7e94bd24706f9ee2b7362f0fe587a863fac7a46bef2cc4c21c0e9038ea5c57aad0fc12a85bce11ef314f229176f497b1eaf99334f319e823eb45d67589f902725fbe07e6fdd33dedf6f33f378d5c09941fc7c621606f7316e7d493a2066584f2f60ea0ff7f307cc29ec631f9859befa9e39677b3c320bb6979b4f99a918fe1974cc09fa13b07f4ee321bfbe639e1ac4d70766eedfb4603db64e7ee1fc598a5ce07eb983fd246d37587f904f91feae3fb9c3ac505f9d7b46fee6f653a9a586ff0acc27ed161adf07df638ee08f01fcc9aa11af8f8a59c2bf5be74f6aa472c4e7c6e53b7478d198bfc6d99f7a1fb33f1e322716e3ed304fa16fe3fc9f8e9396fde519ac238bf3c20373c6f671fb858ac93ec8b714588f30bfe52b7364719f76c59c5a7c9fb660e6f1b5f32795d0f115f7c3032716ef57f17cff8215fe7d0f26f3e23ec4ed378a0e8c3cde0b736a610fc94c471a37bef68cfd70ec19f1dbcdb7ca748cf90bee9953b4ef3699b9bff28559b07dc0b94870bfd4c1de39b5c7f73b76993396cf9dd795d253e85fb8fd4869ad208f72fb1b3997c2f8c2f91755c678bf5162fe293a60fd7737cc06f3dd8dc06602f902f73c1d9624bedf57ed83b5c67c772e3fd513c3f3d3c5cc3cff5dc29cf3fcb9fc4547f43ce67f0e3663c8df74cc3c7e37661efa9b32737fd2e9affbe328ea27cc5cdfb9f38f4ebc7ccedf753af417403eda8f70df5a9c82491ee4c777cc11e4132e9eeb4c6afebe37f4c9257fdfabdd009b18cf7739338f57ef31b37c35e4115e1fd42b9372fd2bf314f3330b99b9bf9961ceb15e8aa19efdab72feacf5a0ff2c60ced07e263de3fb1447cc92ed83fe8c617f9e69e61cf2147bcc8afb77eb5b5b1a0ffd0bcfaeff99db6fcc6890bf5902db1158b978612646b3fece7e2632066c27cc96fd690b6c391e072edf31b1e2f7177a076c783d345c3f8c279c7f9944a5382fd82bf0307eb3c2cce335abe0e1f92a63e6f1b5db0fc95a3c7f95f317d29efdb3da624e585ef49f2983fba76a0f3cb46f66cc31d80cf53cbfe111f3601fd82b1fda4b17cf8da08888f33633c98ffdf89699e50d877ad65fbafdce481d2b9cef31be1ce4d34bccc378e7ccec6f9565667f0a4f98b9fff09899e5d72ede19da2f311f629539c7fd8858036b3e5f34cc96e385dc641ed6fb13f360af03661ecf405f6d79fd550533fb738bf9325ebf0b66b657f7cc3cc49b47e661bc7d661eaf73fb23c1d0fe8e99db1b371ecd0eaf8f4a3173fbf09499fdd13879ed5853c2ecfa5b8087f6b6611ee6d3f937598bfbd7827990e79e99e529b699f979bdc93cd80f1c0df62e1f98f9f9ee967998ff2b66965f3afb9075f9f9da3073fb6ec6ccf3119e310ffabb784bab6988278fccdcbe796066f9cb9479f0b7e1f9411e77bea4d9e5e7ed94999f2f8e98f9f93a61e6e7addb0f491bae0fcf99b9be75eb81a4e5feab8679687fc93cc437e7af3637139c37d51c3c3c2fcf9887f574c13ce8e3d69b1586cf7f01ec2986f18a43e6a13dfaf7eb515a66ae0f305fca8c35f213d8cfafa720601edac37eb49f68c477f8abf6eb6183d9627f90d0d70cfa881b66c3f58567f4af982de7ab0bcfa8877d6c7f41effcc5326be48352331b9c0fc47c60837fafb8e419dfb72ac17684f34270c93ce6fcde78c6f7012acf382f9e30475c5f7bc6fdccf1c0c8c765c79c205f175bcc7cbe52379e918fac324f71be10837c39f23d71c1cce72fa90646bd2c3de37e4d304b96a7f18c783ce8a7c041ea19f639f58c7f5fb7c9acb97ec333ead73c23ffbef10cfbbd7a86fc43ff06cfeb43cf78fed6339e9f7bc6bf675df70cffb9f38cfe67cc96db0bcf682f3dbbf647f77d09037c7e5f42118a9fd6cb507e6e17aa507dae67d2bf1a6f78fe431f26349ffb7e5fff410efc343ff469c302bf41fb50f7bd86e52f4bf5d3da9a0a5abdb56ba87caeff3ba5e1f25ddde731de8ff3dd68f56011d6de846dd885b3701ede50997ffabca5d2fffcfcf7af3e6f7fb3dd4d78473f17f479ff8e7fdd1f5acf9d44bf33cebd977ff87b4f0f6403e3b52fc3c7f0297ca6f242e5f3e750beab7ffb7cfdcd766f9f4be172b812ae866be17ab841659d7ec367cf2bf473f31d6ff05f57def1dbdf3f323eb7a8ac7319febe1e6e873b34db78af60c3dd702fdc0f0fc243578ea81cfe41f9bbcf1d8727e16978169e8717df944bfeefe3df50be7be677ca55781d8ec292b59f87e3701246611c2654522afde794cafbcfa14cdf95f7f5fd735ffdfdfde7c7fa2ccc83300802e18bfc8da2a8fc4ebb6f4b7811e8c0041cf3c3dba008caa0726be296d6ff8c7fbb0deaa01e7effaef8360f6fcffdb47de37f1f056dd005b3601edc04b74ef73b2abd840b2aff9686efcad0e75016a4fdfd07ed1f82c7e0e9fb5decb776ba6f76986f9ea21d2fb0c173f012bc064bc172b012ac066bc1ba93741e6c049b547afeefd27e2bd8769eaf48fb1dd2befeb8afff8ee6bfdaa3dfefcfc16eb0fb517fd2be0af682fde020380c8e82e3e084f4eda53d0dce82f3e022b874fc77b5fbcc5f79fe7d7085b9ff4f6beff50f3e65273f644b4efbeb60148c834910057190042949be1e4c832cc8a979207e2712fc5bda3bcf67ed7b8d21e5c7fce92be9ffd43a420af9a6bd50420b236c301185284545abff46d4a211ade8c44ccc39123a8dc4cdd7daf0dfbf8c155cf7c1223f6a2f6eff53daff3c230ecba016776221eec58378144fe259bc8857b12496c58a58a5b5de6bbf26d6c506d964536c712cfc613ff8c2123f8b94bfa13dc72d1bdadfd3e40bdd647f6280b7f7cffe98cd93eedb6247ec8a3db12f0ec4a13812c7e2449c8a33712e2e28f24b72f74b7125aec5488c8353d2b2d77c1ecc3fe9ff7bbbe3c727c49f684f9971435e6a299fae7fadbd9bdf2731a1d98d442cfa5cb37ce7f7894845ff15cd9c5c87a650d2bc4825b534b4ebdd49db6723b290a5ac642d1ba7752ae6b2955db021677e0605cf76202de50b3fcef9c2d5cd3fd478ede9992fd6fd8f9eece692764679437efa206fc902a6b7c9979ad7836d687eefe59d5cc87bf9201fe513edecf570aa93cff245beca25b92c57e4aa5c93eb72c3edf777c14c6eca2db92d77e4aedc93fbf2c0e99aca4379141cca6379224f3fec800b79464f9ccb0b79e9b47cf3ee5ef32baabb20cb7cb10afe9ef6f25a8ee4584e6424e3fe7cf033ed7b3f110bd9ff73b5a9cca8e42aa4b34633b4a2444dc8656155ff8a542ba368b65541ff95aa52b56a54abda30a3cf4ecd14cd9dba51b76249dd8965b5a0a8307fa7bb55f7ea413daa27f54cfa7cd09efa7b51af6a897cfcb7b5ff52273af9aa65b5a25665a6d6d47ad09f1f03772a0e384afae8d7cf6ed8c81bb5a136d5965c56db6a47edaa3db5ffa6bd7c5607ea90343f52c7ea449d2ae7ebea4c9dab0b75a9aed4b51aa9b19aa848c59405de91f6894a83899aaa8cf28037ed83f05ce5c1950ec3910eb4206b14efea2eb5a43a155e7e5a152e32fe2ded1bad757f797ea40b5dd22a6ede62d947edfba22b5deb46b7ea4e777aa6e7fa46f739ad5ff9fa4e2ff4bd7ed08ffa493feb17fd4a922ee965bda257f59a5e0fcff486ded45b7a5befc85ed754efeabd20d7fbfa401fbec53a69f5913ed627fa549fe9737df161f59365f4a5bed2d7e1f957da7fb7dfff9ef6ef6a3fef824a8ff4584fd48e8e74ab639de854dee0343dc4043dd599ce290d0a8c10874686e746191d8e8ca1f35eaf45d0bf56f1d16c2e1b634d61ca37ddfbdd2ebc3095a94d635ad3999999d32c07de36efb5ff6247fc33edcd8d2e49979b3e9e9b5b7347f17b616e298e3df76416d4b232f7e6c13cca651d9927f36c5edcdf4b173717e6b5df05cc923830cb66454c685c6356f586590b9ecdbadce935e8357bcb5edc6f0bb36136cd26136b62b6ccb6d931bb66cfec079539308764afdfd4de79bef913ed29f6df9b23736c4ecca93933e7e6c25c52b932d76614de98b19998c8c42651772635fd97b973736743f160fb9b780a54b81fb7852dfb1d84e4a6b9b7159d2fe7b6b60dc9f579f7a208665bdbd9998b6c3ee2d9b9bdb1b7f62ebcb20bf164efed431fe1d83e5f6bef4bafbd7dfc13edcdc83ed967fb625fed925db62b76d5ae5159b71b76d3bcdad26ed15fb6ed8eddb57b769fda1d88c88cc4be3db447f6d89ed8537b66cfed85bdd4a978b48fa4fda5bdb2d7416547766c273622af9f7f5cc3fd3f98b5297906c77439b7539bd113a9cdc3cb222c824214d24efd534efb4291f697ff59edc97f970b2d5fed9e490b53d8a2b0db455954455d34455b74c58c2cb167772981211f1079312f6e8adbe24e4e8b45715f3c148fc553f15cbc14afc5922d8be53ee64b5bac14abc55ab15e6c149bc556b1fdce0702bd51ec14aad87dd384daef15fbf6b63820dd0f8ba3e238a88a93e2d447bedfd0fe6f7a7e84a82716c559712e578a0b75575c1657c575312ac6c5442e17511193f6499116d322a3dabca4055f8a52d263caae95e43825295c966555d66553b66557ce7aed49da8b725ede94b78508aecabb7251de970f6c01d2bed7e4bdf6d4fab17c2a9fcb97f092b2c3cbf2b55c1277e5b28b7cac7db9a2afcad5af3dffef46bd72edbdf6e57ab9216cb9596e95dbe54eb95beef551aedc2f0f6c6996cac3f2887c7faf3c2e4fca53b35c9e95e7c558be9617e525e97e555e97a3725c4ecaa88ccbc469bfe857729996d3322bf32a0cae2810884a3afd9df6e1e84d7b5554aaa23da23295d51be165785e155559a8aaaa6a8e0d41d5f4da57ed7f26e67fd4be38afba7e6eab99a52858cdab1bb56392eab6ba93cfd5a2baaf1e8a4bb2c753b92d16d563f5543ddbbdeaa57aad96aae56aa55aadd6aaf5ea59be561bd5a6d31ed16ad1cf63b5556d57e4e94155ed567bfdfef7497b6a55ed5707e1bc3aac8eaae3ea84ca697516de97b7d539e776acfda7b9ff18f3ffde8ef751fb0bf2edc3ead22cd14e76505d555d9115b6ba364b9fb517513592998eaaae1a57932aaa562948c455424fa7d514b9de3bf982fe9c5365551e54945406fdaaf8e8f914f1a25a84a370165cd592f2dcc730abc956e17da16a5d1b55fcdaf37bedc5d39f643b83f626d16d6de533edfe715da8c32223fdaeedd38fdad725e575915caeabbaae9bba2d4dddd5333ae52cd5f34fdabfadeb177b4bfadf7ca1bdad6f8b55aabbab17f57dfd40e5b17eaa9feb97705eecd6af2ef291f6f5928b7a5efbf7f7017fb6dfbf695f6efc5afb7ab95ee9b3a17a9576c7bd7aadb8acd7eb8d7ab3deaab78b8a7c69a7dea97795ad9a1fe7a6deab29a6d7073f682fc28bfab08f0bf511adf9b73bfef3fa98b2c5597dd2473e397fa73dbcfdc3edc69f682fac2eead361ddffaef6d5a23eabcf699e2f689738aa2f699f28e9f34a47f5753daac7fd7e2fe77456456eebfe571cd513f2eba88e7fd07e5127754a333fadb3f7d94f10d4791316eb64c8f3be0768df88f0cc67cdf81f9f721a1998b0fb1ded03dba81fb47fe7f98d86f6e50625e43f78bebc696c5354b74a16a43fe50147fd6f4d598c9baadff19a3a3c6b9aa66d3a794eb3791e9e37b366dedc50e0ba55e510f59cf6fd3c06cd5db30847cd7df3f0e1ecbe681e9ba73e5634fd6997b46f5e48fbd766a959a62892352bcd3295d566ad3f39f5dad3cae2b90feae15eef1bedd79b0db9443bdc71b3d9673bcd56b35d5cea8766a7d925edf79afda256dbcdb67ca08cffae689b83c2aa9de6b03932234a70fbffb3dd95c236c7ee5c7bd49cd8bda2288f9ad33edb71da9fa9d7e6bcb950a3e6b2b96aae9b5170d58c9b09ad09b7869b8838763e6d9b84344c9be9c79c58508468b226afa336a4a7dc09b70d82e756b4b2edaf0cf053b7a6b5d09e6a7faafd702e0b9bb6684b8adb6d5bb575b5b04f6dd3b66d5744ed4cb87b9c764e395d2df2f6a67a140fed6d7b47d9eeba3d6a17e62eac29cbbf6feff5a47d5087eda35caabab2699fdae7f6a5bfd524cf3f6b5fdba57639ccda9576553db66bed7a73d96e38ddfbf87dd16ef24dc5a2dd6ab7db9d76b7ddfae13c10b47bedbe7a6a0fda43f7cc517bdc9eb4a7ed59bba35ee999be9cb717b5e9f74cf27cbfe3054f6fdabf3bbb0fdad7ed657bd55eb7a376dc4ee87cb768a336264eda543c04b69dca519bb5799b99491776810a3ad1c94e75ba33f2a6ef812cb4e86c577465577575d7746dd78928bce153ce6578d1cdaabd62ab3aaf1fba797723cffb6c9ff52359bbdbeeae5bb8553bd3827ebf97c50f77f67dbef4d03d50bb59ef31f4cc63f7d43d5379f29f8f7d06d9df24752ffe6d86081fbef7fc417a11c9e7f6b27b0d1ba289b9a5b3ea7daf7bb744be4ddc2dd37f2bfd2957de74abdd5ab76646d2dd05849a366e7aa6bd94cfe2804eb74bfd79b85b0f1b1ab7e25ccf9de911c1df9ded65b781fb498e58d2fffec52efed68e6cb3186e09b8ccc1e885b4df7ca7fd2cd8e9b6c2dbaf757fff9d96cfdf12f9aefcea4d4758774bb49b90f6ddf6b0dfbf3bd97fcacf7ebcbbffeebdc6b7e517f7f9c16378fbb5661fbe37a3df7d5f467fdfee57d680457bcfff6abfffaaf0bdfedfd3f9ad7c7896e67e27b8328bb737d83ae876fbb7d1bff8ef29bcedf6deff2d68ded7b977d90fe1eec7e7863270b7ef3e9b705447ddc10fb9de0fef64dedd57feb4dd77e5f3f39fdedfcfbbc3eea8ccbbe3eee43ff0df6933fef4b7a1bcfdedac3ba79f17dda52a5d7c7b5f86ace45d51c517bf7fd1eeeb273e97f0b2bb1277bcee8370d65d77a36e4c65e27efeac445ffcf656fae7e32ef1f5dfb549a98cbb699775f98cc2ce4c500966927e4a2af82de0bf2b2ac2fd5573bbc0b1a1323c2166d6b7ef3f95fb19d05fdffa413be2a6ebaec339beb9e2beb5f480ef477de3f1332eb76f7efcfdeae8bfc3f1fe1b1fdfb673dfc7eacfb27f567ae5dfa83f15fdd8e2eb27e984e8beb5f5f66dc59f97feadf3f02efe7d04fb69a433bffb3d8edfd843be789bfaf63d038cf6ab677edc87bed3fe7777b67ff7d9b777f93fd7f4bfa7fcf3fffdcf7ffc7f59ea69f4</data>
+    </image>
+    <image name="image3">
+        <data format="PNG" length="556">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001f349444154388d8d93bf6f13411085bf3dafcf39c5b21d10a2044311a08812456e52a723e187104834fc0734889ad805a2a4a04d4f81a2046c0921010d880621500a9214c4a208c231918d1d7c777b77bb14e71cb662a2bc7adeb7336f660590fa3acbcdfc38779d1c7322c5913211b81d3efcfec3934b9f78268131c7e1dec9fb8f4a56e104a41d84b4e3ea28c4042ef8fb18b78371dbd06b9369fc9853d55769a02a816cbe4089f636da6b22521283000c260a215210fa18e582ea61020f11b5c8172801590964440a8cdf45188d7d67198070bd46f4650d1305c8e92bc8991b00b88fe73151407fd48c04acd8e1638445f8791539731d39b5003a041d25e6e0fd32a6bb8bf13a079158320927f010c222fcf81474809cbd859cbe9684a75e3e44bd58021d0d859a00083c8c7231dd06fee65bf4cf4deccb0f6273ad82aa96476e2501e85fdb986e13540f7bb19c9801ec85a51834026225237476ff990f0cb50aaa564920f6621f90760e0384931b7eaddfb6aa96872083b5000238dbba4add9e9a4437b646ce79a8edd393a8f52d269e53b4203e4fe1e48f658e3bc863facb9080ded963e39cc85d4c5d988f7b3a4a068c0f3b7b6c005a02fe9b062b6aedf5ede229ce1fe733d59b7c7bd76405f005300e9c018ac00483b7315a21d002eac07701a48031200b6418d8cc7fa4011fd807bcbf9fced2eafe63c2350000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>cerrar</sender>
+        <signal>clicked()</signal>
+        <receiver>AQ3About</receiver>
+        <slot>accept()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>cerrar</tabstop>
+    <tabstop>TabWidget2</tabstop>
+</tabstops>
+<layoutdefaults spacing="6" margin="11"/>
+<includes>
+    <include location="global" impldecl="in declaration">AQUi/ui_AQ3About.h</include>
+</includes>
+</UI>

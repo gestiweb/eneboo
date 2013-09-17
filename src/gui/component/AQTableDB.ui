@@ -1,0 +1,234 @@
+<ui version="4.0" >
+ <author>InfoSiAL, S.L.</author>
+ <comment>Acceso general a una tabla.</comment>
+ <class>AQTableDB</class>
+ <widget class="QWidget" name="AQTableDB" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>384</width>
+    <height>417</height>
+   </rect>
+  </property>
+  <property name="focusPolicy" >
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="windowTitle" >
+   <string>AQTableDB</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../gui.qrc" >:/images/icon.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>0</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="Q3Frame" name="FrameFind" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="spacing" >
+       <number>2</number>
+      </property>
+      <property name="leftMargin" >
+       <number>1</number>
+      </property>
+      <property name="topMargin" >
+       <number>1</number>
+      </property>
+      <property name="rightMargin" >
+       <number>1</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="TextLabelSearch" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>Buscar</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditSearch" >
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="focusPolicy" >
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="acceptDrops" >
+         <bool>false</bool>
+        </property>
+        <property name="toolTip" >
+         <string>Busca en el campo seleccionado coincidencias que empiezen por el texto escrito</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Busca en el campo seleccionado coincidencias que empiezen por el texto escrito</string>
+        </property>
+        <property name="maxLength" >
+         <number>100</number>
+        </property>
+        <property name="frame" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="TextLabelIn" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>en</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBoxFieldToSearch" >
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="focusPolicy" >
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip" >
+         <string>Ordena los registros de la tabla por el campo seleccionado</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Ordena los registros de la tabla por el campo seleccionado</string>
+        </property>
+        <property name="duplicatesEnabled" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Q3Frame" name="FrameTable" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth" >
+      <number>0</number>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="spacing" >
+       <number>1</number>
+      </property>
+      <property name="leftMargin" >
+       <number>1</number>
+      </property>
+      <property name="topMargin" >
+       <number>1</number>
+      </property>
+      <property name="rightMargin" >
+       <number>1</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>1</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="0" margin="0" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Q3Frame</class>
+   <extends>QFrame</extends>
+   <header>Qt3Support/Q3Frame</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>lineEditSearch</tabstop>
+  <tabstop>comboBoxFieldToSearch</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../gui.qrc" />
+ </resources>
+ <connections/>
+</ui>
