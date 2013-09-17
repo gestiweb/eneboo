@@ -1,0 +1,10 @@
+.svn
+*.svn
+*.svn.*
+
+Makefile
+Makefile.Debug
+Makefile.Release
+/build/
+gen_settings.pri
+/install/plugins/
