@@ -37,7 +37,7 @@ INCLUDEPATH += $$ROOT/src $$ROOT/src/libdigidoc $$ROOT/src/libdigidoc/libxml2 \
                $$ROOT/src/libdigidoc/openssl/include $$ROOT/src/libdigidoc/openssl/crypto
 QMAKE_LIBS_X11SM =
 
-LIBS += -L$$PREFIX/bin -lssl -lcrypto -lxml2
+LIBS += -L$$PREFIX/lib -lssl -lcrypto -lxml2
 
 VERSION = 2.6.0
 
