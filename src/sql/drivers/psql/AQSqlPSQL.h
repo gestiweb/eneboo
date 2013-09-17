@@ -69,17 +69,19 @@ class AQPSQLDriver : public AQSqlDriver
 public:
 
   enum Protocol {
-    Version6 = 6,
-    Version7 = 7,
+    Version6  = 6,
+    Version7  = 7,
     Version71 = 8,
     Version73 = 9,
     Version74 = 10,
-    Version8 = 11,
+    Version8  = 11,
     Version81 = 12,
     Version82 = 13,
-    Version83 = 14
+    Version83 = 14,
+    Version84 = 15,
+    Version9  = 16,
+    Version91 = 17
   };
-
   explicit AQPSQLDriver( QObject * parent = 0 );
   explicit AQPSQLDriver( PGconn * conn, QObject * parent = 0 );
   virtual ~AQPSQLDriver();

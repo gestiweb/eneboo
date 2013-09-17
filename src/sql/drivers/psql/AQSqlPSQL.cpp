@@ -815,30 +815,36 @@ static AQPSQLDriver::Protocol getPSQLVersion( PGconn * connection )
     QRegExp rx( QLatin1String( "(\\d+)\\.(\\d+)" ) );
     rx.setMinimal( true );
     if ( rx.indexIn( val ) != -1 ) {
-      int vMaj = rx.cap( 1 ).toInt();
-      int vMin = rx.cap( 2 ).toInt();
-      if ( vMaj < 6 ) {
-        aqDebug( "This version of PostgreSQL is not supported and may not work." );
+      int vMaj = rx.cap(1).toInt();
+      int vMin = rx.cap(2).toInt();
+      if (vMaj < 6) {
+        qWarning("This version of PostgreSQL is not supported and may not work.");
         return AQPSQLDriver::Version6;
       }
-      if ( vMaj == 6 ) {
+      if (vMaj == 6) {
         return AQPSQLDriver::Version6;
-      } else if ( vMaj == 7 ) {
-        if ( vMin < 1 )
+      } else if (vMaj == 7) {
+        if (vMin < 1)
           return AQPSQLDriver::Version7;
-        else if ( vMin < 3 )
+        else if (vMin < 3)
           return AQPSQLDriver::Version71;
-        else if ( vMin < 4 )
+        else if (vMin < 4)
           return AQPSQLDriver::Version73;
         return AQPSQLDriver::Version74;
-      } else if ( vMaj == 8 ) {
-        if ( vMin < 1 )
+      } else if (vMaj == 8) {
+        if (vMin < 1)
           return AQPSQLDriver::Version8;
-        else if ( vMin < 2 )
+        else if (vMin < 2)
           return AQPSQLDriver::Version81;
-        else if ( vMin < 3 )
+        else if (vMin < 3)
           return AQPSQLDriver::Version82;
-        return AQPSQLDriver::Version83;
+        else if (vMin < 4)
+          return AQPSQLDriver::Version83;
+        return AQPSQLDriver::Version84;
+      } else if (vMaj == 9) {
+        if (vMin < 1)
+          return AQPSQLDriver::Version9;
+        return AQPSQLDriver::Version91;
       }
       return AQPSQLDriver::Version7;
     }
@@ -1402,7 +1408,12 @@ QString AQPSQLDriver::formatValue( const QSqlField & field, bool trimStrings ) c
       break;
     case QVariant::ByteArray: {
         QByteArray ba( field.value().toByteArray() );
-        size_t len;
+        QByteArray b = ba.toHex();
+        QString res2(b); 
+        r = "E'\\\\x" + res2 + "'";
+        break;
+    
+/*        size_t len;
         unsigned char *data = PQescapeBytea( ( unsigned char* ) ba.constData(), ba.size(), &len );
         r += QLatin1Char( '\'' );
         r += QLatin1String( ( const char* ) data );
@@ -1410,7 +1421,7 @@ QString AQPSQLDriver::formatValue( const QSqlField & field, bool trimStrings ) c
         if ( protocol() >= AQPSQLDriver::Version82 )
           r.prepend( QLatin1Char( 'E' ) );
         qPQfreemem( data );
-        break;
+        break;*/
       }
     default:
       r = QSqlDriver::formatValue( field, trimStrings );
