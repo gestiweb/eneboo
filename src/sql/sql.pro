@@ -48,4 +48,5 @@ DLLDESTDIR = $$ABANQBLDDIR/lib
 DESTDIR = $$ABANQBLDDIR/lib
 target.path = $$ABANQINSDIR/lib
 INSTALLS += target
+LIBS += -lAQCore -lAQAcl
 include(../../includes.pri)

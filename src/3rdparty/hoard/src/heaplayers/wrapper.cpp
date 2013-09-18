@@ -128,8 +128,9 @@ extern "C" void * MYCDECL CUSTOM_CALLOC(size_t nelem, size_t elsize)
 
 
 #if !defined(_WIN32)
+#ifndef MYCDECL CUSTOM_MEMALIGN
 extern "C" void * MYCDECL CUSTOM_MEMALIGN (size_t alignment, size_t size);
-
+#endif
 extern "C" int posix_memalign (void **memptr, size_t alignment, size_t size)
 {
   // Check for non power-of-two alignment.

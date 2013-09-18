@@ -48,3 +48,4 @@ DESTDIR = $$ABANQBLDDIR/lib
 target.path = $$ABANQINSDIR/lib
 INSTALLS += target
 include(../../includes.pri)
+LIBS += -L$$ABANQBLDDIR/lib -lAQbarcode -lAQkugar -lAQCore -lAQAcl -lAQUi -lAQSql -lAQXml -lAQbarcode -lqsa

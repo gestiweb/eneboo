@@ -237,7 +237,7 @@ struct QSASlotCaching
 
 struct QSAConnection
 {
-  QSAConnection() : sender( 0 ), signal( 0 ), function_ref()
+  QSAConnection() : sender( 0 ), signal(), function_ref()
   { }
   QSAConnection( QObject *send, const char *sig, QSObject ref )
       : sender( send ), signal( QLatin1String( sig ) ), function_ref( ref )
