@@ -79,7 +79,7 @@ headers.files 	= \
 		qsargument.h \
 		qsinputdialogfactory.h \
 		qsscript.h \
-		..\ide\qsworkbench.h
+		../ide/qsworkbench.h
 
 KERNELDIR = ../kernel
 !noeditor {
