@@ -1083,11 +1083,10 @@ void QSInterpreter::runtimeError(const QString &message,
            scriptName.latin1(), lineNumber, message.latin1());
   }
 #else
-  QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"),
-                        QString::fromLatin1("The following error occurred in "
-                                            "line <b>%1</b> of  <b>%2</b> while executing "
-                                            "the script:<pre><font color=red>%3</font></pre>")
-                        .arg(lineNumber).arg(scriptName).arg(message));
+  QString errorMsg(QString::fromLatin1("The following error occurred in "
+                                       "line <b>%1</b> of  <b>%2</b> while executing "
+                                       "the script:<pre><font color=red>%3</font></pre>")
+                   .arg(lineNumber).arg(scriptName).arg(message));
   if (d->interactiveGUI_)
     QMessageBox::critical(qApp->mainWidget(), QString::fromLatin1("Error"), errorMsg);
   else
