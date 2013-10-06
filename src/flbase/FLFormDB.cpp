@@ -35,9 +35,6 @@ FLFormDB::FLFormDB(QWidget *parent, const char *name, WFlags f) :
   iface(0), oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0), oldFormObj(0),
   accepted_(false)
 {
-#ifdef QSDEBUGGER
-  pushButtonDebug = 0;
-#endif
 }
 
 FLFormDB::FLFormDB(const QString &actionName, QWidget *parent, WFlags f) :
@@ -46,9 +43,6 @@ FLFormDB::FLFormDB(const QString &actionName, QWidget *parent, WFlags f) :
   oldCursorCtxt(0), isClosing_(false), initFocusWidget_(0), oldFormObj(0),
   accepted_(false)
 {
-#ifdef QSDEBUGGER
-  pushButtonDebug = 0;
-#endif
 
   setFocusPolicy(QWidget::NoFocus);
 
@@ -153,19 +147,22 @@ void FLFormDB::setMainWidget(QWidget *w)
   wt->show();
 
 #ifdef QSDEBUGGER
-  pushButtonDebug = new QPushButton(this, "pushButtonDebug");
-  pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
-                                             pushButtonDebug->sizePolicy().hasHeightForWidth()));
-  pushButtonDebug->setMinimumSize(pbSize);
-  pushButtonDebug->setMaximumSize(pbSize);
-  QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
-  pushButtonDebug->setIconSet(qsa);
-  pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
-  QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
-  QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
-  pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
-  layoutButtons->addWidget(pushButtonDebug);
-  connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+if (FLSettings::readBoolEntry("application/isDebuggerMode"))
+	{
+  	pushButtonDebug = new QPushButton(this, "pushButtonDebug");
+  	pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
+        pushButtonDebug->sizePolicy().hasHeightForWidth()));
+  	pushButtonDebug->setMinimumSize(pbSize);
+  	pushButtonDebug->setMaximumSize(pbSize);
+  	QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
+  	pushButtonDebug->setIconSet(qsa);
+  	pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
+  	QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  	QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  	pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
+  	layoutButtons->addWidget(pushButtonDebug);
+  	connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+  	}
 #endif
 
   layoutButtons->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));

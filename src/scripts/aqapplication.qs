@@ -668,12 +668,6 @@ class MainWindow
           {
             if (sys.isDebuggerMode())
               {
-                var wb = new QAction(ag);
-                wb.name = "openQSWorkbench";
-                wb.menuText = sys.translate("QSA Work Bench");
-                wb.setIconSet(new QIconSet(this.iconSet16x16(AQS.Pixmap_fromMimeSource("bug.png"))));
-                connect(wb, "activated()", this.actSigMap_, "map()");
-		this.actSigMap_.setMapping(wb, "activated():openQSWorkbench():" + wb.name);
     		
       var staticLoad = new QAction(ag);
       staticLoad.name = "staticLoaderSetupAction";
@@ -1032,11 +1026,6 @@ function triggerAction(signature)
     case "staticLoaderSetup()":
       if (ok)
         aqApp.staticLoaderSetup();
-      break;
-
-    case "openQSWorkbench()":
-      if (ok)
-        sys.openQSWorkbench();
       break;
 
     case "reinit()":

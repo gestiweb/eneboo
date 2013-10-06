@@ -170,19 +170,22 @@ void FLFormRecordDB::setMainWidget(QWidget *w)
   wt->show();
 
 #ifdef QSDEBUGGER
-  pushButtonDebug = new QPushButton(this, "pushButtonDebug");
-  pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
-                                             pushButtonDebug->sizePolicy().hasHeightForWidth()));
-  pushButtonDebug->setMinimumSize(pbSize);
-  pushButtonDebug->setMaximumSize(pbSize);
-  QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
-  pushButtonDebug->setIconSet(qsa);
-  pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
-  QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
-  QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
-  pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
-  layoutButtons->addWidget(pushButtonDebug);
-  connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+if (FLSettings::readBoolEntry("application/isDebuggerMode"))
+	{
+  	pushButtonDebug = new QPushButton(this, "pushButtonDebug");
+  	pushButtonDebug->setSizePolicy(QSizePolicy((QSizePolicy::SizeType) 0, (QSizePolicy::SizeType) 0, 0, 0,
+        pushButtonDebug->sizePolicy().hasHeightForWidth()));
+  	pushButtonDebug->setMinimumSize(pbSize);
+  	pushButtonDebug->setMaximumSize(pbSize);
+  	QPixmap qsa(QPixmap::fromMimeSource("bug.png"));
+  	pushButtonDebug->setIconSet(qsa);
+  	pushButtonDebug->setAccel(QKeySequence(Qt::Key_F3));
+  	QToolTip::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  	QWhatsThis::add(pushButtonDebug, tr("Abrir Depurador (F3)"));
+  	pushButtonDebug->setFocusPolicy(QWidget::NoFocus);
+  	layoutButtons->addWidget(pushButtonDebug);
+  	connect(pushButtonDebug, SIGNAL(clicked()), this, SLOT(debugScript()));
+  	}
 #endif
 
   layoutButtons->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));

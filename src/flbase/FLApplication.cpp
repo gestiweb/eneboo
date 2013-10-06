@@ -323,10 +323,6 @@ bool FLApplication::eventFilter(QObject *obj, QEvent *ev)
     case QEvent::KeyPress:
       if (obj == container) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
-        if (ke->key() == Key_W && (ke->state() & (ControlButton | AltButton)) && ap2->isDebuggerMode()) {
-          openQSWorkbench();
-          return true;
-        }
       }
       if (obj == mainWidget_) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(ev);
@@ -759,7 +755,6 @@ void FLApplication::initToolBox()
     return;
 
   modulesMenu->clear();
-  FLApplicationInterface *ap2 = new FLApplicationInterface(this);
   while (toolBox->count()) {
     QWidget *item = toolBox->item(0);
     if (item) {
@@ -807,22 +802,10 @@ void FLApplication::initToolBox()
 
 #ifdef QSDEBUGGER  /// Si compilamos el debugger nos aparece este apartado del menu.
 
-  if (ap2->isDebuggerMode())
+  if (FLSettings::readBoolEntry("application/isDebuggerMode"))
                                   {      
 	++c;  
-        descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
-                        tr("QSA WorkBench");
-        newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,
-                                             QKeySequence(QString("Ctrl+Shift+") + QString(QChar(c))),
-                                             newAreaBar, *itM);
-        newModuleAction->setIconSet(QPixmap::fromMimeSource("bug.png"));
-        newModuleAction->setIdModule(*itM);
-        newModuleAction->addTo(newAreaBar);
-        ag->add(newModuleAction);
-        connect(newModuleAction, SIGNAL(activated()), this, SLOT(openQSWorkbench()));
-        
-        ++c;
-       
+               
         descripModule = QString(QChar(c)) + QString::fromLatin1(": ") +
                         tr("Carga Estática desde Disco Duro");
         newModuleAction = new FLWidgetAction(descripModule, descripModule, descripModule,

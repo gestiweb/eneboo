@@ -198,6 +198,13 @@ protected:
   Boton Ultimo
   */
   QPushButton *pushButtonLast;
+  
+    #ifdef QSDEBUGGER
+  /**
+  Boton Debug Script
+  */
+  QPushButton *pushButtonDebug;
+#endif
 
 public slots:
 
@@ -225,6 +232,7 @@ public slots:
   Devuelve el script asociado al formulario
   */
   virtual QSScript *script() const;
+  
 
 protected slots:
 
