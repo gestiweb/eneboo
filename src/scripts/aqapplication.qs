@@ -463,6 +463,9 @@ class MainWindow
   {
     var tw = this.tw_;
 
+    if (tw.count > 0) 
+    	this.twCorner_.hide();
+    	
     for (var i = 0; i < tw.count; ++i) {
       var page = tw.page(i);
       if (page.rtti() == "FormDB")
@@ -947,6 +950,7 @@ function reinitScript()
   var mw = this.mainWindow_;
   mw.initFromWidget(mainWid);
   mw.writeState();
+  mw.removeAllPages();
   mw.updateMenuAndDocks();
   mw.initModule("sys");
   mw.readState();
