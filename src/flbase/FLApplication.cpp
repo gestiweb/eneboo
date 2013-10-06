@@ -516,7 +516,10 @@ void FLApplication::init(const QString &n, const QString &callFunction,
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
 #ifdef FL_DEBUGGER
+if (FLSettings::readBoolEntry("application/isDebuggerMode"))
     i->setErrorMode( QSInterpreter::AskForDebug );
+else
+    i->setErrorMode( QSInterpreter::Notify );    
 #else
     i->setErrorMode( QSInterpreter::Notify );
 #endif

@@ -32,6 +32,7 @@
 #include "qswrapperfactory.h"
 #ifdef QSDEBUGGER
 #include "../kernel/quickdebugger.h"
+#include "../ide/qsworkbench.h"
 #endif
 #include "../kernel/quickinterpreter.h"
 #include "../kernel/quickobjects.h"
@@ -1078,7 +1079,21 @@ void QSInterpreter::runtimeError(const QString &message,
         qWarning(errorMsg);
     }
   } else if (errorMode() == AskForDebug) {
-    // TODO: Add here code to debug the runtimeError...
+    if (QMessageBox::question(0,
+                         QString::fromLatin1("Depurador de Eneboo"),
+                         QString::fromLatin1("Se ha detectado un error\n\n"
+                                     "¿ Desea visualizar el script ?"),
+                         QMessageBox::Yes,
+                         QMessageBox::No ) == QMessageBox::Yes)
+                         {
+                         QSScript *scr = d->project->script(scriptName);
+                         if (!scr)
+    				return;
+		 	QSWorkbench *wb = new QSWorkbench(d->project);
+		 	wb->open();
+		 	wb->showScript( scr );
+                         }
+                         
     qDebug("Error in script: '%s', line: %d\n  %s\n",
            scriptName.latin1(), lineNumber, message.latin1());
   }
