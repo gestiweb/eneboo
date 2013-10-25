@@ -193,6 +193,27 @@
                                         </widget>
                                     </vbox>
                                 </widget>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>gbActionsMenu</cstring>
+                                    </property>
+                                    <property name="title">
+                                        <string>Menú de acciones</string>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>cbActionsMenuRed</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Mostrar menú de acciones reducido (sin acciones de la barra de herramientas)</string>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
                                 <spacer>
                                     <property name="name">
                                         <cstring>unnamed</cstring>

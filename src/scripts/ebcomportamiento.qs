@@ -48,6 +48,7 @@ function cargarConfiguracion() {
 	else
 		w.child("leCO").paletteBackgroundColor = leerValorLocal("colorObligatorio");
 	w.child("leCO").show();
+	w.child("cbActionsMenuRed").checked = leerValorLocal("ActionsMenuRed");
 }
 
 function leerValorGlobal(valorName):String {
@@ -139,6 +140,7 @@ function guardar_clicked() {
 	grabarValorLocal("ebCallFunction", w.child("leCallFunction").text);
 	grabarValorLocal("maxPixImages", w.child("leMaxPixImages").text);
 	grabarValorLocal("colorObligatorio", w.child("leCO").paletteBackgroundColor + "");
+	grabarValorLocal("ActionsMenuRed", w.child("cbActionsMenuRed").checked);
 	cerrar_clicked();
 }
 
