@@ -854,28 +854,40 @@ class MainWindow
       w.show();
     w.hide();
 
+    var settings = new AQSettings;
+    var reduced = settings.readBoolEntry("ebcomportamiento/ActionsMenuRed");
+
     var root = doc.documentElement().toElement();
 
     var ag = new QActionGroup(parent);
     ag.name = parent.name + "Actions";
     ag.menuText = ag.text = sys.translate("Acciones");
 
-    var bars = root.namedItem("toolbars").toElement();
-    addActions(bars, ag, w);
+    if (!reduced) {
+      var bars = root.namedItem("toolbars").toElement();
+      addActions(bars, ag, w);
+    }
 
     var menu = root.namedItem("menubar").toElement();
     var items = menu.elementsByTagName("item");
     if (items.length() > 0) {
-      ag.addSeparator();
-      var menuAg = new QActionGroup(ag);
-      menuAg.name = ag.name + "More";
-      menuAg.menuText = menuAg.text = sys.translate("Más");
-      menuAg.usesDropDown = true;
-      menuAg.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("plus.png")));
+
+      var menuAg, subMenuAg;
+      if (!reduced) {
+        ag.addSeparator();
+        menuAg = new QActionGroup(ag);
+        menuAg.name = ag.name + "More";
+        menuAg.menuText = menuAg.text = sys.translate("Más");
+        menuAg.usesDropDown = true;
+        menuAg.setIconSet(new QIconSet(AQS.Pixmap_fromMimeSource("plus.png")));
+      }
 
       for (var i = 0; i < items.length(); ++i) {
         var itn = items.item(i).toElement();
-        var subMenuAg = new QActionGroup(menuAg);
+        if (!reduced)
+          subMenuAg = new QActionGroup(menuAg);
+        else
+          subMenuAg = new QActionGroup(ag);
         subMenuAg.menuText = sys.toUnicode(itn.attribute("text"), "UTF-8");
         subMenuAg.usesDropDown = true;
         addActions(itn, subMenuAg, w);
