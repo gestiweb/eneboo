@@ -450,7 +450,11 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       if (comboBoxFieldToSearch->count() == (i - sortColumn_))
         comboBoxFieldToSearch->insertItem(field->alias());
       horizHeader->setLabel(i, field->alias());
-      tableRecords_->setColumn(i, field->name(), field->alias());
+      tableRecords_->setColumn(i, field->name(), field->alias());         
+      //--> Aulla: Recalculamos el tamaño del primer encabezado para que deje espacio al indicador del orden.
+   if ( tableRecords_->columnWidth(sortColumn_) < fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")))
+   		tableRecords_->setColumnWidth(field->name(),fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")));
+     //<-- Aulla.
     }
     comboBoxFieldToSearch2->clear();
     for (int i = sortColumn2_; i < tableRecords_->numCols(); ++i) {
