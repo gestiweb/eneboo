@@ -931,13 +931,21 @@ FLSqlCursor *FLTableDB::cursor()
 void FLTableDB::setOrderCols(QStringList &fields)
 {
   if (!cursor_)
-    return ;
+    return;
   FLTableMetaData *tMD = cursor_->metadata();
   if (!tMD)
-    return ;
+    return;
 
   if (!showed)
     showWidget();
+
+  for (QStringList::Iterator it = fields.begin(); it != fields.end();) {
+    FLFieldMetaData *fmd = tMD->field(*it);
+    if (!fmd || !fmd->visibleGrid())
+      it = fields.remove(it);
+    else
+      ++it;
+  }
 
   QHeader *horizHeader = tableRecords()->horizontalHeader();
   int i = fields.count(), hCount = horizHeader->count();
@@ -945,33 +953,34 @@ void FLTableDB::setOrderCols(QStringList &fields)
   if (i > (hCount - sortColumn_))
     return;
 
-  int j;
-  for (j = sortColumn_; j < i; ++j) {
-    if (fields[ j - sortColumn_ ] != tMD->fieldAliasToName(horizHeader->label(j)))
-      break;
-  }
-  if (j == i)
-    return;
-
-  int c;
-  QString fieldName, fieldAlias;
-  QStringList::Iterator it = fields.end();
+  int c = 0;
+  QString fieldName;
+  QString fieldNameAlias;
+  QString fieldAlias;
+  QString itStr;
+  QStringList::const_iterator it(fields.end());
 
   tableRecords_->hide();
 
   do {
     --it;
     --i;
-    fieldAlias = tMD->fieldNameToAlias(*it);
-    for (c = sortColumn_; horizHeader->label(c) != fieldAlias && c < hCount; ++c)
-      ;
-    if (c < hCount) {
-      fieldName = tMD->fieldAliasToName(horizHeader->label(i + sortColumn_));
-      if (fieldName != (*it)) {
-        tableRecords_->setColumn(i + sortColumn_, *it, fieldAlias);
-        horizHeader->setLabel(i + sortColumn_, tMD->fieldNameToAlias(*it));
-        horizHeader->setLabel(c, tMD->fieldNameToAlias(fieldName));
-        tableRecords_->setColumn(c, fieldName, tMD->fieldNameToAlias(fieldName));
+    itStr = *it;
+    fieldAlias = tMD->fieldNameToAlias(itStr);
+
+    for (c = sortColumn_; horizHeader->label(c) != fieldAlias && c < hCount; ++c) {}
+
+    if (c < hCount && c != i + sortColumn_) {
+      fieldNameAlias = horizHeader->label(i + sortColumn_);
+      fieldName = tMD->fieldAliasToName(fieldNameAlias);
+
+      if (fieldName != itStr) {
+        tableRecords_->setColumn(i + sortColumn_, itStr, fieldAlias);
+        horizHeader->setLabel(i + sortColumn_, fieldAlias);
+
+        tableRecords_->setColumn(c, fieldName, fieldNameAlias);
+        horizHeader->setLabel(c, fieldNameAlias);
+
         tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
       }
     }
