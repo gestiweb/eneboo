@@ -1804,8 +1804,10 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
   QDomNode no(doc.documentElement().firstChild());
   QString scriptForm, scriptFormRecord, name;
   QString preFm("form");
+  QString preFs("formSearch");
   QString preFr("formRecord");
   QString sufFm("::Form");
+  QString sufFs("::formSearch");
   QString sufFr("::FormRecord");
 
   int matchs;
@@ -1870,6 +1872,37 @@ void FLApplication::loadScriptsFromModule(const QString &idM)
               }
             } else {
               stream = mngLoader_->contentCode(scriptForm);
+              if (QString::compare(scr->code(), stream))
+                scr->setCode(stream);
+            }
+          }
+          
+          FLFormSearchDBInterface *fs = static_cast<FLFormSearchDBInterface *>(project_->object(preFs + name));
+          if (!fs) {
+            fs = new FLFormSearchDBInterface(0);
+            fs->setName(preFs + name);
+            project_->addObject(fs);
+            if (stream.isEmpty())
+              stream = mngLoader_->contentCode(scriptForm);
+            QSScript *scr = project_->createScript(fs, stream);
+            scr->setBaseFileName(scriptForm + sufFs);
+            fs->setScript(scr);
+          } else {
+            QSScript *scr = fs->script();
+            if (!scr) {
+              scr = project_->script(fs);
+              if (scr)
+                fs->setScript(scr);
+              else {
+                if (stream.isEmpty())
+                  stream = mngLoader_->contentCode(scriptForm);
+                scr = project_->createScript(fs, stream);
+                scr->setBaseFileName(scriptForm + sufFs);
+                fs->setScript(scr);
+              }
+            } else {
+              if (stream.isEmpty())
+                stream = mngLoader_->contentCode(scriptForm);
               if (QString::compare(scr->code(), stream))
                 scr->setCode(stream);
             }
