@@ -308,14 +308,6 @@ public:
   void removeAccel(int id);
 
   /**
-  Inhabilita el campo
-
-  @param b: TRUE para deshabilitar el campo y FALSE para habilitarlo
-  @author Silix
-  */
-  void setDisabled(const bool b);
-
-  /**
   Establece la capacidad de mantener el componente deshabilitado ignorando posibles
   habilitaciones por refrescos. Ver FLFieldDB::keepDisabled_ .
 
