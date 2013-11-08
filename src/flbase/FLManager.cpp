@@ -581,7 +581,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
     return 0;
 
   QString name, a, q, ftsfun;
-  bool v = true, ed = true, cw = true, dl = false;
+  bool v = true, ed = true, cw = false, dl = false;
 
   QDomNode no = mtd->firstChild();
 

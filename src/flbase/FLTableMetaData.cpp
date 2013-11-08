@@ -23,7 +23,7 @@ email                : mail@infosial.com
 
 FLTableMetaDataPrivate::FLTableMetaDataPrivate(const QString &n, const QString &a, const QString &q) :
   name_(n.lower()), alias_(a), compoundKey_(0), query_(q),
-  concurWarn_(true), detectLocks_(false)
+  concurWarn_(false), detectLocks_(false)
 {
   fieldList_ = new FLTableMetaData::FLFieldMetaDataList(71);
   fieldList_->setAutoDelete(true);
