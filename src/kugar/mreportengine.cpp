@@ -490,10 +490,12 @@ MPageCollection *MReportEngine::renderReport(int initRow, int initCol,
       lastPageFound = true;
       currentPage = pages->getLastPage();
       p->painter()->end();
-      currentPageCopy = new QPicture(*currentPage);
-      p->painter()->begin(currentPage);
-      currentPageCopy->play(p->painter());
-      delete currentPageCopy;
+      if (currentPage) {
+        currentPageCopy = new QPicture(*currentPage);
+        p->painter()->begin(currentPage);
+        currentPageCopy->play(p->painter());
+        delete currentPageCopy;
+      }
     }
   }
 
