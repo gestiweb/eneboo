@@ -452,7 +452,7 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       horizHeader->setLabel(i, field->alias());
       tableRecords_->setColumn(i, field->name(), field->alias());         
       //--> Aulla: Recalculamos el tamaño del primer encabezado para que deje espacio al indicador del orden.
-   if ( tableRecords_->columnWidth(sortColumn_) < fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")))
+   if ( i == 0 &&  tableRecords_->columnWidth(0) < fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")))
    		tableRecords_->setColumnWidth(field->name(),fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")));
      //<-- Aulla.
     }
