@@ -327,10 +327,14 @@ class MainWindow
                 {
                  action = this.agMenu_.child(openActions[i], "QAction");
 				 moduleName = aqApp.db().managerModules().idModuleOfFile(action.name + ".ui");
-                 if (moduleName != undefined)
+                 if (moduleName != undefined && moduleName != "")
                 	{
                 	this.initModule(moduleName);
                		this.addForm(openActions[i],action.iconSet().pixmap());
+               		}
+               	else
+               		{
+               		print ("aqAppScript : No se ha podido inicializar el módulo de la \"Action\" " + action.name + ".La pestaña es omitida.");
                		}
                  }
       var idx = settings.readNumEntry(key + "currentPageIndex");
