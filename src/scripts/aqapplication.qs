@@ -358,12 +358,20 @@ class MainWindow
       var openActions = settings.readListEntry(key + "openActions");
       for (var i = 0; i < tw.count; ++i)
         tw.page(i).close();
-      for (var i = 0; i < openActions.length; ++i) {
-        var act = this.agMenu_.child(openActions[i]);
-        if (!act || act == undefined || !act.isValid || !act.isA("QAction") || !act.isVisible())
-          continue;
-        this.addForm(openActions[i]);
-      }
+      for (var i = 0; i < openActions.length; ++i)
+                {
+                 action = this.agMenu_.child(openActions[i], "QAction");
+				 moduleName = aqApp.db().managerModules().idModuleOfFile(action.name + ".ui");
+                 if (moduleName != undefined && moduleName != "")
+                	{
+                	this.initModule(moduleName);
+               		this.addForm(openActions[i],action.iconSet().pixmap());
+               		}
+               	else
+               		{
+               		print ("aqAppScript : No se ha podido inicializar el módulo de la \"Action\" " + action.name + ".La pestaña es omitida.");
+               		}
+                 }
       var idx = settings.readNumEntry(key + "currentPageIndex");
       if (idx >= 0 && idx < tw.count)
         tw.setCurrentPage(idx);
