@@ -238,18 +238,12 @@ private:
     return hash;
   }
 
-  const QString *newUstr(QChar *s, uint len) {
-    const QString *us = 0;
-    if (len < 50) {
-      uint hash = hashUstr(s, len);
-      us = ustrHash.find(hash);
-      if (!us) {
-        us = new QString(s, len);
-        ustrHash.insert(hash, us);
-      }
-    } else {
+    const QString *newUstr(QChar *s, uint len) {
+    uint hash = hashUstr(s, len);
+    const QString *us = ustrHash.find(hash);
+    if (!us) {
       us = new QString(s, len);
-      ustrList.append(us);
+      ustrHash.insert(hash, us);
     }
     return us;
   }
