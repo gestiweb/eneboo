@@ -884,6 +884,8 @@ class MainWindow
 
       for (var i = 0; i < items.length(); ++i) {
         var itn = items.item(i).toElement();
+        if (itn.parentNode().toElement().tagName() == "item")
+          continue;
         if (!reduced)
           subMenuAg = new QActionGroup(menuAg);
         else
