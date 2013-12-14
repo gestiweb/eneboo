@@ -579,6 +579,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   }
 
   proc->addArgument("-dAutoRotatePages=/PageByPage");
+  proc->addArgument("-dUseCIEColor");
   proc->addArgument("-sOutputFile=" + outPsPdfFile);
   proc->addArgument("-sDEVICE=pdfwrite");
   proc->addArgument(outPsFile);
