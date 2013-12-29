@@ -89,6 +89,7 @@ bool FLFormDB::close()
 {
   if (isClosing_)
     return true;
+  cursor_->setEdition(true);
   isClosing_ = true;
   isClosing_ = QWidget::close();
 }
