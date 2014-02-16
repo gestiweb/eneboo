@@ -2032,6 +2032,7 @@ void FLSqlCursor::setMainFilter(const QString &f)
 {
   d->mainFilter_ = f;
   refresh();
+  emit cursorUpdated();
 }
 
 void FLSqlCursor::setFilter(const QString &filter)
