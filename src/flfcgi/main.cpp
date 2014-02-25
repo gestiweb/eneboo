@@ -151,18 +151,29 @@ void aq_main(int argc, char **argv)
   //AbanQ->syncX();
   //AbanQ->processEvents();
   //AbanQ->init(empty, callFunction, arguments, true);
+
   AbanQ->initfcgi();
     int count = 0;
     while (FCGI_Accept() >= 0)   {    
+        QString hostname = QString::fromAscii(getenv("SERVER_NAME")); 
         printf("Content-type: text/html\r\n"
                "\r\n"
                "<title>FastCGI Hello! (C, fcgi_stdio library)</title>"
                "<h1>FastCGI Hello! (C, fcgi_stdio library)</h1>"
                "Request number %d running on host <i>%s</i>\n",
-                ++count, getenv("SERVER_HOSTNAME"));        
-        QStringList argumentList = QStringList::split(':', arguments, false);
-        QString ret = AbanQ->callfcgi(callFunction, argumentList);
-        printf("\n RET: %s\n\n", ret.ascii());
+                ++count, hostname.ascii());  
+        QString query_string = QString::fromAscii(getenv("QUERY_STRING"));      
+        
+        printf("\n<p> QUERY: %s</p>\n\n", query_string.ascii());
+        if (!query_string.isEmpty()) {
+            QStringList argumentList = QStringList::split(':', query_string, false);
+            callFunction = QString(argumentList.first());
+            argumentList.pop_front();
+            QString ret = AbanQ->callfcgi(callFunction, argumentList);
+            if (!ret.isEmpty()) {
+                printf("\n<p> RET: %s</p>\n\n", ret.ascii());
+            }
+        }
 
     }
   AbanQ->endfcgi();
