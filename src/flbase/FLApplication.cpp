@@ -395,26 +395,31 @@ void FLApplication::init(const QString &n, const QString &callFunction,
 }
 
 
-void FLApplication::initfcgi(const QString &callFunction, const QString &arguments)
+int FLApplication::initfcgi()
 {
   initializing_ = true;
 
   container = new QMainWindow(0);
   container->setName("container");
+  container->setCaption("Eneboo " AQ_VERSION);
 
   FLDiskCache::init(this);
+#ifndef QSDEBUGGER
+  AQ_DISKCACHE_CLR();
+#endif
 
   qInitNetworkProtocols();
 
+#ifdef QSDEBUGGER
+  project_ = new QSProject(this, db()->database());
+#else
   project_ = new QSProject(0, db()->database());
+#endif
 
   AQ_SET_MNGLOADER
 
   db()->manager()->init();
   mngLoader_->init();
-
-   // initStyles();
-   // initMenuBar();
 
   db()->manager()->loadTables();
   mngLoader_->loadKeyFiles();
@@ -429,36 +434,68 @@ void FLApplication::initfcgi(const QString &callFunction, const QString &argumen
   loadTranslations();
 
   QSInterpreter *i = project_->interpreter();
-  if (!i) {
+  if (i) {
     i->addObjectFactory(flFactory_);
     i->addObjectFactory(new AQSObjectFactory);
     i->addWrapperFactory(new AQSWrapperFactory);
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
+#ifdef FL_DEBUGGER
+    i->setErrorMode( QSInterpreter::AskForDebug );
+#else
     i->setErrorMode( QSInterpreter::Notify );
-
-    if (!callFunction.isEmpty()) {
-
-        QStringList argumentList = QStringList::split(':', arguments, false);
-        QSArgumentList arglist;
-        for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
-          arglist.append(QSArgument(*it));
-        }
-        call(callFunction, arglist, 0);
-    }
+#endif
   } else {
     // Failed loading QSA.
   }
-  
+
+/*
+    QStringList argumentList = QStringList::split(':', arguments, false);
+    QSArgumentList arglist;
+    for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
+      arglist.append(QSArgument(*it));
+    }
+    call(callFunction, arglist, 0);
+
   if (!db()->driverName().isEmpty())
     FLVar::clean();
   mngLoader_->finish();
   db()->manager()->finish();
-  QTimer::singleShot(10, this, SLOT(quit()));
-
+  QTimer::singleShot(3000, this, SLOT(quit()));
+  */
   AQ_UNSET_MNGLOADER
 
   initializing_ = false;
+    
+}
+
+QString FLApplication::callfcgi(const QString &callFunction, QStringList argumentList) {    
+    initializing_ = true;
+    AQ_SET_MNGLOADER
+    QSArgumentList arglist;
+    for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
+      arglist.append(QSArgument(*it));
+    }
+    QSArgument ret = call(callFunction, arglist, 0);
+    QVariant v = ret.variant();
+    AQ_UNSET_MNGLOADER
+    initializing_ = false;
+    return v.asString();        
+}
+
+void FLApplication::endfcgi() {    
+    initializing_ = true;
+
+  AQ_SET_MNGLOADER
+  
+  if (!db()->driverName().isEmpty()) FLVar::clean();
+  mngLoader_->finish();
+  db()->manager()->finish();
+  QTimer::singleShot(10, this, SLOT(quit()));
+  AQ_UNSET_MNGLOADER
+    initializing_ = false;
+
+  
 }
 
 
