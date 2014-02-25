@@ -122,8 +122,10 @@ public:
   virtual void init(const QString &n = QString::null, const QString &callFunction = QString::null,
                     const QString &arguments = QString::null, bool quitAfterCall = false, bool noMax = false);
 
-  virtual void initfcgi(const QString &callFunction = QString::null,
-                    const QString &arguments = QString::null);
+  virtual int initfcgi();
+  virtual void endfcgi();
+
+  virtual QString callfcgi(const QString &callFunction, QStringList arguments);
 
   /**
   Para obtener el espacio de trabajo

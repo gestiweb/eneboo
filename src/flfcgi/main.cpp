@@ -32,6 +32,8 @@
 #include "../flbase/AQApplication.h"
 #include "../../AQConfig.h"
 
+#include "fcgi_stdio.h"
+
 static inline bool silentConnect(const QString &conn)
 {
   if (conn.isEmpty())
@@ -120,7 +122,7 @@ void aq_main(int argc, char **argv)
   }
   FLApplication *AbanQ = aqApp;
   if (silentConn.isEmpty()) {
-    printf("Usage: eneboo-fcgi -silentconn dbname:user:PostgreSQL:host:5432:passwd -c rpc_qs_function -a arg1:arg2\n");
+    printf("Usage: eneboo-fcgi -silentconn dbname:user:PostgreSQL:host:5432:passwd\n");
     QTimer::singleShot(0, AbanQ, SLOT(quit()));
     return;
   }
@@ -133,7 +135,9 @@ void aq_main(int argc, char **argv)
   if (!paths.contains(AQ_LIB))
     paths << AQ_LIB;
   AbanQ->setLibraryPaths(paths);
-
+  AbanQ->installTranslator(AbanQ->createSysTranslator(QString(QTextCodec::locale()).left(2), true));
+  AbanQ->installTranslator(AbanQ->createSysTranslator("multilang"));
+  
   int pointSize = 8;
 
   if (!silentConnect(silentConn)) {
@@ -141,13 +145,29 @@ void aq_main(int argc, char **argv)
     return;
   }
   QString empty;
-  AbanQ->setNotExit(FLSettings::readBoolEntry("application/notExit", false));
-  AbanQ->setPrintProgram(FLSettings::readEntry("printing/printProgram", QString::null));
-  AbanQ->processEvents();
-  AbanQ->initfcgi(callFunction, arguments);
+  //AbanQ->setNotExit(FLSettings::readBoolEntry("application/notExit", false));
+  //AbanQ->setPrintProgram(FLSettings::readEntry("printing/printProgram", QString::null));
+  //AbanQ->flushX();
+  //AbanQ->syncX();
+  //AbanQ->processEvents();
+  //AbanQ->init(empty, callFunction, arguments, true);
+  AbanQ->initfcgi();
+    int count = 0;
+    while (FCGI_Accept() >= 0)   {    
+        printf("Content-type: text/html\r\n"
+               "\r\n"
+               "<title>FastCGI Hello! (C, fcgi_stdio library)</title>"
+               "<h1>FastCGI Hello! (C, fcgi_stdio library)</h1>"
+               "Request number %d running on host <i>%s</i>\n",
+                ++count, getenv("SERVER_HOSTNAME"));        
+        QStringList argumentList = QStringList::split(':', arguments, false);
+        QString ret = AbanQ->callfcgi(callFunction, argumentList);
+        printf("\n RET: %s", ret.ascii());
 
-  AbanQ->mainWidget();
+    }
+  AbanQ->endfcgi();
     
+      
 }
 
 int main(int argc, char **argv)
