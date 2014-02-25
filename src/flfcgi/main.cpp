@@ -144,7 +144,7 @@ void aq_main(int argc, char **argv)
   AbanQ->setNotExit(FLSettings::readBoolEntry("application/notExit", false));
   AbanQ->setPrintProgram(FLSettings::readEntry("printing/printProgram", QString::null));
   AbanQ->processEvents();
-  AbanQ->init(empty,callFunction, arguments, true, false);
+  AbanQ->initfcgi(callFunction, arguments);
 
   AbanQ->mainWidget();
     

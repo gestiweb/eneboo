@@ -464,58 +464,20 @@ void FLApplication::initfcgi(const QString &callFunction, const QString &argumen
 
   container = new QMainWindow(0);
   container->setName("container");
-  container->setIcon(QPixmap::fromMimeSource("icono_abanq.png"));
-  container->setCaption("Eneboo " AQ_VERSION);
 
   FLDiskCache::init(this);
-#ifndef QSDEBUGGER
-  AQ_DISKCACHE_CLR();
-#endif
-
-  if (true) {
-    windowMenu = new QPopupMenu(container, "windowMenu");
-    windowCascadeAction = new QAction(tr("Cascada"), tr("Cascada"), QKeySequence(), container);
-    windowCascadeAction->setIconSet(QIconSet(QPixmap::fromMimeSource("cascada.png")));
-    windowCascadeAction->addTo(windowMenu);
-    windowTileAction = new QAction(tr("Mosaico"), tr("Mosaico"), QKeySequence(), container);
-    windowTileAction->setIconSet(QIconSet(QPixmap::fromMimeSource("mosaico.png")));
-    windowTileAction->addTo(windowMenu);
-    windowCloseAction = new QAction(tr("Cerrar"), tr("Cerrar"), QKeySequence(), container);
-    windowCloseAction->setIconSet(QIconSet(QPixmap::fromMimeSource("cerrar.png")));
-    windowCloseAction->addTo(windowMenu);
-
-    modulesMenu = new QPopupMenu(container, "modulesMenu");
-    modulesMenu->setCheckable(false);
-
-    QWidget *w = new QWidget(container, "widgetContainer");
-    QVBoxLayout *vL = new QVBoxLayout(w);
-    exitButton = new QPushButton(QPixmap::fromMimeSource("exit.png"), tr("Salir"), w, "pbSalir");
-    exitButton->setAccel(QKeySequence(tr("Ctrl+Q")));
-    exitButton->setFocusPolicy(QWidget::NoFocus);
-    QToolTip::add(exitButton, tr("Salir de la aplicación (Ctrl+Q)"));
-    QWhatsThis::add(exitButton, tr("Salir de la aplicación (Ctrl+Q)"));
-    connect(exitButton, SIGNAL(clicked()), this, SLOT(generalExit()));
-    toolBox = new QToolBox(w, "toolBox");
-    vL->addWidget(exitButton);
-    vL->addWidget(toolBox);
-    container->setCentralWidget(w);
-  }
 
   qInitNetworkProtocols();
 
-#ifdef QSDEBUGGER
-  project_ = new QSProject(this, db()->database());
-#else
   project_ = new QSProject(0, db()->database());
-#endif
 
   AQ_SET_MNGLOADER
 
   db()->manager()->init();
   mngLoader_->init();
 
-    initStyles();
-    initMenuBar();
+   // initStyles();
+   // initMenuBar();
 
   db()->manager()->loadTables();
   mngLoader_->loadKeyFiles();
@@ -530,38 +492,32 @@ void FLApplication::initfcgi(const QString &callFunction, const QString &argumen
   loadTranslations();
 
   QSInterpreter *i = project_->interpreter();
-  if (i) {
+  if (!i) {
     i->addObjectFactory(flFactory_);
     i->addObjectFactory(new AQSObjectFactory);
     i->addWrapperFactory(new AQSWrapperFactory);
     i->addObjectFactory(new QSInputDialogFactory);
     i->addObjectFactory(new QSUtilFactory);
-#ifdef FL_DEBUGGER
-    i->setErrorMode( QSInterpreter::AskForDebug );
-#else
     i->setErrorMode( QSInterpreter::Notify );
-#endif
+
+    if (!callFunction.isEmpty()) {
+
+        QStringList argumentList = QStringList::split(':', arguments, false);
+        QSArgumentList arglist;
+        for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
+          arglist.append(QSArgument(*it));
+        }
+        call(callFunction, arglist, 0);
+    }
   } else {
     // Failed loading QSA.
   }
-
-  if (!callFunction.isEmpty()) {
-
-    QStringList argumentList = QStringList::split(':', arguments, false);
-    QSArgumentList arglist;
-    for (QStringList::Iterator it = argumentList.begin(); it != argumentList.end(); ++it) {
-      arglist.append(QSArgument(*it));
-    }
-    call(callFunction, arglist, 0);
-    if (true) {
-      if (!db()->driverName().isEmpty())
-        FLVar::clean();
-      mngLoader_->finish();
-      db()->manager()->finish();
-      QTimer::singleShot(3000, this, SLOT(quit()));
-    }
-  }
   
+  if (!db()->driverName().isEmpty())
+    FLVar::clean();
+  mngLoader_->finish();
+  db()->manager()->finish();
+  QTimer::singleShot(10, this, SLOT(quit()));
 
   AQ_UNSET_MNGLOADER
 
