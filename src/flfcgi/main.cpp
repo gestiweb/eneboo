@@ -162,7 +162,7 @@ void aq_main(int argc, char **argv)
                 ++count, getenv("SERVER_HOSTNAME"));        
         QStringList argumentList = QStringList::split(':', arguments, false);
         QString ret = AbanQ->callfcgi(callFunction, argumentList);
-        printf("\n RET: %s", ret.ascii());
+        printf("\n RET: %s\n\n", ret.ascii());
 
     }
   AbanQ->endfcgi();

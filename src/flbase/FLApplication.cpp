@@ -540,6 +540,7 @@ QString FLApplication::callfcgi(const QString &callFunction, QStringList argumen
       arglist.append(QSArgument(*it));
     }
     QSArgument ret = call(callFunction, arglist, 0);
+    // return ret.typeName();
     QVariant v = ret.variant();
     AQ_UNSET_MNGLOADER
     initializing_ = false;
