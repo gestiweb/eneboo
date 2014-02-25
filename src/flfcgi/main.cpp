@@ -156,22 +156,24 @@ void aq_main(int argc, char **argv)
     int count = 0;
     while (FCGI_Accept() >= 0)   {    
         QString hostname = QString::fromAscii(getenv("SERVER_NAME")); 
-        printf("Content-type: text/html\r\n"
+        /*printf("Content-type: text/html\r\n"
                "\r\n"
                "<title>FastCGI Hello! (C, fcgi_stdio library)</title>"
                "<h1>FastCGI Hello! (C, fcgi_stdio library)</h1>"
                "Request number %d running on host <i>%s</i>\n",
                 ++count, hostname.ascii());  
+        */
         QString query_string = QString::fromAscii(getenv("QUERY_STRING"));      
         
-        printf("\n<p> QUERY: %s</p>\n\n", query_string.ascii());
+        //printf("\n<p> QUERY: %s</p>\n\n", query_string.ascii());
         if (!query_string.isEmpty()) {
             QStringList argumentList = QStringList::split(':', query_string, false);
             callFunction = QString(argumentList.first());
             argumentList.pop_front();
             QString ret = AbanQ->callfcgi(callFunction, argumentList);
             if (!ret.isEmpty()) {
-                printf("\n<p> RET: %s</p>\n\n", ret.ascii());
+                //printf("\n<p> RET: %s</p>\n\n", ret.ascii());
+                printf("Content-type: text/html\r\n\r\n%s\n\n", ret.ascii());
             }
         }
 

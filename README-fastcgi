@@ -1,0 +1,59 @@
+Para hacer funcionar fastcgi, primero, recompilar otra vez para Linux.
+
+Esto nos creará un ejecutable eneboo-fastcgi.
+
+Este ejecutable únicamente necesita el parámetro de conexión silenciosa.
+Por ejemplo:
+./eneboo-build-linux64-dba/bin/eneboo-fcgi -silentconn eneboo1:postgres:PostgreSQL:127.0.0.1:5432:1234
+
+Si se lanza de forma normal, es un ejecutable CGI. 
+Podemos pasar el parámetro QUERY_STRING usando export.
+
+export QUERY_STRING="flfactppal.valorDefectoEmpresa:codalmacen"
+
+Para lanzar como fastcgi, habría que usar spawn-fcgi.
+
+Hay básicamente dos modos, para depurar y para producción.
+
+Para depurar lanzamos con "-n", que evita el fork() y vemos lo que está pasando:
+spawn-fcgi -n -s /tmp/eneboo.fcgi.socket -M 0777 -- $(pwd)/eneboo-build-linux64-dba/bin/eneboo-fcgi -silentconn eneboo1:postgres:PostgreSQL:127.0.0.1:5432:1234
+
+Para producción lanzamos con "-F4" para lanzar 4 procesos en paralelo:
+spawn-fcgi -F4 -s /tmp/eneboo.fcgi.socket -M 0777 -- $(pwd)/eneboo-build-linux64-dba/bin/eneboo-fcgi -silentconn eneboo1:postgres:PostgreSQL:127.0.0.1:5432:1234
+
+Para detener un proceso con fork no está aún claro cual es un buen método. Por el momento se puede hacer un:
+pkill -f eneboo-fastcgi
+
+Pero esto puede parar otros procesos no deseados.
+
+NOTA: para lanzar de forma completamente desatendida probablemente necesitemos xvfb, ya que Qt3 no tiene
+soporte para headless.
+
+
+El resto, es tener un servidor web con fastcgi. Cuasi todos tienen soporte.
+En mi caso probé lighttpd con fastcgi, para ello agregué al final de la configuración: (además de agregar el modulo fastcgi a la configuracion)
+fastcgi.server = (
+  "/" =>
+  (( 
+     "socket" => "/home/deavid/git/eneboo/eneboo.fcgi.socket",
+     "check-local" => "disable",
+     "docroot" => "/" # remote server may use 
+                      # its own docroot
+  ))
+)
+
+
+Con esto, cuando se visita una página en ese servidor, todo lo que pongamos detrás del interrogante (?) 
+será enviado como query string, por lo tanto, consultamos desde el navegador a modo de prueba:
+http://127.0.0.1/?flfactppal.valorDefectoEmpresa:codpago
+
+Y debería devolvernos "CONT" o la forma de pago configurada.
+
+
+CUIDADO!!! Esta versión de fastCGI es muy prematura. La seguridad es *NULA*. El formato de paso de parámetros deja mucho que desear, y probablemente cambie.
+Si alguien prueba esto, que sea en un entorno controlado, de pruebas y NUNCA JAMÁS en produción ni en internet... a no ser que esté conectado a un servidor 
+de base de datos que se pueda borrar por completo (dado que es posible afectar a otras bases de datos usando funciones de Eneboo)
+
+Espero que sea útil!
+
+
