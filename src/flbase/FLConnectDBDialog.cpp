@@ -90,6 +90,8 @@ FLConnectDBDialog::~FLConnectDBDialog() {}
 
 void FLConnectDBDialog::tryConnect()
 {
+
+
   FLSqlDatabase *db = new FLSqlDatabase();
 
   if (!db->loadDriver(FLSqlDatabase::driverAliasToDriverName(comboBoxDB->currentText()))) {
