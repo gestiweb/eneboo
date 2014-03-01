@@ -32,7 +32,7 @@ mac:LIBS *= -ladvance -lqui -lflmail -lqwt
 enable_digidoc:mac:LIBS *= -llibdigidoc -lcrypto -lssl -lxml2
 
 load(qsa)
-
+HEADERS += fcgiobjectfactory.h
 SOURCES += main.cpp
 
 

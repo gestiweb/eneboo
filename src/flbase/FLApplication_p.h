@@ -126,6 +126,7 @@ public:
   virtual void endfcgi();
 
   virtual QString callfcgi(const QString &callFunction, QStringList arguments);
+  virtual void addObjectFactory(QSObjectFactory *newObjectFactory);
 
   /**
   Para obtener el espacio de trabajo

@@ -532,6 +532,18 @@ int FLApplication::initfcgi()
     
 }
 
+void FLApplication::addObjectFactory(QSObjectFactory *newObjectFactory) {
+	QSInterpreter *i = project_->interpreter();
+	if (i) {
+		if (newObjectFactory == NULL) {
+			qDebug("ERROR: newObjectFactory == NULL!");
+			return;
+		}
+		i->addObjectFactory(newObjectFactory);
+	}
+}
+
+
 QString FLApplication::callfcgi(const QString &callFunction, QStringList argumentList) {    
     initializing_ = true;
     AQ_SET_MNGLOADER
