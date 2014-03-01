@@ -34,6 +34,7 @@
 #include "fcgi_stdio.h"
 
 #include "AQConfig.h"
+extern char **environ;
 
 
 class FCgiObjectFactory : public QSObjectFactory
@@ -57,9 +58,22 @@ public:
 	virtual ~FLFastCgiInterface() {}
 
 public slots:
+	QStringList getFullEnv() {
+	  char *s = *environ;
+	  int i = 1;
+	  QStringList ret;
+	  for (; s; i++) {
+		QString qs = QString::fromAscii(s);  
+		ret.append(qs);
+		s = *(environ+i);
+	  }
+	  return ret;
+	}
 
-	QString getenv(const QString &name) {
-		QString ret = QString::fromAscii(getenv(name.ascii())); 
+	QString getEnv(const QString &name) {
+		char *cret = getenv(name.ascii());
+		if (cret == NULL) return QString::null;
+		QString ret = QString::fromAscii(cret); 
 		return ret;
 	}
 
