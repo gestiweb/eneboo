@@ -32,6 +32,7 @@
 #include "../flbase/AQApplication.h"
 #include "../../AQConfig.h"
 
+#define NO_FCGI_DEFINES
 #include "fcgi_stdio.h"
 
 static inline bool silentConnect(const QString &conn)
@@ -156,7 +157,7 @@ void aq_main(int argc, char **argv)
     int count = 0;
     while (FCGI_Accept() >= 0)   {    
         QString hostname = QString::fromAscii(getenv("SERVER_NAME")); 
-        /*printf("Content-type: text/html\r\n"
+        /*FCGI_printf("Content-type: text/html\r\n"
                "\r\n"
                "<title>FastCGI Hello! (C, fcgi_stdio library)</title>"
                "<h1>FastCGI Hello! (C, fcgi_stdio library)</h1>"
@@ -165,15 +166,15 @@ void aq_main(int argc, char **argv)
         */
         QString query_string = QString::fromAscii(getenv("QUERY_STRING"));      
         
-        //printf("\n<p> QUERY: %s</p>\n\n", query_string.ascii());
+        //FCGI_printf("\n<p> QUERY: %s</p>\n\n", query_string.ascii());
         if (!query_string.isEmpty()) {
             QStringList argumentList = QStringList::split(':', query_string, false);
             callFunction = QString(argumentList.first());
             argumentList.pop_front();
             QString ret = AbanQ->callfcgi(callFunction, argumentList);
             if (!ret.isEmpty()) {
-                //printf("\n<p> RET: %s</p>\n\n", ret.ascii());
-                printf("Content-type: text/html\r\n\r\n%s\n\n", ret.ascii());
+                //FCGI_printf("\n<p> RET: %s</p>\n\n", ret.ascii());
+                FCGI_printf("Content-type: text/html\r\n\r\n%s\n\n", ret.ascii());
             }
         }
 
