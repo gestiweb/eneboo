@@ -56,4 +56,44 @@ de base de datos que se pueda borrar por completo (dado que es posible afectar a
 
 Espero que sea útil!
 
+==========================================
+ACTUALIZACION:::::
+==========================================
+
+Ahora todas las consultas pasan por QSA directamente y allí hay que hacer todo el trabajo.
+Para facilitar las pruebas, aquí va una función de ejemplo: (fichero flfacppal.qs)
+class oficial (...)
+
+    function fcgiProcessRequest() {
+		return this.ctx.oficial_fcgiProcessRequest();
+    }
+(...)
+
+function oficial_fcgiProcessRequest()
+{
+	//debug("init fcgi request");
+	var fcgi = new FLFastCgi();
+	debug("REQUEST_METHOD: " + fcgi.getEnv("REQUEST_METHOD"));
+	fcgi.write("Content-type: text/html\r\n");
+	fcgi.write("\r\n");
+	fcgi.write("<h1>Hola mundo desde QSA</h1>");
+	fcgi.write("<pre>");
+	var envlist:StringList = fcgi.getFullEnv();
+	for (var i in envlist) {
+		var env = envlist[i];
+		fcgi.write(env + "\r\n");
+	}
+
+	fcgi.write("</pre>");
+	fcgi.write("\r\n\r\n");
+	
+	return "END REQUEST";
+}
+
+Ahora hay que agregar "-c flfactppal.fcgiProcessRequest" a la llamada, para que eneboo enrute todas las consultas
+a través de esta función:
+
+ spawn-fcgi -n -s /tmp/eneboo.fcgi.socket -M 0777 -- ./eneboo-build-linux64-dba/bin/eneboo-fcgi \
+	-silentconn eneboo1:postgres:PostgreSQL:127.0.0.1:5432:1234 -c flfactppal.fcgiProcessRequest
+
 

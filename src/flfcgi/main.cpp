@@ -154,20 +154,9 @@ void aq_main(int argc, char **argv)
   AbanQ->addObjectFactory(new FCgiObjectFactory());
 
     int count = 0;
+	QStringList argumentList;
     while (FCGI_Accept() >= 0)   {    
-        QString hostname = QString::fromAscii(getenv("SERVER_NAME")); 
-        QString query_string = QString::fromAscii(getenv("QUERY_STRING"));      
-        
-        if (!query_string.isEmpty()) {
-            QStringList argumentList = QStringList::split(':', query_string, false);
-            callFunction = QString(argumentList.first());
-            argumentList.pop_front();
-            QString ret = AbanQ->callfcgi(callFunction, argumentList);
-            if (!ret.isEmpty()) {
-                FCGI_printf("Content-type: text/html\r\n\r\n%s\n\n", ret.ascii());
-            }
-        }
-
+		QString ret = AbanQ->callfcgi(callFunction, argumentList);
     }
   AbanQ->endfcgi();
     
