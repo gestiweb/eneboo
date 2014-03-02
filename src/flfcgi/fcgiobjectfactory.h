@@ -25,6 +25,7 @@
 // ----
 
 #include <qsplashscreen.h>
+#include <qurloperator.h>
 
 
 #include <qsobjectfactory.h>
@@ -77,18 +78,65 @@ public slots:
 		return ret;
 	}
 
-//DLLAPI size_t     FCGI_fread(void *ptr, size_t size, size_t nmemb, FCGI_FILE *fp);
+	QString urldecode(const QString &str) {
+		QString ret(str);
+		ret = ret.replace("+"," ");
+		QUrl::decode(ret);
+		return ret;
+	}
+	QString urlencode(const QString &str) {
+		QString ret(str);
+		QUrl::encode(ret);
+		return ret;
+	}
+	QString xmlentityencode(const QString &str) {
+		QString temp(str);
+		temp.replace("&","&amp;");
+		temp.replace("'","&apos;");
+		temp.replace("\"","&quot;");
+		temp.replace("<", "&lt;");
+		temp.replace(">", "&gt;");
+		return temp;
+	}
+	QString xmlentitydecode(const QString &str) {
+		QString temp(str);
+		temp.replace("&amp;", "&");
+		temp.replace("&apos;", "'");
+		temp.replace("&quot;", "\"");
+		temp.replace("&lt;", "<");
+		temp.replace("&gt;", ">");
+		return temp;
+	}
+	
 
+//DLLAPI size_t     FCGI_fread(void *ptr, size_t size, size_t nmemb, FCGI_FILE *fp);
+	QString read(int blocksize = 65535) {
+		// El bloque por defecto lo dejo a 64K por intentar evitar que
+		// el cliente QSA tenga que hacer varias peticiones seguidas
+		// a read en la mayoría de los casos.
+		char *data = new char[blocksize];
+		int szRead = -1;
+		szRead = FCGI_fread((void *) data, sizeof(char), blocksize, FCGI_stdin);
+		if (szRead <= 0) return QString::null;
+		QByteArray qdata(szRead);
+		qdata.setRawData(data,szRead);
+		QString ret(qdata);
+		return ret;
+		
+	}
+	
 
 //DLLAPI size_t     FCGI_fwrite(void *ptr, size_t size, size_t nmemb, FCGI_FILE *fp);
 	int write(QString data) {
 		void *ptr = (void *) data.ascii();
+		if (ptr == NULL) return -33;
 		int sz = data.length();
 		return FCGI_fwrite(ptr, sizeof(char), sz, FCGI_stdout);
 	}
 	
 	int writeError(QString data) {
 		void *ptr = (void *) data.ascii();
+		if (ptr == NULL) return -33;
 		int sz = data.length();
 		return FCGI_fwrite(ptr, sizeof(char), sz, FCGI_stderr);
 	}
