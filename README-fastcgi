@@ -89,7 +89,7 @@ function oficial_fcgiProcessRequest()
 	fcgi.write('</pre>');
 	
 	fcgi.write("<pre>");
-	var envlist:StringList = fcgi.getFullEnv();
+	var envlist = fcgi.getFullEnv();
 	for (var i in envlist) {
 		var env = envlist[i];
 		fcgi.write(env + "\r\n");
