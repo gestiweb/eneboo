@@ -435,28 +435,23 @@ class MainWindow
     if(texto != undefined) //Si existe el texto de ese actionName
                      { 
                       texto = this.ListaTabs_[actionName];
-                        for (var i = 0; i < tw.count; ++i)
-                                           {
-                       if (tw.tabLabel(tw.page(i)) == texto)  //Si la pestaña es visible...
-                                                    {
-                                                    this.ListaTabs_[actionName] = texto;
-                                                    visible = true;
-                                                    idx = i;
-                                                    }
-                                           }
+                      
+                    for (var i = tw.count; i >= 0 ; i--) {
+                   if (tw.tabLabel(tw.page(i)) == texto)  //Si la pestaña es visible...
+                                                {
+                                                tw.page(i).close();
+                                                /*this.ListaTabs_[actionName] = texto;
+                                                // TODO: ELIMINAR ESTA PESTaÑA
+                                                visible = true;
+                                                idx = i;*/
+                                                
+                                                }
+                                       }
                         
                     }
    if (!visible) 
          {
 	texto = fm.caption //Cogemos el nuevo título
-	var ok:Boolean = false;
-	while (!ok) //Busca titulos repetidos
-                   {
-if (tw.count == 0) ok =true;
-                    for (var i = 0; i < tw.count; ++i) if (tw.tabLabel(tw.page(i)) == texto) {
-									texto = texto + " (bís)";
-											     } else ok = true; 
-                   }
 
          tw.addTab(fm,new QIconSet(iconSet16x16(new QPixmap(Pixmap))), texto);
          idx = tw.indexOf(fm);
