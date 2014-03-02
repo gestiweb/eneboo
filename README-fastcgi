@@ -73,10 +73,21 @@ function oficial_fcgiProcessRequest()
 {
 	//debug("init fcgi request");
 	var fcgi = new FLFastCgi();
-	debug("REQUEST_METHOD: " + fcgi.getEnv("REQUEST_METHOD"));
+	debug("REQUEST_METHOD: " + fcgi.getEnv("REQUEST_METHOD") + " : URI:" + fcgi.getEnv("REQUEST_URI") );
 	fcgi.write("Content-type: text/html\r\n");
 	fcgi.write("\r\n");
 	fcgi.write("<h1>Hola mundo desde QSA</h1>");
+	fcgi.write('<form action="." method="POST">');
+	fcgi.write('  First name: <input type="text" name="fname"><br>');
+	fcgi.write('  Last name: <input type="text" name="lname"><br>');
+	fcgi.write('  <input type="submit" value="Submit">');
+	fcgi.write('</form>	');
+	var urlop = new QUrlOperator();
+	var postdata = fcgi.read();
+	fcgi.write('<pre style="color: blue">');
+	fcgi.write(fcgi.xmlentityencode(fcgi.urldecode(postdata)));
+	fcgi.write('</pre>');
+	
 	fcgi.write("<pre>");
 	var envlist:StringList = fcgi.getFullEnv();
 	for (var i in envlist) {
@@ -85,10 +96,12 @@ function oficial_fcgiProcessRequest()
 	}
 
 	fcgi.write("</pre>");
+	
 	fcgi.write("\r\n\r\n");
 	
 	return "END REQUEST";
 }
+
 
 Ahora hay que agregar "-c flfactppal.fcgiProcessRequest" a la llamada, para que eneboo enrute todas las consultas
 a través de esta función:
