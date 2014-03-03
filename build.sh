@@ -634,15 +634,6 @@ $CMD_MAKE $MAKE_INSTALL || exit 1
 
 cd $BASEDIR
 
-echo "Compilando LibFcgi..."
-
-cd $BASEDIR/src/libfcgi
-./configure > /dev/null
-$CMD_MAKE > /dev/null || exit 1
-cp ./libfcgi/.libs/libfcgi.so.0.0.0 $PREFIX/lib/libfcgi.so.0
-
-cd $BASEDIR
-
 echo -e "Creando Makefiles con qmake...\n"
 
 cp -f src/qt/.qmake.cache .qmake.cache
