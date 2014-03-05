@@ -55,5 +55,8 @@ QTranslatorMessage FLTranslator::findMessage(const char *context, const char *so
   //    }
   //    return ret;
   //  }
+  if (!comment)
+  return QTranslator::findMessage(context, sourceText);
+  else
   return QTranslator::findMessage(context, sourceText, comment);
 }
