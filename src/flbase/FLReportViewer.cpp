@@ -149,7 +149,8 @@ void FLReportViewer::setReportEngine(FLReportEngine *r)
 void FLReportViewer::exec()
 {
     soyGuaca_ = false;
-    soyGuaca_ = FLUtil::readSettingEntry( "application/soyGuaca", "false" ).toBool();
+    soyGuaca_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaMode", "false" ).toBool();
+    guacaFolder_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaFolder", "" );
     if (!soyGuaca_) /// Si no soy Guaca , me comporto normalmente.
     {
 
@@ -169,7 +170,7 @@ void FLReportViewer::exec()
           {
           QClipboard *clipboard = QApplication::clipboard();
           clipboard->setText("");  /// Limpio , para que detecte guaca que cambiamos el contenido
-           slotPrintReportToPDF( AQ_USRHOME + "/.Guacamole/outprintps.pdf"); /// Creamos el pdf.
+           slotPrintReportToPDF( guacaFolder + "document.pdf");; /// Creamos el pdf.
            clipboard->setText("GUACA_IMPRIME");  /// Pongo en el portapapeles la bandera
            } 
 }
