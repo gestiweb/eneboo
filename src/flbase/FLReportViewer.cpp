@@ -150,7 +150,12 @@ void FLReportViewer::exec()
 {
     soyGuaca_ = false;
     soyGuaca_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaMode", "false" ).toBool();
-    guacaFolder_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaFolder", "" );
+    guacaFolder_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaFolder", AQ_USRHOME ).toString();
+    
+    QString fileTemp = "document_";
+    fileTemp += QDateTime::currentDateTime().toString().replace(":", "").replace(" ", ""); //Esto lo cambiamos por un string con el tiempo
+    fileTemp += ".pdf";
+    
     if (!soyGuaca_) /// Si no soy Guaca , me comporto normalmente.
     {
 
@@ -170,8 +175,8 @@ void FLReportViewer::exec()
           {
           QClipboard *clipboard = QApplication::clipboard();
           clipboard->setText("");  /// Limpio , para que detecte guaca que cambiamos el contenido
-           slotPrintReportToPDF( guacaFolder + "document.pdf");; /// Creamos el pdf.
-           clipboard->setText("GUACA_IMPRIME");  /// Pongo en el portapapeles la bandera
+           slotPrintReportToPDF( guacaFolder_ + fileTemp ); /// Creamos el pdf.
+           clipboard->setText("GUACA_IMPRIME" + fileTemp);  /// Pongo en el portapapeles la bandera
            } 
 }
 
