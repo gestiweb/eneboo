@@ -353,8 +353,9 @@ public:
   Establece el filtro principal del cursor.
 
   @param f Cadena con el filtro, corresponde con una clausura WHERE
+  @param doRefresh Si TRUE tambien refresca el cursor
   */
-  void setMainFilter(const QString &f);
+  void setMainFilter(const QString &f, bool doRefresh = true);
 
   /**
   Establece el modo de acceso para el cursor.

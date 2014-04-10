@@ -240,6 +240,11 @@ void FLFormDB::showEvent(QShowEvent *e)
 {
   if (!showed && mainWidget_) {
     showed = true;
+    if (cursor_ && iface) {
+      QVariant v(aqApp->call("preloadMainFilter", QSArgumentList(), iface).variant());
+      if (v.isValid() && v.type() == QVariant::String)
+        cursor_->setMainFilter(v.toString(), false);
+    }
     initMainWidget();
     callInitScript();
   }

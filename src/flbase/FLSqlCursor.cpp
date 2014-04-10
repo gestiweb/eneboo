@@ -2028,11 +2028,11 @@ QString FLSqlCursor::curFilter()
   }
 }
 
-void FLSqlCursor::setMainFilter(const QString &f)
+void FLSqlCursor::setMainFilter(const QString &f, bool doRefresh)
 {
   d->mainFilter_ = f;
-  refresh();
-  emit cursorUpdated();
+  if (doRefresh)
+    refresh();
 }
 
 void FLSqlCursor::setFilter(const QString &filter)
