@@ -435,39 +435,39 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     }
     if (autoSortColumn_) {
       QStringList s = QStringList() << tMD->fieldAliasToName(horizHeader->label(sortColumn_)) + (orderAsc_ ? " ASC" : " DESC");
-    s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
-    s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
-      tableRecords_->setSort(s);
-    QString functionQSA = "";
+      s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
+      s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
+      QString functionQSA = "";
 
-    if (functionQSA.isEmpty()) {
-      QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
-                                                             QString::fromLatin1(".mtd")));
-      functionQSA = idMod + QString::fromLatin1(".tableDB_setSort_") + cursor_->metadata()->name();
-    }
-                                                     
-    if (!functionQSA.isEmpty()) {
-      QValueList<QVariant> vargs = QValueList<QVariant>();
-      vargs.append(s);
-      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn_)));
-      vargs.append(orderAsc_);
-      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn2_)));
-      vargs.append(orderAsc2_);
-      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn3_)));
-      vargs.append(orderAsc3_);
-      QSArgumentList args = QSArgumentList(vargs);
-      QVariant v = aqApp->call(functionQSA,args, 0).variant();
-      QStringList ret = v.asStringList();
-      if (!v.isNull()) {
-        s = ret;   
-        qDebug("functionQSA:" + functionQSA + " : " + ret.join(", "));
-      } else {
-        qDebug("functionQSA:" + functionQSA + " -> NULL");
+      if (functionQSA.isEmpty()) {
+        QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
+                                                               QString::fromLatin1(".mtd")));
+        functionQSA = idMod + QString::fromLatin1(".tableDB_setSort_") + cursor_->metadata()->name();
       }
-    } else {
-      qDebug("functionQSA: (empty)");
-    }      
-    
+                                                     
+      if (!functionQSA.isEmpty()) {
+        QValueList<QVariant> vargs = QValueList<QVariant>();
+        vargs.append(s);
+        vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn_)));
+        vargs.append(orderAsc_);
+        vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn2_)));
+        vargs.append(orderAsc2_);
+        vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn3_)));
+        vargs.append(orderAsc3_);
+        QSArgumentList args = QSArgumentList(vargs);
+        QVariant v = aqApp->call(functionQSA,args, 0).variant();
+        QStringList ret = v.asStringList();
+        if (!v.isNull()) {
+          s = ret;   
+          qDebug("functionQSA:" + functionQSA + " : " + ret.join(", "));
+        } else {
+          qDebug("functionQSA:" + functionQSA + " -> NULL");
+        }
+      } else {
+        qDebug("functionQSA: (empty)");
+      }      
+      tableRecords_->setSort(s);
+    }
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
     comboBoxFieldToSearch->clear();
     for (int i = sortColumn_; i < tableRecords_->numCols(); ++i) {
@@ -481,8 +481,8 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
       horizHeader->setLabel(i, field->alias());
       tableRecords_->setColumn(i, field->name(), field->alias());         
       //--> Aulla: Recalculamos el tamaño del primer encabezado para que deje espacio al indicador del orden.
-   if ( i == 0 &&  tableRecords_->columnWidth(0) < fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")))
-   		tableRecords_->setColumnWidth(field->name(),fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")));
+      if ( i == 0 &&  tableRecords_->columnWidth(0) < fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")))
+        tableRecords_->setColumnWidth(field->name(),fontMetrics().width( field ->alias() + QString::fromLatin1("WWWW")));
      //<-- Aulla.
     }
     comboBoxFieldToSearch2->clear();
@@ -502,7 +502,7 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     if (autoSortColumn_) {
       horizHeader->setClickEnabled(false);
       horizHeader->setClickEnabled(true, sortColumn_);
-    horizHeader->setClickEnabled(true, sortColumn2_);
+      horizHeader->setClickEnabled(true, sortColumn2_);
       horizHeader->setSortIndicator(-1, Qt::Ascending);
       horizHeader->setSortIndicator(sortColumn_, (orderAsc_ ? Qt::Ascending : Qt::Descending));
     }
