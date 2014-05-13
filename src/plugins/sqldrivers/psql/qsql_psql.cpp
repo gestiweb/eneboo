@@ -78,11 +78,7 @@ email                : mail@infosial.com
 #include <catalog/pg_type.h>
 #undef errno
 
-#ifdef FL_QUICK_CLIENT
-#define LIMIT_RESULT 49
-#else
 #define LIMIT_RESULT 99
-#endif
 
 //#define AQ_MD5_CHECK
 

@@ -881,9 +881,7 @@ void FLDataTable::setFocus()
     return;
   if (!hasFocus()) {
     setPaletteBackgroundColor(qApp->palette().color(QPalette::Active, QColorGroup::Base));
-#ifndef FL_QUICK_CLIENT
     QDataTable::refresh();
-#endif
   } else
     syncNumRows();
   QWidget::setFocus();

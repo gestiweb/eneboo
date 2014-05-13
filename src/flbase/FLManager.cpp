@@ -963,10 +963,6 @@ FLTableMetaData *FLManager::metadataDev(const QString &n, bool quick)
 #endif
     if (quick)
       delete dictKey;
-#ifdef FL_QUICK_CLIENT
-    else
-      delete dictKey;
-#endif
     return 0;
   }
 
@@ -984,10 +980,6 @@ FLTableMetaData *FLManager::metadataDev(const QString &n, bool quick)
     }
     if (quick)
       delete dictKey;
-#ifdef FL_QUICK_CLIENT
-    else
-      delete dictKey;
-#endif
     if (!ret->fieldsNamesUnlock().isEmpty())
       ret = new FLTableMetaData(ret);
   }
