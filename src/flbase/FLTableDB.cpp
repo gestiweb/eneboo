@@ -438,7 +438,36 @@ void FLTableDB::refresh(const bool refreshHead, const bool refreshData)
     s << tMD->fieldAliasToName(horizHeader->label(sortColumn2_)) + (orderAsc2_ ? " ASC" : " DESC");
     s << tMD->fieldAliasToName(horizHeader->label(sortColumn3_)) + (orderAsc3_ ? " ASC" : " DESC");
       tableRecords_->setSort(s);
+    QString functionQSA = "";
+
+    if (functionQSA.isEmpty()) {
+      QString idMod(cursor_->db()->managerModules()->idModuleOfFile(cursor_->metadata()->name() +
+                                                             QString::fromLatin1(".mtd")));
+      functionQSA = idMod + QString::fromLatin1(".tableDB_setSort_") + cursor_->metadata()->name();
     }
+                                                     
+    if (!functionQSA.isEmpty()) {
+      QValueList<QVariant> vargs = QValueList<QVariant>();
+      vargs.append(s);
+      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn_)));
+      vargs.append(orderAsc_);
+      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn2_)));
+      vargs.append(orderAsc2_);
+      vargs.append(tMD->fieldAliasToName(horizHeader->label(sortColumn3_)));
+      vargs.append(orderAsc3_);
+      QSArgumentList args = QSArgumentList(vargs);
+      QVariant v = aqApp->call(functionQSA,args, 0).variant();
+      QStringList ret = v.asStringList();
+      if (!v.isNull()) {
+        s = ret;   
+        qDebug("functionQSA:" + functionQSA + " : " + ret.join(", "));
+      } else {
+        qDebug("functionQSA:" + functionQSA + " -> NULL");
+      }
+    } else {
+      qDebug("functionQSA: (empty)");
+    }      
+    
     tableRecords_->QDataTable::refresh(QDataTable::RefreshColumns);
     comboBoxFieldToSearch->clear();
     for (int i = sortColumn_; i < tableRecords_->numCols(); ++i) {

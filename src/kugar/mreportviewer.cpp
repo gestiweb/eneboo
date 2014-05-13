@@ -505,9 +505,9 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   }
 
   QString outPsFile(AQ_DISKCACHE_DIRPATH + "/outprintpdf.ps");
-  QString outPsPdfFile(AQ_DISKCACHE_DIRPATH + "/outprintps.pdf");
+  //QString outPsPdfFile(AQ_DISKCACHE_DIRPATH + "/outprintps.pdf");
   QFile::remove(outPsFile);
-  QFile::remove(outPsPdfFile);
+  //QFile::remove(outPsPdfFile);
   if (!printReportToPS(outPsFile))
     return false;
 
@@ -580,7 +580,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
 
   proc->addArgument("-dAutoRotatePages=/PageByPage");
   proc->addArgument("-dUseCIEColor");
-  proc->addArgument("-sOutputFile=" + outPsPdfFile);
+  proc->addArgument("-sOutputFile=" + outPdfFile);
   proc->addArgument("-sDEVICE=pdfwrite");
   proc->addArgument(outPsFile);
 
@@ -595,7 +595,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   delete proc;
 
   qApp->processEvents();
-
+/**
   proc = new QProcess();
   proc->addArgument(gs);
   proc->addArgument("-q");
@@ -605,7 +605,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   proc->addArgument("-dNODISPLAY");
   proc->addArgument("-dDELAYSAFER");
   proc->addArgument("--");
-  proc->addArgument("pdfopt.ps");
+  proc->addArgument("pdfopt.ps"); //Obsoleto desde gs 9.07
   proc->addArgument(outPsPdfFile);
   proc->addArgument(outPdfFile);
 
@@ -620,7 +620,7 @@ bool MReportViewer::printReportToPDF(const QString &outPdfFile)
   delete proc;
 
   qApp->processEvents();
-
+**/
   return true;
 }
 

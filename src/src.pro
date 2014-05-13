@@ -11,6 +11,7 @@ TEMPLATE = subdirs
 CONFIG += warn_off
 CONFIG += ordered
 
+
 enable_hoard:SUBDIRS += hoard
 enable_qwt:SUBDIRS += qwt
 enable_digidoc:SUBDIRS += libdigidoc/openssl/crypto libdigidoc/openssl/ssl libdigidoc/libxml2 libdigidoc
@@ -18,5 +19,6 @@ enable_digidoc:SUBDIRS += libdigidoc/openssl/crypto libdigidoc/openssl/ssl libdi
 SUBDIRS += libxslt
 SUBDIRS += lrelease barcode kugar advance flmail flbase libpq sqlite libmysql plugins dbf 
 SUBDIRS += kudesigner teddy
+unix:SUBDIRS += flfcgi
 SUBDIRS += fllite
 

@@ -393,9 +393,14 @@ protected:
 private:
  
   /**
-  Almacena si se ha activado la bandera SoyGuaca
+  Almacena si se ha activado la bandera guacaMode
   */
   bool soyGuaca_;
+  
+  /**
+  Almacena el path para intercambios
+  */
+  QString guacaFolder_;
 
   /**
   Almacena si se ha abierto el formulario con el método FLReportViewer::exec()

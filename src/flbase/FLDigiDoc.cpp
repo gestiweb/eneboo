@@ -238,6 +238,11 @@ int FLDigiDoc::certRSAKeyValue(const QString &certfile, QByteArray &modResult,
 
   err = ReadPublicKey(&pubKey, certfile.latin1());
 
+if (err != ERR_OK )
+	{
+	qWarning("FLDigiDoc:" + QString(getErrorString(err)));
+	return err;
+	}
   // FIXME
   // modulus
   len1 = BN_bn2bin(pubKey->pkey.rsa->n, buf1);
