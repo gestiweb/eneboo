@@ -63,6 +63,7 @@
 #include <qdom.h>
 #include <qtabwidget.h>
 #include <qptrdict.h>
+#include <qvaluestack.h>
 
 class FLDomNodeInterface;
 class FLDomNodesCache;
@@ -642,6 +643,13 @@ public slots:
     return (obj_->db() ? obj_->db()->transactionLevel() : 0);
   }
 
+   /**
+   @return Array de cursores
+   */
+  QValueStack<int> cursorsOpened() {
+    return obj_->db()->cursorsOpened;
+  }
+  
   /**
    Añade código script al objeto sys, para poder ejecutarlo dinámicamente.
 
