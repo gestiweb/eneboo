@@ -24,7 +24,7 @@
 #include <qptrstack.h>
 #include <qptrqueue.h>
 #include <qguardedptr.h>
-
+#include <qvaluestack.h>
 #include "AQGlobal.h"
 
 class FLTableMetaData;
@@ -471,6 +471,8 @@ public:
   QStringList tables(QSql::TableType type) const;
   QSqlError lastError() const;
   QString connectOptions() const;
+  
+  QValueStack<int> cursorsOpened;
 
 private:
 

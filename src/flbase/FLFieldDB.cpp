@@ -2884,9 +2884,7 @@ void FLFieldDB::setEnabled(bool enable)
               le->setReadOnly(false);
               le->setCursor(QCursor::ibeamCursor);
 //               le->setPaletteForegroundColor(cFg);
-	      le->hide();
               le->setPaletteBackgroundColor(cBg);
-              le->show();
               le->setFocusPolicy(QWidget::StrongFocus);
               continue;
             }
@@ -2900,9 +2898,7 @@ void FLFieldDB::setEnabled(bool enable)
               te->setReadOnly(false);
               te->viewport()->setCursor(QCursor::ibeamCursor);
 //               te->setPaletteForegroundColor(cFg);
-	      te->hide();
               te->setPaletteBackgroundColor(cBg);
-              te->show();
               te->setFocusPolicy(QWidget::WheelFocus);
               continue;
             }
@@ -2937,9 +2933,7 @@ void FLFieldDB::setEnabled(bool enable)
               le->setReadOnly(true);
               le->setCursor(QCursor::ibeamCursor);
 //               le->setPaletteForegroundColor(cFg);
-	      le->hide();
               le->setPaletteBackgroundColor(cBg);
-              le->show();
               le->setFocusPolicy(QWidget::NoFocus);
               continue;
             }
@@ -2953,9 +2947,7 @@ void FLFieldDB::setEnabled(bool enable)
               te->setReadOnly(true);
               te->viewport()->setCursor(QCursor::ibeamCursor);
 //               te->setPaletteForegroundColor(cFg);
-	      te->hide();
               te->setPaletteBackgroundColor(cBg);
-              te->show();
               te->setFocusPolicy(QWidget::NoFocus);
               continue;
             }
