@@ -460,6 +460,44 @@
                                 </spacer>
                             </vbox>
                         </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>TabImagen</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Imagenes</string>
+                            </attribute>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbFLLarge</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Usar múltiples tablas FLLarge (modo AbanQ)</string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer9</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>20</width>
+                                            <height>301</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </vbox>
+                        </widget>
                     </widget>
                 </vbox>
             </widget>

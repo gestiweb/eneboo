@@ -1543,16 +1543,23 @@ bool FLManager::isSystemTable(const QString &n)
 {
   if (n.left(2) != "fl")
     return false;
-  QString systemTable("flfiles,"
+    
+    QString systemTable("flfiles,"
                       "flmetadata,"
                       "flmodules,"
                       "flareas,"
                       "flserial,"
-                      "fllarge,"
                       "flvar,"
                       "flsettings,"
                       "flseqs,"
                       "flupdates");
+//--> FLLarge único           
+  if (aqApp->singleFLLarge())
+               {
+               systemTable = systemTable + QString::fromLatin1(",fllarge");       
+               }
+               
+//<-- FLLarge único                      
   if (n.endsWith(".mtd"))
     return systemTable.contains(n.left(n.length() - 4));
   return systemTable.contains(n);
@@ -1567,7 +1574,35 @@ QString FLManager::storeLargeValue(FLTableMetaData *mtd, const QString &largeVal
   if (isSystemTable(tableName))
     return QString::null;
 
-  QString tableLarge(QString::fromLatin1("fllarge"));
+// --> FLLarge único
+QString tableLarge;
+
+  if (aqApp->singleFLLarge())
+	tableLarge = QString::fromLatin1("fllarge");
+         else
+  	{
+  	tableLarge = QString::fromLatin1("fllarge_") + tableName;
+  	if (!existsTable(tableLarge)) {
+    		FLTableMetaData *mtdLarge = new FLTableMetaData(tableLarge, tableLarge);
+    		FLFieldMetaData *fieldLarge = new FLFieldMetaData("refkey", "refkey", false, true, QVariant::String, 100);
+    		mtdLarge->addFieldMD(fieldLarge);
+    		fieldLarge = new FLFieldMetaData("sha", "sha", true, false, QVariant::String, 50);
+    		mtdLarge->addFieldMD(fieldLarge);
+    		fieldLarge = new FLFieldMetaData("contenido", "contenido", true, false, QVariant::StringList);
+    		mtdLarge->addFieldMD(fieldLarge);
+    		FLTableMetaData *mtdAux = createTable(mtdLarge);
+    		mtd->insertChild(mtdLarge);
+    		if (!mtdAux)
+      			return QString::null;
+  					}
+  	}
+
+
+
+
+//<-- FLLarge único
+
+  
   /*if (!existsTable(tableLarge)) {
     FLTableMetaData *mtdLarge = new FLTableMetaData(tableLarge, tableLarge);
     FLFieldMetaData *fieldLarge = new FLFieldMetaData("refkey", "refkey", false, true, QVariant::String, 100);
@@ -1611,8 +1646,17 @@ QVariant FLManager::fetchLargeValue(const QString &refKey) const
 {
   if (refKey.left(3) != "RK@")
     return QVariant();
+// --> FLLarge único
+QString tableLarge;
 
-  QString tableLarge(QString::fromLatin1("fllarge"));
+  if (aqApp->singleFLLarge())
+  tableLarge = QString::fromLatin1("fllarge");
+  else
+  tableLarge = QString::fromLatin1("fllarge_") + refKey.section('@', 1, 1);
+
+  
+//<-- FLLarge único
+
   if (!existsTable(tableLarge))
     return QVariant();
 
