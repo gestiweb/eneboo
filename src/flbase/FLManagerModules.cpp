@@ -318,7 +318,11 @@ void FLManagerModules::init()
   tmpTMD = db_->manager()->createSystemTable("flsettings");
   tmpTMD = db_->manager()->createSystemTable("flserial");
   tmpTMD = db_->manager()->createSystemTable("flvar");
-  tmpTMD = db_->manager()->createSystemTable("fllarge");
+//-->FLLarge único   
+  if (aqApp->singleFLLarge())
+    tmpTMD = db_->manager()->createSystemTable("fllarge");
+//<--FLarge único
+
   tmpTMD = db_->manager()->createSystemTable("flupdates");
 
   FLSqlCursor curSet("flsettings", true, db_->dbAux());

@@ -42,6 +42,7 @@ function cargarConfiguracion() {
 	w.child("cbSLInterface").checked = leerValorLocal("SLInterface");
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
+	w.child("cbFLLarge").checked = leerValorGlobal("FLLargeMode");
 	w.child("leCO").hide();
 	if (leerValorLocal("colorObligatorio") == "")
 		w.child("leCO").paletteBackgroundColor = "#FFE9AD";
@@ -141,6 +142,7 @@ function guardar_clicked() {
 	grabarValorLocal("maxPixImages", w.child("leMaxPixImages").text);
 	grabarValorLocal("colorObligatorio", w.child("leCO").paletteBackgroundColor + "");
 	grabarValorLocal("ActionsMenuRed", w.child("cbActionsMenuRed").checked);
+	grabarValorGlobal("FLLargeMode",w.child("cbFLLarge").checked);
 	cerrar_clicked();
 }
 
