@@ -23,9 +23,11 @@ function main() {
 	var botonAceptar = w.child("pbnAceptar");
 	var botonCancelar = w.child("pbnCancelar");
 	var botonCambiarColor = w.child("pbnCO");
+	var botonGuacaFolder = w.child("pbnGuacaFolder");
 	connect(botonAceptar, "clicked()", this, "guardar_clicked");
 	connect(botonCancelar, "clicked()", this, "cerrar_clicked");
 	connect(botonCambiarColor, "clicked()", this, "seleccionarColor_clicked");
+	connect(botonGuacaFolder , "clicked()",this, "seleccionarGuacaFolder_clicked");
 	cargarConfiguracion();
 	this.initEventFilter();
 	w_.show();
@@ -43,6 +45,9 @@ function cargarConfiguracion() {
 	w.child("leCallFunction").text = leerValorLocal("ebCallFunction");
 	w.child("leMaxPixImages").text = leerValorLocal("maxPixImages");
 	w.child("cbFLLarge").checked = leerValorGlobal("FLLargeMode");
+	w.child("leGuacaFolder").text = leerValorLocal("guacaFolder");
+	w.child("leGuacaFolder").setEnabled(false);
+	w.child("cbGuacaMode").checked = leerValorLocal("guacaMode");
 	w.child("leCO").hide();
 	if (leerValorLocal("colorObligatorio") == "")
 		w.child("leCO").paletteBackgroundColor = "#FFE9AD";
@@ -83,6 +88,7 @@ function leerValorLocal(valorName):String {
 		case "FLTableDoubleClick":
 		case "FLTableShortCut":
 		case "FLTableExport2Calc":
+		case "guacaMode":
 			var settings = new AQSettings;
 			valor = settings.readBoolEntry("ebcomportamiento/" + valorName );
 		break;
@@ -131,6 +137,10 @@ function cerrar_clicked() {
 
 function guardar_clicked() {
 	var w = this.w_;
+	//Para evitar que guacaMode este activo sin guacaFolder
+	if (w.child("leGuacaFolder").text == "")
+    		w.child("cbGuacaMode").checked = false;
+    			
 	grabarValorGlobal("verticalName", w.child("leNombreVertical").text);
 	grabarValorLocal("FLTableDoubleClick", w.child("cbFLTableDC").checked);
 	grabarValorLocal("FLTableShortCut", w.child("cbFLTableSC").checked);
@@ -143,6 +153,8 @@ function guardar_clicked() {
 	grabarValorLocal("colorObligatorio", w.child("leCO").paletteBackgroundColor + "");
 	grabarValorLocal("ActionsMenuRed", w.child("cbActionsMenuRed").checked);
 	grabarValorGlobal("FLLargeMode",w.child("cbFLLarge").checked);
+	grabarValorLocal("guacaFolder",w.child("leGuacaFolder").text);
+	grabarValorLocal("guacaMode",w.child("cbGuacaMode").checked);
 	cerrar_clicked();
 }
 
@@ -156,5 +168,31 @@ function seleccionarColor_clicked() {
 	if (w.child("leCO").paletteBackgroundColor == "#000000")
 		w.child("leCO").paletteBackgroundColor = colorActual;
 	w.child("leCO").show();
+}
+
+function seleccionarGuacaFolder_clicked()
+	{
+	var w = this.w_;
+	var dirBasePath = fixPath(FileDialog.getExistingDirectory(Dir.home));
+    	if (!dirBasePath)
+    		return;
+    	w.child("leGuacaFolder").text = dirBasePath;
+	}
+
+function fixPath(ruta:String):String
+{
+var rutaFixed:String;
+    if (sys.osName() == "WIN32")
+            {
+           var barra = "\\";
+        while (ruta != rutaFixed)
+                    {
+                    rutaFixed = ruta;
+                    ruta = ruta.replace("/",barra);
+                    }
+        if (!rutaFixed.endsWith(barra)) rutaFixed +="\\";
+            } else
+                rutaFixed= ruta;
+return rutaFixed;
 }
 
