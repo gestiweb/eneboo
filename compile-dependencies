@@ -19,3 +19,4 @@ libpq-dev
 libxrandr-dev
 libxft-dev
 libqwt-dev
+libfcgi-dev
