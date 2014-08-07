@@ -751,12 +751,23 @@ private:
   */
   QColor notNullColor()
   	{
-  	  QColor notNullColor_ = FLSettings::readEntry("ebcomportamiento/colorObligatorio","");
-  if (notNullColor_ == "")
-  	notNullColor_ = QColor(255, 233, 173);
-  	return notNullColor_;
+     if (!initNotNullColor_)
+     		{
+     	  	initNotNullColor_ = true;	
+  	  	notNullColor_ = FLSettings::readEntry("ebcomportamiento/colorObligatorio","");
+  		if (notNullColor_ == "")
+  			notNullColor_ = QColor(255, 233, 173);
+  	
+  		}
+    return notNullColor_;
   	}
-
+  	
+  	
+  QColor notNullColor_;
+  bool initNotNullColor_;
+  
+  
+  
   /**
   El formato del texto
   */

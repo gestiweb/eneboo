@@ -368,28 +368,7 @@ public:
     /**
   Especifica como usar las tablas fllarge (unica o múltiple)
   */
-  bool singleFLLarge()  {
-  	if (initSingleFLLarge_ == false)
-  		{
-  		initSingleFLLarge_ = true;
-  		if (FLUtil::sqlSelect("flsettings", "valor", QString::fromLatin1("flkey='FLLargeMode'")) == QString::fromLatin1("true") || FLUtil::sqlSelect("flsettings", "valor", QString::fromLatin1("flkey='FLLargeMode'")) == QString::fromLatin1("1"))
-  			{
-  			#ifdef FL_DEBUG
-  			qWarning("FLLarge: Modo multiples tablas");
-  			#endif
-  			singleFLLarge_ = false;
-  			}
-  		else
-  			{
-  			#ifdef FL_DEBUG
-  			qWarning("FLLarge: Modo tabla única");
-  			#endif
-  			singleFLLarge_ = true;
-  			}
-  		}
-  		
-    return singleFLLarge_;
-  }
+  bool singleFLLarge();
 
 signals:
 
@@ -940,7 +919,7 @@ protected:
   void checkAndFixTransactionLevel(const QString &ctx = QString::null);
   
  bool singleFLLarge_;
- bool initSingleFLLarge_ = false;
+ bool initSingleFLLarge_;
 };
 
 #endif
