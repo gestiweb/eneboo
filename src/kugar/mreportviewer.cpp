@@ -131,7 +131,12 @@ bool MReportViewer::renderReport(int initRow, int initCol, uint flags)
     report->deleteLater();
     report = 0;
   }
-
+  
+  //Si el report previo no genero paginas, también ponemos report = 0
+  if (report->pageCount() == 0) {
+    report = 0;
+  }
+  
   if (progress) {
     progress->deleteLater();
     progress = 0;
