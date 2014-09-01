@@ -65,7 +65,6 @@ FLReportViewer::FLReportViewer(QWidget *parent, const char *name, bool embedInPa
     spnResolution->hide();
     spnPixel->hide();
     salir->setVisible(false);
-
     if (!parent->layout()) {
       QVBoxLayout *lay = new QVBoxLayout(parent);
       lay->addWidget(this);
@@ -94,7 +93,7 @@ FLReportViewer::FLReportViewer(QWidget *parent, const char *name, bool embedInPa
   setCentralWidget(rptViewer_);
   frEMail->hide();
   initCentralWidget_->hide();
-
+  guacaInit(); //Inicializamos guaca
   if (!embedInParent_) {
     spnResolution->setValue(FLUtil::readSettingEntry("rptViewer/dpi", QVariant(rptViewer_->resolution()).toString()).toInt());
     spnPixel->setValue(FLUtil::readSettingEntry("rptViewer/pixel",
@@ -149,9 +148,6 @@ void FLReportViewer::setReportEngine(FLReportEngine *r)
 
 void FLReportViewer::exec()
 {
-    soyGuaca_ = false;
-    soyGuaca_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaMode", "false" ).toBool();
-    guacaFolder_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaFolder", AQ_USRHOME ).toString();
     
     QString fileTemp = "document_";
     fileTemp += QDateTime::currentDateTime().toString().replace(":", "").replace(" ", ""); //Esto lo cambiamos por un string con el tiempo

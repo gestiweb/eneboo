@@ -24,6 +24,8 @@
 #include "mreportviewer.h"
 
 #include "AQGlobal.h"
+#include "AQConfig.h"
+
 
 class MReportViewer;
 class MPageCollection;
@@ -370,6 +372,17 @@ public slots:
   Solo tiene efecto si el visor tiene un motor de informes activo
   */
   void exportToOds();
+ 
+   /**
+  Inicializa opciones de guacamole
+  */ 
+  
+  void guacaInit()
+  {
+  	soyGuaca_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaMode", "false" ).toBool();
+	if (soyGuaca_)
+        guacaFolder_ = FLUtil::readSettingEntry( "ebcomportamiento/guacaFolder", AQ_USRHOME ).toString();  	
+  }
 
 signals:
 
@@ -485,6 +498,8 @@ private:
   
   /** Uso interno */
   bool printing_;
+  
+
 
 public:
 
