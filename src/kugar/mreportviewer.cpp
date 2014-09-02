@@ -133,7 +133,7 @@ bool MReportViewer::renderReport(int initRow, int initCol, uint flags)
   }
   
   //Si el report previo no genero paginas, también ponemos report = 0
-  if (report->pageCount() == 0) {
+  if (report && report->pageCount() == 0) {
     report = 0;
   }
   
