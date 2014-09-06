@@ -171,8 +171,7 @@ void FLReportViewer::exec()
 } else /// de lo contrario, soy Guaca
           {
           QClipboard *clipboard = QApplication::clipboard();
-          clipboard->setText("");  /// Limpio , para que detecte guaca que cambiamos el contenido
-           slotPrintReportToPDF( guacaFolder_ + fileTemp ); /// Creamos el pdf.
+           reportPrinted_ = rptViewer_->printReportToPDF(guacaFolder_ + fileTemp);
            clipboard->setText("GUACA_IMPRIME" + fileTemp);  /// Pongo en el portapapeles la bandera
            } 
 }
