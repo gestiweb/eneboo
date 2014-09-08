@@ -299,6 +299,7 @@ FLSqlCursor::~FLSqlCursor()
   bool delMtd = d->metadata_ && !d->metadata_->aqWasDeleted() && !d->metadata_->inCache();
   //bool delMtd = d->metadata_ && !d->metadata_->aqWasDeleted() &&
   //              (!d->isSysTable_ && (d->isQuery_ || !d->fieldsNamesUnlock_.isEmpty()));
+  FLTableMetaData *mtd = d->metadata_;
   if (!d->transactionsOpened_.isEmpty()) {
     QString t(d->metadata_ ? d->metadata_->name() : QString(QObject::name()));
     rollbackOpened(
@@ -312,7 +313,7 @@ FLSqlCursor::~FLSqlCursor()
   }
   delete d;
   if (delMtd)
-    delete(FLTableMetaData *) d->metadata_;
+    delete mtd;
 #ifdef FL_DEBUG
   --countRefCursor;
 #endif
