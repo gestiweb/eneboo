@@ -793,7 +793,7 @@ bool AQOdsGenerator::generateOds(const QString &fileNameOut)
 
   QString strInput(str());
   QByteArray input(strInput.utf8());
-  QByteArray content(aqs->xsltproc(&baMain, &input));
+  //QByteArray content(aqs->xsltproc(&baMain, &input));
   // ------------ vvvv   AbanQ 2.5    vvvv  ------
   QString fileNameContent(fileName_ + QString::fromLatin1(".cnt"));
   aqs->xsltproc(&baMain, fileName_, fileNameContent);
