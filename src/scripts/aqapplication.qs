@@ -493,10 +493,7 @@ class MainWindow
 
     for (var i = 0; i < tw.count; ++i) {
       if (tw.page(i).idMDI() == actionName) {
-        tw.setCurrentPage(i);
-        tw.page(i).show();
-        tw.page(i).setFocus();
-        return;
+        tw.page(i).close();
       }
     }
 
