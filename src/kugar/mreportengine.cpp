@@ -997,10 +997,10 @@ void MReportEngine::exportToOds(MPageCollection *pages)
                               QString::fromLatin1(".png"));
           pix.save(pixFileName, "PNG");
           curRow->opIn(AQOdsImage(pixName,
-                                  AQOdsCentimeters(double((*it).rr.width()) / 100.0 * 2.54),
-                                  AQOdsCentimeters(double((*it).rr.height()) / 100.0 * 2.54),
-                                  AQOdsCentimeters(0),
-                                  AQOdsCentimeters(0),
+                                  double((((*it).rr.width()) * 2.54)/98) * 1000,
+                                  double((((*it).rr.height()) * 2.54)/98) * 1000,
+                                  0,
+                                  0,
                                   pixFileName));
           cell.setWidth(1);
         }

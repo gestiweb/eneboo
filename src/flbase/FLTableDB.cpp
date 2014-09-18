@@ -1775,10 +1775,10 @@ if (FLSettings::readBoolEntry("ebcomportamiento/FLTableExport2Calc",false))
                                       QString::fromLatin1(".png"));
                   pix.save(pixFileName, "PNG");
                   row.opIn(AQOdsImage(pixName,
-                                      AQOdsCentimeters(double(pix.width()) / 100.0 * 2.54),
-                                      AQOdsCentimeters(double(pix.height()) / 100.0 * 2.54),
-                                      AQOdsCentimeters(0),
-                                      AQOdsCentimeters(0),
+                                      double((pix.width() * 2.54)/98) * 1000,
+                                      double((pix.height() * 2.54)/98) * 1000,
+                                      0,
+                                      0,
                                       pixFileName));
                 } else
            			 row.coveredCell();
