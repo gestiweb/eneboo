@@ -3320,8 +3320,8 @@ void QPSQLDriver::Mr_Proper()
   }
 #endif
 
-#if 0
-  //#ifndef FL_QUICK_CLIENT
+
+#ifndef FL_QUICK_CLIENT
   steps = 0;
   qry.exec("select tablename,indexname from pg_indexes where indexname like '%_m1_idx'");
   FLUtil::createProgressDialog(tr("Regenerando índices"), qry.size());
