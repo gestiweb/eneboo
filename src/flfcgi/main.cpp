@@ -43,7 +43,7 @@ static inline bool silentConnect(const QString &conn)
   if (conn.isEmpty())
     return false;
 
-  QString user, namedb, db, host, port, password;
+  QString user, namedb, db, host, port, password, connOpts;
   QStringList dat = QStringList::split(":", conn, true);
   int i = 0;
   for (QStringList::Iterator it = dat.begin(); it != dat.end(); ++it, ++i) {
@@ -66,17 +66,29 @@ static inline bool silentConnect(const QString &conn)
       case 5:
         password = *it;
         break;
+      case 6:
+        connOpts = *it;
+        break;
     }
   }
 
   FLSqlDatabase *sqlDb = new FLSqlDatabase();
+  QString driverName(FLSqlDatabase::driverAliasToDriverName(db));
 
-  if (!sqlDb->loadDriver(FLSqlDatabase::driverAliasToDriverName(db))) {
+  if (!sqlDb->loadDriver(driverName)) {
     delete sqlDb;
     return false;
   }
+  
+    if (driverName == "FLQPSQL7") {
+    if (connOpts.isEmpty())
+      connOpts = "connect_timeout=30";
+    else
+      connOpts += ";connect_timeout=30";
+  }
 
-  if (!sqlDb->connectDB(namedb, user, password, host, port.toInt())) {
+  if (!sqlDb->connectDB(namedb, user, password, host, port.toInt(),
+                        "default", connOpts)) {
     delete sqlDb;
     return false;
   }
