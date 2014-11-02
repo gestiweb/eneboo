@@ -588,7 +588,7 @@ function xmlFilesDefBd()
       ba.string = shaSumTxt + sha;
       shaSumTxt = ba.sha1();
     }
-
+ try {
     if (binaryPacking(fName)) {
       ne = doc.createElement("binary");
       nf.appendChild(ne);
@@ -607,6 +607,8 @@ function xmlFilesDefBd()
       var ba = new QByteArray;
       ba.string = shaSumBin + sha;
       shaSumBin = ba.sha1();
+    }
+    } catch (e) {
     }
   }
 
