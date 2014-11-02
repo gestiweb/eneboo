@@ -11,7 +11,7 @@ CONFIG += warn_off link_prl qt
 unix:CONFIG += x11
 CONFIG -= dll
 
-win32:RC_FILE = fllite.rc
+win32:RC_FILE = flfcgi.rc
 mac:RC_FILE = fl.icns
 
 DESTDIR = $$PREFIX/bin

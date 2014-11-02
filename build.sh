@@ -8,6 +8,7 @@ OPT_PREFIX=""
 OPT_QMAKESPEC=""
 OPT_DEBUG=yes
 OPT_SQLLOG=no
+OPT_FLFCGI=no
 
 OPT_HOARD=no
 # Hoard se desactiva por defecto. Eneboo funciona principalmente con un 
@@ -129,6 +130,9 @@ for a in "$@"; do
     ;;
     -win64)
       OPT_WIN64=yes
+    ;;
+    -flfcgi)
+      OPT_FLFCGI=yes    
     ;;
     -qws)
       OPT_QWS=yes
@@ -586,6 +590,25 @@ if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
   cp -fv semaphore.h $BASEDIR/src/qt/src/tmp/
   cp -fv sched.h $BASEDIR/src/qt/src/tmp/
   cd $BASEDIR
+  # flfcgi para windows
+if [ ! -f /opt/mac/cross/flfastcgi_includes/fastcgi.h -a "$OPT_FLFCGI" = "yes" ]; then
+    OPT_FLFCGI=no
+else
+cp -fv /opt/mac/cross/flfastcgi_includes/* $BASEDIR/src/qt/include
+cp -fv /opt/mac/cross/spawn-fcgi.exe $BASEDIR/src/qt/bin/spawn-fcgi.exe
+if [ "$OPT_WIN64" = "yes" ];then
+cp -fv /opt/mac/cross/libfcgi_64.dll $BASEDIR/src/qt/lib/libfcgi.dll
+cp -fv /opt/mac/cross/libfcgi_64.dll $BASEDIR/src/qt/bin/libfcgi.dll
+else
+cp -fv /opt/mac/cross/libfcgi_32.dll $BASEDIR/src/qt/lib/libfcgi.dll
+cp -fv /opt/mac/cross/libfcgi_32.dll $BASEDIR/src/qt/bin/libfcgi.dll
+fi
+fi
+fi
+
+if [ "$OPT_FLFCGI" = "yes" ]
+then
+  echo "CONFIG *= enable_flfcgi" >> settings.pro
 fi
 
 if [ "$OPT_HOARD" = "yes" ]

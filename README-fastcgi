@@ -110,3 +110,28 @@ a través de esta función:
 	-silentconn eneboo1:postgres:PostgreSQL:127.0.0.1:5432:1234 -c flfactppal.fcgiProcessRequest
 
 
+==========================================
+ENEBOO-FASTCGI EN WINDOWS :::::
+==========================================
+Para configurar apache 2.2+:
+
+01. descargamos módulo FastCGI de : http://www.fastcgi.com/dist/mod_fastcgi-2.4.6-AP22.dll
+
+02. renombramos dll a mod_fastcgi.so
+
+03. Copiamod mod_fastcgi en la carpeta de módulos de apache
+
+04. En httpd.conf añadimos la siguiente linea:
+
+LoadModule fastcgi_module modules/mod_fastcgi.so
+
+05. Definimos el servidor externo en httpd.conf:
+
+FastCgiExternalServer "C:\wamp\www\eneboo.fcgi" -host localhost:1160 -idle-timeout 5 -flush
+
+Para hacer la llamada desde terminal (eneboo 2.4.5-rc2 o sup.):
+
+C:\eneboo-build-win32-dba\bin>spawn-fcgi.exe -f "eneboo-fcgi.exe -silentconn dbname:usuario_sql:PostgreSQL:ip_servidor_sql:puerto_sql:password_sql -c flfactppal.fcgiProcessRequest" -a 127.0.0.1 -p 1160
+
+Fuentes spawn-fcgi-win32:
+https://github.com/mkottman/lighttpd-1.5-mingw/blob/master/spawn-fcgi-win32.c
