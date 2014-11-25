@@ -2049,11 +2049,11 @@ bool QMYSQLDriver::alterTable2(const QString &mtd1, const QString &mtd2, const Q
 
   bool ok = false;
   if (!force && !fieldsNamesOld.isEmpty()) {
-//     QString sel(fieldsNamesOld.join(","));
-//     QString inSql("INSERT INTO " + newMTD->name() + "(" + sel + ")" +
-//                   " SELECT " + sel + " FROM " + renameOld);
-//     qWarning(inSql);
-//     ok = q.exec(inSql);
+     QString sel(fieldsNamesOld.join(","));
+     QString inSql("INSERT INTO " + newMTD->name() + "(" + sel + ")" +
+                   " SELECT " + sel + " FROM " + renameOld);
+     qWarning(inSql);
+     ok = q.exec(inSql);
     if (!ok) {
       db_->dbAux()->rollback();
       if ((oldMTD != newMTD) && oldMTD)
