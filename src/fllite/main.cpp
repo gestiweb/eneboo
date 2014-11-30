@@ -317,7 +317,7 @@ void aq_main(int argc, char **argv)
  splash = new QSplashScreen(QPixmap::fromMimeSource("splashclient.png"));
 #endif
     splash->show();
-    splash->message(QT_TR_NOOP("Inicializando..."), Qt::AlignRight, QColor(0, 0, 0));
+    splash->message(QT_TR_NOOP("Inicializando..."), Qt::AlignRight, QColor(255, 255, 255));
   } else if (!silentConnect(silentConn)) {
     QTimer::singleShot(0, AbanQ, SLOT(quit()));
     return;
