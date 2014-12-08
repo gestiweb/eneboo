@@ -143,7 +143,11 @@ void QSEnv::clear()
 
 #ifdef QSDEBUGGER
   it = QPtrListIterator<QSClass>(classList);
+#if defined(ENEBOO_FIXXP)
+  while ((cur = it()) != 0)
+#else
   while ((cur = it()))
+#endif
     cur->clear();
 #endif
 

@@ -26,6 +26,7 @@ OPT_QUICK_CLIENT=no
 OPT_MAKE_SILENT=yes
 OPT_DEBUGGER=no
 OPT_NEBULA_BUILD=no
+OPT_FIXXP=no
 
 QT_CHECK=" -DQT_CHECK_NULL"
 QT_DEBUG=""
@@ -133,6 +134,9 @@ for a in "$@"; do
     ;;
     -flfcgi)
       OPT_FLFCGI=yes    
+    ;;
+    -fixxp)
+      OPT_FIXXP=yes
     ;;
     -qws)
       OPT_QWS=yes
@@ -578,6 +582,11 @@ if [ "$OPT_WIN64" = "yes" ]
 then
   echo "CONFIG *= enable_win64" >> settings.pro
   echo "DEFINES *= AQ_WIN64" >> settings.pro
+fi
+
+if [ "$OPT_FIXXP" = "yes" ]
+then
+ echo "DEFINES *= ENEBOO_FIXXP" >> settings.pro
 fi
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" ];then
