@@ -38,7 +38,6 @@ rm -Rf ./include
 rm -Rf ./mkspecs
 rm -Rf ./phrasebooks
 rm -Rf ./templates
-rm -Rf ./share/eneboo/images
 rm -Rf ./share/eneboo/tmp
 rm -Rf ./share/eneboo/doc
 rm -Rf ./share/eneboo/reports
