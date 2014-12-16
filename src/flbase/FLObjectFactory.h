@@ -7879,7 +7879,29 @@ public slots:
   void setMailServer(const QString &mS) {
     obj_->setMailServer(mS);
   }
+  
+   /**
+   Usuario de correo saliente
 
+   Indica el usuario del correo saliente para la autenticación
+
+   @param User Usuario
+   */
+  void setUser(const QString &User) {
+    obj_->setUser(User);
+  }
+
+   /**
+   Password de correo saliente
+
+   Indica el password del correo saliente para la autenticación
+
+   @param Passwd Password del usuario
+   */
+  void setPassword(const QString &Passwd) {
+    obj_->setPassword(Passwd);
+  }
+  
   /**
    Tipo MIME
 
@@ -7889,6 +7911,38 @@ public slots:
    */
   void setMimeType(const QString &mT) {
     obj_->setMimeType(mT);
+  }
+  
+    /**
+   Tipo de autenticación
+
+   Indica el tipo de autenticación
+
+   @param conn (0=Sin cifrar ,1=SSL,2=TLS)
+   */
+  void setConnectionType(int conn) {
+    obj_->setConnectionType(conn);
+  }
+  
+      /**
+   Puerto
+
+   Indica el puerto usado
+
+   @param port puerto a usar
+   */
+  void setPort(int port) {
+    obj_->setPort(port);
+  }
+      /**
+   Tipo de conexión
+
+   Indica el tipo de conexión al servidor
+
+   @param method (0=Sin autenticación ,1=Texto Plano,2=Login)
+   */
+  void setAuthMethod(int method) {
+    obj_->setAuthMethod(method);
   }
 
   /**
