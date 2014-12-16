@@ -202,7 +202,7 @@ void Smtp::readyRead()
     // *t << "HELO there\r\n";
     // helo should be a full qualified hostname, we can use doaminpart of from
     QString helo = d->from_.mid(d->from_.find('@') + 1);
-    *d->socket_->t_ << "HELO " << helo << "\r\n";
+    *d->socket_->t_ << "EHLO " << helo << "\r\n";
     changeStatus("HELO " + helo, d->state_);
     if (d->starttls_) {
       d->state_ = StartTTLS;
