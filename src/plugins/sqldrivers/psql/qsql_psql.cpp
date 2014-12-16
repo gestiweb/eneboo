@@ -3491,10 +3491,22 @@ QStringList QPSQLDriver::rowsLockeds(const QString &table, const QString &primar
 
 QStringList QPSQLDriver::locksStatus()
 {
-  QString sql("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
-              "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
-              "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.procpid=pg_locks.pid");
 
+QString sql;
+
+if (QPSQLDriver::Version92)
+	{
+	  sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from " 
+              "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' " 
+              "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.pid=pg_locks.pid");
+	}
+	else
+	{
+  	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from " 
+              "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' " 
+              "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.procpid=pg_locks.pid");
+	}
+	
   QSqlSelectCursor qry(sql, db_->dbAux());
   QStringList ret;
 
@@ -3526,10 +3538,22 @@ QStringList QPSQLDriver::locksStatus()
 
 QStringList QPSQLDriver::detectLocks()
 {
+  QString sql;
   QString fieldTransactionName(pro >= QPSQLDriver::Version83 ? "virtualtransaction" : "transaction");
-  QString sql("select pg_locks.%1,pg_locks.pid from pg_stat_activity,pg_locks where "
-              "pg_stat_activity.procpid=pg_locks.pid and pg_locks.mode='ExclusiveLock' "
+  
+  if (QPSQLDriver::Version92)
+	{
+	  sql =  QString("select pg_locks.%1,pg_locks.pid from pg_stat_activity,pg_locks where " 
+              "pg_stat_activity.pid=pg_locks.pid and pg_locks.mode='ExclusiveLock' " 
               "and pg_locks.locktype='tuple' and pg_locks.pid<>'%2' and pg_stat_activity.waiting='t'");
+        }
+        else
+        {
+	  sql =  QString("select pg_locks.%1,pg_locks.pid from pg_stat_activity,pg_locks where " 
+              "pg_stat_activity.procpid=pg_locks.pid and pg_locks.mode='ExclusiveLock' " 
+              "and pg_locks.locktype='tuple' and pg_locks.pid<>'%2' and pg_stat_activity.waiting='t'");
+        }
+        
   QSqlQuery qry(QString::null, db_->dbAux());
 
   if (qry.exec(sql.arg(fieldTransactionName).arg(d->idConn)) && qry.next()) {
@@ -3550,11 +3574,22 @@ QStringList QPSQLDriver::detectLocks()
   } else
     return QStringList();
 
-  sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
+  if (QPSQLDriver::Version92)
+	{
+  	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
+                "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
+                "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.pid=pg_locks.pid "
+                "and pg_locks.mode='ExclusiveLock' and pg_locks.locktype='tuple' "
+                "and pg_locks.pid<>'%1' and pg_stat_activity.waiting='t'");
+        }
+        else
+        {
+  	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
                 "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
                 "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.procpid=pg_locks.pid "
                 "and pg_locks.mode='ExclusiveLock' and pg_locks.locktype='tuple' "
                 "and pg_locks.pid<>'%1' and pg_stat_activity.waiting='t'");
+        }
 
   QSqlSelectCursor qryCur(sql.arg(d->idConn), db_->dbAux());
   QStringList ret;
@@ -3587,10 +3622,23 @@ QStringList QPSQLDriver::detectLocks()
 
 QStringList QPSQLDriver::detectRisksLocks(const QString &table, const QString &primaryKeyValue)
 {
-  QString sql("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
+   
+  QString sql;
+  
+  if (QPSQLDriver::Version92)
+	{
+  	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
+              "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
+              "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.pid=pg_locks.pid "
+              "and pg_locks.mode like '%%ExclusiveLock' and pg_locks.pid<>'%1'");
+         }
+         else
+         {
+         sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
               "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
               "and pg_class.relfilenode=pg_locks.relation and pg_stat_activity.procpid=pg_locks.pid "
               "and pg_locks.mode like '%%ExclusiveLock' and pg_locks.pid<>'%1'");
+         }
 
   if (!table.isEmpty())
     sql += " and pg_class.relname='" + table + "'";
