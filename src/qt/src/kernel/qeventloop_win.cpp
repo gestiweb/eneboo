@@ -347,6 +347,7 @@ bool QEventLoop::processEvents(ProcessEventsFlags flags)
       }
       WaitMessage();
     } while (idleTimerWasActive);
+   emit aboutToBlock();
   }
 
   if (!seenWM_QT_SENDPOSTEDEVENTS && (flags & QEventLoop::EventLoopExec) == 0)
