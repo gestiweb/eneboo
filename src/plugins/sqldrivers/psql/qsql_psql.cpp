@@ -3494,7 +3494,7 @@ QStringList QPSQLDriver::locksStatus()
 
 QString sql;
 
-if (QPSQLDriver::Version92)
+  if (pro >= QPSQLDriver::Version92)
 	{
 	  sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from " 
               "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' " 
@@ -3541,7 +3541,7 @@ QStringList QPSQLDriver::detectLocks()
   QString sql;
   QString fieldTransactionName(pro >= QPSQLDriver::Version83 ? "virtualtransaction" : "transaction");
   
-  if (QPSQLDriver::Version92)
+  if (pro >= QPSQLDriver::Version92)
 	{
 	  sql =  QString("select pg_locks.%1,pg_locks.pid from pg_stat_activity,pg_locks where " 
               "pg_stat_activity.pid=pg_locks.pid and pg_locks.mode='ExclusiveLock' " 
@@ -3574,7 +3574,7 @@ QStringList QPSQLDriver::detectLocks()
   } else
     return QStringList();
 
-  if (QPSQLDriver::Version92)
+  if (pro >= QPSQLDriver::Version92)
 	{
   	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
                 "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
@@ -3625,7 +3625,7 @@ QStringList QPSQLDriver::detectRisksLocks(const QString &table, const QString &p
    
   QString sql;
   
-  if (QPSQLDriver::Version92)
+  if (pro >= QPSQLDriver::Version92)
 	{
   	sql = QString("select pg_class.relname,pg_stat_activity.*,pg_locks.* from "
               "pg_class,pg_stat_activity,pg_locks where pg_class.relkind='r' "
