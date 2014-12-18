@@ -23,7 +23,7 @@
 
 #define AQ_NEW_SETTING \
   QSettings s; \
-  s.setPath("InfoSiAL", "AbanQ", QSettings::User)
+  s.setPath("Eneboo", "Eneboo", QSettings::User)
 
 #define AQ_OLD_SETTING \
   s.setPath("InfoSiAL", "FacturaLUX", QSettings::User)

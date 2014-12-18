@@ -185,9 +185,9 @@ int main(int argc, char *argv[])
   qInitImages_designercore();
 
   QSettings settings;
-  settings.setPath("InfoSiAL", "AbanQ", QSettings::User);
+  settings.setPath("Eneboo", "Eneboo", QSettings::User);
   QFont appFont;
-  QString keybase("AbanQ/");
+  QString keybase("Eneboo/");
 
 #if defined (Q_OS_LINUX)
   QPaintDeviceMetrics pdm(QApplication::desktop());
