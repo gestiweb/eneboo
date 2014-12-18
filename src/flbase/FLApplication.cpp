@@ -2483,7 +2483,10 @@ void FLApplication::popupWarn(const QString &msgWarn,
                               const QMap<QString, QSArgumentList> & scriptCalls)
 {
   if (!container)
-    return;
+    {
+    //return;
+    container =  new QMainWindow(QApplication::desktop());
+    }
   if (!popupWarn_)
     popupWarn_ = new FLPopupWarn(container);
   popupWarn_->scriptCalls_ = scriptCalls;
