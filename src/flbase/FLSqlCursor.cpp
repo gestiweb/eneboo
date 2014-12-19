@@ -1981,7 +1981,7 @@ void FLSqlCursor::setMainFilter(const QString &f, bool doRefresh)
   if (doRefresh)
   	{
          refresh();
-         emit cursorUpdated(); //Fuerza a que actualice el contenido del FLTable
+//         emit cursorUpdated(); //Fuerza a que actualice el contenido del FLTable
         }
 }
 
