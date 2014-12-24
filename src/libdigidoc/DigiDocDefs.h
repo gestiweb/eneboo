@@ -96,7 +96,7 @@ typedef	unsigned char	byte;
 
 //==========< Digest types >=======================
 
-#define SIGNATURE_LEN	128
+#define SIGNATURE_LEN	256
 #define DIGEST_LEN		20
 #define DIGEST_SHA1		0
 #define CERT_DATA_LEN	4096
