@@ -746,7 +746,7 @@ void FLTableDB::browseRecord()
 void FLTableDB::editRecord()
 {
   QWidget *w = ::qt_cast<QWidget *>(sender());
-  if (w && (!cursor_ || reqReadOnly_ || reqEditOnly_ || reqOnlyTable_
+  if (w && (!cursor_ || reqReadOnly_ || reqInsertOnly_ || reqOnlyTable_
             || (cursor_->cursorRelation() && cursor_->cursorRelation()->isLocked()))) {
     w->setDisabled(true);
     return;
