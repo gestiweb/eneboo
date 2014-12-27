@@ -225,8 +225,11 @@ QSqlError qMakeErrorSerial(const QString &err, int type, const QMYSQLDriverPriva
 QVariant::Type qDecodeMYSQLType(MYSQL_FIELD *field)
 {
   int mysqltype = field->type;
+  
+
   uint flags = field->flags;
   QVariant::Type type;
+    
   switch (mysqltype) {
     case FIELD_TYPE_TINY :
     case FIELD_TYPE_SHORT :
@@ -243,9 +246,7 @@ QVariant::Type qDecodeMYSQLType(MYSQL_FIELD *field)
     case FIELD_TYPE_DECIMAL :
     case FIELD_TYPE_FLOAT :
     case FIELD_TYPE_DOUBLE :
-#ifndef __APPLE__
     case FIELD_TYPE_NEWDECIMAL:
-#endif
       type = QVariant::Double;
       break;
     case FIELD_TYPE_DATE :
@@ -275,6 +276,7 @@ QVariant::Type qDecodeMYSQLType(MYSQL_FIELD *field)
       type = QVariant::String;
       break;
   }
+  
   return type;
 }
 
