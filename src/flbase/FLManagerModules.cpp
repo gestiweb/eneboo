@@ -58,10 +58,15 @@ void test_sha256(const string name, const string str)
     {
         ss << hex << setw(2) << setfill('0') << (int)hash[i];
     }
+    if (ss.str() == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    	qWarning("FLManagerModules : Fichero " + QString(name) + " vacío.");
+    else
+    	{
     ss << "  " << name;
     const std::string tmp = ss.str();
     const char* cstr = tmp.c_str();
     qDebug(cstr);
+    	}
     // return ss.str();
 }
 
