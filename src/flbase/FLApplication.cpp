@@ -234,7 +234,7 @@ FLApplication::FLApplication(int &argc, char **argv) :
   QPixmapCache::setCacheLimit(2048);
 
 #if !defined(QSDEBUGGER) && !defined(AQ_NEBULA_BUILD_VERBOSE)
-  qInstallMsgHandler(abanqMessageVoidOutput);
+  qInstallMsgHandler(abanqMessageOutput);
 #endif
 }
 
