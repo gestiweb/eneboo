@@ -104,15 +104,15 @@ else
 #endif
   }
 
-#ifdef QSDEBUGGER
-  project_->evaluate();
-  if (i && i->hadError()) {
-    i->stopExecution();
-    i->clear();
-    project_->clearObjects();
-    loadScriptsFromModule("sys");
-  }
-#endif
+//#ifdef QSDEBUGGER
+//  project_->evaluate();
+//  if (i && i->hadError()) {
+//    i->stopExecution();
+//    i->clear();
+//    project_->clearObjects();
+//    loadScriptsFromModule("sys");
+//  }
+//#endif
 
   d->aqAppScriptObject_ = new QObject(this, "aqAppScript");
   project_->addObject(d->aqAppScriptObject_);
