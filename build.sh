@@ -12,9 +12,9 @@ OPT_FLFCGI=no
 
 OPT_HOARD=no
 # Hoard se desactiva por defecto. Eneboo funciona principalmente con un 
-# 鷑ico hilo y hoard es un "memory allocator" orientado a mejorar la 
-# velocidad de malloc/free para multihilo, en sistemas con m醩 de un 
-# n鷆leo.
+# 煤nico hilo y hoard es un "memory allocator" orientado a mejorar la 
+# velocidad de malloc/free para multihilo, en sistemas con m谩s de un 
+# n煤cleo.
 
 OPT_QWT=yes
 OPT_DIGIDOC=yes
@@ -232,9 +232,9 @@ fi
 VERSION="$VER (Build $BUILD_NUMBER)"
 BUILD_KEY="$VER-Build"
 
-echo -e "\nUtilidad de compilaci髇 e instalaci髇 de Eneboo $VERSION ( - ESTABLE - )"
+echo -e "\nUtilidad de compilaci贸n e instalaci贸n de Eneboo $VERSION ( - ESTABLE - )"
 echo -e "(C) 2003-2013 InfoSiAL, S.L. http://infosial.com - http://abanq.org\n"
-echo -e "(C) 2012 Gestiweb Integraci髇 de Soluciones Web S.L.  http://www.gestiweb.com \n"
+echo -e "(C) 2012 Gestiweb Integraci贸n de Soluciones Web S.L.  http://www.gestiweb.com \n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
   export CC=${CROSS}gcc
@@ -263,7 +263,7 @@ fi
 
 if [ "$OPT_PREFIX" == "" ]
 then
-  echo -e "AVISO : No se ha especificado directorio de instalaci髇"
+  echo -e "AVISO : No se ha especificado directorio de instalaci贸n"
   echo -e "Uso :  $0 directorio_de_instalacion\n"
   DIRINST=$PWD/eneboo-build
   echo -e "Utilizando por defecto el directorio $DIRINST\n"
@@ -275,19 +275,19 @@ mkdir -p $DIRINST
 
 if [ ! -w $DIRINST ]
 then
-  echo -e "ERROR : Actualmente no tienes permisos de escritura en el directorio de instalaci髇 ($DIRINST)."
-  echo -e "Soluci髇 : Cambia los permisos o ejecuta este script como un usuario que tenga permisos de escritura en ese directorio.\n"
+  echo -e "ERROR : Actualmente no tienes permisos de escritura en el directorio de instalaci贸n ($DIRINST)."
+  echo -e "Soluci贸n : Cambia los permisos o ejecuta este script como un usuario que tenga permisos de escritura en ese directorio.\n"
   exit 1
 fi
 
 BASEDIR=$PWD
 PREFIX=$DIRINST
 
-echo -e "Directorio de instalaci髇 : $PREFIX\n"
+echo -e "Directorio de instalaci贸n : $PREFIX\n"
 
 echo -e "El comando MAKE es: $CMD_MAKE\n"
 
-echo -e "Estableciendo configuraci髇...\n"
+echo -e "Estableciendo configuraci贸n...\n"
 
 cd $BASEDIR/src/libdigidoc/openssl/crypto
 rm -f opensslconf.h
@@ -310,7 +310,7 @@ then
 fi
 
 version=$(cat $QTDIR/include/qglobal.h | grep "QT_VERSION_STR" | sed "s/.*\"\(.*\)\"/\1/g")
-echo -e "Versi髇 de Qt... $version\n"
+echo -e "Versi贸n de Qt... $version\n"
 echo -e "Compilando qmake y moc...\n"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QTDIR/lib:../lib
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QTDIR/lib:../lib
@@ -371,8 +371,8 @@ else
       # Configure informa de que no se encuentra MySQL o PostgreSQL, pero si se agrega:
       # -I/usr/include/mysql/ -I/usr/include/postgresql/
       # , se incluyen, pero luego aparece un error para libpg: LOCALEDIR undefined.
-      # rpath: -R $ORIGIN/../lib , sirve para que en Linux busque las librer韆s (tambi閚) de forma relativa al ejecutable del programa.
-      # ... pero el s韒bolo d髄ar ($) da problemas tanto en bash como en make. En bash hay que escaparlo, y en make hay que duplicar el s韒bolo dolar.
+      # rpath: -R $ORIGIN/../lib , sirve para que en Linux busque las librer铆as (tambi茅n) de forma relativa al ejecutable del programa.
+      # ... pero el s铆mbolo d贸lar ($) da problemas tanto en bash como en make. En bash hay que escaparlo, y en make hay que duplicar el s铆mbolo dolar.
       # ... hacer uso del flag "-continue" puede desembocar en que no se aplique el -rpath.
     if [ "$OPT_QWS" = "no" ]; then      
       ./configure $QT_CONFIG_VERBOSE --x11 -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -R'$$(ORIGIN)/../../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu  \
@@ -402,7 +402,7 @@ then
   echo -e "OK : qmake encontrado\n"
 else
   echo -e "ERROR : No se encuentra qmake, esta utilidad se proporciona con las Qt."
-  echo -e "        Comprueba que se encuentra en la ruta de b鷖queda (variable $PATH).\n"
+  echo -e "        Comprueba que se encuentra en la ruta de b煤squeda (variable $PATH).\n"
   exit 1
 fi
 
@@ -430,12 +430,12 @@ if [ "$AQ_PACK_VER" == "" ]; then
 fi
 
 
-echo -e "\n\nRecopilando datos de la compilaci髇 \n"
+echo -e "\n\nRecopilando datos de la compilaci贸n \n"
 
 if  [ "$OPT_QMAKESPEC" == "win32-g++-cross" -o "$OPT_QMAKESPEC" == "macx-g++-cross" ];then
-DATOS_CROSS="Versi髇 CROSS-GCC: $CC ( $(${CROSS}gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') ) \n"
+DATOS_CROSS="Versi贸n CROSS-GCC: $CC ( $(${CROSS}gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') ) \n"
 fi
-DATOS_COMPILACION="\n Versi髇 eneboo: $VERSION \n  Mkspecs: $OPT_QMAKESPEC \n $DATOS_CROSS Make: $CMD_MAKE \n Versi髇 GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilaci髇 : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT \n QT_DEBUG_OPT: $QT_DEBUG_OPT" 
+DATOS_COMPILACION="\n Versi贸n eneboo: $VERSION \n  Mkspecs: $OPT_QMAKESPEC \n $DATOS_CROSS Make: $CMD_MAKE \n Versi贸n GCC: $(gcc -v 2> temp && cat temp | grep 'gcc ver' | cut -f3 -d ' ') \n\n Opciones de Compilaci贸n : \n QWT: $OPT_QWT \n DIGIDOC: $OPT_DIGIDOC \n MULTICORE: $OPT_MULTICORE \n HOARD: $OPT_HOARD \n REBUILD_QT: $REBUILD_QT \n QT_DEBUG_OPT: $QT_DEBUG_OPT" 
 
 
 cat > AQConfig.h <<EOF
@@ -746,7 +746,7 @@ fi
 
 cd $BASEDIR
 
-# A veces (en win32) no compila correctamente qwt, porque compila antes el designer plugin de qwt que la propia librer韆.
+# A veces (en win32) no compila correctamente qwt, porque compila antes el designer plugin de qwt que la propia librer铆a.
 # , por eso, esperamos que el make falle y lo re-ejecutamos, para que complete.
 $CMD_MAKE || { $CMD_MAKE || exit 1; }
 $CMD_MAKE $MAKE_INSTALL
@@ -825,7 +825,7 @@ then
   cd ../..
 fi
 
-echo -e "\nTerminando compilaci髇...\n"
+echo -e "\nTerminando compilaci贸n...\n"
 cp -f ./src/fllite/images/icon*.png $PREFIX/share/eneboo/images 2> /dev/null
 cp -f ./src/forms/*.ui $PREFIX/share/eneboo/forms 2> /dev/null
 cp -f ./src/tables/*.mtd $PREFIX/share/eneboo/tables 2> /dev/null
@@ -843,5 +843,5 @@ cp -f ./src/*.xml $PREFIX/share/eneboo 2> /dev/null
 cp -f ./src/*.xpm $PREFIX/share/eneboo 2> /dev/null
 # cp -f ./packages/*.eneboo $PREFIX/share/eneboo/packages 2> /dev/null
 
-echo -e "\n * Eneboo $VERSION - Compilaci髇 terminada. * \n"
+echo -e "\n * Eneboo $VERSION - Compilaci贸n terminada. * \n"
 
