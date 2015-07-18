@@ -263,7 +263,9 @@ void FLSqlCursor::init(const QString &name, bool autopopulate,
 
   if (d->isQuery_) {
     FLSqlQuery *qry = d->db_->manager()->query(d->metadata_->query(), this);
+    qry->setWhere("1=0");
     d->query_ = qry->sql();
+    
     if (qry && !d->query_.isEmpty())
       exec(d->query_);
     if (qry)
@@ -369,6 +371,7 @@ void FLSqlCursor::refresh(const QString &fN)
       refreshDelayed(500);
     }
   } else {
+  qWarning("FLSqlCursor::refresh");
     QSqlCursor::select();
     int pos = atFrom();
     if (pos >= size())
@@ -1950,6 +1953,14 @@ QString FLSqlCursor::baseFilter()
       finalFilter = relationFilter;
     else
       finalFilter += " AND " + relationFilter;
+  }
+  QString archiveWhere = d->metadata_->archiveWhere();
+  if (!archiveWhere.isEmpty()) {
+    if (finalFilter.isEmpty())
+      finalFilter = archiveWhere;
+    else
+      finalFilter += " AND " + archiveWhere;
+  
   }
 
   return finalFilter;

@@ -577,7 +577,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   if (!mtd)
     return 0;
 
-  QString name, a, q, ftsfun;
+  QString name, a, q, ftsfun, archiveWhere;
   bool v = true, ed = true, cw = false, dl = false;
 
   QDomNode no = mtd->firstChild();
@@ -630,6 +630,11 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
         no = no.nextSibling();
         continue;
       }
+      if (e.tagName() == "archiveWhere") {
+        archiveWhere = e.text();
+        no = no.nextSibling();
+        continue;
+      }
     }
     no = no.nextSibling();
   }
@@ -638,6 +643,7 @@ FLTableMetaData *FLManager::metadata(QDomElement *mtd, bool quick)
   FLCompoundKey *cK = 0;
   QStringList assocs;
   tmd->setFTSFunction(ftsfun);
+  tmd->setArchiveWhere(archiveWhere);
   tmd->setConcurWarn(cw);
   tmd->setDetectLocks(dl);
   no = mtd->firstChild();
