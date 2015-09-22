@@ -847,6 +847,7 @@ public:
   bool autoSelect;
 
 public slots:
+  virtual void setText(const QString &, bool checkfocus);
   virtual void setText(const QString &);
 
 protected:
