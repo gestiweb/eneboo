@@ -89,14 +89,13 @@ QString FLLineEdit::text() const
   return text;
 }
 
-void FLLineEdit::setText(const QString &text, bool checkfocus)
+void FLLineEdit::setText(const QString &text)
 {
-  if (checkfocus) {
-    if (text.isEmpty() || hasFocus()) {
-      QLineEdit::setText(text);
-      return;
-    }
+  if (text.isEmpty() || hasFocus()) {
+    QLineEdit::setText(text);
+    return;
   }
+
   bool ok = false;
   QString s(text);
   bool minus = false;
@@ -131,12 +130,6 @@ void FLLineEdit::setText(const QString &text, bool checkfocus)
   }
 
   QLineEdit::setText(s);
-
-}
-
-void FLLineEdit::setText(const QString &text)
-{
-    this->setText(text, true);
 }
 
 void FLLineEdit::focusOutEvent(QFocusEvent *f)
@@ -611,7 +604,7 @@ void FLFieldDB::setValue(const QVariant &cv)
     case QVariant::String:
       if (editor_) {
         bool doHome = (::qt_cast<FLLineEdit *>(editor_)->text().isEmpty());
-        ::qt_cast<FLLineEdit *>(editor_)->setText(isNull ? QString() : v.toString(), false);
+        ::qt_cast<FLLineEdit *>(editor_)->setText(isNull ? QString() : v.toString());
         if (doHome)
           ::qt_cast<FLLineEdit *>(editor_)->home(false);
       }
@@ -619,14 +612,14 @@ void FLFieldDB::setValue(const QVariant &cv)
     case QVariant::StringList:
       if (!editor_)
         return;
-      ::qt_cast<QTextEdit *>(editor_)->setText(isNull ? QString() : v.toString(), false);
+      ::qt_cast<QTextEdit *>(editor_)->setText(isNull ? QString() : v.toString());
       break;
     case QVariant::Double:
       if (editor_) {
         QString s;
         if (!isNull)
           s.setNum(v.toDouble(), 'f', partDecimal_ != -1 ? partDecimal_ : field->partDecimal());
-        ::qt_cast<FLLineEdit *>(editor_)->setText(s, false);
+        ::qt_cast<FLLineEdit *>(editor_)->setText(s);
       }
       break;
     case FLFieldMetaData::Serial:
@@ -1351,7 +1344,7 @@ void FLFieldDB::setPartDecimal(int d)
     partDecimal_ = d;
     editor->partDecimal = d;
     refreshQuick(fieldName_);
-    editor->setText(editor->text(), false);
+    editor->setText(editor->text());
   }
 }
 
@@ -1802,7 +1795,7 @@ void FLFieldDB::refreshQuick(const QString &fN)
         QString s;
         if (!null)
           s.setNum(v.toDouble(), 'f', partDecimal);
-        ::qt_cast<FLLineEdit *>(editor_)->setText(s, false);
+        ::qt_cast<FLLineEdit *>(editor_)->setText(s);
       }
       connect(editor_, SIGNAL(textChanged(const QString &)), this,
               SLOT(updateValue(const QString &)));
@@ -1826,12 +1819,12 @@ void FLFieldDB::refreshQuick(const QString &fN)
             field->optionsList().findIndex(
               v.toString()));
         else
-          ::qt_cast<FLLineEdit *>(editor_)->setText(v.toString(), false);
+          ::qt_cast<FLLineEdit *>(editor_)->setText(v.toString());
       } else {
         if (ol)
           ::qt_cast<QComboBox *>(editor_)->setCurrentItem(0);
         else
-          ::qt_cast<FLLineEdit *>(editor_)->setText(QString::null, false);
+          ::qt_cast<FLLineEdit *>(editor_)->setText(QString::null);
       }
       if (!ol && doHome)
         ::qt_cast<FLLineEdit *>(editor_)->home(false);
@@ -1849,7 +1842,7 @@ void FLFieldDB::refreshQuick(const QString &fN)
         QString s;
         if (!null)
           s.setNum(v.toUInt());
-        ::qt_cast<FLLineEdit *>(editor_)->setText(s, false);
+        ::qt_cast<FLLineEdit *>(editor_)->setText(s);
       }
       connect(editor_, SIGNAL(textChanged(const QString &)), this,
               SLOT(updateValue(const QString &)));
@@ -1864,7 +1857,7 @@ void FLFieldDB::refreshQuick(const QString &fN)
         QString s;
         if (!null)
           s.setNum(v.toInt());
-        ::qt_cast<FLLineEdit *>(editor_)->setText(s, false);
+        ::qt_cast<FLLineEdit *>(editor_)->setText(s);
       }
       connect(editor_, SIGNAL(textChanged(const QString &)), this,
               SLOT(updateValue(const QString &)));
