@@ -3247,6 +3247,37 @@ static inline bool notEqualsFields(QSqlField *fieldBd,
 
 void QPSQLDriver::Mr_Proper()
 {
+
+ bool fllarge = true;
+ QStringList listadoFLLarge,listadoTablasFLLarge;
+ QSqlQuery qry3(QString::null, db_->dbAux());
+ QSqlQuery qry4(QString::null, db_->dbAux());
+ bool found;
+ bool multiFlLarge = false;
+ QString item2;
+
+ 
+   QString mproperMsg(tr("¿ Limpiar fllarge ?"));
+  int res = QMessageBox::question(0, tr("Mr. Proper"), mproperMsg, QMessageBox::Yes, QMessageBox::No);
+  if (res != QMessageBox::Yes)
+               fllarge = false;
+
+  if (fllarge)
+  	{    
+//     QString mproperMsg2(tr("¿ Usa múltiples tablas para FLLarge (modo AbanQ) ?"));
+//  int res2 = QMessageBox::question(0, tr("Mr. Proper"), mproperMsg2, QMessageBox::Yes, QMessageBox::No);
+//  if (res2 != QMessageBox::Yes)
+
+ qry4.exec("select valor from flsettings where flkey ='FLLargeMode'");
+ while (qry4.next()) {
+ if (qry4.value(0).toString() == "true")
+     multiFlLarge = true;
+	           }  
+	           
+  if (!multiFlLarge)
+      listadoTablasFLLarge.append("fllarge");  
+
+	}
 #if 0
   QString mproperMsg(tr("Este proceso puede tener una larga duración, dependiendo\n"
                         "del tamaño de la base de datos.\n"
@@ -3414,11 +3445,88 @@ void QPSQLDriver::Mr_Proper()
             cur.update(false);
           }
         }
+      
+       if (fllarge)
+       	{
+       	 QString v2; 
+         QSqlCursor cur2(item, true, db_->dbAux());
+         QSqlRecord *buf2;
+         cur2.select((*it)->name() + QString::fromLatin1(" like 'RK@%'"));
+         while (cur2.next()) {
+             v2 = cur2.value((*it)->name()).toString();
+             if (v2.isEmpty())
+                 continue;
+                    //qWarning("FLLARGE -> " + item + " : " +  v2);
+		    //Añadiendo a listado ...
+		     listadoFLLarge.append(v2);
+//		     	qWarning("PASO !: Añadiendo tabla ... fllarge_" + v2.section('@', 1, 1));
+		     if (multiFlLarge)
+		     	    listadoTablasFLLarge.append("fllarge_" + v2.section('@', 1, 1));
+                   } 
+ 
+       } 
+      
+      
+      
       }
 
       sqlCursor.setName(item, true);
     }
   }
+  
+  if (fllarge)
+     {
+       for (QStringList::Iterator it3 = listadoTablasFLLarge.begin(); it3 != listadoTablasFLLarge.end(); ++it3) {
+//	qWarning("Nueva talba " + (*it3));
+          steps = 0;
+  	qry3.exec("select refkey from " + (*it3) + " where 1 = 1");
+  FLUtil::createProgressDialog(tr("Limpiando %1").arg((*it3)), qry3.size());
+  while (qry3.next()) {
+    item2 = qry3.value(0).toString();
+    found = false;
+    FLUtil::setLabelText(tr("Comprobando registro %1 en Fllarge").arg(item2));
+#ifdef FL_DEBUG
+//    qWarning("Comprobando registro " +(*it3) + "." + item2);
+#endif
+      
+    FLUtil::setProgress(++steps);
+    
+    for (QStringList::Iterator it = listadoFLLarge.begin(); it != listadoFLLarge.end(); ++it) {
+//     qWarning("IT " + (*it));
+     if ((*it) == item2)
+     		{
+//    		qWarning("¡¡ Encontrado !! ");        
+     		found = true;
+     		break;
+     		}
+     }
+     
+     if (!found )
+     	    {
+//     	    qWarning("No encontrado ");
+	 QString tableName;
+	   if (!multiFlLarge)
+	       tableName = "fllarge";
+	   else
+	       tableName = "fllarge_" + item2.section('@', 1, 1);
+	       
+	 
+     	 if ( ((*it3) == tableName))
+         	{
+#ifdef FL_DEBUG
+    		qWarning("Eliminando registro " + (*it3) + "." + item2 );
+#endif           
+        	qry4.exec("delete from "+ (*it3) +" where refkey = '" + item2 + "'");
+        	}
+  //      	else
+//        	qWarning("El registro " + item2 + " no es de la tabla " + (*it3));      
+          }
+        }
+     }
+   }
+  
+  
+  
   d->checkLock = true;
   d->activeCreateIndex = false;
   db_->dbAux()->commit();
