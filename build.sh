@@ -27,6 +27,7 @@ OPT_MAKE_SILENT=yes
 OPT_DEBUGGER=no
 OPT_NEBULA_BUILD=no
 OPT_FIXXP=no
+OPT_CONSOLE=no
 
 QT_CHECK=" -DQT_CHECK_NULL"
 QT_DEBUG=""
@@ -119,6 +120,9 @@ for a in "$@"; do
     ;;
     -no-hoard)
       OPT_HOARD=no
+    ;;
+    -console)
+      OPT_CONSOLE=yes
     ;;
     -qwt)
       OPT_QWT=yes
@@ -618,6 +622,11 @@ fi
 if [ "$OPT_FLFCGI" = "yes" ]
 then
   echo "CONFIG *= enable_flfcgi" >> settings.pro
+fi
+
+if [ "$OPT_CONSOLE" = "yes" ]
+then
+  echo "CONFIG *= enable_console" >> settings.pro
 fi
 
 if [ "$OPT_HOARD" = "yes" ]

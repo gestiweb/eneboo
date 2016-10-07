@@ -8,6 +8,8 @@ else {
 TEMPLATE = app 
 
 CONFIG += warn_off link_prl qt 
+enable_console:CONFIG += console
+
 unix:CONFIG += x11
 CONFIG -= dll
 
