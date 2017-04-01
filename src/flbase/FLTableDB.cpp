@@ -83,9 +83,9 @@ FLDataTable *FLTableDB::tableRecords()
     tableRecords_->setFocusPolicy(QTable::StrongFocus);
     setFocusProxy(tableRecords_);
     tabDataLayout->addWidget(tableRecords_);
-    setTabOrder(tableRecords_, lineEditSearch);
-    setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(lineEditSearch ,comboBoxFieldToSearch);
     setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
+    setTabOrder(comboBoxFieldToSearch2, tableRecords_);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
     if (autoSortColumn_)
@@ -105,9 +105,9 @@ void FLTableDB::setTableRecordsCursor()
     tableRecords_->setFocusPolicy(QTable::StrongFocus);
     setFocusProxy(tableRecords_);
     tabDataLayout->addWidget(tableRecords_);
-    setTabOrder(tableRecords_, lineEditSearch);
-    setTabOrder(lineEditSearch, comboBoxFieldToSearch);
+    setTabOrder(lineEditSearch ,comboBoxFieldToSearch);
     setTabOrder(comboBoxFieldToSearch, comboBoxFieldToSearch2);
+    setTabOrder(comboBoxFieldToSearch2, tableRecords_);
     lineEditSearch->installEventFilter(this);
     tableRecords_->installEventFilter(this);
   }
@@ -1168,7 +1168,7 @@ void FLTableDB::setSortOrder(int ascending)
   
   orderAsc_ = ascending;
   tableRecords()->hide();
-  refresh( true, true );
+  refresh(true, true);
 }
 
 bool FLTableDB::isSortOrderAscending()

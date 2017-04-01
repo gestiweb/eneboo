@@ -2772,6 +2772,99 @@ void FLFieldDB::emitActivatedAccel(int id)
   }
 }
 
+// Silix
+void FLFieldDB::setDisabled(const bool b)
+{
+  if (!cursor_)
+    return;
+
+  FLTableMetaData *tMD = cursor_->metadata();
+  if (!tMD)
+    return;
+
+  FLFieldMetaData *field = tMD->field(fieldName_);
+  if (!field)
+    return;
+
+  QColor cTexto;
+  QColor cFondo;
+  if (b) {
+    cTexto = qApp->palette().color(QPalette::Disabled, QColorGroup::Text);
+    cFondo = qApp->palette().color(QPalette::Disabled, QColorGroup::Background);
+  } else {
+    cTexto = qApp->palette().color(QPalette::Active, QColorGroup::Text);
+    if (field->allowNull())
+      cFondo = qApp->palette().color(QPalette::Active, QColorGroup::Base);
+    else
+      cFondo = QColor(255, 233, 173);
+  }
+
+  switch (field->type()) {
+    case QVariant::UInt:
+    case QVariant::Int:
+    case QVariant::Double:
+    case QVariant::String:
+      if (field->hasOptionsList()) {
+        if (editor_ && ::qt_cast<QComboBox *>(editor_)) {
+          ::qt_cast<QComboBox *>(editor_)->setDisabled(b);
+          ::qt_cast<QComboBox *>(editor_)->setPaletteBackgroundColor(cFondo);
+          ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
+        }
+      } else {
+        if (editor_ && ::qt_cast<FLLineEdit *>(editor_)) {
+          ::qt_cast<FLLineEdit *>(editor_)->setReadOnly(b);
+          ::qt_cast<FLLineEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
+          ::qt_cast<FLLineEdit *>(editor_)->setPaletteForegroundColor(cTexto);
+          ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
+          if (::qt_cast<QPushButton *>(pushButtonDB))
+            ::qt_cast<QPushButton *>(pushButtonDB)->setDisabled(b);
+        }
+      }
+      break;
+
+    case FLFieldMetaData::Serial:
+      if (editor_ && ::qt_cast<FLSpinBox *>(editor_)) {
+        ::qt_cast<FLSpinBox *>(editor_)->setDisabled(b);
+      }
+      break;
+
+    case QVariant::Pixmap:
+      if (editorImg_ && ::qt_cast<FLPixmapView *>(editorImg_)) {
+        ::qt_cast<FLPixmapView *>(editorImg_)->setDisabled(b);
+      }
+      break;
+
+    case QVariant::Date:
+      if (editor_ && ::qt_cast<FLDateEdit *>(editor_)) {
+        ::qt_cast<FLDateEdit *>(editor_)->setDisabled(b);
+        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
+      }
+      break;
+
+    case QVariant::Time:
+      if (editor_ && ::qt_cast<QTimeEdit *>(editor_)) {
+        ::qt_cast<QTimeEdit *>(editor_)->setDisabled(b);
+        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
+      }
+      break;
+
+    case QVariant::StringList:
+      if (editor_ && ::qt_cast<QTextEdit *>(editor_)) {
+        ::qt_cast<QTextEdit *>(editor_)->setReadOnly(b);
+        ::qt_cast<QTextEdit *>(editor_)->setPaletteBackgroundColor(cFondo);
+        ::qt_cast<QTextEdit *>(editor_)->setPaletteForegroundColor(cTexto);
+        ::qt_cast<QLabel *>(textLabelDB)->setDisabled(b);
+      }
+      break;
+
+    case QVariant::Bool:
+      if (editor_ && ::qt_cast<QCheckBox *>(editor_)) {
+        ::qt_cast<QCheckBox *>(editor_)->setDisabled(b);
+      }
+      break;
+  }
+}
+
 void FLFieldDB::setKeepDisabled(const bool keep)
 {
   keepDisabled_ = keep;

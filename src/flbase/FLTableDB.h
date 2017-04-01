@@ -769,6 +769,10 @@ public slots:
   void setSortOrder(int ascending);
   bool isSortOrderAscending();
   
+  void setSortOrder(int ascending);
+  
+  bool isSortOrderAscending();
+  
   /**
   Activa la tabla de datos
   */

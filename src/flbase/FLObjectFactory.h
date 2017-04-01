@@ -2839,6 +2839,10 @@ public slots:
     return obj_->filter();
   }
   
+  void switchSortOrder() {
+    obj_->switchSortOrder(-1);  
+  }
+  
   bool isSortOrderAscending() {
     return obj_->isSortOrderAscending();  
   }

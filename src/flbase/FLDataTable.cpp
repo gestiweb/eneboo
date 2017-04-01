@@ -856,24 +856,33 @@ void FLDataTable::contentsMouseDoubleClickEvent(QMouseEvent *e)
 
 void FLDataTable::refresh()
 {
-  if (popup_)
-    QDataTable::refresh();
-  if (!refreshing_ && cursor_  && !cursor_->aqWasDeleted() && cursor_->metadata()) {
-  refreshing_ = true;
-    cursor_->setFilter(persistentFilter_);
-    FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
-    if (sndCursor) {
-      setFilter(cursor_->curFilter());
-      QDataTable::refresh();
-      cursor_->QSqlCursor::seek(cursor_->atFrom());
-      selectRow();
-    } else {
-      setFilter(cursor_->curFilter());
-      QDataTable::refresh();
-      selectRow();
-    }
+  if (refreshing_) {
+      if (!refresh_timer_) {
+        QTimer::singleShot(500, this, SLOT(refresh()));
+        refresh_timer_ = true;
+      }
+      return;
   }
-  refreshing_ = false;
+  if(!cursor_->aqWasDeleted() && cursor_->metadata()) {
+    refreshing_ = true;
+    refresh_timer_ = false;
+    if (popup_) QDataTable::refresh();
+    if (cursor_  && cursor_->metadata()) {
+      cursor_->setFilter(persistentFilter_);
+      FLSqlCursor *sndCursor = ::qt_cast<FLSqlCursor *>(sender());
+      if (sndCursor) {
+        setFilter(cursor_->curFilter());
+        QDataTable::refresh();
+        cursor_->QSqlCursor::seek(cursor_->atFrom());
+        selectRow();
+      } else {
+        setFilter(cursor_->curFilter());
+        QDataTable::refresh();
+        selectRow();
+      }
+    }
+    refreshing_ = false;
+  }
 }
 
 void FLDataTable::setFocus()
