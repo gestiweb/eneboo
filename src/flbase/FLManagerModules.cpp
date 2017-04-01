@@ -168,6 +168,7 @@ void FLManagerModules::loadAllIdModules()
 
 void FLManagerModules::checkSignatures(FLInfoMod *mod)
 {
+    return;
     QDomDocument sig = mod->signatures;
     QDomDocument cert = mod->certificates;
     
