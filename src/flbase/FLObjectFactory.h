@@ -8325,7 +8325,7 @@ private:
 };
 
 // dpinelo: Creado para poder manipular adecuadamante objetos ComboBox
-class FL_EXPORT FLComboBoxInterface : public QObject {
+class FLComboBoxInterface : public QObject {
 
 	Q_OBJECT
 

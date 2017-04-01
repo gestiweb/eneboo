@@ -108,10 +108,10 @@ protected:
     candidates[1].append(QString::fromLatin1("QImage*"));
     QString sgt(castArgsSignature(args, candidates));
     if (sgt.isEmpty()) {
-      qWarning("AQSPixmap::construct - Empty");
+      //qWarning("AQSPixmap::construct - Empty");
       return new QPixmap;
     }
-    qWarning("AQSPixmap::construct - Signature: %s", sgt.latin1());
+    //qWarning("AQSPixmap::construct - Signature: %s", sgt.latin1());
     if (sgt == QString::fromLatin1("int,int"))
       return new QPixmap(args[0].variant().toInt(),
                          args[1].variant().toInt());
