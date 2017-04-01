@@ -1620,12 +1620,14 @@ int QPSQLDriver::atFrom(FLSqlCursor *cur)
 
 void QPSQLDriver::createSortIndex(FLSqlCursor *cur)
 {
+  #ifndef FL_QUICK_CLIENT
   d->checkLock = false;
   d->activeCreateIndex = true;
   createIndex(cur->sort().toStringList().join(",").replace(" ASC", "").replace(" DESC", ""),
               cur->metadata()->name(), false);
   d->activeCreateIndex = false;
   d->checkLock = true;
+  #endif
 }
 
 bool QPSQLDriver::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)

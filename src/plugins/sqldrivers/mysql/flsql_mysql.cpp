@@ -1834,9 +1834,11 @@ int QMYSQLDriver::atFrom(FLSqlCursor *cur)
 
 void QMYSQLDriver::createSortIndex(FLSqlCursor *cur)
 {
+  #ifndef FL_QUICK_CLIENT
   d->activeCreateIndex = true;
   createIndex(cur->sort().toStringList().join(",").replace(" ASC", "").replace(" DESC", ""), cur->metadata()->name());
   d->activeCreateIndex = false;
+  #endif
 }
 
 bool QMYSQLDriver::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)
