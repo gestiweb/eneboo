@@ -47,7 +47,12 @@ public:
    Establece el color de fondo para una celda
    */
   void setCellBackgroundColor( int row, int col, const QColor & color );
-
+	
+  /**
+  [d5] Cambia el color de fondo para una celda  DC 16/03/2010
+  */
+  //void chgCellBackgroundColor( int row, int col, const QColor & color , const FLTable & obj);
+  
   /**
    Establece el alineamiento de texto para una celda
    */
