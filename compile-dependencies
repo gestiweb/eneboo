@@ -19,3 +19,4 @@ libxrender-dev
 unixodbc-dev
 uuid-dev
 zlib1g-dev
+libfcgi-dev
