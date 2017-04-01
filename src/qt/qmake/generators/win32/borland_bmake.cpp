@@ -383,7 +383,7 @@ BorlandMakefileGenerator::init()
     if(project->isEmpty("QMAKE_INSTALL_DIR"))
 	project->variables()["QMAKE_INSTALL_DIR"].append("$(COPY_DIR)");
 
-    bool is_qt = (project->first("TARGET") == "qt"QTDLL_POSTFIX || project->first("TARGET") == "qtmt"QTDLL_POSTFIX);
+    bool is_qt = (project->first("TARGET") == "qt" QTDLL_POSTFIX || project->first("TARGET") == "qtmt"QTDLL_POSTFIX);
     QStringList &configs = project->variables()["CONFIG"];
     if (project->isActiveConfig("shared"))
 	project->variables()["DEFINES"].append("QT_DLL");

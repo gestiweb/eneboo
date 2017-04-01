@@ -765,10 +765,7 @@ public slots:
   @param p Cadena de caracteres con el patrón de filtrado
   */
   void filterRecords(const QString &p);
-  
-  void setSortOrder(int ascending);
-  bool isSortOrderAscending();
-  
+   
   void setSortOrder(int ascending);
   
   bool isSortOrderAscending();
