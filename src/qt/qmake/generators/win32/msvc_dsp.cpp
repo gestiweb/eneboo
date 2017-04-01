@@ -620,7 +620,7 @@ DspMakefileGenerator::init()
     if ( project->variables()["QMAKESPEC"].isEmpty() )
 	project->variables()["QMAKESPEC"].append( getenv("QMAKESPEC") );
 
-    bool is_qt = (project->first("TARGET") == "qt" QTDLL_POSTFIX || project->first("TARGET") == "qt-mt"QTDLL_POSTFIX);
+    bool is_qt = (project->first("TARGET") == "qt" QTDLL_POSTFIX || project->first("TARGET") == "qt-mt" QTDLL_POSTFIX);
     project->variables()["QMAKE_ORIG_TARGET"] = project->variables()["TARGET"];
 
     QStringList &configs = project->variables()["CONFIG"];

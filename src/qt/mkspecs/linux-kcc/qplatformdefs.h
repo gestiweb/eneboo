@@ -11,12 +11,12 @@
 // <resolv.h> includes <arpa/nameser.h>. <arpa/nameser.h> is using
 // 'u_char' and includes <sys/types.h>.  Now the problem is that
 // <sys/types.h> defines 'u_char' only if __USE_BSD is defined.
-// __USE_BSD is defined in <features.h> if _BSD_SOURCE is defined.
-#ifndef _BSD_SOURCE
-#  define _BSD_SOURCE
+// __USE_BSD is defined in <features.h> if _DEFAULT_SOURCE is defined.
+#ifndef _DEFAULT_SOURCE
+#  define _DEFAULT_SOURCE
 #endif
 
-// 1) need to reset default environment if _BSD_SOURCE is defined
+// 1) need to reset default environment if _DEFAULT_SOURCE is defined
 // 2) need to specify POSIX thread interfaces explicitly in glibc 2.0
 // 3) it seems older glibc need this to include the X/Open stuff
 #ifndef _GNU_SOURCE

@@ -792,7 +792,7 @@ version 1.0.7beta18 [June 23, 2000]
   Revised PNGAPI definition, and pngvcrd.c to work with __GCC__
     and do not redefine PNGAPI if it is passed in via a compiler directive.
   Revised visupng/PngFile.c to remove returns from within the Try block.
-  Removed leading underscores from "_PNG_H" and "_PNG_SAVE_BSD_SOURCE" macros.
+  Removed leading underscores from "_PNG_H" and "_PNG_SAVE_DEFAULT_SOURCE" macros.
   Updated contrib/visupng/cexcept.h to version 1.0.0.
   Fixed bugs in pngwrite.c and pngwutil.c that prevented writing iCCP chunks.
 version 1.0.7rc2 [June 28, 2000]

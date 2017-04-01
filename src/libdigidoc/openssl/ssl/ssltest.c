@@ -114,7 +114,7 @@
  * SUN MICROSYSTEMS, INC., and contributed to the OpenSSL project.
  */
 
-#define _BSD_SOURCE 1		/* Or gethostname won't be declared properly
+#define _DEFAULT_SOURCE 1		/* Or gethostname won't be declared properly
 				   on Linux and GNU platforms. */
 
 #include <assert.h>

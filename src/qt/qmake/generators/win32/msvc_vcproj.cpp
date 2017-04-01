@@ -457,7 +457,7 @@ void VcprojGenerator::init()
     // Are we building Qt?
     bool is_qt =
 	( project->first("TARGET") == "qt" QTDLL_POSTFIX ||
-	  project->first("TARGET") == "qt-mt"QTDLL_POSTFIX );
+	  project->first("TARGET") == "qt-mt" QTDLL_POSTFIX );
 
     // Are we using Qt?
     bool isQtActive = project->isActiveConfig("qt");
@@ -1095,7 +1095,7 @@ void VcprojGenerator::initOld()
 
     bool is_qt =
 	( project->first("TARGET") == "qt" QTDLL_POSTFIX ||
-	  project->first("TARGET") == "qt-mt"QTDLL_POSTFIX );
+	  project->first("TARGET") == "qt-mt" QTDLL_POSTFIX );
 
    QStringList &configs = project->variables()["CONFIG"];
 

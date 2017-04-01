@@ -479,7 +479,7 @@ NmakeMakefileGenerator::init()
     if(project->isEmpty("QMAKE_INSTALL_DIR"))
 	project->variables()["QMAKE_INSTALL_DIR"].append("$(COPY_DIR)");
 
-    bool is_qt = (project->first("TARGET") == "qt" QTDLL_POSTFIX || project->first("TARGET") == "qt-mt"QTDLL_POSTFIX);
+    bool is_qt = (project->first("TARGET") == "qt" QTDLL_POSTFIX || project->first("TARGET") == "qt-mt" QTDLL_POSTFIX);
     project->variables()["QMAKE_ORIG_TARGET"] = project->variables()["TARGET"];
 
     QString targetfilename = project->variables()["TARGET"].first();
