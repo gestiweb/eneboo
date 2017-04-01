@@ -624,6 +624,7 @@ class AQS : public QObject
   Q_ENUMS(ScrollBarMode)
   Q_ENUMS(SortOrder)
   Q_ENUMS(TableEditType EditMode SelectionMode FocusStyle)
+  Q_ENUMS(FtpState FtpError FtpCommand)
 
 public:
 
@@ -1192,6 +1193,39 @@ public:
   enum FocusStyle {
     FollowStyle,
     SpreadSheet
+  };
+
+  enum FtpState {
+    FtpUnconnected,
+    FtpHostLookup,
+    FtpConnecting,
+    FtpConnected,
+    FtpLoggedIn,
+    FtpClosing
+  };
+
+  enum FtpError {
+    FtpNoError,
+    FtpUnknownError,
+    FtpHostNotFound,
+    FtpConnectionRefused,
+    FtpNotConnected
+  };
+
+  enum FtpCommand {
+    FtpNone,
+    FtpConnectToHost,
+    FtpLogin,
+    FtpClose,
+    FtpList,
+    FtpCd,
+    FtpGet,
+    FtpPut,
+    FtpRemove,
+    FtpMkdir,
+    FtpRmdir,
+    FtpRename,
+    FtpRawCommand
   };
 
   AQS() : QObject(0, "aqs_namespace"), objectsCount_(0) {

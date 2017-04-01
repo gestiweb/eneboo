@@ -48,77 +48,75 @@ class QSqlCursorPrivate
 {
 public:
 
-    QSqlCursorPrivate( const QString& name, QSqlDatabase* sdb )
-	: lastAt( QSql::BeforeFirst ), nm( name ), srt( name ), md( 0 ), db( sdb ), q( 0 ), sql( 0 )
-    {}
-    ~QSqlCursorPrivate()
-    {
-	delete q;
-    }
+  QSqlCursorPrivate(const QString &name, QSqlDatabase *sdb)
+    : lastAt(QSql::BeforeFirst), nm(name), srt(name), md(0), db(sdb), q(0), sql(0)
+  {}
+  ~QSqlCursorPrivate() {
+    delete q;
+  }
 
-    QSqlQuery* query()
-    {
-	if ( !q )
-	    q = new QSqlQuery( 0, db );
-	return q;
-    }
-    
-    int               lastAt;
-    QString           nm;         //name
-    QSqlIndex         srt;        //sort
-    QString           ftr;        //filter
-    int               md;         //mode
-    QSqlIndex         priIndx;    //primary index
-    QSqlRecord        editBuffer;
-    // the primary index as it was before the user changed the values in editBuffer
-    QString           editIndex;
-    QSqlRecordInfo    infoBuffer;
-    QSqlDatabase*     db;
-    QSqlQuery*        q;
-//### AbanQ
-    QSqlQuery*        sql;
+  QSqlQuery *query() {
+    if (!q)
+      q = new QSqlQuery(0, db);
+    return q;
+  }
+
+  int               lastAt;
+  QString           nm;         //name
+  QSqlIndex         srt;        //sort
+  QString           ftr;        //filter
+  int               md;         //mode
+  QSqlIndex         priIndx;    //primary index
+  QSqlRecord        editBuffer;
+  // the primary index as it was before the user changed the values in editBuffer
+  QString           editIndex;
+  QSqlRecordInfo    infoBuffer;
+  QSqlDatabase     *db;
+  QSqlQuery        *q;
+  //### AbanQ
+  QSqlQuery        *sql;
 };
 
-QString qOrderByClause( const QSqlIndex & i, const QString& prefix = QString::null )
+QString qOrderByClause(const QSqlIndex &i, const QString &prefix = QString::null)
 {
-    QString str;
-    int k = i.count();
-    if( k == 0 ) return QString::null;
-    str = " order by " + i.toString( prefix );
-    return str;
+  QString str;
+  int k = i.count();
+  if (k == 0) return QString::null;
+  str = " order by " + i.toString(prefix);
+  return str;
 }
 
-QString qWhereClause( const QString& prefix, QSqlField* field, const QSqlDriver* driver )
+QString qWhereClause(const QString &prefix, QSqlField *field, const QSqlDriver *driver)
 {
-    QString f;
-    if ( field && driver ) {
-        f = ( prefix.length() > 0 ? prefix + QString(".") : QString::null ) + field->name();
-        if ( field->isNull() ) {
-            f += " IS NULL";
-        } else {
-            f += " = " + driver->formatValue( field );
-        }
+  QString f;
+  if (field && driver) {
+    f = (prefix.length() > 0 ? prefix + QString(".") : QString::null) + field->name();
+    if (field->isNull()) {
+      f += " IS NULL";
+    } else {
+      f += " = " + driver->formatValue(field);
     }
-    return f;
+  }
+  return f;
 }
 
-QString qWhereClause( QSqlRecord* rec, const QString& prefix, const QString& sep, 
-		      const QSqlDriver* driver )
+QString qWhereClause(QSqlRecord *rec, const QString &prefix, const QString &sep,
+                     const QSqlDriver *driver)
 {
-    static QString blank( " " );
-    QString filter;
-    bool separator = FALSE;
-    for ( uint j = 0; j < rec->count(); ++j ) {
-        QSqlField* f = rec->field( j );
-        if ( rec->isGenerated( j ) ) {
-            if ( separator )
-                filter += sep + blank;
-            filter += qWhereClause( prefix, f, driver );
-            filter += blank;
-            separator = TRUE;
-        }
+  static QString blank(" ");
+  QString filter;
+  bool separator = FALSE;
+  for (uint j = 0; j < rec->count(); ++j) {
+    QSqlField *f = rec->field(j);
+    if (rec->isGenerated(j)) {
+      if (separator)
+        filter += sep + blank;
+      filter += qWhereClause(prefix, f, driver);
+      filter += blank;
+      separator = TRUE;
     }
-    return filter;
+  }
+  return filter;
 }
 
 /*!
@@ -275,33 +273,33 @@ QString qWhereClause( QSqlRecord* rec, const QString& prefix, const QString& sep
     \sa setName() setMode()
 */
 
-QSqlCursor::QSqlCursor( const QString & name, bool autopopulate, QSqlDatabase* db )
-    : QSqlRecord(), QSqlQuery( QString::null, db )
+QSqlCursor::QSqlCursor(const QString &name, bool autopopulate, QSqlDatabase *db)
+  : QSqlRecord(), QSqlQuery(QString::null, db)
 {
-    d = new QSqlCursorPrivate( name, db );
-    setMode( Writable );
-    if ( !d->nm.isNull() )
-	setName( d->nm, autopopulate );
+  d = new QSqlCursorPrivate(name, db);
+  setMode(Writable);
+  if (!d->nm.isNull())
+    setName(d->nm, autopopulate);
 }
 
 /*!
     Constructs a copy of \a other.
 */
 
-QSqlCursor::QSqlCursor( const QSqlCursor & other )
-    : QSqlRecord( other ), QSqlQuery( other )
+QSqlCursor::QSqlCursor(const QSqlCursor &other)
+  : QSqlRecord(other), QSqlQuery(other)
 {
-    d = new QSqlCursorPrivate( other.d->nm, other.d->db );
-    d->lastAt = other.d->lastAt;
-    d->nm = other.d->nm;
-    d->srt = other.d->srt;
-    d->ftr = other.d->ftr;
-    d->priIndx = other.d->priIndx;
-    d->editBuffer = other.d->editBuffer;
-    d->infoBuffer = other.d->infoBuffer;
-    d->q = 0; // do not share queries
-    d->sql = 0;
-    setMode( other.mode() );
+  d = new QSqlCursorPrivate(other.d->nm, other.d->db);
+  d->lastAt = other.d->lastAt;
+  d->nm = other.d->nm;
+  d->srt = other.d->srt;
+  d->ftr = other.d->ftr;
+  d->priIndx = other.d->priIndx;
+  d->editBuffer = other.d->editBuffer;
+  d->infoBuffer = other.d->infoBuffer;
+  d->q = 0; // do not share queries
+  d->sql = 0;
+  setMode(other.mode());
 }
 
 /*!
@@ -310,30 +308,30 @@ QSqlCursor::QSqlCursor( const QSqlCursor & other )
 
 QSqlCursor::~QSqlCursor()
 {
-    delete d;
+  delete d;
 }
 
 /*!
     Sets the cursor equal to \a other.
 */
 
-QSqlCursor& QSqlCursor::operator=( const QSqlCursor& other )
+QSqlCursor &QSqlCursor::operator=(const QSqlCursor &other)
 {
-    QSqlRecord::operator=( other );
-    QSqlQuery::operator=( other );
-    delete d;
-    d = new QSqlCursorPrivate( other.d->nm, other.d->db );
-    d->lastAt = other.d->lastAt;
-    d->nm = other.d->nm;
-    d->srt = other.d->srt;
-    d->ftr = other.d->ftr;
-    d->priIndx = other.d->priIndx;
-    d->editBuffer = other.d->editBuffer;
-    d->infoBuffer = other.d->infoBuffer;
-    d->q = 0; // do not share queries
-    d->sql = 0;
-    setMode( other.mode() );
-    return *this;
+  QSqlRecord::operator=(other);
+  QSqlQuery::operator=(other);
+  delete d;
+  d = new QSqlCursorPrivate(other.d->nm, other.d->db);
+  d->lastAt = other.d->lastAt;
+  d->nm = other.d->nm;
+  d->srt = other.d->srt;
+  d->ftr = other.d->ftr;
+  d->priIndx = other.d->priIndx;
+  d->editBuffer = other.d->editBuffer;
+  d->infoBuffer = other.d->infoBuffer;
+  d->q = 0; // do not share queries
+  d->sql = 0;
+  setMode(other.mode());
+  return *this;
 }
 
 /*!
@@ -343,9 +341,9 @@ QSqlCursor& QSqlCursor::operator=( const QSqlCursor& other )
     specify a sort.
 */
 
-void QSqlCursor::setSort( const QSqlIndex& sort )
+void QSqlCursor::setSort(const QSqlIndex &sort)
 {
-    d->srt = sort;
+  d->srt = sort;
 }
 
 /*!
@@ -354,7 +352,7 @@ void QSqlCursor::setSort( const QSqlIndex& sort )
 */
 QSqlIndex QSqlCursor::sort() const
 {
-    return d->srt;
+  return d->srt;
 }
 
 /*!
@@ -366,9 +364,9 @@ QSqlIndex QSqlCursor::sort() const
     The filter is a SQL \c WHERE clause without the keyword 'WHERE',
     e.g. \c{name='Dave'} which will be processed by the DBMS.
 */
-void QSqlCursor::setFilter( const QString& filter )
+void QSqlCursor::setFilter(const QString &filter)
 {
-    d->ftr = filter;
+  d->ftr = filter;
 }
 
 /*!
@@ -377,7 +375,7 @@ void QSqlCursor::setFilter( const QString& filter )
 */
 QString QSqlCursor::filter() const
 {
-    return d->ftr;
+  return d->ftr;
 }
 
 /*!
@@ -388,21 +386,21 @@ QString QSqlCursor::filter() const
     auto-populated. See the QSqlCursor constructor documentation for
     more information.
 */
-void QSqlCursor::setName( const QString& name, bool autopopulate )
+void QSqlCursor::setName(const QString &name, bool autopopulate)
 {
-    d->nm = name;
-    if ( autopopulate ) {
-	if ( driver() ) {
-	    d->infoBuffer = driver()->recordInfo( name );
-	    *this = d->infoBuffer.toRecord();
-	    d->editBuffer = *this;
-	    d->priIndx = driver()->primaryIndex( name );
-	}
-#ifdef QT_CHECK_RANGE
-	if ( isEmpty() )
-	    qWarning("QSqlCursor::setName: unable to build record, does '%s' exist?", name.latin1() );
-#endif
+  d->nm = name;
+  if (autopopulate) {
+    if (driver()) {
+      d->infoBuffer = driver()->recordInfo(name);
+      *this = d->infoBuffer.toRecord();
+      d->editBuffer = *this;
+      d->priIndx = driver()->primaryIndex(name);
     }
+#ifdef QT_CHECK_RANGE
+    if (isEmpty())
+      qWarning("QSqlCursor::setName: unable to build record, does '%s' exist?", name.latin1());
+#endif
+  }
 }
 
 /*!
@@ -411,28 +409,28 @@ void QSqlCursor::setName( const QString& name, bool autopopulate )
 
 QString QSqlCursor::name() const
 {
-    return d->nm;
+  return d->nm;
 }
 
 /*! \reimp
 */
 
-QString QSqlCursor::toString( const QString& prefix, const QString& sep ) const
+QString QSqlCursor::toString(const QString &prefix, const QString &sep) const
 {
-    QString pflist;
-    QString pfix =  prefix.isEmpty() ? QString::null : prefix + ".";
-    bool comma = FALSE;
+  QString pflist;
+  QString pfix =  prefix.isEmpty() ? QString::null : prefix + ".";
+  bool comma = FALSE;
 
-    for ( uint i = 0; i < count(); ++i ) {
-	const QString fname = fieldName( i );
-	if ( isGenerated( i ) ) {
-	    if( comma )
-		pflist += sep + " ";
-	    pflist += pfix + fname;
-	    comma = TRUE;
-	}
+  for (uint i = 0; i < count(); ++i) {
+    const QString fname = fieldName(i);
+    if (isGenerated(i)) {
+      if (comma)
+        pflist += sep + " ";
+      pflist += pfix + fname;
+      comma = TRUE;
     }
-    return pflist;
+  }
+  return pflist;
 }
 
 /*!
@@ -441,9 +439,9 @@ QString QSqlCursor::toString( const QString& prefix, const QString& sep ) const
   Assigns the record \a list.
 
 */
-QSqlRecord & QSqlCursor::operator=( const QSqlRecord & list )
+QSqlRecord &QSqlCursor::operator=(const QSqlRecord &list)
 {
-    return QSqlRecord::operator=( list );
+  return QSqlRecord::operator=(list);
 }
 
 /*!
@@ -451,13 +449,13 @@ QSqlRecord & QSqlCursor::operator=( const QSqlRecord & list )
     that all references to the cursor edit buffer become invalidated.
 */
 
-void QSqlCursor::append( const QSqlFieldInfo& fieldInfo )
+void QSqlCursor::append(const QSqlFieldInfo &fieldInfo)
 {
-    d->editBuffer.append( fieldInfo.toField() );
-    d->editBuffer.setGenerated( d->editBuffer.count() - 1, fieldInfo.isGenerated() );
-    d->infoBuffer.append( fieldInfo );
-    QSqlRecord::append( fieldInfo.toField() );
-    QSqlRecord::setGenerated( QSqlRecord::count() - 1, fieldInfo.isGenerated() );
+  d->editBuffer.append(fieldInfo.toField());
+  d->editBuffer.setGenerated(d->editBuffer.count() - 1, fieldInfo.isGenerated());
+  d->infoBuffer.append(fieldInfo);
+  QSqlRecord::append(fieldInfo.toField());
+  QSqlRecord::setGenerated(QSqlRecord::count() - 1, fieldInfo.isGenerated());
 }
 
 /*!
@@ -466,9 +464,9 @@ void QSqlCursor::append( const QSqlFieldInfo& fieldInfo )
 */
 void QSqlCursor::clear()
 {
-    d->editBuffer.clear();
-    d->infoBuffer.clear();
-    QSqlRecord::clear();
+  d->editBuffer.clear();
+  d->infoBuffer.clear();
+  QSqlRecord::clear();
 }
 
 
@@ -478,13 +476,13 @@ void QSqlCursor::clear()
     to the cursor edit buffer become invalidated.
 */
 
-void  QSqlCursor::insert( int pos, const QSqlFieldInfo& fieldInfo )
+void  QSqlCursor::insert(int pos, const QSqlFieldInfo &fieldInfo)
 {
-    d->editBuffer.insert( pos, fieldInfo.toField() );
-    d->editBuffer.setGenerated( pos, fieldInfo.isGenerated() );
-    d->infoBuffer[ pos ] = fieldInfo;
-    QSqlRecord::insert( pos, fieldInfo.toField() );
-    QSqlRecord::setGenerated( pos, fieldInfo.isGenerated() );
+  d->editBuffer.insert(pos, fieldInfo.toField());
+  d->editBuffer.setGenerated(pos, fieldInfo.isGenerated());
+  d->infoBuffer[ pos ] = fieldInfo;
+  QSqlRecord::insert(pos, fieldInfo.toField());
+  QSqlRecord::setGenerated(pos, fieldInfo.isGenerated());
 }
 
 /*!
@@ -493,12 +491,28 @@ void  QSqlCursor::insert( int pos, const QSqlFieldInfo& fieldInfo )
     invalidated.
 */
 
-void QSqlCursor::remove( int pos )
+void QSqlCursor::remove(int pos)
 {
-    d->editBuffer.remove( pos );
-    d->infoBuffer[ pos ] = QSqlFieldInfo();
-    QSqlRecord::remove( pos );
+  d->editBuffer.remove(pos);
+  d->infoBuffer[ pos ] = QSqlFieldInfo();
+  QSqlRecord::remove(pos);
 }
+
+// ### AbanQ
+void QSqlCursor::changePos(const QString &name, int newPos)
+{
+  d->editBuffer.changePos(name, newPos);
+  d->infoBuffer.changePos(name, newPos);
+  QSqlRecord::changePos(name, newPos);
+}
+
+void QSqlCursor::setOrder(const QStringList &order)
+{
+  d->editBuffer.setOrder(order);
+  d->infoBuffer.setOrder(order);
+  QSqlRecord::setOrder(order);
+}
+// ### AbanQ
 
 /*!
     Sets the generated flag for the field \a name to \a generated. If
@@ -509,14 +523,14 @@ void QSqlCursor::remove( int pos )
     \sa isGenerated()
 */
 
-void QSqlCursor::setGenerated( const QString& name, bool generated )
+void QSqlCursor::setGenerated(const QString &name, bool generated)
 {
-    int pos = position( name );
-    if ( pos == -1 )
-	return;
-    QSqlRecord::setGenerated( name, generated );
-    d->editBuffer.setGenerated( name, generated );
-    d->infoBuffer[ pos ].setGenerated( generated );
+  int pos = position(name);
+  if (pos == -1)
+    return;
+  QSqlRecord::setGenerated(name, generated);
+  d->editBuffer.setGenerated(name, generated);
+  d->infoBuffer[ pos ].setGenerated(generated);
 }
 
 /*!
@@ -526,13 +540,13 @@ void QSqlCursor::setGenerated( const QString& name, bool generated )
 
     \sa isGenerated()
 */
-void QSqlCursor::setGenerated( int i, bool generated )
+void QSqlCursor::setGenerated(int i, bool generated)
 {
-    if ( i < 0 || i >= (int)d->infoBuffer.count() )
-	return;
-    QSqlRecord::setGenerated( i, generated );
-    d->editBuffer.setGenerated( i, generated );
-    d->infoBuffer[i].setGenerated( generated );
+  if (i < 0 || i >= (int)d->infoBuffer.count())
+    return;
+  QSqlRecord::setGenerated(i, generated);
+  d->editBuffer.setGenerated(i, generated);
+  d->infoBuffer[i].setGenerated(generated);
 }
 
 /*!
@@ -543,16 +557,16 @@ void QSqlCursor::setGenerated( int i, bool generated )
     record.
 */
 
-QSqlIndex QSqlCursor::primaryIndex( bool setFromCursor ) const
+QSqlIndex QSqlCursor::primaryIndex(bool setFromCursor) const
 {
-    if ( setFromCursor ) {
-	for ( uint i = 0; i < d->priIndx.count(); ++i ) {
-	    const QString fn = d->priIndx.fieldName( i );
-	    if ( contains( fn ) )
-		d->priIndx.setValue( i, value( fn ) );
-	}
+  if (setFromCursor) {
+    for (uint i = 0; i < d->priIndx.count(); ++i) {
+      const QString fn = d->priIndx.fieldName(i);
+      if (contains(fn))
+        d->priIndx.setValue(i, value(fn));
     }
-    return d->priIndx;
+  }
+  return d->priIndx;
 }
 
 /*!
@@ -564,9 +578,9 @@ QSqlIndex QSqlCursor::primaryIndex( bool setFromCursor ) const
     \sa update() del()
 */
 
-void QSqlCursor::setPrimaryIndex( const QSqlIndex& idx )
+void QSqlCursor::setPrimaryIndex(const QSqlIndex &idx)
 {
-    d->priIndx = idx;
+  d->priIndx = idx;
 }
 
 
@@ -578,18 +592,18 @@ void QSqlCursor::setPrimaryIndex( const QSqlIndex& idx )
     \sa QSqlIndex
 */
 
-QSqlIndex QSqlCursor::index( const QStringList& fieldNames ) const
+QSqlIndex QSqlCursor::index(const QStringList &fieldNames) const
 {
-    QSqlIndex idx;
-    for ( QStringList::ConstIterator it = fieldNames.begin(); it != fieldNames.end(); ++it ) {
-	const QSqlField* f = field( (*it) );
-	if ( !f ) { /* all fields must exist */
-	    idx.clear();
-	    break;
-	}
-	idx.append( *f );
+  QSqlIndex idx;
+  for (QStringList::ConstIterator it = fieldNames.begin(); it != fieldNames.end(); ++it) {
+    const QSqlField *f = field((*it));
+    if (!f) {   /* all fields must exist */
+      idx.clear();
+      break;
     }
-    return idx;
+    idx.append(*f);
+  }
+  return idx;
 }
 
 /*!
@@ -598,10 +612,10 @@ QSqlIndex QSqlCursor::index( const QStringList& fieldNames ) const
     Returns an index based on \a fieldName.
 */
 
-QSqlIndex QSqlCursor::index( const QString& fieldName ) const
+QSqlIndex QSqlCursor::index(const QString &fieldName) const
 {
-    QStringList fl( fieldName );
-    return index( fl );
+  QStringList fl(fieldName);
+  return index(fl);
 }
 
 /*!
@@ -610,9 +624,9 @@ QSqlIndex QSqlCursor::index( const QString& fieldName ) const
     Returns an index based on \a fieldName.
 */
 
-QSqlIndex QSqlCursor::index( const char* fieldName ) const
+QSqlIndex QSqlCursor::index(const char *fieldName) const
 {
-    return index( QStringList( QString( fieldName ) ) );
+  return index(QStringList(QString(fieldName)));
 }
 
 /*!
@@ -631,7 +645,7 @@ QSqlIndex QSqlCursor::index( const char* fieldName ) const
     QSqlCursor cur( "Employee" ); // Use the Employee table or view
     cur.select( "deptno=10" ); // select all records in department 10
     while( cur.next() ) {
-	... // process data
+  ... // process data
     }
     ...
     // select records in other departments, ordered by department number
@@ -648,7 +662,7 @@ QSqlIndex QSqlCursor::index( const char* fieldName ) const
     QSqlCursor cur( "Employee" );
     cur.select( "deptno=10" ); // select all records in department 10
     while( cur.next() ) {
-	... // process data
+  ... // process data
     }
     ...
     cur.select(); // re-selects all records in department 10
@@ -657,22 +671,22 @@ QSqlIndex QSqlCursor::index( const char* fieldName ) const
 
 */
 
-bool QSqlCursor::select( const QString & filter, const QSqlIndex & sort )
+bool QSqlCursor::select(const QString &filter, const QSqlIndex &sort)
 {
-    QString fieldList = toString( d->nm );
-    if ( fieldList.isEmpty() )
-	return FALSE;
-    QString str= "select " + fieldList;
-    str += " from " + d->nm;
-    if ( !filter.isEmpty() ) {
-	d->ftr = filter;
-	str += " where " + filter;
-    } else
-	d->ftr = QString::null;
-    if ( sort.count() > 0 )
-	str += " order by " + sort.toString( d->nm );
-    d->srt = sort;
-    return exec( str );
+  QString fieldList = toString(d->nm);
+  if (fieldList.isEmpty())
+    return FALSE;
+  QString str = "select " + fieldList;
+  str += " from " + d->nm;
+  if (!filter.isEmpty()) {
+    d->ftr = filter;
+    str += " where " + filter;
+  } else
+    d->ftr = QString::null;
+  if (sort.count() > 0)
+    str += " order by " + sort.toString(d->nm);
+  d->srt = sort;
+  return exec(str);
 }
 
 /*!
@@ -695,7 +709,7 @@ bool QSqlCursor::select( const QString & filter, const QSqlIndex & sort )
 
 bool QSqlCursor::select()
 {
-    return select( filter(), sort() );
+  return select(filter(), sort());
 }
 
 /*!
@@ -710,9 +724,9 @@ bool QSqlCursor::select()
     last(), prev() or next().
 */
 
-bool QSqlCursor::select( const QSqlIndex& sort )
+bool QSqlCursor::select(const QSqlIndex &sort)
 {
-    return select( filter(), sort );
+  return select(filter(), sort);
 }
 
 /*!
@@ -743,9 +757,9 @@ bool QSqlCursor::select( const QSqlIndex& sort )
     used for the ORDER BY clause, \c{ORDER BY id} in this example.
 */
 
-bool QSqlCursor::select( const QSqlIndex & filter, const QSqlIndex & sort )
+bool QSqlCursor::select(const QSqlIndex &filter, const QSqlIndex &sort)
 {
-    return select( toString( filter, this, d->nm, "=", "and" ), sort );
+  return select(toString(filter, this, d->nm, "=", "and"), sort);
 }
 
 /*!
@@ -764,9 +778,9 @@ bool QSqlCursor::select( const QSqlIndex & filter, const QSqlIndex & sort )
     \endcode
 */
 
-void QSqlCursor::setMode( int mode )
+void QSqlCursor::setMode(int mode)
 {
-    d->md = mode;
+  d->md = mode;
 }
 
 /*!
@@ -777,7 +791,7 @@ void QSqlCursor::setMode( int mode )
 
 int QSqlCursor::mode() const
 {
-    return d->md;
+  return d->md;
 }
 
 /*!
@@ -791,14 +805,14 @@ int QSqlCursor::mode() const
     \sa calculateField() QSqlRecord::setGenerated()
 */
 
-void QSqlCursor::setCalculated( const QString& name, bool calculated )
+void QSqlCursor::setCalculated(const QString &name, bool calculated)
 {
-    int pos = position( name );
-    if ( pos < 0 )
-	return;
-    d->infoBuffer[ pos ].setCalculated( calculated );
-    if ( calculated )
-	setGenerated( pos, FALSE );
+  int pos = position(name);
+  if (pos < 0)
+    return;
+  d->infoBuffer[ pos ].setCalculated(calculated);
+  if (calculated)
+    setGenerated(pos, FALSE);
 }
 
 /*!
@@ -808,12 +822,12 @@ void QSqlCursor::setCalculated( const QString& name, bool calculated )
     \sa setCalculated()
 */
 
-bool QSqlCursor::isCalculated( const QString& name ) const
+bool QSqlCursor::isCalculated(const QString &name) const
 {
-    int pos = position( name );
-    if ( pos < 0 )
-	return FALSE;
-    return d->infoBuffer[ pos ].isCalculated();
+  int pos = position(name);
+  if (pos < 0)
+    return FALSE;
+  return d->infoBuffer[ pos ].isCalculated();
 }
 
 /*!
@@ -826,12 +840,12 @@ bool QSqlCursor::isCalculated( const QString& name ) const
     \sa isTrimmed() QVariant
 */
 
-void QSqlCursor::setTrimmed( const QString& name, bool trim )
+void QSqlCursor::setTrimmed(const QString &name, bool trim)
 {
-    int pos = position( name );
-    if ( pos < 0 )
-	return;
-    d->infoBuffer[ pos ].setTrim( trim );
+  int pos = position(name);
+  if (pos < 0)
+    return;
+  d->infoBuffer[ pos ].setTrim(trim);
 }
 
 /*!
@@ -844,12 +858,12 @@ void QSqlCursor::setTrimmed( const QString& name, bool trim )
     \sa setTrimmed()
 */
 
-bool QSqlCursor::isTrimmed( const QString& name ) const
+bool QSqlCursor::isTrimmed(const QString &name) const
 {
-    int pos = position( name );
-    if ( pos < 0 )
-	return FALSE;
-    return d->infoBuffer[ pos ].isTrim();
+  int pos = position(name);
+  if (pos < 0)
+    return FALSE;
+  return d->infoBuffer[ pos ].isTrim();
 }
 
 /*!
@@ -862,7 +876,7 @@ bool QSqlCursor::isTrimmed( const QString& name ) const
 
 bool QSqlCursor::isReadOnly() const
 {
-    return d->md == 0;
+  return d->md == 0;
 }
 
 /*!
@@ -874,7 +888,7 @@ bool QSqlCursor::isReadOnly() const
 
 bool QSqlCursor::canInsert() const
 {
-    return ( ( d->md & Insert ) == Insert ) ;
+  return ((d->md & Insert) == Insert) ;
 }
 
 
@@ -887,7 +901,7 @@ bool QSqlCursor::canInsert() const
 
 bool QSqlCursor::canUpdate() const
 {
-    return ( ( d->md & Update ) == Update ) ;
+  return ((d->md & Update) == Update) ;
 }
 
 /*!
@@ -899,7 +913,7 @@ bool QSqlCursor::canUpdate() const
 
 bool QSqlCursor::canDelete() const
 {
-    return ( ( d->md & Delete ) == Delete ) ;
+  return ((d->md & Delete) == Delete) ;
 }
 
 /*!
@@ -912,19 +926,19 @@ bool QSqlCursor::canDelete() const
     statements.
 */
 
-QString QSqlCursor::toString( const QString& prefix, QSqlField* field, const QString& fieldSep ) const
+QString QSqlCursor::toString(const QString &prefix, QSqlField *field, const QString &fieldSep) const
 {
-    QString f;
-    if ( field && driver() ) {
-	f = ( prefix.length() > 0 ? prefix + QString(".") : QString::null ) + field->name();
-	f += " " + fieldSep + " ";
-	if ( field->isNull() ) {
-	    f += "NULL";
-	} else {
-	    f += driver()->formatValue( field );
-	}
+  QString f;
+  if (field && driver()) {
+    f = (prefix.length() > 0 ? prefix + QString(".") : QString::null) + field->name();
+    f += " " + fieldSep + " ";
+    if (field->isNull()) {
+      f += "NULL";
+    } else {
+      f += driver()->formatValue(field);
     }
-    return f;
+  }
+  return f;
 }
 
 /*!
@@ -937,23 +951,23 @@ QString QSqlCursor::toString( const QString& prefix, QSqlField* field, const QSt
     is useful for generating SQL statements.
 */
 
-QString QSqlCursor::toString( QSqlRecord* rec, const QString& prefix, const QString& fieldSep,
-			      const QString& sep ) const
+QString QSqlCursor::toString(QSqlRecord *rec, const QString &prefix, const QString &fieldSep,
+                             const QString &sep) const
 {
-    static QString blank( " " );
-    QString filter;
-    bool separator = FALSE;
-    for ( uint j = 0; j < count(); ++j ) {
-	QSqlField* f = rec->field( j );
-	if ( rec->isGenerated( j ) ) {
-	    if ( separator )
-		filter += sep + blank;
-	    filter += toString( prefix, f, fieldSep );
-	    filter += blank;
-	    separator = TRUE;
-	}
+  static QString blank(" ");
+  QString filter;
+  bool separator = FALSE;
+  for (uint j = 0; j < count(); ++j) {
+    QSqlField *f = rec->field(j);
+    if (rec->isGenerated(j)) {
+      if (separator)
+        filter += sep + blank;
+      filter += toString(prefix, f, fieldSep);
+      filter += blank;
+      separator = TRUE;
     }
-    return filter;
+  }
+  return filter;
 }
 
 /*!
@@ -969,23 +983,23 @@ QString QSqlCursor::toString( QSqlRecord* rec, const QString& prefix, const QStr
     SQL statements.
 */
 
-QString QSqlCursor::toString( const QSqlIndex& i, QSqlRecord* rec, const QString& prefix,
-				const QString& fieldSep, const QString& sep ) const
+QString QSqlCursor::toString(const QSqlIndex &i, QSqlRecord *rec, const QString &prefix,
+                             const QString &fieldSep, const QString &sep) const
 {
-    QString filter;
-    bool separator = FALSE;
-    for( uint j = 0; j < i.count(); ++j ){
-	if ( rec->isGenerated( j ) ) {
-	    if( separator ) {
-		filter += " " + sep + " " ;
-	    }
-	    QString fn = i.fieldName( j );
-	    QSqlField* f = rec->field( fn );
-	    filter += toString( prefix, f, fieldSep );
-	    separator = TRUE;
-	}
+  QString filter;
+  bool separator = FALSE;
+  for (uint j = 0; j < i.count(); ++j) {
+    if (rec->isGenerated(j)) {
+      if (separator) {
+        filter += " " + sep + " " ;
+      }
+      QString fn = i.fieldName(j);
+      QSqlField *f = rec->field(fn);
+      filter += toString(prefix, f, fieldSep);
+      separator = TRUE;
     }
-    return filter;
+  }
+  return filter;
 }
 
 /*!
@@ -1017,62 +1031,62 @@ QString QSqlCursor::toString( const QSqlIndex& i, QSqlRecord* rec, const QString
     \sa setMode() lastError()
 */
 
-int QSqlCursor::insert( bool invalidate )
+int QSqlCursor::insert(bool invalidate)
 {
-    if ( ( d->md & Insert ) != Insert || !driver() )
-	return FALSE;
-    int k = d->editBuffer.count();
-    if ( k == 0 )
-	return 0;
-    
-    QString fList;
-    QString vList;
-    bool comma = FALSE;
-    // use a prepared query if the driver supports it
-    if ( driver()->hasFeature( QSqlDriver::PreparedQueries ) ) {
-	int cnt = 0;
-	bool oraStyle = driver()->hasFeature( QSqlDriver::NamedPlaceholders );
-	for( int j = 0; j < k; ++j ) {
-	    QSqlField* f = d->editBuffer.field( j );
-	    if ( d->editBuffer.isGenerated( j ) ) {
-		if ( comma ) {
-		    fList += ",";
-		    vList += ",";
-		}
-		fList += f->name();
-		vList += (oraStyle == TRUE) ? ":f" + QString::number(cnt) : QString("?");
-		cnt++;
-		comma = TRUE;
-	    }
-	}
-	if ( !comma ) {
-	    return 0;
-	}
-	QString str;
-	str.append( "insert into " ).append( name() ).append( "(" ).append( fList ).append( ") values (" ).append( vList ). append ( ")" );
-	return applyPrepared( str, invalidate );
-    } else {
-	for( int j = 0; j < k; ++j ) {
-	    QSqlField* f = d->editBuffer.field( j );
-	    if ( d->editBuffer.isGenerated( j ) ) {
-		if ( comma ) {
-		    fList += ",";
-		    vList += ",";
-		}
-		fList += f->name();
-		vList += driver()->formatValue( f );
-		comma = TRUE;
-	    }
-	}
+  if ((d->md & Insert) != Insert || !driver())
+    return FALSE;
+  int k = d->editBuffer.count();
+  if (k == 0)
+    return 0;
 
-	if ( !comma ) {
-	    // no valid fields found
-	    return 0;
-	}
-	QString str;
-	str.append( "insert into " ).append( name() ).append( "(" ).append( fList ).append( ") values (" ).append( vList ). append ( ")" );
-	return apply( str, invalidate );
+  QString fList;
+  QString vList;
+  bool comma = FALSE;
+  // use a prepared query if the driver supports it
+  if (driver()->hasFeature(QSqlDriver::PreparedQueries)) {
+    int cnt = 0;
+    bool oraStyle = driver()->hasFeature(QSqlDriver::NamedPlaceholders);
+    for (int j = 0; j < k; ++j) {
+      QSqlField *f = d->editBuffer.field(j);
+      if (d->editBuffer.isGenerated(j)) {
+        if (comma) {
+          fList += ",";
+          vList += ",";
+        }
+        fList += f->name();
+        vList += (oraStyle == TRUE) ? ":f" + QString::number(cnt) : QString("?");
+        cnt++;
+        comma = TRUE;
+      }
     }
+    if (!comma) {
+      return 0;
+    }
+    QString str;
+    str.append("insert into ").append(name()).append("(").append(fList).append(") values (").append(vList). append(")");
+    return applyPrepared(str, invalidate);
+  } else {
+    for (int j = 0; j < k; ++j) {
+      QSqlField *f = d->editBuffer.field(j);
+      if (d->editBuffer.isGenerated(j)) {
+        if (comma) {
+          fList += ",";
+          vList += ",";
+        }
+        fList += f->name();
+        vList += driver()->formatValue(f);
+        comma = TRUE;
+      }
+    }
+
+    if (!comma) {
+      // no valid fields found
+      return 0;
+    }
+    QString str;
+    str.append("insert into ").append(name()).append("(").append(fList).append(") values (").append(vList). append(")");
+    return apply(str, invalidate);
+  }
 }
 
 /*!
@@ -1085,18 +1099,18 @@ int QSqlCursor::insert( bool invalidate )
     \sa primeInsert(), primeUpdate() primeDelete()
 */
 
-QSqlRecord* QSqlCursor::editBuffer( bool copy )
+QSqlRecord *QSqlCursor::editBuffer(bool copy)
 {
-    if ( copy ) {
-	for(uint i = 0; i < d->editBuffer.count(); i++) {
-	    if ( QSqlRecord::isNull( i ) ) {
-		d->editBuffer.setNull( i );
-	    } else {
-		d->editBuffer.setValue( i, value( i ) );
-	    }
-	}
+  if (copy) {
+    for (uint i = 0; i < d->editBuffer.count(); i++) {
+      if (QSqlRecord::isNull(i)) {
+        d->editBuffer.setNull(i);
+      } else {
+        d->editBuffer.setValue(i, value(i));
+      }
     }
-    return &d->editBuffer;
+  }
+  return &d->editBuffer;
 }
 
 /*!
@@ -1110,16 +1124,16 @@ QSqlRecord* QSqlCursor::editBuffer( bool copy )
     \sa editBuffer() update()
 */
 
-QSqlRecord* QSqlCursor::primeUpdate()
+QSqlRecord *QSqlCursor::primeUpdate()
 {
-    // memorize the primary keys as they were before the user changed the values in editBuffer
-    QSqlRecord* buf = editBuffer( TRUE );
-    QSqlIndex idx = primaryIndex( FALSE );
-    if ( !idx.isEmpty() )
-	d->editIndex = toString( idx, buf, d->nm, "=", "and" );
-    else
-	d->editIndex = qWhereClause( buf, d->nm, "and", driver() );
-    return buf;
+  // memorize the primary keys as they were before the user changed the values in editBuffer
+  QSqlRecord *buf = editBuffer(TRUE);
+  QSqlIndex idx = primaryIndex(FALSE);
+  if (!idx.isEmpty())
+    d->editIndex = toString(idx, buf, d->nm, "=", "and");
+  else
+    d->editIndex = qWhereClause(buf, d->nm, "and", driver());
+  return buf;
 }
 
 /*!
@@ -1133,9 +1147,9 @@ QSqlRecord* QSqlCursor::primeUpdate()
     \sa editBuffer() del()
 */
 
-QSqlRecord* QSqlCursor::primeDelete()
+QSqlRecord *QSqlCursor::primeDelete()
 {
-    return editBuffer( TRUE );
+  return editBuffer(TRUE);
 }
 
 /*!
@@ -1147,10 +1161,10 @@ QSqlRecord* QSqlCursor::primeDelete()
     \sa editBuffer() insert()
 */
 
-QSqlRecord* QSqlCursor::primeInsert()
+QSqlRecord *QSqlCursor::primeInsert()
 {
-    d->editBuffer.clearValues();
-    return &d->editBuffer;
+  d->editBuffer.clearValues();
+  return &d->editBuffer;
 }
 
 
@@ -1190,11 +1204,11 @@ QSqlRecord* QSqlCursor::primeInsert()
     \sa setMode() lastError()
 */
 
-int QSqlCursor::update( bool invalidate )
+int QSqlCursor::update(bool invalidate)
 {
-    if ( d->editIndex.isEmpty() )
-	return 0;
-    return update( d->editIndex, invalidate );
+  if (d->editIndex.isEmpty())
+    return 0;
+  return update(d->editIndex, invalidate);
 }
 
 /*!
@@ -1215,49 +1229,49 @@ int QSqlCursor::update( bool invalidate )
     \sa primeUpdate() setMode() lastError()
 */
 
-int QSqlCursor::update( const QString & filter, bool invalidate )
-{    
-    if ( ( d->md & Update ) != Update ) {
-	return FALSE;
+int QSqlCursor::update(const QString &filter, bool invalidate)
+{
+  if ((d->md & Update) != Update) {
+    return FALSE;
+  }
+  int k = count();
+  if (k == 0) {
+    return 0;
+  }
+
+  // use a prepared query if the driver supports it
+  if (driver()->hasFeature(QSqlDriver::PreparedQueries)) {
+    QString fList;
+    bool comma = FALSE;
+    int cnt = 0;
+    bool oraStyle = driver()->hasFeature(QSqlDriver::NamedPlaceholders);
+    for (int j = 0; j < k; ++j) {
+      QSqlField *f = d->editBuffer.field(j);
+      if (d->editBuffer.isGenerated(j)) {
+        if (comma) {
+          fList += ",";
+        }
+        fList += f->name() + " = " + (oraStyle == TRUE ? ":f" + QString::number(cnt) : QString("?"));
+        cnt++;
+        comma = TRUE;
+      }
     }
-    int k = count();
-    if ( k == 0 ) {
-	return 0;
+    if (!comma) {
+      return 0;
     }
-    
-    // use a prepared query if the driver supports it
-    if ( driver()->hasFeature( QSqlDriver::PreparedQueries ) ) {
-	QString fList;
-	bool comma = FALSE;
-	int cnt = 0;
-	bool oraStyle = driver()->hasFeature( QSqlDriver::NamedPlaceholders );
-	for( int j = 0; j < k; ++j ) {
-	    QSqlField* f = d->editBuffer.field( j );
-	    if ( d->editBuffer.isGenerated( j ) ) {
-		if ( comma ) {
-		    fList += ",";
-		}
-		fList += f->name() + " = " + (oraStyle == TRUE ? ":f" + QString::number(cnt) : QString("?"));
-		cnt++;
-		comma = TRUE;
-	    }
-	}
-	if ( !comma ) {
-	    return 0;
-	}
-	QString str = "update " + name() + " set " + fList;
-	if ( filter.length() ) {
-	    str+= " where " + filter;
-	}
-	return applyPrepared( str, invalidate );
-    } else {
-	QString str = "update " + name();
-	str += " set " + toString( &d->editBuffer, QString::null, "=", "," );
-	if ( filter.length() ) {
-	    str+= " where " + filter;
-	}
-	return apply( str, invalidate );
+    QString str = "update " + name() + " set " + fList;
+    if (filter.length()) {
+      str += " where " + filter;
     }
+    return applyPrepared(str, invalidate);
+  } else {
+    QString str = "update " + name();
+    str += " set " + toString(&d->editBuffer, QString::null, "=", ",");
+    if (filter.length()) {
+      str += " where " + filter;
+    }
+    return apply(str, invalidate);
+  }
 }
 
 /*!
@@ -1289,14 +1303,14 @@ int QSqlCursor::update( const QString & filter, bool invalidate )
     \sa primeDelete() setMode() lastError()
 */
 
-int QSqlCursor::del( bool invalidate )
+int QSqlCursor::del(bool invalidate)
 {
-    QSqlIndex idx = primaryIndex( FALSE );
-    if ( idx.isEmpty() )
-        return del( qWhereClause( &d->editBuffer, d->nm, "and", driver() ), invalidate );
-    else
-	return del( toString( primaryIndex(), &d->editBuffer, d->nm,
-			  "=", "and" ), invalidate );
+  QSqlIndex idx = primaryIndex(FALSE);
+  if (idx.isEmpty())
+    return del(qWhereClause(&d->editBuffer, d->nm, "and", driver()), invalidate);
+  else
+    return del(toString(primaryIndex(), &d->editBuffer, d->nm,
+                        "=", "and"), invalidate);
 }
 
 /*!
@@ -1314,73 +1328,73 @@ int QSqlCursor::del( bool invalidate )
     \sa setMode() lastError()
 */
 
-int QSqlCursor::del( const QString & filter, bool invalidate )
+int QSqlCursor::del(const QString &filter, bool invalidate)
 {
-    if ( ( d->md & Delete ) != Delete )
-	return 0;
-    int k = count();
-    if( k == 0 ) return 0;
-    QString str = "delete from " + name();
-    if ( filter.length() )
-	str+= " where " + filter;
-    return apply( str, invalidate );
+  if ((d->md & Delete) != Delete)
+    return 0;
+  int k = count();
+  if (k == 0) return 0;
+  QString str = "delete from " + name();
+  if (filter.length())
+    str += " where " + filter;
+  return apply(str, invalidate);
 }
 
 /*
   \internal
 */
 
-int QSqlCursor::apply( const QString& q, bool invalidate )
+int QSqlCursor::apply(const QString &q, bool invalidate)
 {
-    d->sql = 0;
-    int ar = 0;
-    if ( invalidate ) {
-	if ( exec( q ) )
-	    ar = numRowsAffected();
-    } else if ( driver() ) {
-	d->sql = d->query();
-	if ( d->sql && d->sql->exec( q ) )
-	    ar = d->sql->numRowsAffected();
-    }
-    return ar;
+  d->sql = 0;
+  int ar = 0;
+  if (invalidate) {
+    if (exec(q))
+      ar = numRowsAffected();
+  } else if (driver()) {
+    d->sql = d->query();
+    if (d->sql && d->sql->exec(q))
+      ar = d->sql->numRowsAffected();
+  }
+  return ar;
 }
 
 /*
   \internal
 */
 
-int QSqlCursor::applyPrepared( const QString& q, bool invalidate )
+int QSqlCursor::applyPrepared(const QString &q, bool invalidate)
 {
-    int ar = 0;
-    QSqlQuery* sql = 0;
-    
-    if ( invalidate ) {
-	sql = (QSqlQuery*)this;
-	d->lastAt = QSql::BeforeFirst;
-    } else {
-	sql = d->query();
+  int ar = 0;
+  QSqlQuery *sql = 0;
+
+  if (invalidate) {
+    sql = (QSqlQuery *)this;
+    d->lastAt = QSql::BeforeFirst;
+  } else {
+    sql = d->query();
+  }
+  if (!sql)
+    return 0;
+
+  if (invalidate || sql->lastQuery() != q) {
+    if (!sql->prepare(q))
+      return 0;
+  }
+
+  int cnt = 0;
+  int fieldCount = (int)count();
+  for (int j = 0; j < fieldCount; ++j) {
+    const QSqlField *f = d->editBuffer.field(j);
+    if (d->editBuffer.isGenerated(j)) {
+      sql->bindValue(cnt, f->value());
+      cnt++;
     }
-    if ( !sql )
-	return 0;
-    
-    if ( invalidate || sql->lastQuery() != q ) {
-	if ( !sql->prepare( q ) )
-	    return 0;
-    }
-    
-    int cnt = 0;
-    int fieldCount = (int)count();
-    for ( int j = 0; j < fieldCount; ++j ) {
-	const QSqlField* f = d->editBuffer.field( j );
-	if ( d->editBuffer.isGenerated( j ) ) {
-	    sql->bindValue( cnt, f->value() );
-	    cnt++;
-	}
-    }
-    if ( sql->exec() ) {
-	ar = sql->numRowsAffected();
-    }
-    return ar;
+  }
+  if (sql->exec()) {
+    ar = sql->numRowsAffected();
+  }
+  return ar;
 }
 
 /*!  \reimp
@@ -1389,11 +1403,11 @@ int QSqlCursor::applyPrepared( const QString& q, bool invalidate )
   active, otherwise returns FALSE.
 
 */
-bool QSqlCursor::exec( const QString & sql )
+bool QSqlCursor::exec(const QString &sql)
 {
-    d->lastAt = QSql::BeforeFirst;
-    QSqlQuery::exec( sql );
-    return isActive();
+  d->lastAt = QSql::BeforeFirst;
+  QSqlQuery::exec(sql);
+  return isActive();
 }
 
 /*!
@@ -1406,9 +1420,9 @@ bool QSqlCursor::exec( const QString & sql )
     \sa setCalculated()
 */
 
-QVariant QSqlCursor::calculateField( const QString& )
+QVariant QSqlCursor::calculateField(const QString &)
 {
-    return QVariant();
+  return QVariant();
 }
 
 /*! \internal
@@ -1416,14 +1430,14 @@ QVariant QSqlCursor::calculateField( const QString& )
 
 */
 
-static QString qTrim( const QString& s )
+static QString qTrim(const QString &s)
 {
-    QString result = s;
-    int end = result.length() - 1;
-    while ( end >= 0 && result[end].isSpace() ) // skip white space from end
-	end--;
-    result.truncate( end + 1 );
-    return result;
+  QString result = s;
+  int end = result.length() - 1;
+  while (end >= 0 && result[end].isSpace())   // skip white space from end
+    end--;
+  result.truncate(end + 1);
+  return result;
 }
 
 /*! \internal
@@ -1431,34 +1445,34 @@ static QString qTrim( const QString& s )
 
 void QSqlCursor::sync()
 {
-    if ( isActive() && isValid() && d->lastAt != at() ) {
-	d->lastAt = at();
-	uint i = 0;
-	uint j = 0;
-	bool haveCalculatedFields = FALSE;
-	for ( ; i < count(); ++i ) {
-	    if ( !haveCalculatedFields && d->infoBuffer[i].isCalculated() ) {
-		haveCalculatedFields = TRUE;
-	    }
-	    if ( QSqlRecord::isGenerated( i ) ) {
-		QVariant v = QSqlQuery::value( j );
-		if ( ( v.type() == QVariant::String || v.type() == QVariant::CString ) &&
-			d->infoBuffer[ i ].isTrim() ) {
-		    v = qTrim( v.toString() );
-		}
-		QSqlRecord::setValue( i, v );
-		if ( QSqlQuery::isNull( j ) )
-		    QSqlRecord::field( i )->setNull();
-		j++;
-	    }
-	}
-	if ( haveCalculatedFields ) {
-	    for ( i = 0; i < count(); ++i ) {
-		if ( d->infoBuffer[i].isCalculated() )
-		    QSqlRecord::setValue( i, calculateField( fieldName( i ) ) );
-	    }
-	}
+  if (isActive() && isValid() && d->lastAt != at()) {
+    d->lastAt = at();
+    uint i = 0;
+    uint j = 0;
+    bool haveCalculatedFields = FALSE;
+    for (; i < count(); ++i) {
+      if (!haveCalculatedFields && d->infoBuffer[i].isCalculated()) {
+        haveCalculatedFields = TRUE;
+      }
+      if (QSqlRecord::isGenerated(i)) {
+        QVariant v = QSqlQuery::value(j);
+        if ((v.type() == QVariant::String || v.type() == QVariant::CString) &&
+            d->infoBuffer[ i ].isTrim()) {
+          v = qTrim(v.toString());
+        }
+        QSqlRecord::setValue(i, v);
+        if (QSqlQuery::isNull(j))
+          QSqlRecord::field(i)->setNull();
+        j++;
+      }
     }
+    if (haveCalculatedFields) {
+      for (i = 0; i < count(); ++i) {
+        if (d->infoBuffer[i].isCalculated())
+          QSqlRecord::setValue(i, calculateField(fieldName(i)));
+      }
+    }
+  }
 }
 
 /*! \reimp
@@ -1467,7 +1481,7 @@ void QSqlCursor::sync()
 
 void QSqlCursor::afterSeek()
 {
-    sync();
+  sync();
 }
 
 /*!
@@ -1476,9 +1490,9 @@ void QSqlCursor::afterSeek()
     Returns the value of field number \a i.
 */
 
-QVariant QSqlCursor::value( int i ) const
+QVariant QSqlCursor::value(int i) const
 {
-    return QSqlRecord::value( i );
+  return QSqlRecord::value(i);
 }
 
 /*!
@@ -1487,24 +1501,24 @@ QVariant QSqlCursor::value( int i ) const
     Returns the value of the field called \a name.
 */
 
-QVariant QSqlCursor::value( const QString& name ) const
+QVariant QSqlCursor::value(const QString &name) const
 {
-    return QSqlRecord::value( name );
+  return QSqlRecord::value(name);
 }
 
 /*! \internal
   cursors should be filled with QSqlFieldInfos...
 */
-void QSqlCursor::append( const QSqlField& field )
+void QSqlCursor::append(const QSqlField &field)
 {
-    append( QSqlFieldInfo( field ) );
+  append(QSqlFieldInfo(field));
 }
 /*! \internal
   cursors should be filled with QSqlFieldInfos...
 */
-void QSqlCursor::insert( int pos, const QSqlField& field )
+void QSqlCursor::insert(int pos, const QSqlField &field)
 {
-    insert( pos, QSqlFieldInfo( field ) );
+  insert(pos, QSqlFieldInfo(field));
 }
 
 /*!
@@ -1513,9 +1527,9 @@ void QSqlCursor::insert( int pos, const QSqlField& field )
 
     This is the same as calling QSqlRecord::isNull( \a i )
 */
-bool QSqlCursor::isNull( int i ) const
+bool QSqlCursor::isNull(int i) const
 {
-    return QSqlRecord::isNull( i );
+  return QSqlRecord::isNull(i);
 }
 /*!
     \overload
@@ -1525,32 +1539,33 @@ bool QSqlCursor::isNull( int i ) const
 
     This is the same as calling QSqlRecord::isNull( \a name )
 */
-bool QSqlCursor::isNull( const QString& name ) const
+bool QSqlCursor::isNull(const QString &name) const
 {
-    return QSqlRecord::isNull( name );
+  return QSqlRecord::isNull(name);
 }
 
 /*! \reimp */
-void QSqlCursor::setValue( int i, const QVariant& val )
+void QSqlCursor::setValue(int i, const QVariant &val)
 {
 #ifdef QT_DEBUG
-    qDebug("QSqlCursor::setValue(): This will not affect actual database values. Use primeInsert(), primeUpdate() or primeDelete().");
+  qDebug("QSqlCursor::setValue(): This will not affect actual database values. Use primeInsert(), primeUpdate() or primeDelete().");
 #endif
-    QSqlRecord::setValue( i, val );
+  QSqlRecord::setValue(i, val);
 }
 
 /*! \reimp */
-void QSqlCursor::setValue( const QString& name, const QVariant& val )
+void QSqlCursor::setValue(const QString &name, const QVariant &val)
 {
 #ifdef QT_DEBUG
-    qDebug("QSqlCursor::setValue(): This will not affect actual database values. Use primeInsert(), primeUpdate() or primeDelete().");
+  qDebug("QSqlCursor::setValue(): This will not affect actual database values. Use primeInsert(), primeUpdate() or primeDelete().");
 #endif
-    QSqlRecord::setValue( name, val );
+  QSqlRecord::setValue(name, val);
 }
 #endif
 
-QSqlError QSqlCursor::lastError() const {
-  if ( d->sql )
+QSqlError QSqlCursor::lastError() const
+{
+  if (d->sql)
     return d->sql->lastError();
   return QSqlQuery::lastError();
 }

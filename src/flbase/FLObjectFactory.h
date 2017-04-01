@@ -1787,6 +1787,14 @@ public slots:
     obj_->changeConnection(connName);
   }
 
+  void changePos(const QString &name, int newPos = 0) {
+    obj_->changePos(name, newPos);
+  }
+
+  void setOrder(const QStringList &order) {
+    obj_->setOrder(order);
+  }
+
   QSqlCursor *qSqlCursor() const {
     return static_cast<QSqlCursor *>(obj_);
   }

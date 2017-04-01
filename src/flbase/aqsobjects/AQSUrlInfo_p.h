@@ -36,6 +36,14 @@ protected:
       delete o_;
   }
 
+public slots:
+  QString urlName() const {
+    AQ_CALL_RET_V(name(), QString);
+  }
+  bool urlIsValid() const {
+    AQ_CALL_RET_V(isValid(), bool);
+  }
+
   //@AQ_BEGIN_DEF_PUB_SLOTS@
 public slots:
   virtual void setName(const QString &);

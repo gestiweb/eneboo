@@ -94,6 +94,8 @@ public:
   virtual QVariant nextSerialVal(const QString &table, const QString &field);
   /** Ver FLSqlDatabase::atFrom() */
   virtual int atFrom(FLSqlCursor *cur);
+  /** Ver FLSqlDatabase::createSortIndex() */
+  virtual void createSortIndex(FLSqlCursor *cur) {}
   /** Ver FLSqlDatabase::alterTable() */
   virtual bool alterTable(const QString &mtd1, const QString &mtd2, const QString &key = QString::null);
   /** Ver FLSqlDatabase::canSavePoint() */

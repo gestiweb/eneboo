@@ -17,6 +17,7 @@ OPT_HOARD=no
 # núcleo.
 
 OPT_QWT=yes
+OPT_NEBULA=no
 OPT_DIGIDOC=yes
 OPT_WIN64=no
 OPT_QWS=no
@@ -126,6 +127,11 @@ for a in "$@"; do
     ;;
     -qwt)
       OPT_QWT=yes
+    ;;
+    -nebula)
+      OPT_NEBULA=yes
+      OPT_QUICK=yes
+      VERSION="$VER-Nebula Build $BUILD_NUMBER"
     ;;
     -digidoc)
       OPT_DIGIDOC=yes
@@ -564,6 +570,13 @@ then
   echo "DEFINES *= AQ_DEBUG" >> settings.pro
 fi
 
+if [ "$OPT_NEBULA" = "yes" ]
+then
+  echo "DEFINES *= AQ_NEBULA_BUILD" >> settings.pro
+  echo "CONFIG *= aq_nebula_build" >> settings.pro
+  echo "exists(../../../nebula_settings.pro):include(../../../nebula_settings.pro)" >> settings.pro
+fi
+
 if [ "$OPT_SQLLOG" = "yes" ]
 then
   echo "DEFINES *= FL_SQL_LOG" >> settings.pro
@@ -829,9 +842,12 @@ then
   strip --strip-unneeded $PREFIX/plugins/designer/* 2> /dev/null
   strip --strip-unneeded $PREFIX/plugins/sqldrivers/* 2> /dev/null
   strip --strip-unneeded $PREFIX/plugins/styles/* 2> /dev/null
-  cd src/translations
-  ./update.sh 2> /dev/null
-  cd ../..
+  if [ "$OPT_NEBULA" != "yes" ]
+  then
+    cd src/translations
+    ./update.sh 2> /dev/null
+    cd ../..
+  fi
 fi
 
 echo -e "\nTerminando compilación...\n"

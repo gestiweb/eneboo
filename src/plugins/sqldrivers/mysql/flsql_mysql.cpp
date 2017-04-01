@@ -1827,13 +1827,16 @@ int QMYSQLDriver::atFrom(FLSqlCursor *cur)
 {
 #if 0
   //#ifndef FL_QUICK_CLIENT
-  if (cur && cur->metadata() && !cur->metadata()->isQuery() && cur->sort().count() > 1) {
-    d->activeCreateIndex = true;
-    createIndex(cur->sort().toStringList().join(",").replace(" ASC", "").replace(" DESC", ""), cur->metadata()->name());
-    d->activeCreateIndex = false;
-  }
+  createSortIndex(cur);
 #endif
   return -99;
+}
+
+void QMYSQLDriver::createSortIndex(FLSqlCursor *cur)
+{
+  d->activeCreateIndex = true;
+  createIndex(cur->sort().toStringList().join(",").replace(" ASC", "").replace(" DESC", ""), cur->metadata()->name());
+  d->activeCreateIndex = false;
 }
 
 bool QMYSQLDriver::alterTable(const QString &mtd1, const QString &mtd2, const QString &key)

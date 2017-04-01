@@ -228,6 +228,11 @@ public:
   int atFrom(FLSqlCursor *cur);
 
   /**
+  Crea un índice para el filtro de ordenación del cursor.
+  */
+  void createSortIndex(FLSqlCursor *cur);
+
+  /**
   @return Conexión principal a la base de datos actual
   */
   QSqlDatabase *db() const {

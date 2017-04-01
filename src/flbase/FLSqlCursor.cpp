@@ -1918,7 +1918,12 @@ bool FLSqlCursor::select(const QString &filter, const QSqlIndex &sort)
       !fieldsOrderBy.upper().contains(d->metadata_->primaryKey().upper()))
     fields << d->metadata_->primaryKey();
 
-  return QSqlCursor::select(finalFilter, QSqlIndex::fromStringList(fields, this));
+  bool ret = QSqlCursor::select(finalFilter, QSqlIndex::fromStringList(fields, this));
+
+  if (aqApp->consoleShown() && QSqlCursor::sort().count() > 1)
+    d->db_->createSortIndex(this);
+
+  return ret;
 }
 
 void FLSqlCursor::setSort(const QSqlIndex &sort)
