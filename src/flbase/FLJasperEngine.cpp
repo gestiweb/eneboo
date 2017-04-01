@@ -553,6 +553,7 @@ QString FLJasperEnginePrivate::createDataFile()
 
 bool FLJasperEnginePrivate::loadJvm()
 {
+  return true; //Pasamos por alto la precarga
   if (jvmLib_.isEmpty()) {
     jvmLib_ = FLUtil::readSettingEntry("aqreports/jvmLib").toString();
     QStringList searchPaths;

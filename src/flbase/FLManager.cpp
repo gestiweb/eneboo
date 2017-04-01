@@ -19,6 +19,7 @@
 #include <qdom.h>
 #include <qdict.h>
 #include <qstringlist.h>
+#include <qbuffer.h>
 
 #include "FLManager.h"
 #include "FLFieldMetaData.h"
@@ -93,6 +94,7 @@ void FLManager::init()
 
   tmpTMD = createSystemTable("flmetadata");
   tmpTMD = createSystemTable("flseqs");
+  tmpTMD = createSystemTable("flreports");
 
   if (!db_->dbAux())
     return;
@@ -1630,11 +1632,18 @@ QString tableLarge;
   curLarge.setFilter(QString::fromLatin1("refkey='") + refKey +
                      QString::fromLatin1("'"));
   curLarge.select();
-  if (curLarge.next()) {
+  QByteArray valor(largeValue.utf8());
+     QPixmap pixmap(valor);
+     QByteArray bytes;
+     QBuffer buffer(bytes);
+     buffer.open(IO_WriteOnly);
+     pixmap.save(&buffer, "PNG"); // writes pixmap into bytes in PNG format
+    if (curLarge.next()) {
     if (curLarge.value("sha").toString() != sha) {
       bufLarge = curLarge.primeUpdate();
       bufLarge->setValue("sha", sha);
       bufLarge->setValue("contenido", largeValue);
+      bufLarge->setValue("imagen",bytes.data());
       curLarge.update();
     }
   } else {
@@ -1642,6 +1651,7 @@ QString tableLarge;
     bufLarge->setValue("refkey", refKey);
     bufLarge->setValue("sha", sha);
     bufLarge->setValue("contenido", largeValue);
+    bufLarge->setValue("imagen",bytes.data());
     curLarge.insert();
   }
 

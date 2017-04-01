@@ -1,11 +1,11 @@
 <!DOCTYPE TMD>
 <TMD>
-	<name>fllarge</name>
-	<alias>QT_TRANSLATE_NOOP("MetaData","Ficheros de gran tamaño")</alias>
+	<name>flreports</name>
+	<alias>QT_TRANSLATE_NOOP("MetaData","Informes enebooreports")</alias>
 
 	<field>
-		<name>refkey</name>
-		<alias>QT_TRANSLATE_NOOP("MetaData","Clave de Referencia")</alias>
+		<name>name</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","name")</alias>
 		<null>false</null>
 		<pk>true</pk>
 		<type>string</type>
@@ -22,17 +22,8 @@
 	</field>
 
 	<field>
-		<name>contenido</name>
-		<alias>QT_TRANSLATE_NOOP("MetaData","Contenido")</alias>
-		<null>true</null>
-		<pk>false</pk>
-		<type>stringlist</type>
-		<visiblegrid>false</visiblegrid>
-	</field>
-
-	<field>
-		<name>imagen</name>
-		<alias>QT_TRANSLATE_NOOP("MetaData","Imagen")</alias>
+		<name>data</name>
+		<alias>QT_TRANSLATE_NOOP("MetaData","Datos")</alias>
 		<null>true</null>
 		<pk>false</pk>
 		<type>bytearray</type>
