@@ -345,6 +345,12 @@ public:
   void setFTSFunction(QString ftsfun);
 
   /**
+  Where a agregar para descartar archivados
+  */
+  QString archiveWhere();
+  void setArchiveWhere(QString archive_where);
+
+  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache() const;
@@ -472,6 +478,11 @@ public:
   QString ftsfun_;
   
   /**
+  Indica la where para descartar los registros archivados
+  */
+  QString archiveWhere_;
+  
+  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache_;
@@ -568,6 +579,17 @@ inline QString FLTableMetaData::FTSFunction()
 inline void FLTableMetaData::setFTSFunction(QString ftsfun)
 {
   d->ftsfun_ = ftsfun;  
+}
+
+inline QString FLTableMetaData::archiveWhere()
+{
+  return d->archiveWhere_;
+}
+
+
+inline void FLTableMetaData::setArchiveWhere(QString archive_where)
+{
+  d->archiveWhere_ = archive_where;  
 }
 
 #endif

@@ -78,7 +78,7 @@ email                : mail@infosial.com
 #include <catalog/pg_type.h>
 #undef errno
 
-#define LIMIT_RESULT 99
+#define LIMIT_RESULT 800
 
 //#define AQ_MD5_CHECK
 
@@ -428,15 +428,15 @@ bool QPSQLResult::openCursor()
     else
       q = "DECLARE " + d->idCursor + " SCROLL CURSOR";
 
-    if (PQtransactionStatus(d->connection) != PQTRANS_INTRANS) {
+    //if (PQtransactionStatus(d->connection) != PQTRANS_INTRANS) {
       q += " WITH HOLD FOR " + d->qry;
       d->closeCursor = true;
 #ifdef FL_DEBUG
       if (d->dictPendCursors)
         d->dictPendCursors->replace(d->idCursor, new QString(d->qry));
 #endif
-    } else
-      q += " WITHOUT HOLD FOR " + d->qry;
+    //} else
+    //  q += " WITHOUT HOLD FOR " + d->qry;
 
     PGresult *result = 0;
     if (d->isUtf8) {
@@ -870,13 +870,20 @@ void QPSQLResult::calcSize()
   if (isSelect() && !d->qry.isEmpty()) {
     if (!d->idCursor.isEmpty() && !isForwardOnly() && isCursorValid()) {
       PGresult *result = 0;
-      QString qr = "MOVE ALL FROM " + d->idCursor;
+      QString qr = "MOVE ABSOLUTE 0 FROM " + d->idCursor;
       if (d->isUtf8) {
         result = PQexec(d->connection, qr.utf8());
       } else {
         result = PQexec(d->connection, qr.local8Bit());
       }
-      currentSize = LIMIT_RESULT + QString(PQcmdTuples(result)).toInt();
+      PQclear(result);
+      qr = "MOVE ALL FROM " + d->idCursor;
+      if (d->isUtf8) {
+        result = PQexec(d->connection, qr.utf8());
+      } else {
+        result = PQexec(d->connection, qr.local8Bit());
+      }
+      currentSize = QString(PQcmdTuples(result)).toInt();
       PQclear(result);
       qr = "MOVE ABSOLUTE " + QString::number((d->currentResult + 1) * LIMIT_RESULT) + " FROM " + d->idCursor;
       if (d->isUtf8) {
@@ -965,13 +972,16 @@ bool QPSQLResult::reset(const QString &query)
   QString qLimit(q);
   QString qUpper(q.upper());
   bool forUpdate = false;
+  int sqlsize = q.length();
+  int limitsize = 100;
 
   if (qUpper.left(7).contains("SELECT")) {
     forUpdate = qUpper.endsWith("FOR UPDATE") ||
                 qUpper.endsWith("FOR SHARE") ||
                 qUpper.endsWith("NOWAIT");
-    if (!forUpdate && !qUpper.contains(" LIMIT "))
-      qLimit += " LIMIT " + QString::number(LIMIT_RESULT + 1);
+    if (sqlsize > 500) limitsize = 0;             
+    //if (!forUpdate && !qUpper.contains(" LIMIT "))  qLimit += " LIMIT " + QString::number(LIMIT_RESULT + 1);
+    if (!forUpdate && !qUpper.contains(" LIMIT "))  qLimit += " LIMIT " + QString::number(limitsize);
   }
 
   cleanup();
@@ -1007,9 +1017,9 @@ bool QPSQLResult::reset(const QString &query)
     return false;
   }
 
-  if (!forUpdate && currentSize >= LIMIT_RESULT) {
+  if (!forUpdate && currentSize >= limitsize) {
     d->qry = q;
-    d->idCursor = "C" + QString::number(d->idConn) + QString::number(cursorCounter++);
+    d->idCursor = "C" + QString::number(d->idConn) + "_" + QString::number(cursorCounter++);
     if (!openCursor())
       return false;
     calcSize();
