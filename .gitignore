@@ -72,3 +72,8 @@ src/qsa/src/ide/variablescontainer.cpp
 src/qsa/src/ide/variablescontainer.h
 src/qsa/src/qsa/qmake_image_collection.cpp
 temp
+*.orig
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
