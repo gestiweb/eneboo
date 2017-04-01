@@ -1168,7 +1168,7 @@ void FLTableDB::setSortOrder(int ascending)
   
   orderAsc_ = ascending;
   tableRecords()->hide();
-  refresh(true, true);
+  refresh( true, true );
 }
 
 bool FLTableDB::isSortOrderAscending()

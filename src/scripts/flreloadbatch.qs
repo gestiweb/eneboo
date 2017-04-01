@@ -232,7 +232,7 @@ function oficial_cargarModulo(nombreFichero: String) : Boolean {
   var versionSys = sys.version().match(/ [ 0 - 9 ] + .[ 0 - 9 ] + /);
   if (this.iface.compararVersiones(versionSys, versionMinimaFL) == 2) {
     var contVersion = MessageBox.warning(util.translate("scripts", "Este módulo necesita la versión ") + versionMinimaFL + util.translate("scripts", " o superior de la aplicación base,\nactualmente la versión instalada es la ") + sys.version() + util.translate("scripts", ".\nFacturaLUX puede fallar por esta causa.\n¿Desea continuar la carga?"), MessageBox.Yes, MessageBox.No);
-    if (contVersion == MessageBox.No) return;
+    if (contVersion != MessageBox.Yes) return;
   }
 
   if (!util.sqlSelect("flareas", "idarea", "idarea = '" + area + "'")) {
@@ -354,6 +354,8 @@ function oficial_elegirOpcion(opciones: Array) : Array {
   for (var i: Number = 0; i < opciones.length; i++) {
     cB[i] = new CheckBox;
     bgroup.add(cB[i]);
+    if (util.getOS() == "WIN32")
+		opciones[i]=opciones[i].left(opciones[i].length -1); //Elimina caracter intruso al final de la cadena de texto
     cB[i].text = opciones[i];
     cB[i].checked = true;
   }

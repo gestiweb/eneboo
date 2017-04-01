@@ -765,8 +765,7 @@ public slots:
   @param p Cadena de caracteres con el patrón de filtrado
   */
   void filterRecords(const QString &p);
-
-  // void switchSortOrder( int col ); // AbanQ 2.5 agrego esta funcion
+  
   void setSortOrder(int ascending);
   bool isSortOrderAscending();
   

@@ -1210,8 +1210,6 @@ function updateAbanQ()
   /*
   var msg = "";
   msg += sys.translate("Se va a proceder a conectar a través de Internet\n");
-  msg += sys.translate("con los sistemas de InfoSiAL S.L. para obtener la\n");
-  msg += sys.translate("herramienta de actualización de AbanQ.\n\n");
   msg += sys.translate("Esta es una nueva herramienta que le permitirá mantener\n");
   msg += sys.translate("actualizados, de forma cómoda y totalmente automática,\n");
   msg += sys.translate("los módulos y extensiones que tenga instalados. Además le\n");
