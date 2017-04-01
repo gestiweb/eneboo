@@ -1649,85 +1649,6 @@ void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const in
 }
 
 // Silix
-void FLFieldDB::setPixmapFromPixmap(const QPixmap &pixmap, const int w, const int h)
-{
-  if (pixmap.isNull())
-    return;
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  QImage img = pixmap.convertToImage();
-  if (w != 0 && h != 0)
-    pix.convertFromImage(img.scale(w, h, QImage::ScaleMin));
-  else
-    pix.convertFromImage(img);
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
-
-// Silix
-void FLFieldDB::setPixmapFromClipboard()
-{
-  QImage img = QApplication::clipboard()->image();
-  if (img.isNull())
-    return;
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  QPixmap pix;
-  QCString s;
-  QBuffer buffer(s);
-
-  pix.convertFromImage(img);
-
-  QApplication::restoreOverrideCursor();
-
-  if (pix.isNull())
-    return;
-
-  editorImg_->setPixmap(pix);
-
-  QApplication::setOverrideCursor(waitCursor);
-
-  buffer.open(IO_WriteOnly);
-  pix.save(&buffer, "XPM");
-
-  QApplication::restoreOverrideCursor();
-
-  if (s.isEmpty())
-    return;
-
-  if (!QPixmapCache::find(s.left(100)))
-    QPixmapCache::insert(s.left(100), pix);
-
-  updateValue(QString(s));
-}
-
-// Silix
 void FLFieldDB::savePixmap(const QString &filename, const char *format)
 {
   if (editorImg_) {
@@ -1800,32 +1721,6 @@ void FLFieldDB::setPixmapFromClipboard()
     QPixmapCache::insert(s.left(100), pix);
 
   updateValue(QString(s));
-}
-
-
-
-// Silix
-void FLFieldDB::savePixmap(const QString &filename, const char *format)
-{
-  if (editorImg_) {
-    if (!filename.isEmpty()) {
-      QPixmap pix;
-      QApplication::setOverrideCursor(waitCursor);
-      pix.loadFromData(value().toCString());
-      if (!pix.isNull())
-        if (!pix.save(filename, format))
-          QMessageBox::warning(this, tr("Error"), tr("Error guardando fichero"));
-      QApplication::restoreOverrideCursor();
-    }
-  }
-}
-
-// Silix
-QPixmap FLFieldDB::pixmap()
-{
-  QPixmap pix;
-  pix.loadFromData(value().toCString());
-  return pix;
 }
 
 void FLFieldDB::setFilter(const QString &f)

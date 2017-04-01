@@ -1,1 +1,1 @@
-opensslconf.h.64
+opensslconf.h.32
