@@ -482,8 +482,8 @@ void qDebug( const char *msg, ... )
 	QString fstr( buf );
 	OutputDebugString( (fstr + "\n").ucs2() );
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
     }
 }
 
@@ -508,8 +508,8 @@ void debug( const char *msg, ... )
 	QString fstr( buf );
 	OutputDebugString( (fstr + "\n").ucs2() );
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
     }
 }
 
@@ -533,8 +533,8 @@ void qWarning( const char *msg, ... )
 	QString fstr( buf );
 	OutputDebugString( (fstr + "\n").ucs2() );
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
     }
 }
 
@@ -560,8 +560,8 @@ void warning( const char *msg, ... )
 	QString fstr( buf );
 	OutputDebugString( (fstr + "\n").ucs2() );
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
     }
 }
 
@@ -582,8 +582,8 @@ void qFatal( const char *msg, ... )
 #if defined(Q_CC_MWERKS)
         mac_default_handler(buf);
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
 #if defined(Q_OS_UNIX) && defined(QT_DEBUG)
 	abort();				// trap; generates core dump
 #elif defined(Q_OS_TEMP) && defined(QT_DEBUG)
@@ -616,8 +616,8 @@ void fatal( const char *msg, ... )
 #if defined(Q_CC_MWERKS)
         mac_default_handler(buf);
 #else
-	fprintf( stderr, "%s\n", buf );		// add newline
 #endif
+	fprintf( stderr, "%s\n", buf );		// add newline
 #if defined(Q_OS_UNIX) && defined(QT_DEBUG)
 	abort();				// trap; generates core dump
 #elif defined(Q_OS_TEMP) && defined(QT_DEBUG)

@@ -2576,7 +2576,7 @@ void QPainter::drawPixmap( int x, int y, const QPixmap &pixmap,
 
     if ( sw <= 0 || sh <= 0 )
         return;
-
+    //qDebug("QPainter-x11::drawPixmap(x:%d,y:%d,pixmap,sx:%d,sy:%d,sw:%d,sh:%d)",x,y,sx,sy,sw,sh);
     if ( pdev->x11Screen() != pixmap.x11Screen() ) {
         QPixmap* p = (QPixmap*) &pixmap;
         p->x11SetScreen( pdev->x11Screen() );

@@ -50,6 +50,8 @@
 #include "private/qsvgdevice_p.h"
 #endif
 
+//#define QT_CHECK_RANGE
+
 /*!
     \class QPicture qpicture.h
     \brief The QPicture class is a paint device that records and

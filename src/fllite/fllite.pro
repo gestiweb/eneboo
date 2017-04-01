@@ -7,7 +7,7 @@ else {
 }
 TEMPLATE = app 
 
-CONFIG += warn_off link_prl qt 
+CONFIG += warn_off link_prl qt console
 enable_console:CONFIG += console
 
 unix:CONFIG += x11
