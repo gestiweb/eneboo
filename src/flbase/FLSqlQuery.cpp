@@ -118,7 +118,7 @@ QString FLSqlQuery::sql()
 {
   for (QStringList::Iterator it = d->tablesList_.begin(); it != d->tablesList_.end(); ++it) {
     if (!d->db_->manager()->existsTable(*it) && !d->db_->manager()->createTable(*it))
-      return false;
+      return QString::null;
   }
 
   QString res;

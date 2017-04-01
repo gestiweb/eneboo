@@ -4,7 +4,7 @@ libmysqlclient-dev
 libpq-dev
 libqwt-dev
 libsm-dev
-libstdc++6-4.6-dev
+libstdc++-6-dev
 libx11-dev
 libxau-dev
 libxcb1-dev

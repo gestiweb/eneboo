@@ -619,7 +619,7 @@ void FLFieldDB::setValue(const QVariant &cv)
     case QVariant::StringList:
       if (!editor_)
         return;
-      ::qt_cast<QTextEdit *>(editor_)->setText(isNull ? QString() : v.toString(), false);
+      ::qt_cast<QTextEdit *>(editor_)->setText(isNull ? QString() : v.toString());
       break;
     case QVariant::Double:
       if (editor_) {

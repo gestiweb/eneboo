@@ -765,7 +765,7 @@ void AQOdsGenerator::clear()
   fileName_ = AQ_DISKCACHE_DIRPATH + QString::fromLatin1("/report_") +
               QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") +
               QString::fromLatin1(".str");
-  fileStream_.open(fileName_, std::ios_base::in | std::ios_base::out | std::ios_base::trunc);
+  fileStream_.open(fileName_.ascii(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc);
   if (!fileStream_.is_open())
     qWarning("AQOdsGenerator::clear : Error opening " + fileName_);
 }
@@ -775,7 +775,7 @@ QString AQOdsGenerator::str()
   if (fileStream_.is_open()) {
     fileStream_.flush();
     fileStream_.close();
-    fileStream_.open(fileName_, std::ios_base::in | std::ios_base::out | std::ios_base::app);
+    fileStream_.open(fileName_.ascii(), std::ios_base::in | std::ios_base::out | std::ios_base::app);
     strStream_ << fileStream_.rdbuf();
     fileStream_.seekp(0, std::ios_base::end);
   }
