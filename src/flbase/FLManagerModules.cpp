@@ -769,6 +769,20 @@ QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
   return str_ret;
 }
 
+QString FLManagerModules::contentCached(const QString &n, QString *shaKey)
+{
+  QString ret = _contentCached(n,shaKey);
+  if (n && ret) {
+    test_sha256(n.latin1(), ret.latin1());
+      QString path = QString(".cache/") + n;
+      ofstream myfile;
+      myfile.open(path.latin1());
+      myfile << ret.utf8();
+      myfile.close();  
+  }
+  return ret;
+}
+
 void FLManagerModules::setContent(const QString &n, const QString &idM, const QString &content)
 {
   if (!db_->dbAux())

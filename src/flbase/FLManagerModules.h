@@ -123,6 +123,7 @@ public:
   @param n Nombre del fichero.
   @return QString con el contenido del fichero o vacía en caso de error.
   */
+  QString _contentCached(const QString &n, QString *shaKey = 0);
   QString contentCached(const QString &n, QString *shaKey = 0);
 
   /**
