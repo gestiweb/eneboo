@@ -202,9 +202,15 @@ QSqlDatabase *flsqlcursor_selectDatabase(const QString &name, bool autopopulate,
                          FLRelationMetaData *r, QObject *parent)
 {
   FLSqlDatabase *db_ = FLSqlConnections::database(connectionName);
+  if (!db_->manager()->existsTable(name))
+  {
+    return db_->db();
+  }
   FLTableMetaData *metadata_ = db_->manager()->metadata(name);
+  if (!metadata_) {
+    return db_->db();
+  }
   QSqlDatabase *db = NULL;
-  
   if (metadata_->transactionBehavior() == "strict") {
     db = db_->db();
   }
