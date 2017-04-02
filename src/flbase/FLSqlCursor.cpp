@@ -197,17 +197,38 @@ bool FLSqlCursorPrivate::needUpdate()
 }
 #endif
 
+QSqlDatabase *flsqlcursor_selectDatabase(const QString &name, bool autopopulate,
+                         const QString &connectionName, FLSqlCursor *cR,
+                         FLRelationMetaData *r, QObject *parent)
+{
+  FLSqlDatabase *db_ = FLSqlConnections::database(connectionName);
+  FLTableMetaData *metadata_ = db_->manager()->metadata(name);
+  QSqlDatabase *db = NULL;
+  
+  if (metadata_->transactionBehavior() == "strict") {
+    db = db_->db();
+  }
+  if (metadata_->transactionBehavior() == "autocommit") {
+    db = db_->dbAux();
+  }
+  if (!db) {
+    db = db_->db();
+  }
+  return db;
+  
+}
 
 FLSqlCursor::FLSqlCursor(const QString &name, bool autopopulate,
                          const QString &connectionName, FLSqlCursor *cR,
                          FLRelationMetaData *r, QObject *parent) :
-  QObject(parent, name + QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") + "-K"),
-  QSqlCursor(QString::null, autopopulate, FLSqlConnections::database(connectionName)->db())
+  QObject(parent, name + QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") + "-K")
+ ,  QSqlCursor(QString::null, autopopulate, flsqlcursor_selectDatabase(name,autopopulate,connectionName,cR,r,parent)) 
 {
+
   d = new FLSqlCursorPrivate();
   d->cursor_ = this;
   d->db_ = FLSqlConnections::database(connectionName);
-
+ 
   init(name, autopopulate, cR, r);
 }
 
@@ -217,6 +238,7 @@ FLSqlCursor::FLSqlCursor(const QString &name, bool autopopulate,
   QObject(parent, name + QDateTime::currentDateTime().toString("ddMMyyyyhhmmsszzz") + "-K"),
   QSqlCursor(QString::null, autopopulate, db)
 {
+ 
   d = new FLSqlCursorPrivate();
   d->cursor_ = this;
   d->db_ = FLSqlConnections::database();
@@ -256,7 +278,7 @@ void FLSqlCursor::init(const QString &name, bool autopopulate,
 
   if (!d->metadata_)
     return;
-
+  
   d->fieldsNamesUnlock_ = d->metadata_->fieldsNamesUnlock();
   d->isQuery_ = d->metadata_->isQuery();
   d->isSysTable_ = name.left(3) == "sys" || d->db_->manager()->isSystemTable(name);

@@ -351,6 +351,12 @@ public:
   void setArchiveWhere(QString archive_where);
 
   /**
+  Clave para determinar comportamiento de tabla en transacciones
+  */
+  QString transactionBehavior();
+  void setTransactionBehavior(QString transact_behavior);
+
+  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache() const;
@@ -483,6 +489,11 @@ public:
   QString archiveWhere_;
   
   /**
+  Estilo de transacciones para la tabla
+  */
+  QString transact_behavior_;
+  
+  /**
   Indica si lo metadatos están en caché (FLManager::cacheMetaData_)
   */
   bool inCache_;
@@ -586,10 +597,20 @@ inline QString FLTableMetaData::archiveWhere()
   return d->archiveWhere_;
 }
 
-
 inline void FLTableMetaData::setArchiveWhere(QString archive_where)
 {
   d->archiveWhere_ = archive_where;  
+}
+
+
+inline QString FLTableMetaData::transactionBehavior()
+{
+  return d->transact_behavior_;
+}
+
+inline void FLTableMetaData::setTransactionBehavior(QString transact_behavior)
+{
+  d->transact_behavior_ = transact_behavior;  
 }
 
 #endif

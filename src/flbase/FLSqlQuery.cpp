@@ -272,10 +272,29 @@ int FLSqlQuery::fieldNameToPos(const QString &n) const
   return d->fieldList_.findIndex(n);
 }
 
+
 void FLSqlQuery::setTablesList(const QString &tl)
 {
   d->tablesList_.clear();
   d->tablesList_ = QStringList::split(',', tl);
+  if (d->tablesList_.count() > 0) {
+    QString firstTable = d->tablesList_.first();
+    FLTableMetaData *metadata_ = d->db_->manager()->metadata(firstTable);
+    QSqlDatabase *db = NULL;
+  
+    if (metadata_->transactionBehavior() == "autocommit") {
+      db = d->db_->dbAux();
+    }
+    if (db) {
+      qry_ = QSqlQuery(db);
+    }
+    
+  }
+  
+  if (d->tablesList_.findIndex("clientes")>=0) {
+    qWarning("Found clientes in >> " + tl);
+  }
+  
 }
 
 void FLSqlQuery::setValueParam(const QString &name, const QVariant &v)
