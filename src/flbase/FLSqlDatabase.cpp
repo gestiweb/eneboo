@@ -510,6 +510,15 @@ bool FLSqlDatabase::existsTable(const QString &n) const
   return dr->existsTable(n);
 }
 
+QString FLSqlDatabase::getNotifies() const
+{
+  if (driverName_.isEmpty() || !dbAux_)
+    return QString::null;
+
+  FLSqlDriver *dr = ::qt_cast<FLSqlDriver *>(db_->driver());
+  return dr->getNotifies();
+}
+
 bool FLSqlDatabase::isOpen() const
 {
   return db_ ? db_->isOpen() : false;

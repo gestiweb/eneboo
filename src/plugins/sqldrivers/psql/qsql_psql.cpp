@@ -2443,6 +2443,19 @@ bool QPSQLDriver::existsTable(const QString &n) const
   return ok;
 }
 
+QString QPSQLDriver::getNotifies() const
+{
+  PGconn *conn = d->connection;
+  PGnotify   *notify;
+
+  PQconsumeInput(conn);
+  notify = PQnotifies(conn);
+  if (notify == NULL) {
+    return QString::null;
+  }
+  return QString("%1 :: %2").arg(notify->relname).arg(notify->extra);
+}
+
 QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const
 {
   QSqlIndex idx(tablename);

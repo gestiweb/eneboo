@@ -456,6 +456,11 @@ public:
   bool existsTable(const QString &n) const;
 
   /**
+  Descarga las notificaciones (PostgreSQL Notify) pendientes en la DB.
+  */
+  QString getNotifies() const;
+
+  /**
   @return El nivel actual de anidamiento de transacciones, 0 no hay transaccion
   */
   int transactionLevel() const {

@@ -1048,6 +1048,13 @@ QString FLUtil::getOS()
 #endif
 }
 
+QString FLUtil::getNotifies()
+{
+  QString ret = FLSqlConnections::database()->getNotifies();
+  return ret;
+}
+
+
 bool FLUtil::execSql(const QString &sql, const QString &connName)
 {
   if (sql.isNull() || connName.isNull()) {

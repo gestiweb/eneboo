@@ -146,6 +146,11 @@ bool FLSqlDriver::existsTable(const QString &n) const
   return tables("").contains(n);
 }
 
+QString FLSqlDriver::getNotifies() const
+{
+  return QString::null;
+}
+
 void FLSqlDriver::msgBoxCritical(const QString &title, const QString &msg)
 {
   if (db_ && !db_->interactiveGUI()) {

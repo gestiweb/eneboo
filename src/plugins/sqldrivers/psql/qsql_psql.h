@@ -154,6 +154,8 @@ public:
   bool mismatchedTable(const QString &table,
                        const FLTableMetaData *tmd) const;
   int backendId() const;
+  QString getNotifies() const;
+
 
 private slots:
 

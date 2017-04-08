@@ -6071,6 +6071,15 @@ public slots:
   }
 
   /**
+  Obtiene el siguiente NOTIFY de la base de datos
+
+  @return "NOTIFY_NAME :: NOTIFY_EXTRADATA"
+   */
+  QString getNotifies() {
+    return FLUtil::getNotifies();
+  }
+  
+  /**
   Generación "casi-aleatoria" de números aleatorios por el método rápido xorshf96
   */
   void setFastRandSeed(uint seed) {

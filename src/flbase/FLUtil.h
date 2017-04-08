@@ -638,6 +638,14 @@ public:
   @author Silix
   */
   static void savePixmap(const QString &data, const QString &filename, const char *format);
+  
+  /**
+  Descarga un NOTIFY pendiente, o QString::null
+
+  @return "NOTIFY_NAME :: NOTIFY_EXTRADATA"
+  */
+  static QString getNotifies();
+  
 
 private:
 

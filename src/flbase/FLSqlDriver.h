@@ -128,6 +128,8 @@ public:
                                const FLTableMetaData *tmd) const;
   /** Ver FLSqlDatabase::existsTable() */
   virtual bool existsTable(const QString &n) const;
+  
+  virtual QString getNotifies() const;
 
   /**
   Informa al driver de la base de datos que lo utiliza
