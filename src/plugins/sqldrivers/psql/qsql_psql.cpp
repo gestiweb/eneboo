@@ -1132,6 +1132,9 @@ static inline QPSQLDriver::Protocol getPSQLVersion(PGconn *connection)
         else if (vMin < 2)
           return QPSQLDriver::Version91;
         return QPSQLDriver::Version92;
+      } else if (vMaj > 9) {
+        qWarning(QString("Version of PostgreSQL %1.%2 is higher than tested. Proceed carefully").arg(vMaj).arg(vMin));
+        return QPSQLDriver::Version92;
       }
       return QPSQLDriver::Version7;
     }
