@@ -842,10 +842,12 @@ void FLFieldDB::initCursor()
                                      false, false, checkIntegrity);
         fMD->addRelationMD(rMD);
 #ifdef FL_DEBUG
+        /*
         qWarning(tr("FLFieldDB : La relación entre la tabla del formulario ( %1 ) y la tabla ( %2 ) de este campo ( %3 ) no existe, pero sin embargo se han indicado los campos de relación( %4, %5 )")
                  .arg(curName).arg(tableName_).arg(fieldName_).arg(fieldRelation_).arg(foreignField_));
         qWarning(tr("FLFieldDB : Creando automáticamente %1.%2 --1M--> %3.%4")
                  .arg(tableName_).arg(fieldRelation_).arg(curName).arg(foreignField_));
+                 */
 #endif
       }
 #ifdef FL_DEBUG
