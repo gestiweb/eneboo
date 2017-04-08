@@ -1070,7 +1070,10 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
         }
       }
       QString pKWhere(d->db_->manager()->formatAssignValue(d->metadata_->field(pKN), valueBuffer(pKN)));
-      insert(false);
+      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer INSERT %1").arg(d->action_->name()));
+      insert(false); // TODO: QS -> onCommitBuffer -> INSERT
+      qWarning(QString("FLSqlCursor:: END onCommitBuffer INSERT %1").arg(d->action_->name()));
+      
       if (!d->db_->canSavePoint()) {
         if (d->db_->currentSavePoint_)
           d->db_->currentSavePoint_->saveInsert(pKN, d->buffer_, this);
@@ -1082,7 +1085,7 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
       }
       if (!d->persistentFilter_.contains(pKWhere))
         d->persistentFilter_ = (d->persistentFilter_.isEmpty() ?
-                                pKWhere : d->persistentFilter_ + QString::fromLatin1(" OR ") + pKWhere);
+                                pKWhere : d->persistentFilter_ + QString::fromLatin1(" OR ") + pKWhere); // WARN: Este código es el que hace que después de insertar se sigan viendo las filas aún filtradas.
       updated = true;
     }
     break;
@@ -1111,7 +1114,9 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
             d->buffer_->setGenerated(i, false);
           }
         }
-        update(false);
+        qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer UPDATE %1").arg(d->action_->name()));
+        update(false); // TODO: QS -> onCommitBuffer -> UPDATE
+        qWarning(QString("FLSqlCursor:: END onCommitBuffer UPDATE %1").arg(d->action_->name()));
         for (uint i = 0; i < d->buffer_->count(); ++i)
           d->buffer_->setGenerated(i, true);
         updated = true;
@@ -1134,7 +1139,9 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
       if (d->cursorRelation_ && d->relation_)
         if (d->cursorRelation_->metadata())
           d->cursorRelation_->setAskForCancelChanges(true);
-      del(false);
+      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer DELETE %1").arg(d->action_->name()));
+      del(false); // TODO: QS -> onCommitBuffer -> DELETE
+      qWarning(QString("FLSqlCursor:: END onCommitBuffer DELETE %1").arg(d->action_->name()));
       updated = true;
     }
     break;
@@ -1788,6 +1795,22 @@ bool FLSqlCursor::transaction(bool /*lock*/)
 #endif
     return false;
   }
+  /// QSA -> onBeginTransaction
+  qWarning(QString("FLSqlCursor:: onBeginTransaction %1").arg(d->metadata_->name()));
+  QString idMod(d->db_->managerModules()->idModuleOfFile(d->metadata_->name() + QString::fromLatin1(".mtd")));
+  QString functionQSA = idMod + QString::fromLatin1(".metadata_beginTransaction") ;
+  
+  FLSqlCursorInterface *cI = FLSqlCursorInterface::sqlCursorInterface(this);
+  QSArgumentList args = QSArgumentList(cI);
+  QVariant v = aqApp->call(functionQSA,args, 0).variant();
+  if (!v.isNull()) {
+      QStringList ret = v.asStringList();
+      if (ret.contains(QString("emulate"))) {
+          qWarning("FLSqlCursor:: Inicio de transaccion emulada.");
+          return true;
+      }
+  }
+  
 
   return d->db_->doTransaction(this);
 }
@@ -1801,6 +1824,25 @@ bool FLSqlCursor::rollback()
     return false;
   }
 
+  /// QSA -> onRollbackTransaction
+  qWarning(QString("FLSqlCursor:: onRollbackTransaction %1").arg(d->action_->name()));
+  
+  QString idMod(d->db_->managerModules()->idModuleOfFile(d->metadata_->name() + QString::fromLatin1(".mtd")));
+  QString functionQSA = idMod + QString::fromLatin1(".metadata_rollbackTransaction") ;
+  
+  FLSqlCursorInterface *cI = FLSqlCursorInterface::sqlCursorInterface(this);
+  QValueList<QVariant> vargs = QValueList<QVariant>();
+  QSArgumentList args = QSArgumentList(cI);
+  QVariant v = aqApp->call(functionQSA,args, 0).variant();
+  if (!v.isNull()) {
+      QStringList ret = v.asStringList();
+      if (ret.contains(QString("emulate"))) {
+          qWarning("FLSqlCursor:: Cancelacion de transaccion emulada.");
+          return true;
+      }
+  }
+  
+  
   return d->db_->doRollback(this);
 }
 
@@ -1812,6 +1854,23 @@ bool FLSqlCursor::commit(bool notify)
 #endif
     return false;
   }
+  /// QSA -> onCommitTransaction
+  qWarning(QString("FLSqlCursor:: onCommitTransaction %1").arg(d->action_->name()));
+  QString idMod(d->db_->managerModules()->idModuleOfFile(d->metadata_->name() + QString::fromLatin1(".mtd")));
+  QString functionQSA = idMod + QString::fromLatin1(".metadata_commitTransaction") ;
+  
+  FLSqlCursorInterface *cI = FLSqlCursorInterface::sqlCursorInterface(this);
+  QSArgumentList args = QSArgumentList(cI);
+  QVariant v = aqApp->call(functionQSA,args, 0).variant();
+  if (!v.isNull()) {
+      QStringList ret = v.asStringList();
+      if (ret.contains(QString("emulate"))) {
+          qWarning("FLSqlCursor:: Finalizacion de transaccion emulada.");
+          emit commited();
+          return true;
+      }
+  }
+  
   bool r = d->db_->doCommit(this, notify);
   if (r) {
     emit commited();

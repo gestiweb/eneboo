@@ -831,6 +831,17 @@ FLTableMetaData *FLManager::metadata(const QString &n, bool quick)
       ret->setInCache();
       cacheMetaDataSys_->insert(key, ret);
     }
+      //qWarning(QString("FLManager : Inicializada la tabla %1").arg(n));    
+      QString idMod(db_->managerModules()->idModuleOfFile(n + QString::fromLatin1(".mtd")));
+      QString functionQSA = idMod + QString::fromLatin1(".metadata_afterInit") ;
+      
+      QValueList<QVariant> vargs = QValueList<QVariant>();
+      vargs.append(n);
+      QSArgumentList args = QSArgumentList(vargs);
+      QVariant v = aqApp->call(functionQSA,args, 0).variant();
+      QStringList ret = v.asStringList();
+      
+      
   } else
     acl = aqApp->acl();
 

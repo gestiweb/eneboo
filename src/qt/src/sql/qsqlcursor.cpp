@@ -1042,6 +1042,8 @@ int QSqlCursor::insert(bool invalidate)
   QString fList;
   QString vList;
   bool comma = FALSE;
+  // QSA onTableInsert
+  
   // use a prepared query if the driver supports it
   if (driver()->hasFeature(QSqlDriver::PreparedQueries)) {
     int cnt = 0;
@@ -1064,6 +1066,7 @@ int QSqlCursor::insert(bool invalidate)
     }
     QString str;
     str.append("insert into ").append(name()).append("(").append(fList).append(") values (").append(vList). append(")");
+    qWarning(QString("QSqlCursor:: onTableInsert (prepared) %1 ::").arg(name())+str);
     return applyPrepared(str, invalidate);
   } else {
     for (int j = 0; j < k; ++j) {
@@ -1085,6 +1088,7 @@ int QSqlCursor::insert(bool invalidate)
     }
     QString str;
     str.append("insert into ").append(name()).append("(").append(fList).append(") values (").append(vList). append(")");
+    qWarning(QString("QSqlCursor:: onTableInsert %1 ::").arg(name())+str);
     return apply(str, invalidate);
   }
 }
@@ -1238,7 +1242,7 @@ int QSqlCursor::update(const QString &filter, bool invalidate)
   if (k == 0) {
     return 0;
   }
-
+  // QSA onTableUpdate
   // use a prepared query if the driver supports it
   if (driver()->hasFeature(QSqlDriver::PreparedQueries)) {
     QString fList;
@@ -1263,6 +1267,7 @@ int QSqlCursor::update(const QString &filter, bool invalidate)
     if (filter.length()) {
       str += " where " + filter;
     }
+    qWarning(QString("QSqlCursor:: onTableUpdate (preparedQuery) %1 ::").arg(name()) + str);
     return applyPrepared(str, invalidate);
   } else {
     QString str = "update " + name();
@@ -1270,6 +1275,7 @@ int QSqlCursor::update(const QString &filter, bool invalidate)
     if (filter.length()) {
       str += " where " + filter;
     }
+    qWarning(QString("QSqlCursor:: onTableUpdate %1 ::").arg(name()) + str);
     return apply(str, invalidate);
   }
 }
@@ -1306,6 +1312,7 @@ int QSqlCursor::update(const QString &filter, bool invalidate)
 int QSqlCursor::del(bool invalidate)
 {
   QSqlIndex idx = primaryIndex(FALSE);
+
   if (idx.isEmpty())
     return del(qWhereClause(&d->editBuffer, d->nm, "and", driver()), invalidate);
   else
@@ -1337,6 +1344,9 @@ int QSqlCursor::del(const QString &filter, bool invalidate)
   QString str = "delete from " + name();
   if (filter.length())
     str += " where " + filter;
+  // QSA onTableDelete
+  qWarning(QString("QSqlCursor:: onTableDelete %1 ::").arg(name()) + str);
+  
   return apply(str, invalidate);
 }
 

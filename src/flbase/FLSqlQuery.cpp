@@ -290,11 +290,7 @@ void FLSqlQuery::setTablesList(const QString &tl)
     }
     
   }
-  
-  if (d->tablesList_.findIndex("clientes")>=0) {
-    qWarning("Found clientes in >> " + tl);
-  }
-  
+    
 }
 
 void FLSqlQuery::setValueParam(const QString &name, const QVariant &v)
