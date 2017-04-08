@@ -2456,7 +2456,7 @@ QString QPSQLDriver::getNotifies() const
   if (notify == NULL) {
     return QString::null;
   }
-  return QString("%1 :: %2").arg(notify->relname).arg(notify->extra);
+  return QString("%1 [%3] :: %2").arg(notify->relname).arg(notify->extra).arg(notify->be_pid);
 }
 
 QSqlIndex QPSQLDriver::primaryIndex2(const QString &tablename) const

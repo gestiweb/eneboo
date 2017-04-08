@@ -6073,7 +6073,7 @@ public slots:
   /**
   Obtiene el siguiente NOTIFY de la base de datos
 
-  @return "NOTIFY_NAME :: NOTIFY_EXTRADATA"
+  @return "NOTIFY_NAME [PID] :: NOTIFY_EXTRADATA"
    */
   QString getNotifies() {
     return FLUtil::getNotifies();
