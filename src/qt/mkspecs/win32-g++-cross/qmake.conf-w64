@@ -18,7 +18,7 @@ QMAKE_YACCFLAGS		= -d
 QMAKE_CFLAGS_DEPS	= -M
 QMAKE_CFLAGS_WARN_ON	= -w
 QMAKE_CFLAGS_WARN_OFF	= -w
-QMAKE_CFLAGS_RELEASE	= -O2 -fpermissive
+QMAKE_CFLAGS_RELEASE	= -Os -fpermissive
 QMAKE_CFLAGS_DEBUG	= -g -gstabs -fpermissive
 QMAKE_CFLAGS_YACC	= -Wno-unused -Wno-parentheses
 

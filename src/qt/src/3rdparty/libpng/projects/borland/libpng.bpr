@@ -34,7 +34,7 @@
       -wnod -wnak -wdef -wcln -wbbf -wasm -wamp -wamb"/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-WD -O2 -w -Vx -Ve -x- -RT- -X- -a8 -5 -b- -d -k- -vi -tWD -tWM -c"/>
+    <CFLAG1 value="-WD -Os -w -Vx -Ve -x- -RT- -X- -a8 -5 -b- -d -k- -vi -tWD -tWM -c"/>
     <PFLAGS value="-$Y- -$L- -$D- -$C- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zn"/>

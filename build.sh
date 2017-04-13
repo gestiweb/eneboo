@@ -552,7 +552,6 @@ fi
 
 if [ "$OPT_DEBUG" = "yes" ]
 then
-  echo "CONFIG *= debug" >> settings.pro
   echo "DEFINES *= FL_DEBUG" >> settings.pro
 fi
 

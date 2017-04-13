@@ -102,8 +102,8 @@ else
              LDSHARED=${LDSHARED-"ld -b"}
              shared_ext='.sl'
              SHAREDLIB='libz.sl';;
-  IRIX*)     SFLAGS=${CFLAGS-"-ansi -O2 -rpath ."}
-             CFLAGS=${CFLAGS-"-ansi -O2"}
+  IRIX*)     SFLAGS=${CFLAGS-"-ansi -Os -rpath ."}
+             CFLAGS=${CFLAGS-"-ansi -Os"}
              LDSHARED=${LDSHARED-"cc -shared"};;
   OSF1\ V4*) SFLAGS=${CFLAGS-"-O -std1"}
              CFLAGS=${CFLAGS-"-O -std1"}
@@ -122,8 +122,8 @@ else
   SunOS\ 5*) SFLAGS=${CFLAGS-"-fast -xcg89 -KPIC -R."}
              CFLAGS=${CFLAGS-"-fast -xcg89"}
              LDSHARED=${LDSHARED-"cc -G"};;
-  SunOS\ 4*) SFLAGS=${CFLAGS-"-O2 -PIC"}
-             CFLAGS=${CFLAGS-"-O2"}
+  SunOS\ 4*) SFLAGS=${CFLAGS-"-Os -PIC"}
+             CFLAGS=${CFLAGS-"-Os"}
              LDSHARED=${LDSHARED-"ld"};;
   UNIX_System_V\ 4.2.0)
              SFLAGS=${CFLAGS-"-KPIC -O"}

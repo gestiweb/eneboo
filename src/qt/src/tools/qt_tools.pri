@@ -146,8 +146,8 @@ tools {
 
         irix-cc* {
                 CXXFLAGS_PRELINK = $$QMAKE_CXXFLAGS
-                CXXFLAGS_PRELINK -= -O2
-                QMAKE_PRE_LINK          = $(CXX) -c $$CXXFLAGS_PRELINK -O1 $(INCPATH) -o $(OBJECTS_DIR)/qlocale.o tools/qlocale.cpp
+                CXXFLAGS_PRELINK -= -Os
+                QMAKE_PRE_LINK          = $(CXX) -c $$CXXFLAGS_PRELINK -Os $(INCPATH) -o $(OBJECTS_DIR)/qlocale.o tools/qlocale.cpp
         }
 }
 

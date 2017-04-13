@@ -19,7 +19,7 @@ CC = bcc32
 AS = bcc32
 LD = bcc32
 AR = tlib
-CFLAGS  = -a -d -k- -O2 $(LOC)
+CFLAGS  = -a -d -k- -Os $(LOC)
 ASFLAGS = $(LOC)
 LDFLAGS = $(LOC)
 

@@ -50,9 +50,9 @@ LDEBUG=$(LDEBUG) -N
 
 # -X- turn on dependency generation in the object file
 # -w  set all warnings on
-# -O2 optimize for speed
+# -Os optimize for speed
 # -Z  global optimization
-CFLAGS=-O2 -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
+CFLAGS=-Os -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 
 # -M  generate map file
 LDFLAGS=-M -L$(ZLIB_DIR) $(MODEL_ARG) $(LDEBUG)

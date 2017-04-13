@@ -23,12 +23,12 @@ CC= bcc
 
 # You may need to adjust these cc options:
 !if $d(DOS)
-CFLAGS= -O2 -mm -w-par -w-stu -w-ccc -w-rch
+CFLAGS= -Os -mm -w-par -w-stu -w-ccc -w-rch
 !else
-CFLAGS= -O1 -w-par -w-stu -w-ccc -w-rch
+CFLAGS= -Os -w-par -w-stu -w-ccc -w-rch
 !endif
-# -O2 enables full code optimization (for pre-3.0 Borland C++, use -O -G -Z).
-# -O2 is buggy in Borland OS/2 C++ revision 2.0, so use -O1 there for now.
+# -Os enables full code optimization (for pre-3.0 Borland C++, use -O -G -Z).
+# -Os is buggy in Borland OS/2 C++ revision 2.0, so use -Os there for now.
 # If you have Borland OS/2 C++ revision 1.0, use -O or no optimization at all.
 # -mm selects medium memory model (near data, far code pointers; DOS only!)
 # -w-par suppresses warnings about unused function parameters
