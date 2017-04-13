@@ -1070,9 +1070,9 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
         }
       }
       QString pKWhere(d->db_->manager()->formatAssignValue(d->metadata_->field(pKN), valueBuffer(pKN)));
-      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer INSERT %1").arg(d->action_->name()));
+      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer INSERT %1").arg(d->metadata_->name()));
       insert(false); // TODO: QS -> onCommitBuffer -> INSERT
-      qWarning(QString("FLSqlCursor:: END onCommitBuffer INSERT %1").arg(d->action_->name()));
+      qWarning(QString("FLSqlCursor:: END onCommitBuffer INSERT %1").arg(d->metadata_->name()));
       
       if (!d->db_->canSavePoint()) {
         if (d->db_->currentSavePoint_)
@@ -1114,9 +1114,9 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
             d->buffer_->setGenerated(i, false);
           }
         }
-        qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer UPDATE %1").arg(d->action_->name()));
+        qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer UPDATE %1").arg(d->metadata_->name()));
         update(false); // TODO: QS -> onCommitBuffer -> UPDATE
-        qWarning(QString("FLSqlCursor:: END onCommitBuffer UPDATE %1").arg(d->action_->name()));
+        qWarning(QString("FLSqlCursor:: END onCommitBuffer UPDATE %1").arg(d->metadata_->name()));
         for (uint i = 0; i < d->buffer_->count(); ++i)
           d->buffer_->setGenerated(i, true);
         updated = true;
@@ -1139,9 +1139,9 @@ bool FLSqlCursor::commitBuffer(bool emite, bool checkLocks)
       if (d->cursorRelation_ && d->relation_)
         if (d->cursorRelation_->metadata())
           d->cursorRelation_->setAskForCancelChanges(true);
-      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer DELETE %1").arg(d->action_->name()));
+      qWarning(QString("FLSqlCursor:: BEGIN onCommitBuffer DELETE %1").arg(d->metadata_->name()));
       del(false); // TODO: QS -> onCommitBuffer -> DELETE
-      qWarning(QString("FLSqlCursor:: END onCommitBuffer DELETE %1").arg(d->action_->name()));
+      qWarning(QString("FLSqlCursor:: END onCommitBuffer DELETE %1").arg(d->metadata_->name()));
       updated = true;
     }
     break;
