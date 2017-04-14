@@ -1122,7 +1122,7 @@ EOF
 		    fi
 		  fi
 
-		  # CHECK ME:  I think I busted this.  -Ossama
+		  # CHECK ME:  I think I busted this.  -O3sama
 		  if test "$prev" = dlprefiles; then
 		    # Preload the old-style object.
 		    dlprefiles="$dlprefiles $pic_object"
@@ -1611,7 +1611,7 @@ EOF
 	      fi
 	    fi
 
-	    # CHECK ME:  I think I busted this.  -Ossama
+	    # CHECK ME:  I think I busted this.  -O3sama
 	    if test "$prev" = dlprefiles; then
 	      # Preload the old-style object.
 	      dlprefiles="$dlprefiles $pic_object"

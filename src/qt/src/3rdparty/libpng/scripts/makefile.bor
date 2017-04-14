@@ -50,7 +50,7 @@ LDEBUG=$(LDEBUG) -N
 
 # -X- turn on dependency generation in the object file
 # -w  set all warnings on
-# -Os optimize for speed
+# -O3 optimize for speed
 # -Z  global optimization
 CFLAGS=-Os -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 

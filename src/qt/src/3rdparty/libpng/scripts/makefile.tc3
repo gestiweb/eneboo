@@ -7,7 +7,7 @@
 
 MODEL=l
 CFLAGS=-Os -Z -m$(MODEL) -I..\zlib
-#CFLAGS=-D_NO_PROTO -Os -Z -m$(MODEL) -I..\zlib  # Turbo C older than 3.00
+#CFLAGS=-D_NO_PROTO -O3 -Z -m$(MODEL) -I..\zlib  # Turbo C older than 3.00
 CC=tcc
 LD=tcc
 LIB=tlib

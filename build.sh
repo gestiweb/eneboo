@@ -10,7 +10,7 @@ OPT_DEBUG=yes
 OPT_SQLLOG=no
 OPT_FLFCGI=no
 
-OPT_HOARD=no
+OPT_HOARD=yes
 # Hoard se desactiva por defecto. Eneboo funciona principalmente con un 
 # único hilo y hoard es un "memory allocator" orientado a mejorar la 
 # velocidad de malloc/free para multihilo, en sistemas con más de un 

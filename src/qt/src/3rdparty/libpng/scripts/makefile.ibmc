@@ -18,7 +18,7 @@ LD = ilink
 AR = ilib
 RM = del
 
-CFLAGS = -I$(ZLIBINC) -Mc -Os -W3
+CFLAGS = -I$(ZLIBINC) -Mc -O3 -W3
 LDFLAGS =
 
 # File extensions

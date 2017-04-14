@@ -23,7 +23,7 @@ CFLAGS = -AM -Oecigt -Gs -W3
 
 # Ingar Steinsland suggests the following switches when building
 # a 16-bit Windows DLL:
-# CFLAGS = -ALw -Gsw -Zpe -W3 -Os -Zi -Zd
+# CFLAGS = -ALw -Gsw -Zpe -W3 -O3 -Zi -Zd
 
 # Put here the object file name for the correct system-dependent memory
 # manager file.  For DOS, we recommend jmemdos.c and jmemdosa.asm.

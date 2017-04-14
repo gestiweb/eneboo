@@ -27,7 +27,7 @@ unix {
 	CONFIG -= x11
 	DEFINES += OS_UNIX=1
 }
-
+QMAKE_CFLAGS_RELEASE	= -Os
 DESTDIR = $$PREFIX/lib
 
 TARGET = sqlite

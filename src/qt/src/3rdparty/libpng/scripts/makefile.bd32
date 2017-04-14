@@ -20,7 +20,7 @@ PNGDLL=png32bd.dll
 PNGLIB=png32bd.lib
 
 CC=bcc32
-CFLAGS= -ps -Os -N- -k- -d -r- -w-par -w-aus -I$(ZLIBDIR) \
+CFLAGS= -ps -O3 -N- -k- -d -r- -w-par -w-aus -I$(ZLIBDIR) \
 	-DPNG_NO_GLOBAL_ARRAYS #-DPNG_DEBUG=5
 #LINK=tlink32
 #LINK=ilink32

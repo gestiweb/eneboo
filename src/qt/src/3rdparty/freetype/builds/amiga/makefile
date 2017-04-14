@@ -41,7 +41,7 @@ CC =     ppc-morphos-gcc
 AR =     ppc-morphos-ar rc
 RANLIB = ppc-morphos-ranlib
 LD =     ppc-morphos-ld
-CFLAGS = -Os -I/emu/emulinclude/includegcc -I/emu/include -Iinclude -I$(FTSRC) -I/FT/include
+CFLAGS = -O3 -I/emu/emulinclude/includegcc -I/emu/include -Iinclude -I$(FTSRC) -I/FT/include
 
 #
 # FreeType2 library base

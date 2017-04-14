@@ -5,8 +5,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-CFLAGS = -Wall -Os -D_GNU_SOURCE -D__KAME__ -I../common_source
-CPPFLAGS = -Wall -Os -D_GNU_SOURCE -D__KAME__ -I../common_source
+CFLAGS = -Wall -O3 -D_GNU_SOURCE -D__KAME__ -I../common_source
+CPPFLAGS = -Wall -O3 -D_GNU_SOURCE -D__KAME__ -I../common_source
 # -D_DEFAULT_SOURCE
 
 build: build-stamp

@@ -13,7 +13,7 @@ MNGOPT = -DMNG_BUILD_DLL
 CC= bcc32
 
 # compiler options:
-CFLAGS= -WD -Os -Hc -w-par -k -y -v -vi -c -tWD \
+CFLAGS= -WD -O3 -Hc -w-par -k -y -v -vi -c -tWD \
 	-wuse -wucp -wstv -wstu -wsig -wpin -wnod -wnak -wdef -wcln -wbbf -wasm -wamp \
 	-wamb -Tkh30000 -ff -5 -I.;..\zlib;..\jpgsrc6b;..\lcms\include $(MNGOPT)
 

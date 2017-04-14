@@ -102,8 +102,8 @@ else
              LDSHARED=${LDSHARED-"ld -b"}
              shared_ext='.sl'
              SHAREDLIB='libz.sl';;
-  IRIX*)     SFLAGS=${CFLAGS-"-ansi -Os -rpath ."}
-             CFLAGS=${CFLAGS-"-ansi -Os"}
+  IRIX*)     SFLAGS=${CFLAGS-"-ansi -O3 -rpath ."}
+             CFLAGS=${CFLAGS-"-ansi -O3"}
              LDSHARED=${LDSHARED-"cc -shared"};;
   OSF1\ V4*) SFLAGS=${CFLAGS-"-O -std1"}
              CFLAGS=${CFLAGS-"-O -std1"}

@@ -339,7 +339,7 @@ void QSStatementNode::checkIfGlobalAllowed(QSCheckData *c)
 void QSProgramNode::check(QSCheckData *c)
 {
   if (source)
-    source->check(c);
+    source->check(c); // <<<
   QSClass *cl = c->currentScope();
   if (cl->numVariables() < c->varBlockCount()) {
     cl->setNumVariables(c->varBlockCount());

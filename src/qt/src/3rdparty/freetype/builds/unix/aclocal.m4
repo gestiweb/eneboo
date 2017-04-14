@@ -5850,7 +5850,7 @@ ifelse([AC_DISABLE_FAST_INSTALL])
 
 AC_DEFUN([LT_AC_PROG_GCJ],
 [AC_CHECK_TOOL(GCJ, gcj, no)
-  test "x${GCJFLAGS+set}" = xset || GCJFLAGS="-g -Os"
+  test "x${GCJFLAGS+set}" = xset || GCJFLAGS="-g -O3"
   AC_SUBST(GCJFLAGS)
 ])
 
