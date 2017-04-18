@@ -1825,7 +1825,7 @@ bool FLSqlCursor::rollback()
   }
 
   /// QSA -> onRollbackTransaction
-  qWarning(QString("FLSqlCursor:: onRollbackTransaction %1").arg(d->action_->name()));
+  qWarning(QString("FLSqlCursor:: onRollbackTransaction %1").arg(d->metadata_->name()));
   
   QString idMod(d->db_->managerModules()->idModuleOfFile(d->metadata_->name() + QString::fromLatin1(".mtd")));
   QString functionQSA = idMod + QString::fromLatin1(".metadata_rollbackTransaction") ;
@@ -1855,7 +1855,7 @@ bool FLSqlCursor::commit(bool notify)
     return false;
   }
   /// QSA -> onCommitTransaction
-  qWarning(QString("FLSqlCursor:: onCommitTransaction %1").arg(d->action_->name()));
+  qWarning(QString("FLSqlCursor:: onCommitTransaction %1").arg(d->metadata_->name()));
   QString idMod(d->db_->managerModules()->idModuleOfFile(d->metadata_->name() + QString::fromLatin1(".mtd")));
   QString functionQSA = idMod + QString::fromLatin1(".metadata_commitTransaction") ;
   
