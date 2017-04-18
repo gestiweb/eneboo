@@ -386,12 +386,12 @@ else
       # ... hacer uso del flag "-continue" puede desembocar en que no se aplique el -rpath.
     if [ "$OPT_QWS" = "no" ]; then      
       ./configure $QT_CONFIG_VERBOSE --x11 -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -R'$$(ORIGIN)/../../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu  \
-                  -no-pch -no-exceptions -xinerama -buildkey $BUILD_KEY -disable-opengl -no-cups \
-                  -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+                  -no-pch -no-exceptions -xinerama -buildkey $BUILD_KEY -disable-opengl -no-cups -xft \
+                  -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng -v || exit 1
     else
       ./configure $QT_CONFIG_VERBOSE -depths 8,16,32 -qvfb -qt-gfx-vnc -platform $OPT_QMAKESPEC -prefix $PREFIX -R'$$(ORIGIN)/../lib' -R'$$(ORIGIN)/../../lib' -L$PREFIX/lib $QT_DEBUG -thread -stl -L/usr/lib/i386-linux-gnu -L/usr/lib/x86_64-linux-gnu  \
-            -no-pch -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups \
-            -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng || exit 1
+            -no-pch -no-exceptions -buildkey $BUILD_KEY -disable-opengl -no-cups -xft \
+            -no-nas-sound -no-nis -qt-libjpeg -qt-gif -qt-libmng -qt-libpng -qt-imgfmt-png -qt-imgfmt-jpeg -qt-imgfmt-mng -v || exit 1
     fi
     fi
   fi
