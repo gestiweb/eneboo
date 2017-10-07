@@ -4,10 +4,10 @@
  *	  This file contains definitions for structures and
  *	  externs for functions used by frontend postgres applications.
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
- * $PostgreSQL: pgsql/src/interfaces/libpq/libpq-fe.h,v 1.120.2.2 2006/05/21 20:19:44 tgl Exp $
+ * src/interfaces/libpq/libpq-fe.h
  *
  *-------------------------------------------------------------------------
  */
@@ -16,7 +16,7 @@
 #define LIBPQ_FE_H
 
 #ifdef __cplusplus
-extern		"C"
+extern "C"
 {
 #endif
 
@@ -28,20 +28,24 @@ extern		"C"
  */
 #include "postgres_ext.h"
 
-/* SSL type is needed here only to declare PQgetssl() */
-#ifdef USE_SSL
-#include <openssl/ssl.h>
-#endif
+/*
+ * Option flags for PQcopyResult
+ */
+#define PG_COPYRES_ATTRS		  0x01
+#define PG_COPYRES_TUPLES		  0x02	/* Implies PG_COPYRES_ATTRS */
+#define PG_COPYRES_EVENTS		  0x04
+#define PG_COPYRES_NOTICEHOOKS	  0x08
 
 /* Application-visible enum types */
 
-			typedef enum
+/*
+ * Although it is okay to add to these lists, values which become unused
+ * should never be removed, nor should constants be redefined - that would
+ * break compatibility with existing code.
+ */
+
+typedef enum
 {
-	/*
-	 * Although it is okay to add to this list, values which become unused
-	 * should never be removed, nor should constants be redefined - that would
-	 * break compatibility with existing code.
-	 */
 	CONNECTION_OK,
 	CONNECTION_BAD,
 	/* Non-blocking mode only below here */
@@ -51,14 +55,18 @@ extern		"C"
 	 * be used for user feedback or similar purposes.
 	 */
 	CONNECTION_STARTED,			/* Waiting for connection to be made.  */
-	CONNECTION_MADE,			/* Connection OK; waiting to send.	   */
-	CONNECTION_AWAITING_RESPONSE,		/* Waiting for a response from the
-										 * postmaster.		  */
+	CONNECTION_MADE,			/* Connection OK; waiting to send.     */
+	CONNECTION_AWAITING_RESPONSE,	/* Waiting for a response from the
+									 * postmaster.        */
 	CONNECTION_AUTH_OK,			/* Received authentication; waiting for
 								 * backend startup. */
 	CONNECTION_SETENV,			/* Negotiating environment. */
 	CONNECTION_SSL_STARTUP,		/* Negotiating SSL. */
-	CONNECTION_NEEDED			/* Internal state: connect() needed */
+	CONNECTION_NEEDED,			/* Internal state: connect() needed */
+	CONNECTION_CHECK_WRITABLE,	/* Check if we could make a writable
+								 * connection. */
+	CONNECTION_CONSUME			/* Wait for any pending message and consume
+								 * them. */
 } ConnStatusType;
 
 typedef enum
@@ -85,7 +93,9 @@ typedef enum
 	PGRES_BAD_RESPONSE,			/* an unexpected response was recv'd from the
 								 * backend */
 	PGRES_NONFATAL_ERROR,		/* notice or warning message */
-	PGRES_FATAL_ERROR			/* query failed */
+	PGRES_FATAL_ERROR,			/* query failed */
+	PGRES_COPY_BOTH,			/* Copy In/Out data transfer in progress */
+	PGRES_SINGLE_TUPLE			/* single tuple from larger resultset */
 } ExecStatusType;
 
 typedef enum
@@ -103,6 +113,26 @@ typedef enum
 	PQERRORS_DEFAULT,			/* recommended style */
 	PQERRORS_VERBOSE			/* all the facts, ma'am */
 } PGVerbosity;
+
+typedef enum
+{
+	PQSHOW_CONTEXT_NEVER,		/* never show CONTEXT field */
+	PQSHOW_CONTEXT_ERRORS,		/* show CONTEXT for errors only (default) */
+	PQSHOW_CONTEXT_ALWAYS		/* always show CONTEXT field */
+} PGContextVisibility;
+
+/*
+ * PGPing - The ordering of this enum should not be altered because the
+ * values are exposed externally via pg_isready.
+ */
+
+typedef enum
+{
+	PQPING_OK,					/* server is accepting connections */
+	PQPING_REJECT,				/* server is alive but rejecting connections */
+	PQPING_NO_RESPONSE,			/* could not establish connection */
+	PQPING_NO_ATTEMPT			/* connection not attempted (bad params) */
+} PGPing;
 
 /* PGconn encapsulates a connection to the backend.
  * The contents of this struct are not supposed to be known to applications.
@@ -131,7 +161,7 @@ typedef struct pg_cancel PGcancel;
 typedef struct pgNotify
 {
 	char	   *relname;		/* notification condition name */
-	int			be_pid;			/* process ID of server process */
+	int			be_pid;			/* process ID of notifying server process */
 	char	   *extra;			/* notification parameter */
 	/* Fields below here are private to libpq; apps should not use 'em */
 	struct pgNotify *next;		/* list link */
@@ -161,6 +191,7 @@ typedef struct _PQprintOpt
 
 /* ----------------
  * Structure for the conninfo parameter definitions returned by PQconndefaults
+ * or PQconninfoParse.
  *
  * All fields except "val" point at static strings which must not be altered.
  * "val" is either NULL or a malloc'd current-value string.  PQconninfoFree()
@@ -174,7 +205,7 @@ typedef struct _PQconninfoOption
 	char	   *compiled;		/* Fallback compiled in default value	*/
 	char	   *val;			/* Option's current value, or NULL		 */
 	char	   *label;			/* Label for field in connect dialog	*/
-	char	   *dispchar;		/* Character to display for this field in a
+	char	   *dispchar;		/* Indicates how to display this field in a
 								 * connect dialog. Values are: "" Display
 								 * entered value as is "*" Password field -
 								 * hide value "D"  Debug option - don't show
@@ -198,6 +229,21 @@ typedef struct
 } PQArgBlock;
 
 /* ----------------
+ * PGresAttDesc -- Data about a single attribute (column) of a query result
+ * ----------------
+ */
+typedef struct pgresAttDesc
+{
+	char	   *name;			/* column name */
+	Oid			tableid;		/* source table, if known */
+	int			columnid;		/* source column, if known */
+	int			format;			/* format code for value (text/binary) */
+	Oid			typid;			/* type id */
+	int			typlen;			/* type size */
+	int			atttypmod;		/* type-specific modifier info */
+} PGresAttDesc;
+
+/* ----------------
  * Exported functions of libpq
  * ----------------
  */
@@ -207,10 +253,14 @@ typedef struct
 /* make a new client connection to the backend */
 /* Asynchronous (non-blocking) */
 extern PGconn *PQconnectStart(const char *conninfo);
+extern PGconn *PQconnectStartParams(const char *const *keywords,
+					 const char *const *values, int expand_dbname);
 extern PostgresPollingStatusType PQconnectPoll(PGconn *conn);
 
 /* Synchronous (blocking) */
 extern PGconn *PQconnectdb(const char *conninfo);
+extern PGconn *PQconnectdbParams(const char *const *keywords,
+				  const char *const *values, int expand_dbname);
 extern PGconn *PQsetdbLogin(const char *pghost, const char *pgport,
 			 const char *pgoptions, const char *pgtty,
 			 const char *dbName,
@@ -225,7 +275,13 @@ extern void PQfinish(PGconn *conn);
 /* get info about connection options known to PQconnectdb */
 extern PQconninfoOption *PQconndefaults(void);
 
-/* free the data structure returned by PQconndefaults() */
+/* parse connection options in same way as PQconnectdb */
+extern PQconninfoOption *PQconninfoParse(const char *conninfo, char **errmsg);
+
+/* return the connection options used by a live connection */
+extern PQconninfoOption *PQconninfo(PGconn *conn);
+
+/* free the data structure returned by PQconndefaults() or PQconninfoParse() */
 extern void PQconninfoFree(PQconninfoOption *connOptions);
 
 /*
@@ -268,21 +324,33 @@ extern int	PQserverVersion(const PGconn *conn);
 extern char *PQerrorMessage(const PGconn *conn);
 extern int	PQsocket(const PGconn *conn);
 extern int	PQbackendPID(const PGconn *conn);
+extern int	PQconnectionNeedsPassword(const PGconn *conn);
+extern int	PQconnectionUsedPassword(const PGconn *conn);
 extern int	PQclientEncoding(const PGconn *conn);
 extern int	PQsetClientEncoding(PGconn *conn, const char *encoding);
 
-#ifdef USE_SSL
-/* Get the SSL structure associated with a connection */
-extern SSL *PQgetssl(PGconn *conn);
-#else
+/* SSL information functions */
+extern int	PQsslInUse(PGconn *conn);
+extern void *PQsslStruct(PGconn *conn, const char *struct_name);
+extern const char *PQsslAttribute(PGconn *conn, const char *attribute_name);
+extern const char *const *PQsslAttributeNames(PGconn *conn);
+
+/* Get the OpenSSL structure associated with a connection. Returns NULL for
+ * unencrypted connections or if any other TLS library is in use. */
 extern void *PQgetssl(PGconn *conn);
-#endif
 
 /* Tell libpq whether it needs to initialize OpenSSL */
 extern void PQinitSSL(int do_init);
 
+/* More detailed way to tell libpq whether it needs to initialize OpenSSL */
+extern void PQinitOpenSSL(int do_ssl, int do_crypto);
+
 /* Set verbosity for PQerrorMessage and PQresultErrorMessage */
 extern PGVerbosity PQsetErrorVerbosity(PGconn *conn, PGVerbosity verbosity);
+
+/* Set CONTEXT visibility for PQerrorMessage and PQresultErrorMessage */
+extern PGContextVisibility PQsetErrorContextVisibility(PGconn *conn,
+							PGContextVisibility show_context);
 
 /* Enable/disable tracing */
 extern void PQtrace(PGconn *conn, FILE *debug_port);
@@ -315,7 +383,7 @@ extern PGresult *PQexecParams(PGconn *conn,
 			 const char *command,
 			 int nParams,
 			 const Oid *paramTypes,
-			 const char *const * paramValues,
+			 const char *const *paramValues,
 			 const int *paramLengths,
 			 const int *paramFormats,
 			 int resultFormat);
@@ -325,7 +393,7 @@ extern PGresult *PQprepare(PGconn *conn, const char *stmtName,
 extern PGresult *PQexecPrepared(PGconn *conn,
 			   const char *stmtName,
 			   int nParams,
-			   const char *const * paramValues,
+			   const char *const *paramValues,
 			   const int *paramLengths,
 			   const int *paramFormats,
 			   int resultFormat);
@@ -336,7 +404,7 @@ extern int PQsendQueryParams(PGconn *conn,
 				  const char *command,
 				  int nParams,
 				  const Oid *paramTypes,
-				  const char *const * paramValues,
+				  const char *const *paramValues,
 				  const int *paramLengths,
 				  const int *paramFormats,
 				  int resultFormat);
@@ -346,10 +414,11 @@ extern int PQsendPrepare(PGconn *conn, const char *stmtName,
 extern int PQsendQueryPrepared(PGconn *conn,
 					const char *stmtName,
 					int nParams,
-					const char *const * paramValues,
+					const char *const *paramValues,
 					const int *paramLengths,
 					const int *paramFormats,
 					int resultFormat);
+extern int	PQsetSingleRowMode(PGconn *conn);
 extern PGresult *PQgetResult(PGconn *conn);
 
 /* Routines for managing an asynchronous query */
@@ -374,6 +443,10 @@ extern int	PQendcopy(PGconn *conn);
 /* Set blocking/nonblocking connection to the backend */
 extern int	PQsetnonblocking(PGconn *conn, int arg);
 extern int	PQisnonblocking(const PGconn *conn);
+extern int	PQisthreadsafe(void);
+extern PGPing PQping(const char *conninfo);
+extern PGPing PQpingParams(const char *const *keywords,
+			 const char *const *values, int expand_dbname);
 
 /* Force the write buffer to be written (or at least try) */
 extern int	PQflush(PGconn *conn);
@@ -394,6 +467,9 @@ extern PGresult *PQfn(PGconn *conn,
 extern ExecStatusType PQresultStatus(const PGresult *res);
 extern char *PQresStatus(ExecStatusType status);
 extern char *PQresultErrorMessage(const PGresult *res);
+extern char *PQresultVerboseErrorMessage(const PGresult *res,
+							PGVerbosity verbosity,
+							PGContextVisibility show_context);
 extern char *PQresultErrorField(const PGresult *res, int fieldcode);
 extern int	PQntuples(const PGresult *res);
 extern int	PQnfields(const PGresult *res);
@@ -413,6 +489,14 @@ extern char *PQcmdTuples(PGresult *res);
 extern char *PQgetvalue(const PGresult *res, int tup_num, int field_num);
 extern int	PQgetlength(const PGresult *res, int tup_num, int field_num);
 extern int	PQgetisnull(const PGresult *res, int tup_num, int field_num);
+extern int	PQnparams(const PGresult *res);
+extern Oid	PQparamtype(const PGresult *res, int param_num);
+
+/* Describe prepared statements and portals */
+extern PGresult *PQdescribePrepared(PGconn *conn, const char *stmt);
+extern PGresult *PQdescribePortal(PGconn *conn, const char *portal);
+extern int	PQsendDescribePrepared(PGconn *conn, const char *stmt);
+extern int	PQsendDescribePortal(PGconn *conn, const char *portal);
 
 /* Delete a PGresult */
 extern void PQclear(PGresult *res);
@@ -423,26 +507,29 @@ extern void PQfreemem(void *ptr);
 /* Exists for backward compatibility.  bjm 2003-03-24 */
 #define PQfreeNotify(ptr) PQfreemem(ptr)
 
-/* Define the string so all uses are consistent. */
+/* Error when no password was given. */
+/* Note: depending on this is deprecated; use PQconnectionNeedsPassword(). */
 #define PQnoPasswordSupplied	"fe_sendauth: no password supplied\n"
 
-/*
- * Make an empty PGresult with given status (some apps find this
- * useful). If conn is not NULL and status indicates an error, the
- * conn's errorMessage is copied.
- */
+/* Create and manipulate PGresults */
 extern PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status);
-
+extern PGresult *PQcopyResult(const PGresult *src, int flags);
+extern int	PQsetResultAttrs(PGresult *res, int numAttributes, PGresAttDesc *attDescs);
+extern void *PQresultAlloc(PGresult *res, size_t nBytes);
+extern int	PQsetvalue(PGresult *res, int tup_num, int field_num, char *value, int len);
 
 /* Quoting strings before inclusion in queries. */
 extern size_t PQescapeStringConn(PGconn *conn,
-								 char *to, const char *from, size_t length,
-								 int *error);
+				   char *to, const char *from, size_t length,
+				   int *error);
+extern char *PQescapeLiteral(PGconn *conn, const char *str, size_t len);
+extern char *PQescapeIdentifier(PGconn *conn, const char *str, size_t len);
 extern unsigned char *PQescapeByteaConn(PGconn *conn,
 				  const unsigned char *from, size_t from_length,
 				  size_t *to_length);
 extern unsigned char *PQunescapeBytea(const unsigned char *strtext,
 				size_t *retbuflen);
+
 /* These forms are deprecated! */
 extern size_t PQescapeString(char *to, const char *from, size_t length);
 extern unsigned char *PQescapeBytea(const unsigned char *from, size_t from_length,
@@ -452,24 +539,21 @@ extern unsigned char *PQescapeBytea(const unsigned char *from, size_t from_lengt
 
 /* === in fe-print.c === */
 
-extern void
-PQprint(FILE *fout,				/* output stream */
+extern void PQprint(FILE *fout,				/* output stream */
 		const PGresult *res,
 		const PQprintOpt *ps);	/* option structure */
 
 /*
  * really old printing routines
  */
-extern void
-PQdisplayTuples(const PGresult *res,
+extern void PQdisplayTuples(const PGresult *res,
 				FILE *fp,		/* where to send the output */
 				int fillAlign,	/* pad the fields with spaces */
 				const char *fieldSep,	/* field separator */
 				int printHeader,	/* display headers? */
 				int quiet);
 
-extern void
-PQprintTuples(const PGresult *res,
+extern void PQprintTuples(const PGresult *res,
 			  FILE *fout,		/* output stream */
 			  int printAttName, /* print attribute names */
 			  int terseOutput,	/* delimiter bars */
@@ -482,16 +566,24 @@ PQprintTuples(const PGresult *res,
 extern int	lo_open(PGconn *conn, Oid lobjId, int mode);
 extern int	lo_close(PGconn *conn, int fd);
 extern int	lo_read(PGconn *conn, int fd, char *buf, size_t len);
-extern int	lo_write(PGconn *conn, int fd, char *buf, size_t len);
+extern int	lo_write(PGconn *conn, int fd, const char *buf, size_t len);
 extern int	lo_lseek(PGconn *conn, int fd, int offset, int whence);
+extern pg_int64 lo_lseek64(PGconn *conn, int fd, pg_int64 offset, int whence);
 extern Oid	lo_creat(PGconn *conn, int mode);
 extern Oid	lo_create(PGconn *conn, Oid lobjId);
 extern int	lo_tell(PGconn *conn, int fd);
+extern pg_int64 lo_tell64(PGconn *conn, int fd);
+extern int	lo_truncate(PGconn *conn, int fd, size_t len);
+extern int	lo_truncate64(PGconn *conn, int fd, pg_int64 len);
 extern int	lo_unlink(PGconn *conn, Oid lobjId);
 extern Oid	lo_import(PGconn *conn, const char *filename);
+extern Oid	lo_import_with_oid(PGconn *conn, const char *filename, Oid lobjId);
 extern int	lo_export(PGconn *conn, Oid lobjId, const char *filename);
 
 /* === in fe-misc.c === */
+
+/* Get the version of the libpq library in use */
+extern int	PQlibVersion(void);
 
 /* Determine length of multibyte encoded char at *s */
 extern int	PQmblen(const char *s, int encoding);
@@ -502,8 +594,19 @@ extern int	PQdsplen(const char *s, int encoding);
 /* Get encoding id from environment variable PGCLIENTENCODING */
 extern int	PQenv2encoding(void);
 
+/* === in fe-auth.c === */
+
+extern char *PQencryptPassword(const char *passwd, const char *user);
+extern char *PQencryptPasswordConn(PGconn *conn, const char *passwd, const char *user, const char *algorithm);
+
+/* === in encnames.c === */
+
+extern int	pg_char_to_encoding(const char *name);
+extern const char *pg_encoding_to_char(int encoding);
+extern int	pg_valid_server_encoding_id(int encoding);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif   /* LIBPQ_FE_H */
+#endif							/* LIBPQ_FE_H */

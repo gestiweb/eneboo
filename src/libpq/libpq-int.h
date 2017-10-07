@@ -9,10 +9,10 @@
  *	  more likely to break across PostgreSQL releases than code that uses
  *	  only the official API.
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
- * $PostgreSQL: pgsql/src/interfaces/libpq/libpq-int.h,v 1.108.2.2 2006/05/21 20:19:44 tgl Exp $
+ * src/interfaces/libpq/libpq-int.h
  *
  *-------------------------------------------------------------------------
  */
@@ -21,10 +21,9 @@
 #define LIBPQ_INT_H
 
 /* We assume libpq-fe.h has already been included. */
-#include "postgres_fe.h"
+#include "libpq-events.h"
 
 #include <time.h>
-#include <sys/types.h>
 #ifndef WIN32
 #include <sys/time.h>
 #endif
@@ -38,27 +37,53 @@
 #include <signal.h>
 #endif
 
-#ifdef WIN32_CLIENT_ONLY
-typedef int ssize_t;			/* ssize_t doesn't exist in VC (at least not
-								 * VC6) */
-#endif
-
 /* include stuff common to fe and be */
 #include "getaddrinfo.h"
 #include "libpq/pqcomm.h"
 /* include stuff found in fe only */
 #include "pqexpbuffer.h"
 
-#ifdef USE_SSL
+#ifdef ENABLE_GSS
+#if defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#else
+#include <gssapi/gssapi.h>
+#endif
+#endif
+
+#ifdef ENABLE_SSPI
+#define SECURITY_WIN32
+#if defined(WIN32) && !defined(_MSC_VER)
+#include <ntsecapi.h>
+#endif
+#include <security.h>
+#undef SECURITY_WIN32
+
+#ifndef ENABLE_GSS
+/*
+ * Define a fake structure compatible with GSSAPI on Unix.
+ */
+typedef struct
+{
+	void	   *value;
+	int			length;
+} gss_buffer_desc;
+#endif
+#endif							/* ENABLE_SSPI */
+
+#ifdef USE_OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+
+#ifndef OPENSSL_NO_ENGINE
+#define USE_SSL_ENGINE
 #endif
+#endif							/* USE_OPENSSL */
 
 /*
  * POSTGRES backend dependent Constants.
  */
-#define PQERRORMSG_LENGTH 1024
-#define CMDSTATUS_LEN 40
+#define CMDSTATUS_LEN 64		/* should match COMPLETION_TAG_BUFSIZE */
 
 /*
  * PGresult and the subsidiary types PGresAttDesc, PGresAttValue
@@ -81,18 +106,11 @@ union pgresult_data
 	char		space[1];		/* dummy for accessing block as bytes */
 };
 
-/* Data about a single attribute (column) of a query result */
-
-typedef struct pgresAttDesc
+/* Data about a single parameter of a prepared statement */
+typedef struct pgresParamDesc
 {
-	char	   *name;			/* column name */
-	Oid			tableid;		/* source table, if known */
-	int			columnid;		/* source column, if known */
-	int			format;			/* format code for value (text/binary) */
 	Oid			typid;			/* type id */
-	int			typlen;			/* type size */
-	int			atttypmod;		/* type-specific modifier info */
-} PGresAttDesc;
+} PGresParamDesc;
 
 /*
  * Data for a single attribute of a single tuple
@@ -125,7 +143,7 @@ typedef struct pgMessageField
 {
 	struct pgMessageField *next;	/* list link */
 	char		code;			/* field code */
-	char		contents[1];	/* field value (VARIABLE LENGTH) */
+	char		contents[FLEXIBLE_ARRAY_MEMBER];	/* value, nul-terminated */
 } PGMessageField;
 
 /* Fields needed for notice handling */
@@ -133,9 +151,18 @@ typedef struct
 {
 	PQnoticeReceiver noticeRec; /* notice message receiver */
 	void	   *noticeRecArg;
-	PQnoticeProcessor noticeProc;		/* notice message processor */
+	PQnoticeProcessor noticeProc;	/* notice message processor */
 	void	   *noticeProcArg;
 } PGNoticeHooks;
+
+typedef struct PGEvent
+{
+	PGEventProc proc;			/* the function to call on events */
+	char	   *name;			/* used only for error messages */
+	void	   *passThrough;	/* pointer supplied at registration time */
+	void	   *data;			/* optional state (instance) data */
+	bool		resultInitialized;	/* T if RESULTCREATE/COPY succeeded */
+} PGEvent;
 
 struct pg_result
 {
@@ -145,8 +172,10 @@ struct pg_result
 	PGresAttValue **tuples;		/* each PGresTuple is an array of
 								 * PGresAttValue's */
 	int			tupArrSize;		/* allocated size of tuples array */
+	int			numParameters;
+	PGresParamDesc *paramDescs;
 	ExecStatusType resultStatus;
-	char		cmdStatus[CMDSTATUS_LEN];		/* cmd status from the query */
+	char		cmdStatus[CMDSTATUS_LEN];	/* cmd status from the query */
 	int			binary;			/* binary tuple values if binary == 1,
 								 * otherwise text */
 
@@ -155,6 +184,8 @@ struct pg_result
 	 * on the PGresult don't have to reference the PGconn.
 	 */
 	PGNoticeHooks noticeHooks;
+	PGEvent    *events;
+	int			nEvents;
 	int			client_encoding;	/* encoding id */
 
 	/*
@@ -164,6 +195,7 @@ struct pg_result
 	 */
 	char	   *errMsg;			/* error message, or NULL if no error */
 	PGMessageField *errFields;	/* message broken into fields */
+	char	   *errQuery;		/* text of triggering query, if available */
 
 	/* All NULL attributes in the query result point to this null string */
 	char		null_field[1];
@@ -185,7 +217,8 @@ typedef enum
 	PGASYNC_BUSY,				/* query in progress */
 	PGASYNC_READY,				/* result ready for PQgetResult */
 	PGASYNC_COPY_IN,			/* Copy In data transfer in progress */
-	PGASYNC_COPY_OUT			/* Copy Out data transfer in progress */
+	PGASYNC_COPY_OUT,			/* Copy Out data transfer in progress */
+	PGASYNC_COPY_BOTH			/* Copy In/Out data transfer in progress */
 } PGAsyncStatusType;
 
 /* PGQueryClass tracks which query protocol we are now executing */
@@ -193,13 +226,16 @@ typedef enum
 {
 	PGQUERY_SIMPLE,				/* simple Query protocol (PQexec) */
 	PGQUERY_EXTENDED,			/* full Extended protocol (PQexecParams) */
-	PGQUERY_PREPARE				/* Parse only (PQprepare) */
+	PGQUERY_PREPARE,			/* Parse only (PQprepare) */
+	PGQUERY_DESCRIBE			/* Describe Statement or Portal */
 } PGQueryClass;
 
 /* PGSetenvStatusType defines the state of the PQSetenv state machine */
 /* (this is used only for 2.0-protocol connections) */
 typedef enum
 {
+	SETENV_STATE_CLIENT_ENCODING_SEND,	/* About to send an Environment Option */
+	SETENV_STATE_CLIENT_ENCODING_WAIT,	/* Waiting for above send to complete */
 	SETENV_STATE_OPTION_SEND,	/* About to send an Environment Option */
 	SETENV_STATE_OPTION_WAIT,	/* Waiting for above send to complete */
 	SETENV_STATE_QUERY1_SEND,	/* About to send a status query */
@@ -219,7 +255,7 @@ typedef struct PQEnvironmentOption
 /* Typedef for parameter-status list entries */
 typedef struct pgParameterStatus
 {
-	struct pgParameterStatus *next;		/* list link */
+	struct pgParameterStatus *next; /* list link */
 	char	   *name;			/* parameter name */
 	char	   *value;			/* parameter value */
 	/* Note: name and value are stored in same malloc block as struct is */
@@ -234,10 +270,50 @@ typedef struct pgLobjfuncs
 	Oid			fn_lo_create;	/* OID of backend function lo_create	*/
 	Oid			fn_lo_unlink;	/* OID of backend function lo_unlink	*/
 	Oid			fn_lo_lseek;	/* OID of backend function lo_lseek		*/
+	Oid			fn_lo_lseek64;	/* OID of backend function lo_lseek64	*/
 	Oid			fn_lo_tell;		/* OID of backend function lo_tell		*/
+	Oid			fn_lo_tell64;	/* OID of backend function lo_tell64	*/
+	Oid			fn_lo_truncate; /* OID of backend function lo_truncate	*/
+	Oid			fn_lo_truncate64;	/* OID of function lo_truncate64 */
 	Oid			fn_lo_read;		/* OID of backend function LOread		*/
 	Oid			fn_lo_write;	/* OID of backend function LOwrite		*/
 } PGlobjfuncs;
+
+/* PGdataValue represents a data field value being passed to a row processor.
+ * It could be either text or binary data; text data is not zero-terminated.
+ * A SQL NULL is represented by len < 0; then value is still valid but there
+ * are no data bytes there.
+ */
+typedef struct pgDataValue
+{
+	int			len;			/* data length in bytes, or <0 if NULL */
+	const char *value;			/* data value, without zero-termination */
+} PGdataValue;
+
+typedef enum pg_conn_host_type
+{
+	CHT_HOST_NAME,
+	CHT_HOST_ADDRESS,
+	CHT_UNIX_SOCKET
+} pg_conn_host_type;
+
+/*
+ * pg_conn_host stores all information about one of possibly several hosts
+ * mentioned in the connection string.  Derived by splitting the pghost
+ * on the comma character and then parsing each segment.
+ */
+typedef struct pg_conn_host
+{
+	pg_conn_host_type type;		/* type of host */
+	char	   *host;			/* host name or socket path */
+	char	   *hostaddr;		/* host address */
+	char	   *port;			/* port number for this host; if not NULL,
+								 * overrides the PGConn's pgport */
+	char	   *password;		/* password for this host, read from the
+								 * password file.  only set if the PGconn's
+								 * pgpass field is NULL. */
+	struct addrinfo *addrlist;	/* list of possible backend addresses */
+} pg_conn_host;
 
 /*
  * PGconn stores all the state data associated with a single connection
@@ -246,26 +322,47 @@ typedef struct pgLobjfuncs
 struct pg_conn
 {
 	/* Saved values of connection options */
-	char	   *pghost;			/* the machine on which the server is running */
-	char	   *pghostaddr;		/* the IPv4 address of the machine on which
-								 * the server is running, in IPv4
-								 * numbers-and-dots notation. Takes precedence
-								 * over above. */
-	char	   *pgport;			/* the server's communication port */
-	char	   *pgunixsocket;	/* the Unix-domain socket that the server is
-								 * listening on; if NULL, uses a default
-								 * constructed from pgport */
+	char	   *pghost;			/* the machine on which the server is running,
+								 * or a path to a UNIX-domain socket, or a
+								 * comma-separated list of machines and/or
+								 * paths, optionally with port suffixes; if
+								 * NULL, use DEFAULT_PGSOCKET_DIR */
+	char	   *pghostaddr;		/* the numeric IP address of the machine on
+								 * which the server is running.  Takes
+								 * precedence over above. */
+	char	   *pgport;			/* the server's communication port number */
 	char	   *pgtty;			/* tty on which the backend messages is
 								 * displayed (OBSOLETE, NOT USED) */
 	char	   *connect_timeout;	/* connection timeout (numeric string) */
+	char	   *client_encoding_initial;	/* encoding to use */
 	char	   *pgoptions;		/* options to start the backend with */
+	char	   *appname;		/* application name */
+	char	   *fbappname;		/* fallback application name */
 	char	   *dbName;			/* database name */
+	char	   *replication;	/* connect as the replication standby? */
 	char	   *pguser;			/* Postgres username and password, if any */
 	char	   *pgpass;
+	char	   *pgpassfile;		/* path to a file containing password(s) */
+	char	   *keepalives;		/* use TCP keepalives? */
+	char	   *keepalives_idle;	/* time between TCP keepalives */
+	char	   *keepalives_interval;	/* time between TCP keepalive
+										 * retransmits */
+	char	   *keepalives_count;	/* maximum number of TCP keepalive
+									 * retransmits */
 	char	   *sslmode;		/* SSL mode (require,prefer,allow,disable) */
-#ifdef KRB5
+	char	   *sslcompression; /* SSL compression (0 or 1) */
+	char	   *sslkey;			/* client key filename */
+	char	   *sslcert;		/* client certificate filename */
+	char	   *sslrootcert;	/* root certificate filename */
+	char	   *sslcrl;			/* certificate revocation list filename */
+	char	   *requirepeer;	/* required peer credentials for local sockets */
+
+#if defined(ENABLE_GSS) || defined(ENABLE_SSPI)
 	char	   *krbsrvname;		/* Kerberos service name */
 #endif
+
+	/* Type of connection to make.  Possible values: any, read-write. */
+	char	   *target_session_attrs;
 
 	/* Optional file to write trace info to */
 	FILE	   *Pfdebug;
@@ -273,43 +370,59 @@ struct pg_conn
 	/* Callback procedures for notice message processing */
 	PGNoticeHooks noticeHooks;
 
+	/* Event procs registered via PQregisterEventProc */
+	PGEvent    *events;			/* expandable array of event data */
+	int			nEvents;		/* number of active events */
+	int			eventArraySize; /* allocated array size */
+
 	/* Status indicators */
 	ConnStatusType status;
 	PGAsyncStatusType asyncStatus;
-	PGTransactionStatusType xactStatus;
-	/* note: xactStatus never changes to ACTIVE */
+	PGTransactionStatusType xactStatus; /* never changes to ACTIVE */
 	PGQueryClass queryclass;
+	char	   *last_query;		/* last SQL command, or NULL if unknown */
+	char		last_sqlstate[6];	/* last reported SQLSTATE */
+	bool		options_valid;	/* true if OK to attempt connection */
 	bool		nonblocking;	/* whether this connection is using nonblock
 								 * sending semantics */
+	bool		singleRowMode;	/* return current query result row-by-row? */
 	char		copy_is_binary; /* 1 = copy binary, 0 = copy text */
-	int			copy_already_done;		/* # bytes already returned in COPY
-										 * OUT */
+	int			copy_already_done;	/* # bytes already returned in COPY OUT */
 	PGnotify   *notifyHead;		/* oldest unreported Notify msg */
 	PGnotify   *notifyTail;		/* newest unreported Notify msg */
 
+	/* Support for multiple hosts in connection string */
+	int			nconnhost;		/* # of possible hosts */
+	int			whichhost;		/* host we're currently considering */
+	pg_conn_host *connhost;		/* details about each possible host */
+
 	/* Connection data */
-	int			sock;			/* Unix FD for socket, -1 if not connected */
+	pgsocket	sock;			/* FD for socket, PGINVALID_SOCKET if
+								 * unconnected */
 	SockAddr	laddr;			/* Local address */
 	SockAddr	raddr;			/* Remote address */
 	ProtocolVersion pversion;	/* FE/BE protocol version in use */
 	int			sversion;		/* server version, e.g. 70401 for 7.4.1 */
+	bool		auth_req_received;	/* true if any type of auth req received */
+	bool		password_needed;	/* true if server demanded a password */
+	bool		pgpassfile_used;	/* true if password is from pgpassfile */
+	bool		sigpipe_so;		/* have we masked SIGPIPE via SO_NOSIGPIPE? */
+	bool		sigpipe_flag;	/* can we mask SIGPIPE via MSG_NOSIGNAL? */
 
 	/* Transient state needed while establishing connection */
-	struct addrinfo *addrlist;	/* list of possible backend addresses */
-	struct addrinfo *addr_cur;	/* the one currently being tried */
-	int			addrlist_family;	/* needed to know how to free addrlist */
+	struct addrinfo *addr_cur;	/* backend address currently being tried */
 	PGSetenvStatusType setenv_state;	/* for 2.0 protocol only */
 	const PQEnvironmentOption *next_eo;
+	bool		send_appname;	/* okay to send application_name? */
 
 	/* Miscellaneous stuff */
 	int			be_pid;			/* PID of backend --- needed for cancels */
 	int			be_key;			/* key of backend --- needed for cancels */
-	char		md5Salt[4];		/* password salt received from backend */
-	char		cryptSalt[2];	/* password salt received from backend */
 	pgParameterStatus *pstatus; /* ParameterStatus data */
 	int			client_encoding;	/* encoding id */
 	bool		std_strings;	/* standard_conforming_strings */
 	PGVerbosity verbosity;		/* error/notice message verbosity */
+	PGContextVisibility show_context;	/* whether to show CONTEXT field */
 	PGlobjfuncs *lobjfuncs;		/* private state for large-object access fns */
 
 	/* Buffer for data received from backend and not yet processed */
@@ -329,22 +442,53 @@ struct pg_conn
 								 * msg has no length word */
 	int			outMsgEnd;		/* offset to msg end (so far) */
 
+	/* Row processor interface workspace */
+	PGdataValue *rowBuf;		/* array for passing values to rowProcessor */
+	int			rowBufLen;		/* number of entries allocated in rowBuf */
+
 	/* Status for asynchronous result construction */
 	PGresult   *result;			/* result being constructed */
-	PGresAttValue *curTuple;	/* tuple currently being read */
+	PGresult   *next_result;	/* next result (used in single-row mode) */
+
+	/* Assorted state for SASL, SSL, GSS, etc */
+	void	   *sasl_state;
 
 #ifdef USE_SSL
 	bool		allow_ssl_try;	/* Allowed to try SSL negotiation */
 	bool		wait_ssl_try;	/* Delay SSL negotiation until after
 								 * attempting normal connection */
+	bool		ssl_in_use;
+#ifdef USE_OPENSSL
 	SSL		   *ssl;			/* SSL status, if have SSL connection */
 	X509	   *peer;			/* X509 cert of server */
-	char		peer_dn[256 + 1];		/* peer distinguished name */
-	char		peer_cn[SM_USER + 1];	/* peer common name */
+#ifdef USE_SSL_ENGINE
+	ENGINE	   *engine;			/* SSL engine, if any */
+#else
+	void	   *engine;			/* dummy field to keep struct the same if
+								 * OpenSSL version changes */
+#endif
+#endif							/* USE_OPENSSL */
+#endif							/* USE_SSL */
+
+#ifdef ENABLE_GSS
+	gss_ctx_id_t gctx;			/* GSS context */
+	gss_name_t	gtarg_nam;		/* GSS target name */
+#endif
+
+#ifdef ENABLE_SSPI
+#ifdef ENABLE_GSS
+	char	   *gsslib;			/* What GSS library to use ("gssapi" or
+								 * "sspi") */
+#endif
+	CredHandle *sspicred;		/* SSPI credentials handle */
+	CtxtHandle *sspictx;		/* SSPI context */
+	char	   *sspitarget;		/* SSPI target name */
+	int			usesspi;		/* Indicate if SSPI is in use on the
+								 * connection */
 #endif
 
 	/* Buffer for current error message */
-	PQExpBufferData errorMessage;		/* expansible string */
+	PQExpBufferData errorMessage;	/* expansible string */
 
 	/* Buffer for receiving various parts of messages */
 	PQExpBufferData workBuffer; /* expansible string */
@@ -367,6 +511,24 @@ struct pg_cancel
  */
 extern char *const pgresStatus[];
 
+
+#ifdef USE_SSL
+
+#ifndef WIN32
+#define USER_CERT_FILE		".postgresql/postgresql.crt"
+#define USER_KEY_FILE		".postgresql/postgresql.key"
+#define ROOT_CERT_FILE		".postgresql/root.crt"
+#define ROOT_CRL_FILE		".postgresql/root.crl"
+#else
+/* On Windows, the "home" directory is already PostgreSQL-specific */
+#define USER_CERT_FILE		"postgresql.crt"
+#define USER_KEY_FILE		"postgresql.key"
+#define ROOT_CERT_FILE		"root.crt"
+#define ROOT_CRL_FILE		"root.crl"
+#endif
+
+#endif							/* USE_SSL */
+
 /* ----------------
  * Internal functions of libpq
  * Functions declared here need to be visible across files of libpq,
@@ -378,6 +540,7 @@ extern char *const pgresStatus[];
 
 /* === in fe-connect.c === */
 
+extern void pqDropConnection(PGconn *conn, bool flushInput);
 extern int pqPacketSend(PGconn *conn, char pack_type,
 			 const void *buf, size_t buf_len);
 extern bool pqGetHomeDirectory(char *buf, int bufsize);
@@ -385,13 +548,19 @@ extern bool pqGetHomeDirectory(char *buf, int bufsize);
 #ifdef ENABLE_THREAD_SAFETY
 extern pgthreadlock_t pg_g_threadlock;
 
+#define PGTHREAD_ERROR(msg) \
+	do { \
+		fprintf(stderr, "%s\n", msg); \
+		abort(); \
+	} while (0)
+
+
 #define pglock_thread()		pg_g_threadlock(true)
 #define pgunlock_thread()	pg_g_threadlock(false)
 #else
 #define pglock_thread()		((void) 0)
 #define pgunlock_thread()	((void) 0)
 #endif
-
 
 /* === in fe-exec.c === */
 
@@ -402,15 +571,12 @@ extern char *pqResultStrdup(PGresult *res, const char *str);
 extern void pqClearAsyncResult(PGconn *conn);
 extern void pqSaveErrorResult(PGconn *conn);
 extern PGresult *pqPrepareAsyncResult(PGconn *conn);
-extern void
-pqInternalNotice(const PGNoticeHooks *hooks, const char *fmt,...)
-/* This lets gcc check the format string for consistency. */
-__attribute__((format(printf, 2, 3)));
-extern int	pqAddTuple(PGresult *res, PGresAttValue *tup);
+extern void pqInternalNotice(const PGNoticeHooks *hooks, const char *fmt,...) pg_attribute_printf(2, 3);
 extern void pqSaveMessageField(PGresult *res, char code,
 				   const char *value);
 extern void pqSaveParameterStatus(PGconn *conn, const char *name,
 					  const char *value);
+extern int	pqRowProcessor(PGconn *conn, const char **errmsgp);
 extern void pqHandleSendFailure(PGconn *conn);
 
 /* === in fe-protocol2.c === */
@@ -435,6 +601,8 @@ extern char *pqBuildStartupPacket3(PGconn *conn, int *packetlen,
 					  const PQEnvironmentOption *options);
 extern void pqParseInput3(PGconn *conn);
 extern int	pqGetErrorNotice3(PGconn *conn, bool isError);
+extern void pqBuildErrorMessage3(PQExpBuffer msg, const PGresult *res,
+					 PGVerbosity verbosity, PGContextVisibility show_context);
 extern int	pqGetCopyData3(PGconn *conn, char **buffer, int async);
 extern int	pqGetline3(PGconn *conn, char *s, int maxlen);
 extern int	pqGetlineAsync3(PGconn *conn, char *buffer, int bufsize);
@@ -451,13 +619,15 @@ extern PGresult *pqFunctionCall3(PGconn *conn, Oid fnid,
   * Get, EOF merely means the buffer is exhausted, not that there is
   * necessarily any error.
   */
-extern int	pqCheckOutBufferSpace(int bytes_needed, PGconn *conn);
-extern int	pqCheckInBufferSpace(int bytes_needed, PGconn *conn);
+extern int	pqCheckOutBufferSpace(size_t bytes_needed, PGconn *conn);
+extern int	pqCheckInBufferSpace(size_t bytes_needed, PGconn *conn);
 extern int	pqGetc(char *result, PGconn *conn);
 extern int	pqPutc(char c, PGconn *conn);
 extern int	pqGets(PQExpBuffer buf, PGconn *conn);
+extern int	pqGets_append(PQExpBuffer buf, PGconn *conn);
 extern int	pqPuts(const char *s, PGconn *conn);
 extern int	pqGetnchar(char *s, size_t len, PGconn *conn);
+extern int	pqSkipnchar(size_t len, PGconn *conn);
 extern int	pqPutnchar(const char *s, size_t len, PGconn *conn);
 extern int	pqGetInt(int *result, size_t bytes, PGconn *conn);
 extern int	pqPutInt(int value, size_t bytes, PGconn *conn);
@@ -479,6 +649,8 @@ extern PostgresPollingStatusType pqsecure_open_client(PGconn *);
 extern void pqsecure_close(PGconn *);
 extern ssize_t pqsecure_read(PGconn *, void *ptr, size_t len);
 extern ssize_t pqsecure_write(PGconn *, const void *ptr, size_t len);
+extern ssize_t pqsecure_raw_read(PGconn *, void *ptr, size_t len);
+extern ssize_t pqsecure_raw_write(PGconn *, const void *ptr, size_t len);
 
 #if defined(ENABLE_THREAD_SAFETY) && !defined(WIN32)
 extern int	pq_block_sigpipe(sigset_t *osigset, bool *sigpipe_pending);
@@ -487,17 +659,28 @@ extern void pq_reset_sigpipe(sigset_t *osigset, bool sigpipe_pending,
 #endif
 
 /*
+ * The SSL implementation provides these functions (fe-secure-openssl.c)
+ */
+extern void pgtls_init_library(bool do_ssl, int do_crypto);
+extern int	pgtls_init(PGconn *conn);
+extern PostgresPollingStatusType pgtls_open_client(PGconn *conn);
+extern void pgtls_close(PGconn *conn);
+extern ssize_t pgtls_read(PGconn *conn, void *ptr, size_t len);
+extern bool pgtls_read_pending(PGconn *conn);
+extern ssize_t pgtls_write(PGconn *conn, const void *ptr, size_t len);
+
+/*
  * this is so that we can check if a connection is non-blocking internally
  * without the overhead of a function call
  */
 #define pqIsnonblocking(conn)	((conn)->nonblocking)
 
 #ifdef ENABLE_NLS
-extern char *
-libpq_gettext(const char *msgid)
-__attribute__((format_arg(1)));
+extern char *libpq_gettext(const char *msgid) pg_attribute_format_arg(1);
+extern char *libpq_ngettext(const char *msgid, const char *msgid_plural, unsigned long n) pg_attribute_format_arg(1) pg_attribute_format_arg(2);
 #else
 #define libpq_gettext(x) (x)
+#define libpq_ngettext(s, p, n) ((n) == 1 ? (s) : (p))
 #endif
 
 /*
@@ -514,4 +697,4 @@ __attribute__((format_arg(1)));
 #define SOCK_ERRNO_SET(e) (errno = (e))
 #endif
 
-#endif   /* LIBPQ_INT_H */
+#endif							/* LIBPQ_INT_H */

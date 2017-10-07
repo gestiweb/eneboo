@@ -7,7 +7,7 @@
  *	For example, the Oid type is part of the API of libpq and other libraries.
  *
  *	   Declarations which are specific to a particular interface should
- *	go in the header file for that interface (such as libpq-fe.h).	This
+ *	go in the header file for that interface (such as libpq-fe.h).  This
  *	file is only for fundamental Postgres declarations.
  *
  *	   User-written C functions don't count as "external to Postgres."
@@ -15,13 +15,15 @@
  *	use header files that are otherwise internal to Postgres to interface
  *	with the backend.
  *
- * $PostgreSQL: pgsql/src/include/postgres_ext.h,v 1.16 2004/08/29 05:06:55 momjian Exp $
+ * src/include/postgres_ext.h
  *
  *-------------------------------------------------------------------------
  */
 
 #ifndef POSTGRES_EXT_H
 #define POSTGRES_EXT_H
+
+#include "pg_config_ext.h"
 
 /*
  * Object ID is a fundamental type in Postgres.
@@ -37,15 +39,12 @@ typedef unsigned int Oid;
 #define OID_MAX  UINT_MAX
 /* you will need to include <limits.h> to use the above #define */
 
+#define atooid(x) ((Oid) strtoul((x), NULL, 10))
+/* the above needs <stdlib.h> */
 
-/*
- * NAMEDATALEN is the max length for system identifiers (e.g. table names,
- * attribute names, function names, etc).  It must be a multiple of
- * sizeof(int) (typically 4).
- *
- * NOTE that databases with different NAMEDATALEN's cannot interoperate!
- */
-#define NAMEDATALEN 64
+
+/* Define a signed 64-bit integer type for use in client API declarations. */
+typedef PG_INT64_TYPE pg_int64;
 
 
 /*
@@ -54,6 +53,7 @@ typedef unsigned int Oid;
  * applications.
  */
 #define PG_DIAG_SEVERITY		'S'
+#define PG_DIAG_SEVERITY_NONLOCALIZED 'V'
 #define PG_DIAG_SQLSTATE		'C'
 #define PG_DIAG_MESSAGE_PRIMARY 'M'
 #define PG_DIAG_MESSAGE_DETAIL	'D'
@@ -62,8 +62,13 @@ typedef unsigned int Oid;
 #define PG_DIAG_INTERNAL_POSITION 'p'
 #define PG_DIAG_INTERNAL_QUERY	'q'
 #define PG_DIAG_CONTEXT			'W'
+#define PG_DIAG_SCHEMA_NAME		's'
+#define PG_DIAG_TABLE_NAME		't'
+#define PG_DIAG_COLUMN_NAME		'c'
+#define PG_DIAG_DATATYPE_NAME	'd'
+#define PG_DIAG_CONSTRAINT_NAME 'n'
 #define PG_DIAG_SOURCE_FILE		'F'
 #define PG_DIAG_SOURCE_LINE		'L'
 #define PG_DIAG_SOURCE_FUNCTION 'R'
 
-#endif
+#endif							/* POSTGRES_EXT_H */

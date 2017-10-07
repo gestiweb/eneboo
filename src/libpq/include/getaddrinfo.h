@@ -13,19 +13,17 @@
  * This code will also work on platforms where struct addrinfo is defined
  * in the system headers but no getaddrinfo() can be located.
  *
- * Copyright (c) 2003-2005, PostgreSQL Global Development Group
+ * Copyright (c) 2003-2017, PostgreSQL Global Development Group
  *
- * $PostgreSQL: pgsql/src/include/getaddrinfo.h,v 1.17.2.1 2005/12/08 17:52:20 momjian Exp $
+ * src/include/getaddrinfo.h
  *
  *-------------------------------------------------------------------------
  */
 #ifndef GETADDRINFO_H
 #define GETADDRINFO_H
 
-#ifndef WIN32_CLIENT_ONLY
 #include <sys/socket.h>
 #include <netdb.h>
-#endif
 
 
 /* Various macros that ought to be in <netdb.h>, but might not be */
@@ -42,9 +40,11 @@
 #define EAI_MEMORY		(-10)
 #define EAI_SYSTEM		(-11)
 #else							/* WIN32 */
-#if defined(WIN32_CLIENT_ONLY)
-#define WSA_NOT_ENOUGH_MEMORY   (WSAENOBUFS)
-#define WSATYPE_NOT_FOUND       (WSABASEERR+109)
+#ifdef _MSC_VER
+#ifndef WSA_NOT_ENOUGH_MEMORY
+#define WSA_NOT_ENOUGH_MEMORY	(WSAENOBUFS)
+#endif
+#define WSATYPE_NOT_FOUND		(WSABASEERR+109)
 #endif
 #define EAI_AGAIN		WSATRY_AGAIN
 #define EAI_BADFLAGS	WSAEINVAL
@@ -55,8 +55,8 @@
 #define EAI_NONAME		WSAHOST_NOT_FOUND
 #define EAI_SERVICE		WSATYPE_NOT_FOUND
 #define EAI_SOCKTYPE	WSAESOCKTNOSUPPORT
-#endif   /* !WIN32 */
-#endif   /* !EAI_FAIL */
+#endif							/* !WIN32 */
+#endif							/* !EAI_FAIL */
 
 #ifndef AI_PASSIVE
 #define AI_PASSIVE		0x0001
@@ -80,6 +80,9 @@
 #ifndef NI_NUMERICSERV
 #define NI_NUMERICSERV	2
 #endif
+#ifndef NI_NAMEREQD
+#define NI_NAMEREQD		4
+#endif
 
 #ifndef NI_MAXHOST
 #define NI_MAXHOST	1025
@@ -91,6 +94,7 @@
 
 #ifndef HAVE_STRUCT_ADDRINFO
 
+#ifndef WIN32
 struct addrinfo
 {
 	int			ai_flags;
@@ -102,7 +106,25 @@ struct addrinfo
 	char	   *ai_canonname;
 	struct addrinfo *ai_next;
 };
-#endif   /* HAVE_STRUCT_ADDRINFO */
+#else
+/*
+ *	The order of the structure elements on Win32 doesn't match the
+ *	order specified in the standard, but we have to match it for
+ *	IPv6 to work.
+ */
+struct addrinfo
+{
+	int			ai_flags;
+	int			ai_family;
+	int			ai_socktype;
+	int			ai_protocol;
+	size_t		ai_addrlen;
+	char	   *ai_canonname;
+	struct sockaddr *ai_addr;
+	struct addrinfo *ai_next;
+};
+#endif
+#endif							/* HAVE_STRUCT_ADDRINFO */
 
 
 #ifndef HAVE_GETADDRINFO
@@ -129,12 +151,12 @@ struct addrinfo
 #define getnameinfo pg_getnameinfo
 
 extern int getaddrinfo(const char *node, const char *service,
-			const struct addrinfo * hints, struct addrinfo ** res);
-extern void freeaddrinfo(struct addrinfo * res);
+			const struct addrinfo *hints, struct addrinfo **res);
+extern void freeaddrinfo(struct addrinfo *res);
 extern const char *gai_strerror(int errcode);
-extern int getnameinfo(const struct sockaddr * sa, int salen,
+extern int getnameinfo(const struct sockaddr *sa, int salen,
 			char *node, int nodelen,
 			char *service, int servicelen, int flags);
-#endif   /* HAVE_GETADDRINFO */
+#endif							/* HAVE_GETADDRINFO */
 
-#endif   /* GETADDRINFO_H */
+#endif							/* GETADDRINFO_H */

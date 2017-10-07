@@ -4,10 +4,10 @@
  *	  Definitions for network authentication routines
  *
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
- * $PostgreSQL: pgsql/src/include/libpq/auth.h,v 1.31 2005/10/17 16:24:20 tgl Exp $
+ * src/include/libpq/auth.h
  *
  *-------------------------------------------------------------------------
  */
@@ -17,10 +17,13 @@
 #include "libpq/libpq-be.h"
 
 extern char *pg_krb_server_keyfile;
-extern char *pg_krb_srvnam;
 extern bool pg_krb_caseins_users;
-extern char *pg_krb_server_hostname;
+extern char *pg_krb_realm;
 
 extern void ClientAuthentication(Port *port);
 
-#endif   /* AUTH_H */
+/* Hook for plugins to get control in ClientAuthentication() */
+typedef void (*ClientAuthentication_hook_type) (Port *, int);
+extern PGDLLIMPORT ClientAuthentication_hook_type ClientAuthentication_hook;
+
+#endif							/* AUTH_H */

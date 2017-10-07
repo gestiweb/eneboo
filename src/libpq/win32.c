@@ -1,4 +1,7 @@
 /*
+ * src/interfaces/libpq/win32.c
+ *
+ *
  *	FILE
  *		win32.c
  *
@@ -12,7 +15,7 @@
  * The error constants are taken from the Frambak Bakfram LGSOCKET
  * library guys who in turn took them from the Winsock FAQ.
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  */
@@ -25,19 +28,23 @@
 #endif
 #define NOCRYPT
 
-#include <windows.h>
-#include <winsock.h>
-#include <stdio.h>
-#include "win32.h"
 #include "postgres_fe.h"
-#include "libpq-fe.h"
-#include "libpq-int.h"
+
+#include "win32.h"
+
+/* Declared here to avoid pulling in all includes, which causes name collisions */
+#ifdef ENABLE_NLS
+extern char *libpq_gettext(const char *msgid) pg_attribute_format_arg(1);
+#else
+#define libpq_gettext(x) (x)
+#endif
+
 
 static struct WSErrorEntry
 {
 	DWORD		error;
 	const char *description;
-}	WSErrors[] =
+}			WSErrors[] =
 
 {
 	{
@@ -104,7 +111,7 @@ static struct WSErrorEntry
 		WSAEADDRINUSE, "Address already in use"
 	},
 	{
-		WSAEADDRNOTAVAIL, "Can't assign requested address"
+		WSAEADDRNOTAVAIL, "Cannot assign requested address"
 	},
 	{
 		WSAENETDOWN, "Network is down"
@@ -131,10 +138,10 @@ static struct WSErrorEntry
 		WSAENOTCONN, "Socket is not connected"
 	},
 	{
-		WSAESHUTDOWN, "Can't send after socket shutdown"
+		WSAESHUTDOWN, "Cannot send after socket shutdown"
 	},
 	{
-		WSAETOOMANYREFS, "Too many references, can't splice"
+		WSAETOOMANYREFS, "Too many references, cannot splice"
 	},
 	{
 		WSAETIMEDOUT, "Connection timed out"
@@ -229,7 +236,7 @@ struct MessageDLL
 	const char *dll_name;
 	void	   *handle;
 	int			loaded;			/* BOOL */
-}	dlls[] =
+}			dlls[] =
 
 {
 	{
@@ -237,9 +244,6 @@ struct MessageDLL
 	},
 	{
 		"winsock.dll", 0, 0
-	},
-	{
-		"wsock32.dll", 0, 0
 	},
 	{
 		"ws2_32.dll", 0, 0
@@ -268,7 +272,7 @@ struct MessageDLL
  * to find it in the lookup table, and if that fails, tries
  * to load any of the winsock dlls to find that message.
  * The DLL thing works from Nt4 (spX ?) up, but some special
- * versions of winsock might have this aswell (seen on Win98 SE
+ * versions of winsock might have this as well (seen on Win98 SE
  * special install)			   / Magnus Naeslund (mag@fbab.net)
  *
  */
@@ -303,21 +307,21 @@ winsock_strerror(int err, char *strerrbuf, size_t buflen)
 		success = 0 != FormatMessage(
 									 flags,
 									 dlls[i].handle, err,
-								   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+									 MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
 									 strerrbuf, buflen - 64,
 									 0
 			);
 	}
 
 	if (!success)
-		sprintf(strerrbuf, libpq_gettext("Unknown socket error (0x%08X/%i)"), err, err);
+		sprintf(strerrbuf, libpq_gettext("unrecognized socket error: 0x%08X/%d"), err, err);
 	else
 	{
 		strerrbuf[buflen - 1] = '\0';
 		offs = strlen(strerrbuf);
 		if (offs > (int) buflen - 64)
 			offs = buflen - 64;
-		sprintf(strerrbuf + offs, " (0x%08X/%i)", err, err);
+		sprintf(strerrbuf + offs, " (0x%08X/%d)", err, err);
 	}
 	return strerrbuf;
 }

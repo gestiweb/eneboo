@@ -7,10 +7,10 @@
  *	  of the API of the memory management subsystem.
  *
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
- * $PostgreSQL: pgsql/src/include/utils/memutils.h,v 1.59 2004/12/31 22:03:46 pgsql Exp $
+ * src/include/utils/memutils.h
  *
  *-------------------------------------------------------------------------
  */
@@ -21,44 +21,29 @@
 
 
 /*
- * MaxAllocSize
- *		Quasi-arbitrary limit on size of allocations.
+ * MaxAllocSize, MaxAllocHugeSize
+ *		Quasi-arbitrary limits on size of allocations.
  *
  * Note:
- *		There is no guarantee that allocations smaller than MaxAllocSize
- *		will succeed.  Allocation requests larger than MaxAllocSize will
- *		be summarily denied.
+ *		There is no guarantee that smaller allocations will succeed, but
+ *		larger requests will be summarily denied.
  *
- * XXX This is deliberately chosen to correspond to the limiting size
- * of varlena objects under TOAST.	See VARATT_MASK_SIZE in postgres.h.
- *
- * XXX Also, various places in aset.c assume they can compute twice an
- * allocation's size without overflow, so beware of raising this.
+ * palloc() enforces MaxAllocSize, chosen to correspond to the limiting size
+ * of varlena objects under TOAST.  See VARSIZE_4B() and related macros in
+ * postgres.h.  Many datatypes assume that any allocatable size can be
+ * represented in a varlena header.  This limit also permits a caller to use
+ * an "int" variable for an index into or length of an allocation.  Callers
+ * careful to avoid these hazards can access the higher limit with
+ * MemoryContextAllocHuge().  Both limits permit code to assume that it may
+ * compute twice an allocation's size without overflow.
  */
-#define MaxAllocSize	((Size) 0x3fffffff)		/* 1 gigabyte - 1 */
+#define MaxAllocSize	((Size) 0x3fffffff) /* 1 gigabyte - 1 */
 
 #define AllocSizeIsValid(size)	((Size) (size) <= MaxAllocSize)
 
-/*
- * All chunks allocated by any memory context manager are required to be
- * preceded by a StandardChunkHeader at a spacing of STANDARDCHUNKHEADERSIZE.
- * A currently-allocated chunk must contain a backpointer to its owning
- * context as well as the allocated size of the chunk.	The backpointer is
- * used by pfree() and repalloc() to find the context to call.	The allocated
- * size is not absolutely essential, but it's expected to be needed by any
- * reasonable implementation.
- */
-typedef struct StandardChunkHeader
-{
-	MemoryContext context;		/* owning context */
-	Size		size;			/* size of data space allocated in chunk */
-#ifdef MEMORY_CONTEXT_CHECKING
-	/* when debugging memory usage, also store actual requested size */
-	Size		requested_size;
-#endif
-} StandardChunkHeader;
+#define MaxAllocHugeSize	(SIZE_MAX / 2)
 
-#define STANDARDCHUNKHEADERSIZE  MAXALIGN(sizeof(StandardChunkHeader))
+#define AllocHugeSizeIsValid(size)	((Size) (size) <= MaxAllocHugeSize)
 
 
 /*
@@ -67,17 +52,19 @@ typedef struct StandardChunkHeader
  * Only TopMemoryContext and ErrorContext are initialized by
  * MemoryContextInit() itself.
  */
-extern DLLIMPORT MemoryContext TopMemoryContext;
-extern DLLIMPORT MemoryContext ErrorContext;
-extern DLLIMPORT MemoryContext PostmasterContext;
-extern DLLIMPORT MemoryContext CacheMemoryContext;
-extern DLLIMPORT MemoryContext MessageContext;
-extern DLLIMPORT MemoryContext TopTransactionContext;
-extern DLLIMPORT MemoryContext CurTransactionContext;
+extern PGDLLIMPORT MemoryContext TopMemoryContext;
+extern PGDLLIMPORT MemoryContext ErrorContext;
+extern PGDLLIMPORT MemoryContext PostmasterContext;
+extern PGDLLIMPORT MemoryContext CacheMemoryContext;
+extern PGDLLIMPORT MemoryContext MessageContext;
+extern PGDLLIMPORT MemoryContext TopTransactionContext;
+extern PGDLLIMPORT MemoryContext CurTransactionContext;
 
-/* These two are transient links to contexts owned by other objects: */
-extern DLLIMPORT MemoryContext QueryContext;
-extern DLLIMPORT MemoryContext PortalContext;
+/* This is a transient link to the active portal's memory context: */
+extern PGDLLIMPORT MemoryContext PortalContext;
+
+/* Backwards compatibility macro */
+#define MemoryContextResetAndDeleteChildren(ctx) MemoryContextReset(ctx)
 
 
 /*
@@ -86,18 +73,59 @@ extern DLLIMPORT MemoryContext PortalContext;
 extern void MemoryContextInit(void);
 extern void MemoryContextReset(MemoryContext context);
 extern void MemoryContextDelete(MemoryContext context);
+extern void MemoryContextResetOnly(MemoryContext context);
 extern void MemoryContextResetChildren(MemoryContext context);
 extern void MemoryContextDeleteChildren(MemoryContext context);
-extern void MemoryContextResetAndDeleteChildren(MemoryContext context);
+extern void MemoryContextSetParent(MemoryContext context,
+					   MemoryContext new_parent);
 extern Size GetMemoryChunkSpace(void *pointer);
-extern MemoryContext GetMemoryChunkContext(void *pointer);
+extern MemoryContext MemoryContextGetParent(MemoryContext context);
 extern bool MemoryContextIsEmpty(MemoryContext context);
 extern void MemoryContextStats(MemoryContext context);
+extern void MemoryContextStatsDetail(MemoryContext context, int max_children);
+extern void MemoryContextAllowInCriticalSection(MemoryContext context,
+									bool allow);
 
 #ifdef MEMORY_CONTEXT_CHECKING
 extern void MemoryContextCheck(MemoryContext context);
 #endif
 extern bool MemoryContextContains(MemoryContext context, void *pointer);
+
+/*
+ * GetMemoryChunkContext
+ *		Given a currently-allocated chunk, determine the context
+ *		it belongs to.
+ *
+ * All chunks allocated by any memory context manager are required to be
+ * preceded by the corresponding MemoryContext stored, without padding, in the
+ * preceding sizeof(void*) bytes.  A currently-allocated chunk must contain a
+ * backpointer to its owning context.  The backpointer is used by pfree() and
+ * repalloc() to find the context to call.
+ */
+#ifndef FRONTEND
+static inline MemoryContext
+GetMemoryChunkContext(void *pointer)
+{
+	MemoryContext context;
+
+	/*
+	 * Try to detect bogus pointers handed to us, poorly though we can.
+	 * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+	 * allocated chunk.
+	 */
+	Assert(pointer != NULL);
+	Assert(pointer == (void *) MAXALIGN(pointer));
+
+	/*
+	 * OK, it's probably safe to look at the context.
+	 */
+	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+
+	AssertArg(MemoryContextIsValid(context));
+
+	return context;
+}
+#endif
 
 /*
  * This routine handles the context-type-independent part of memory
@@ -121,6 +149,12 @@ extern MemoryContext AllocSetContextCreate(MemoryContext parent,
 					  Size initBlockSize,
 					  Size maxBlockSize);
 
+/* slab.c */
+extern MemoryContext SlabContextCreate(MemoryContext parent,
+				  const char *name,
+				  Size blockSize,
+				  Size chunkSize);
+
 /*
  * Recommended default alloc parameters, suitable for "ordinary" contexts
  * that might hold quite a lot of data.
@@ -128,13 +162,36 @@ extern MemoryContext AllocSetContextCreate(MemoryContext parent,
 #define ALLOCSET_DEFAULT_MINSIZE   0
 #define ALLOCSET_DEFAULT_INITSIZE  (8 * 1024)
 #define ALLOCSET_DEFAULT_MAXSIZE   (8 * 1024 * 1024)
+#define ALLOCSET_DEFAULT_SIZES \
+	ALLOCSET_DEFAULT_MINSIZE, ALLOCSET_DEFAULT_INITSIZE, ALLOCSET_DEFAULT_MAXSIZE
 
 /*
- * Recommended alloc parameters for "small" contexts that are not expected
+ * Recommended alloc parameters for "small" contexts that are never expected
  * to contain much data (for example, a context to contain a query plan).
  */
 #define ALLOCSET_SMALL_MINSIZE	 0
 #define ALLOCSET_SMALL_INITSIZE  (1 * 1024)
 #define ALLOCSET_SMALL_MAXSIZE	 (8 * 1024)
+#define ALLOCSET_SMALL_SIZES \
+	ALLOCSET_SMALL_MINSIZE, ALLOCSET_SMALL_INITSIZE, ALLOCSET_SMALL_MAXSIZE
 
-#endif   /* MEMUTILS_H */
+/*
+ * Recommended alloc parameters for contexts that should start out small,
+ * but might sometimes grow big.
+ */
+#define ALLOCSET_START_SMALL_SIZES \
+	ALLOCSET_SMALL_MINSIZE, ALLOCSET_SMALL_INITSIZE, ALLOCSET_DEFAULT_MAXSIZE
+
+
+/*
+ * Threshold above which a request in an AllocSet context is certain to be
+ * allocated separately (and thereby have constant allocation overhead).
+ * Few callers should be interested in this, but tuplesort/tuplestore need
+ * to know it.
+ */
+#define ALLOCSET_SEPARATE_THRESHOLD  8192
+
+#define SLAB_DEFAULT_BLOCK_SIZE		(8 * 1024)
+#define SLAB_LARGE_BLOCK_SIZE		(8 * 1024 * 1024)
+
+#endif							/* MEMUTILS_H */

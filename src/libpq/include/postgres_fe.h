@@ -8,16 +8,22 @@
  * postgres.h.
  *
  *
- * Portions Copyright (c) 1996-2005, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2017, PostgreSQL Global Development Group
  * Portions Copyright (c) 1995, Regents of the University of California
  *
- * $PostgreSQL: pgsql/src/include/postgres_fe.h,v 1.10 2004/12/31 22:03:19 pgsql Exp $
+ * src/include/postgres_fe.h
  *
  *-------------------------------------------------------------------------
  */
 #ifndef POSTGRES_FE_H
 #define POSTGRES_FE_H
 
+#ifndef FRONTEND
+#define FRONTEND 1
+#endif
+
 #include "c.h"
 
-#endif   /* POSTGRES_FE_H */
+#include "common/fe_memutils.h"
+
+#endif							/* POSTGRES_FE_H */

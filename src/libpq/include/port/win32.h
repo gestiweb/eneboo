@@ -1,55 +1,101 @@
-/* $PostgreSQL: pgsql/src/include/port/win32.h,v 1.49 2005/10/25 15:15:16 tgl Exp $ */
+/* src/include/port/win32.h */
+
+/*
+ * Make sure _WIN32_WINNT has the minimum required value.
+ * Leave a higher value in place. When building with at least Visual
+ * Studio 2015 the minimum requirement is Windows Vista (0x0600) to
+ * get support for GetLocaleInfoEx() with locales. For everything else
+ * the minimum version is Windows XP (0x0501).
+ * Also for VS2015, add a define that stops compiler complaints about
+ * using the old Winsock API.
+ */
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define  _WINSOCK_DEPRECATED_NO_WARNINGS
+#define MIN_WINNT 0x0600
+#else
+#define MIN_WINNT 0x0501
+#endif
+
+#if defined(_WIN32_WINNT) && _WIN32_WINNT < MIN_WINNT
+#undef _WIN32_WINNT
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT MIN_WINNT
+#endif
+
+/*
+ * Always build with SSPI support. Keep it as a #define in case
+ * we want a switch to disable it sometime in the future.
+ */
+#define ENABLE_SSPI 1
 
 /* undefine and redefine after #include */
 #undef mkdir
 
 #undef ERROR
+
+/*
+ * The Mingw64 headers choke if this is already defined - they
+ * define it themselves.
+ */
+#if !defined(__MINGW64_VERSION_MAJOR) || defined(_MSC_VER)
+#define _WINSOCKAPI_
+#endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
-#include <winsock.h>
+#undef small
 #include <process.h>
 #include <signal.h>
 #include <errno.h>
-
+#include <direct.h>
+#include <sys/utime.h>			/* for non-unicode version */
 #undef near
 
 /* Must be here to avoid conflicting with prototype in windows.h */
 #define mkdir(a,b)	mkdir(a)
 
-
-#define HAVE_FSYNC_WRITETHROUGH
-#define HAVE_FSYNC_WRITETHROUGH_ONLY
 #define ftruncate(a,b)	chsize(a,b)
-/*
- *	Even though we don't support 'fsync' as a wal_sync_method,
- *	we do fsync() a few other places where _commit() is just fine.
- */
+
+/* Windows doesn't have fsync() as such, use _commit() */
 #define fsync(fd) _commit(fd)
+
+/*
+ * For historical reasons, we allow setting wal_sync_method to
+ * fsync_writethrough on Windows, even though it's really identical to fsync
+ * (both code paths wind up at _commit()).
+ */
+#define HAVE_FSYNC_WRITETHROUGH
+#define FSYNC_WRITETHROUGH_IS_FSYNC
 
 #define USES_WINSOCK
 
-/* defines for dynamic linking on Win32 platform */
-#if defined(__MINGW32__) || defined(__CYGWIN__)
+/* defines for dynamic linking on Win32 platform
+ *
+ *	http://support.microsoft.com/kb/132044
+ *	http://msdn.microsoft.com/en-us/library/8fskxacy(v=vs.80).aspx
+ *	http://msdn.microsoft.com/en-us/library/a90k134d(v=vs.80).aspx
+ */
 
-#if __GNUC__ && ! defined (__declspec)
-#error You need egcs 1.1 or newer for compiling!
-#endif
+#if defined(WIN32) || defined(__CYGWIN__)
 
 #ifdef BUILDING_DLL
-#define DLLIMPORT __declspec (dllexport)
+#define PGDLLIMPORT __declspec (dllexport)
 #else							/* not BUILDING_DLL */
-#define DLLIMPORT __declspec (dllimport)
+#define PGDLLIMPORT __declspec (dllimport)
 #endif
-#elif defined(WIN32_CLIENT_ONLY)
 
-#if defined(_DLL)
-#define DLLIMPORT __declspec (dllexport)
-#else							/* not _DLL */
-#define DLLIMPORT __declspec (dllimport)
+#ifdef _MSC_VER
+#define PGDLLEXPORT __declspec (dllexport)
+#else
+#define PGDLLEXPORT
 #endif
 #else							/* not CYGWIN, not MSVC, not MingW */
-
-#define DLLIMPORT
+#define PGDLLIMPORT
+#define PGDLLEXPORT
 #endif
+
 
 /*
  *	IPC defines
@@ -65,7 +111,9 @@
 #define IPC_STAT 4096
 
 #define EACCESS 2048
+#ifndef EIDRM
 #define EIDRM 4096
+#endif
 
 #define SETALL 8192
 #define GETNCNT 16384
@@ -73,50 +121,58 @@
 #define SETVAL 131072
 #define GETPID 262144
 
-/*
- *	Shared memory
- */
-struct shmid_ds
-{
-	int			dummy;
-	int			shm_nattch;
-};
-
-int			shmdt(const void *shmaddr);
-void	   *shmat(int memId, void *shmaddr, int flag);
-int			shmctl(int shmid, int flag, struct shmid_ds * dummy);
-int			shmget(int memKey, int size, int flag);
-
 
 /*
- *	Semaphores
+ *	Signal stuff
+ *
+ *	For WIN32, there is no wait() call so there are no wait() macros
+ *	to interpret the return value of system().  Instead, system()
+ *	return values < 0x100 are used for exit() termination, and higher
+ *	values are used to indicated non-exit() termination, which is
+ *	similar to a unix-style signal exit (think SIGSEGV ==
+ *	STATUS_ACCESS_VIOLATION).  Return values are broken up into groups:
+ *
+ *	http://msdn2.microsoft.com/en-gb/library/aa489609.aspx
+ *
+ *		NT_SUCCESS			0 - 0x3FFFFFFF
+ *		NT_INFORMATION		0x40000000 - 0x7FFFFFFF
+ *		NT_WARNING			0x80000000 - 0xBFFFFFFF
+ *		NT_ERROR			0xC0000000 - 0xFFFFFFFF
+ *
+ *	Effectively, we don't care on the severity of the return value from
+ *	system(), we just need to know if it was because of exit() or generated
+ *	by the system, and it seems values >= 0x100 are system-generated.
+ *	See this URL for a list of WIN32 STATUS_* values:
+ *
+ *		Wine (URL used in our error messages) -
+ *			http://source.winehq.org/source/include/ntstatus.h
+ *		Descriptions - http://www.comp.nus.edu.sg/~wuyongzh/my_doc/ntstatus.txt
+ *		MS SDK - http://www.nologs.com/ntstatus.html
+ *
+ *	It seems the exception lists are in both ntstatus.h and winnt.h, but
+ *	ntstatus.h has a more comprehensive list, and it only contains
+ *	exception values, rather than winnt, which contains lots of other
+ *	things:
+ *
+ *		http://www.microsoft.com/msj/0197/exception/exception.aspx
+ *
+ *		The ExceptionCode parameter is the number that the operating system
+ *		assigned to the exception. You can see a list of various exception codes
+ *		in WINNT.H by searching for #defines that start with "STATUS_". For
+ *		example, the code for the all-too-familiar STATUS_ACCESS_VIOLATION is
+ *		0xC0000005. A more complete set of exception codes can be found in
+ *		NTSTATUS.H from the Windows NT DDK.
+ *
+ *	Some day we might want to print descriptions for the most common
+ *	exceptions, rather than printing an include file name.  We could use
+ *	RtlNtStatusToDosError() and pass to FormatMessage(), which can print
+ *	the text of error values, but MinGW does not support
+ *	RtlNtStatusToDosError().
  */
-union semun
-{
-	int			val;
-	struct semid_ds *buf;
-	unsigned short *array;
-};
-
-struct sembuf
-{
-	int			sem_flg;
-	int			sem_op;
-	int			sem_num;
-};
-
-int			semctl(int semId, int semNum, int flag, union semun);
-int			semget(int semKey, int semNum, int flags);
-int			semop(int semId, struct sembuf * sops, int flag);
-
-
-/*
- * Signal stuff
- */
-#define WEXITSTATUS(w)	(((w) >> 8) & 0xff)
-#define WIFEXITED(w)	(((w) & 0xff) == 0)
-#define WIFSIGNALED(w)	(((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
-#define WTERMSIG(w)		((w) & 0x7f)
+#define WIFEXITED(w)	(((w) & 0XFFFFFF00) == 0)
+#define WIFSIGNALED(w)	(!WIFEXITED(w))
+#define WEXITSTATUS(w)	(w)
+#define WTERMSIG(w)		(w)
 
 #define sigmask(sig) ( 1 << ((sig)-1) )
 
@@ -146,11 +202,17 @@ int			semop(int semId, struct sembuf * sops, int flag);
 #define SIGUSR1				30
 #define SIGUSR2				31
 
+/*
+ * New versions of mingw have gettimeofday() and also declare
+ * struct timezone to support it.
+ */
+#ifndef HAVE_GETTIMEOFDAY
 struct timezone
 {
 	int			tz_minuteswest; /* Minutes west of GMT.  */
 	int			tz_dsttime;		/* Nonzero if DST is ever in effect.  */
 };
+#endif
 
 /* for setitimer in backend/port/win32/timer.c */
 #define ITIMER_REAL 0
@@ -159,25 +221,38 @@ struct itimerval
 	struct timeval it_interval;
 	struct timeval it_value;
 };
-int			setitimer(int which, const struct itimerval * value, struct itimerval * ovalue);
 
+int			setitimer(int which, const struct itimerval *value, struct itimerval *ovalue);
+
+/*
+ * WIN32 does not provide 64-bit off_t, but does provide the functions operating
+ * with 64-bit offsets.
+ */
+#define pgoff_t __int64
+#ifdef _MSC_VER
+#define fseeko(stream, offset, origin) _fseeki64(stream, offset, origin)
+#define ftello(stream) _ftelli64(stream)
+#else
+#ifndef fseeko
+#define fseeko(stream, offset, origin) fseeko64(stream, offset, origin)
+#endif
+#ifndef ftello
+#define ftello(stream) ftello64(stream)
+#endif
+#endif
 
 /*
  * Supplement to <sys/types.h>.
  *
- * Perl already has conflicting defines for uid_t and gid_t.
+ * Perl already has typedefs for uid_t and gid_t.
  */
 #ifndef PLPERL_HAVE_UID_GID
 typedef int uid_t;
 typedef int gid_t;
-#else
-/* These are redefined by perl. */
-#define uid_t int
-#define gid_t int
 #endif
 typedef long key_t;
 
-#ifdef WIN32_CLIENT_ONLY
+#ifdef _MSC_VER
 typedef int pid_t;
 #endif
 
@@ -196,26 +271,88 @@ typedef int pid_t;
 
 /*
  * Supplement to <errno.h>.
+ *
+ * We redefine network-related Berkeley error symbols as the corresponding WSA
+ * constants.  This allows elog.c to recognize them as being in the Winsock
+ * error code range and pass them off to pgwin32_socket_strerror(), since
+ * Windows' version of plain strerror() won't cope.  Note that this will break
+ * if these names are used for anything else besides Windows Sockets errors.
+ * See TranslateSocketError() when changing this list.
  */
 #undef EAGAIN
+#define EAGAIN WSAEWOULDBLOCK
 #undef EINTR
 #define EINTR WSAEINTR
-#define EAGAIN WSAEWOULDBLOCK
+#undef EMSGSIZE
 #define EMSGSIZE WSAEMSGSIZE
+#undef EAFNOSUPPORT
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
+#undef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
+#undef ECONNABORTED
+#define ECONNABORTED WSAECONNABORTED
+#undef ECONNRESET
 #define ECONNRESET WSAECONNRESET
+#undef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
+#undef EISCONN
+#define EISCONN WSAEISCONN
+#undef ENOBUFS
 #define ENOBUFS WSAENOBUFS
+#undef EPROTONOSUPPORT
 #define EPROTONOSUPPORT WSAEPROTONOSUPPORT
+#undef ECONNREFUSED
 #define ECONNREFUSED WSAECONNREFUSED
-#define EBADFD WSAENOTSOCK
+#undef ENOTSOCK
+#define ENOTSOCK WSAENOTSOCK
+#undef EOPNOTSUPP
 #define EOPNOTSUPP WSAEOPNOTSUPP
+#undef EADDRINUSE
+#define EADDRINUSE WSAEADDRINUSE
+#undef EADDRNOTAVAIL
+#define EADDRNOTAVAIL WSAEADDRNOTAVAIL
+#undef EHOSTUNREACH
+#define EHOSTUNREACH WSAEHOSTUNREACH
+#undef ENOTCONN
+#define ENOTCONN WSAENOTCONN
+
+/*
+ * Extended locale functions with gratuitous underscore prefixes.
+ * (These APIs are nevertheless fully documented by Microsoft.)
+ */
+#define locale_t _locale_t
+#define tolower_l _tolower_l
+#define toupper_l _toupper_l
+#define towlower_l _towlower_l
+#define towupper_l _towupper_l
+#define isdigit_l _isdigit_l
+#define iswdigit_l _iswdigit_l
+#define isalpha_l _isalpha_l
+#define iswalpha_l _iswalpha_l
+#define isalnum_l _isalnum_l
+#define iswalnum_l _iswalnum_l
+#define isupper_l _isupper_l
+#define iswupper_l _iswupper_l
+#define islower_l _islower_l
+#define iswlower_l _iswlower_l
+#define isgraph_l _isgraph_l
+#define iswgraph_l _iswgraph_l
+#define isprint_l _isprint_l
+#define iswprint_l _iswprint_l
+#define ispunct_l _ispunct_l
+#define iswpunct_l _iswpunct_l
+#define isspace_l _isspace_l
+#define iswspace_l _iswspace_l
+#define strcoll_l _strcoll_l
+#define strxfrm_l _strxfrm_l
+#define wcscoll_l _wcscoll_l
+#define wcstombs_l _wcstombs_l
+#define mbstowcs_l _mbstowcs_l
 
 
 /* In backend/port/win32/signal.c */
-extern DLLIMPORT volatile int pg_signal_queue;
-extern DLLIMPORT int pg_signal_mask;
+extern PGDLLIMPORT volatile int pg_signal_queue;
+extern PGDLLIMPORT int pg_signal_mask;
 extern HANDLE pgwin32_signal_event;
 extern HANDLE pgwin32_initial_signal_pipe;
 
@@ -227,14 +364,11 @@ HANDLE		pgwin32_create_signal_listener(pid_t pid);
 void		pgwin32_dispatch_queued_signals(void);
 void		pg_queue_signal(int signum);
 
-#ifndef FRONTEND
-#define pg_usleep(t) pgwin32_backend_usleep(t)
-void		pgwin32_backend_usleep(long microsec);
-#endif
-
 /* In backend/port/win32/socket.c */
 #ifndef FRONTEND
 #define socket(af, type, protocol) pgwin32_socket(af, type, protocol)
+#define bind(s, addr, addrlen) pgwin32_bind(s, addr, addrlen)
+#define listen(s, backlog) pgwin32_listen(s, backlog)
 #define accept(s, addr, addrlen) pgwin32_accept(s, addr, addrlen)
 #define connect(s, name, namelen) pgwin32_connect(s, name, namelen)
 #define select(n, r, w, e, timeout) pgwin32_select(n, r, w, e, timeout)
@@ -242,19 +376,80 @@ void		pgwin32_backend_usleep(long microsec);
 #define send(s, buf, len, flags) pgwin32_send(s, buf, len, flags)
 
 SOCKET		pgwin32_socket(int af, int type, int protocol);
-SOCKET		pgwin32_accept(SOCKET s, struct sockaddr * addr, int *addrlen);
-int			pgwin32_connect(SOCKET s, const struct sockaddr * name, int namelen);
-int			pgwin32_select(int nfds, fd_set *readfs, fd_set *writefds, fd_set *exceptfds, const struct timeval * timeout);
+int			pgwin32_bind(SOCKET s, struct sockaddr *addr, int addrlen);
+int			pgwin32_listen(SOCKET s, int backlog);
+SOCKET		pgwin32_accept(SOCKET s, struct sockaddr *addr, int *addrlen);
+int			pgwin32_connect(SOCKET s, const struct sockaddr *name, int namelen);
+int			pgwin32_select(int nfds, fd_set *readfs, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout);
 int			pgwin32_recv(SOCKET s, char *buf, int len, int flags);
-int			pgwin32_send(SOCKET s, char *buf, int len, int flags);
+int			pgwin32_send(SOCKET s, const void *buf, int len, int flags);
 
 const char *pgwin32_socket_strerror(int err);
-int			pgwin32_waitforsinglesocket(SOCKET s, int what);
+int			pgwin32_waitforsinglesocket(SOCKET s, int what, int timeout);
 
-/* in backend/port/win32/security.c */
-extern int	pgwin32_is_admin(void);
-extern int	pgwin32_is_service(void);
+extern int	pgwin32_noblock;
+
 #endif
 
-/* in backend/port/win32/error.c */
+/* in backend/port/win32_shmem.c */
+extern int	pgwin32_ReserveSharedMemoryRegion(HANDLE);
+
+/* in backend/port/win32/crashdump.c */
+extern void pgwin32_install_crashdump_handler(void);
+
+/* in port/win32error.c */
 extern void _dosmaperr(unsigned long);
+
+/* in port/win32env.c */
+extern int	pgwin32_putenv(const char *);
+extern void pgwin32_unsetenv(const char *);
+
+/* in port/win32security.c */
+extern int	pgwin32_is_service(void);
+extern int	pgwin32_is_admin(void);
+
+#define putenv(x) pgwin32_putenv(x)
+#define unsetenv(x) pgwin32_unsetenv(x)
+
+/* Things that exist in MingW headers, but need to be added to MSVC */
+#ifdef _MSC_VER
+
+#ifndef _WIN64
+typedef long ssize_t;
+#else
+typedef __int64 ssize_t;
+#endif
+
+typedef unsigned short mode_t;
+
+#define S_IRUSR _S_IREAD
+#define S_IWUSR _S_IWRITE
+#define S_IXUSR _S_IEXEC
+#define S_IRWXU (S_IRUSR | S_IWUSR | S_IXUSR)
+/* see also S_IRGRP etc below */
+#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+
+#define F_OK 0
+#define W_OK 2
+#define R_OK 4
+
+#if (_MSC_VER < 1800)
+#define isinf(x) ((_fpclass(x) == _FPCLASS_PINF) || (_fpclass(x) == _FPCLASS_NINF))
+#define isnan(x) _isnan(x)
+#endif
+
+/* Pulled from Makefile.port in mingw */
+#define DLSUFFIX ".dll"
+
+#endif							/* _MSC_VER */
+
+/* These aren't provided by either MingW or MSVC */
+#define S_IRGRP 0
+#define S_IWGRP 0
+#define S_IXGRP 0
+#define S_IRWXG 0
+#define S_IROTH 0
+#define S_IWOTH 0
+#define S_IXOTH 0
+#define S_IRWXO 0
