@@ -263,7 +263,7 @@ extern long lrand48( void );
 extern void srand48( long seed );
 
 /* Last parameter not used */
-//extern int gettimeofday( struct timeval * tp, struct timezone * tzp );
+extern int gettimeofday( struct timeval * tp, struct timezone * tzp );
 #else       /* !WIN32 */
 
 /*

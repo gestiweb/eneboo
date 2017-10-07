@@ -44,9 +44,7 @@
 #endif
 
 #ifdef HAVE_CRYPT_H
-#ifndef __APPLE__
 #include <crypt.h>
-#endif
 #endif
 
 #include "libpq-fe.h"

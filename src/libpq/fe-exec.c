@@ -1249,10 +1249,6 @@ PQgetResult(PGconn *conn)
 PGresult *
 PQexec(PGconn *conn, const char *query)
 {
-#ifdef FL_SQL_LOG
-	fprintf(stdout,"**********************\n");
-	fprintf(stdout,"%s\n",query);
-#endif
 	if (!PQexecStart(conn))
 		return NULL;
 	if (!PQsendQuery(conn, query))
