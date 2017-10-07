@@ -252,7 +252,7 @@ typedef int gid_t;
 #endif
 typedef long key_t;
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER && !defined(AQ_WIN64)
 typedef int pid_t;
 #endif
 

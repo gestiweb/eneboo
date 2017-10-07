@@ -39,6 +39,8 @@
 #endif
 
 #include "common/md5.h"
+#ifndef __APPLE__
+#endif
 #include "libpq-fe.h"
 #include "libpq/scram.h"
 #include "fe-auth.h"
